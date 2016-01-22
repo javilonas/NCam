@@ -1,0 +1,21 @@
+##TPLJSONHEADER##
+	"status": { 
+	"ucs":"##UCS##",
+	"uca":"##UCA##",
+	"ucac":"##UCAC##",
+	"cfgh":"##CFGH##",
+	"scs":"##SCS##",
+	"sch":"##SCH##",
+	"sca":"##SCA##",
+	"mcs":"##MCS##",
+	"mca":"##MCA##",
+	"rcc":"##RCC##",
+	"rca":"##RCA##",
+	"rco":"##RCO##",
+	"pcc":"##PCC##",
+	"pca":"##PCA##",
+	"pco":"##PCO##",
+	"client":[
+	                          ##JSONSTATUSBITS##
+								]}
+##TPLJSONFOOTER##

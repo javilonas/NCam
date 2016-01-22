@@ -1,0 +1,16 @@
+The idea of devtools directory is to collect tools that are useful for
+NCAm coders during development or tools used in the ncam build.
+
+These tools are not meant to be used by NCAm users.
+
+Currently available tools are:
+
+  check_config_tables.sh                This script checks config tables
+                                        against variable defintions
+                                        in order to find wrong types.
+
+  check_cmdline_opts.sh                 This script checks if all command
+                                        line parameters are properly set.
+
+  extract_config.sh                     This script extracts NCAm build
+                                        config from ncam binary.

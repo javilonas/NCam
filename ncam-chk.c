@@ -706,7 +706,7 @@ int32_t matching_reader(ECM_REQUEST *er, struct s_reader *rdr)
 		return 0;
 	}
 
-	if(!is_network_reader(rdr) && ((rdr->caid >> 8) != ((er->caid >> 8) & 0xFF) && (rdr->caid >> 8) != ((er->ocaid >> 8) & 0xFF)))
+	if(!(rdr->typ == R_EMU) && !is_network_reader(rdr) && ((rdr->caid >> 8) != ((er->caid >> 8) & 0xFF) && (rdr->caid >> 8) != ((er->ocaid >> 8) & 0xFF)))
 	{
 		if (!rdr->csystem)
 			return 0;
@@ -742,7 +742,7 @@ int32_t matching_reader(ECM_REQUEST *er, struct s_reader *rdr)
 	}
 
 	//Checking ident:
-	if(!chk_rfilter(er, rdr))
+	if(!(rdr->typ == R_EMU && (er->caid>>8 == 0x26 || er->caid == 0xFFFF)) && !chk_rfilter(er, rdr))
 	{
 		cs_log_dbg(D_TRACE, "r-filter reader %s", rdr->label);
 		return (0);
@@ -977,7 +977,7 @@ int32_t chk_caid(uint16_t caid, CAIDTAB *ctab)
 
 int32_t chk_caid_rdr(struct s_reader *rdr, uint16_t caid)
 {
-	if(is_network_reader(rdr))
+	if(is_network_reader(rdr) || rdr->typ == R_EMU)
 	{
 		return 1; //reader caid is not real caid
 	}

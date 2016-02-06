@@ -135,6 +135,7 @@ struct s_ecmpids
 	ca_index_t index[MAX_STREAM_INDICES];
 	int8_t useMultipleIndices;
 	uint32_t streams;
+	int16_t pvu_counter;
 };
 
 typedef struct filter_s

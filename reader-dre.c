@@ -2,6 +2,7 @@
 #ifdef READER_DRE
 #include "cscrypt/des.h"
 #include "reader-common.h"
+#include "module-emulator-dre2overcrypt.h"
 
 struct dre_data
 {
@@ -18,6 +19,23 @@ static uchar xor(const uchar *cmd, int32_t cmdlen)
 	for(i = 0; i < cmdlen; i++)
 		{ checksum ^= cmd[i]; }
 	return checksum;
+}
+
+static int8_t isValidDCW(uint8_t *dw)
+{
+	if (((dw[0]+dw[1]+dw[2]) & 0xFF) != dw[3]) {
+		return 0;
+	}
+	if (((dw[4]+dw[5]+dw[6]) & 0xFF) != dw[7]) {
+		return 0;
+	}
+	if (((dw[8]+dw[9]+dw[10]) & 0xFF) != dw[11]) {
+		return 0;
+	}
+	if (((dw[12]+dw[13]+dw[14]) & 0xFF) != dw[15]) {
+		return 0;
+	}
+	return 1;
 }
 
 static int32_t dre_command(struct s_reader *reader, const uchar *cmd, int32_t cmdlen, unsigned char *cta_res, uint16_t *p_cta_lr)       //attention: inputcommand will be changed!!!! answer will be in cta_res, length cta_lr ; returning 1 = no error, return ERROR = err
@@ -146,7 +164,7 @@ static int32_t dre_set_provider_info(struct s_reader *reader)
 					int32_t endday = temp.tm_mday;
 					rdr_log(reader, "active package %i valid from %04i/%02i/%02i to %04i/%02i/%02i", i, startyear, startmonth, startday,
 							endyear, endmonth, endday);
-					cs_add_entitlement(reader, reader->caid, b2ll(4, reader->prid[0]), 0, 0, start, end, 1, 1);
+					cs_add_entitlement(reader, reader->caid, b2ll(4, reader->prid[0]), 0, i, start, end, 1, 1);
 				}
 	}
 	return OK;
@@ -203,6 +221,7 @@ static int32_t dre_card_init(struct s_reader *reader, ATR *newatr)
 	}
 
 	memset(reader->prid, 0x00, 8);
+	reader->prid[0][3] = atr[6];
 
 	static const uchar cmd30[] =
 	{
@@ -269,9 +288,17 @@ static int32_t dre_card_init(struct s_reader *reader, ATR *newatr)
 					  reader->sa[0][3], cs_hexdump(0, reader->hexserial + 2, 4, tmp, sizeof(tmp)));
 
 	reader->nprov = 1;
-
+	
+	if(csystem_data->provider == 0x11)
+	{
+		memset(reader->prid[1], 0x00, 8);
+		reader->prid[1][3] = 0xFE;
+		reader->nprov = 2;
+	}
+	
 	if(!dre_set_provider_info(reader))
 		{ return ERROR; }           //fatal error
+		
 
 	rdr_log(reader, "ready for requests");
 	return OK;
@@ -312,6 +339,8 @@ static void DREover(const unsigned char *ECMdata, unsigned char *DW)
 static int32_t dre_do_ecm(struct s_reader *reader, const ECM_REQUEST *er, struct s_ecm_answer *ea)
 {
 	def_resp;
+	uint16_t overcryptId;
+	uint8_t tmp[16];
 	char tmp_dbg[256];
 	struct dre_data *csystem_data = reader->csystem_data;
 	if(reader->caid == 0x4ae0)
@@ -352,14 +381,33 @@ static int32_t dre_do_ecm(struct s_reader *reader, const ECM_REQUEST *er, struct
 		rdr_log_dbg(reader, D_READER, "unused ECM info front:%s", cs_hexdump(0, er->ecm, 5, tmp_dbg, sizeof(tmp_dbg)));
 		rdr_log_dbg(reader, D_READER, "unused ECM info back:%s", cs_hexdump(0, er->ecm + 37, 4, tmp_dbg, sizeof(tmp_dbg)));
 		ecmcmd51[33] = csystem_data->provider;  //no part of sig
+		
 		if((dre_cmd(ecmcmd51)))     //ecm request
 		{
 			if((cta_res[cta_lr - 2] != 0x90) || (cta_res[cta_lr - 1] != 0x00))
 				{ return ERROR; }       //exit if response is not 90 00
+				
+			if(er->ecm[2] >= 46 && er->ecm[43] == 1)
+			{
+				memcpy(tmp, cta_res + 11, 8);
+				memcpy(tmp + 8, cta_res + 3, 8);
+				overcryptId = b2i(2, &er->ecm[44]);
+				rdr_log_dbg(reader, D_READER, "ICG ID: %04X", overcryptId);
+				Drecrypt2OverCW(overcryptId,tmp);
+				memcpy(ea->cw, tmp, 16);
+				return OK;
+			}
+			
 			DREover(er->ecm, cta_res + 3);
-			memcpy(ea->cw, cta_res + 11, 8);
-			memcpy(ea->cw + 8, cta_res + 3, 8);
-			return OK;
+			
+			if(isValidDCW(cta_res + 3))
+			{
+
+				
+				memcpy(ea->cw, cta_res + 11, 8);
+				memcpy(ea->cw + 8, cta_res + 3, 8);
+				return OK;
+			}
 		}
 	}
 	return ERROR;
@@ -394,6 +442,10 @@ static int32_t dre_get_emm_type(EMM_PACKET *ep, struct s_reader *rdr)
 		memset(ep->hexserial, 0, 8);
 		ep->hexserial[0] = ep->emm[3];
 		return ep->hexserial[0] == rdr->sa[0][0];
+	
+	case 0x91:
+		ep->type = GLOBAL;
+		return 1;
 
 	default:
 		ep->type = UNKNOWN;
@@ -405,7 +457,7 @@ static int32_t dre_get_emm_filter(struct s_reader *rdr, struct s_csystem_emm_fil
 {
 	if(*emm_filters == NULL)
 	{
-		const unsigned int max_filter_count = 7;
+		const unsigned int max_filter_count = 8;
 		if(!cs_malloc(emm_filters, max_filter_count * sizeof(struct s_csystem_emm_filter)))
 			{ return ERROR; }
 
@@ -477,6 +529,12 @@ static int32_t dre_get_emm_filter(struct s_reader *rdr, struct s_csystem_emm_fil
 		filters[idx].mask[0]   = 0xFF;
 		//FIXME: No filter for hexserial
 		idx++;
+		
+		filters[idx].type = EMM_GLOBAL;
+		filters[idx].enabled   = 1;
+		filters[idx].filter[0] = 0x91;
+		filters[idx].mask[0]   = 0xFF;
+		idx++;
 
 		*filter_count = idx;
 	}
@@ -491,6 +549,8 @@ static int32_t dre_do_emm(struct s_reader *reader, EMM_PACKET *ep)
 
 	if(reader->caid == 0x4ae1)
 	{
+		if(reader->caid != b2i(2, ep->caid)) return ERROR;
+				
 		if(ep->type == UNIQUE && ep->emm[39] == 0x3d)
 		{
 			/* For new package activation. */
@@ -502,7 +562,7 @@ static int32_t dre_do_emm(struct s_reader *reader, EMM_PACKET *ep)
 				if((cta_res[cta_lr - 2] != 0x90) || (cta_res[cta_lr - 1] != 0x00))
 					{ return ERROR; }
 		}
-		else
+		else if(ep->emm[4] == 0x02 && csystem_data->provider != 0x11)
 		{
 			uchar emmcmd52[0x3a];
 			emmcmd52[0] = 0x52;
@@ -519,6 +579,45 @@ static int32_t dre_do_emm(struct s_reader *reader, EMM_PACKET *ep)
 						{ return ERROR; } //exit if response is not 90 00
 			}
 		}
+		else if(ep->emm[0] == 0x86 && ep->emm[4] == 0x4D && csystem_data->provider == 0x11)
+		{
+			uchar emmcmd52[0x3a];
+			emmcmd52[0] = 0x52;
+			emmcmd52[1] = 0x01;
+			emmcmd52[2] = ep->emm[5];
+			emmcmd52[3] = 0x01;
+			emmcmd52[4] = ep->emm[3];
+			emmcmd52[5] = 0;
+			emmcmd52[6] = 0;
+			emmcmd52[7] = 0;
+			emmcmd52[9] = 0x01;
+			emmcmd52[10] = 0x01;
+			emmcmd52[11] = 0;
+			memcpy(emmcmd52 + 13, ep->emm + 0x5C, 4);
+			int32_t i;
+			for(i = 0; i < 2; i++)
+			{
+				//memcpy(emmcmd52 + 1, ep->emm + 5 + 32 + i * 56, 56);
+				emmcmd52[8] = ep->emm[0x61+i*0x29];
+				if(i == 0) emmcmd52[12] = ep->emm[0x60] == 0x56 ? 0x56:0x3B;
+				else emmcmd52[12] = ep->emm[0x60] == 0x56 ? 0x3B:0x56;
+				memcpy(emmcmd52 + 0x11, ep->emm + 0x62 + i * 0x29, 40);
+				
+				// check for shared address
+				if(ep->emm[3] != reader->sa[0][0])
+					{ return OK; } // ignore, wrong address
+				emmcmd52[0x39] = csystem_data->provider;
+				if((dre_cmd(emmcmd52)))
+					if((cta_res[cta_lr - 2] != 0x90) || (cta_res[cta_lr - 1] != 0x00))
+						{ return ERROR; } //exit if response is not 90 00
+			}
+		}
+		else if(ep->type == GLOBAL && ep->emm[0] == 0x91)
+		{
+			Drecrypt2OverEMM(ep->emm);
+			return OK;
+		}
+		else return ERROR;
 	}
 	else
 	{

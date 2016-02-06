@@ -35,6 +35,7 @@ int32_t array_has_nonzero_byte(uchar *value, int32_t length);
 void get_random_bytes_init(void);
 void get_random_bytes(uint8_t *dst, uint32_t dst_len);
 
+uint32_t fletcher_crc32(uint8_t *data, uint32_t len);
 unsigned long crc32(unsigned long crc, const unsigned char *buf, unsigned int len);
 uint16_t ccitt_crc(uint8_t *data, size_t length, uint16_t seed, uint16_t final);
 uint32_t jhash(const char *key, size_t len);

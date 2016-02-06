@@ -389,12 +389,12 @@ typedef unsigned char uchar;
 #define CS_ECM_RINGBUFFER_MAX 0x10 // max size for ECM last responsetimes ringbuffer. Keep this set to power of 2 values!
 
 // Support for multiple CWs per channel and other encryption algos
-//#define WITH_EXTENDED_CW 1
+#define WITH_EXTENDED_CW 1
 
 #define MAX_ECM_SIZE 596
-#define MAX_EMM_SIZE 512
+#define MAX_EMM_SIZE 1024
 
-#define CS_EMMCACHESIZE  512 //nr of EMMs that each reader will cache
+#define CS_EMMCACHESIZE  1024 //nr of EMMs that each reader will cache
 #define MSGLOGSIZE 64   //size of string buffer for a ecm to return messages
 
 #define D_TRACE     0x0001  // Generate very detailed error/trace messages per routine
@@ -425,6 +425,7 @@ typedef unsigned char uchar;
 /////////////////// readers that do not reed baudrate setting and timings are guarded by reader itself (large buffer built in): AFTER R_SMART
 #define R_SMART     0x7 // Smartreader+
 #define R_PCSC      0x8 // PCSC
+#define R_EMU       0x17  // Reader emu
 /////////////////// proxy readers after R_CS378X
 #define R_CAMD35    0x20  // Reader cascading camd 3.5x
 #define R_CAMD33    0x21  // Reader cascading camd 3.3x
@@ -849,6 +850,13 @@ typedef struct s_entitlement            // contains entitlement Info
 	uint32_t        class;              // the class needed for some systems
 	time_t          start;              // startdate
 	time_t          end;                // enddate
+#ifdef WITH_EMU
+	bool            isKey;
+	bool            isData;
+	char            name[8];
+	uint8_t         *key;
+	uint32_t        keyLength;
+#endif
 } S_ENTITLEMENT;
 
 struct s_client ;
@@ -972,6 +980,7 @@ struct s_cardsystem
 	void (*post_process)(struct s_reader *);
 	int32_t (*get_emm_type)(struct emm_packet_t *, struct s_reader *);
 	int32_t (*get_emm_filter)(struct s_reader *, struct s_csystem_emm_filter **, unsigned int *);
+	int32_t (*get_emm_filter_adv)(struct s_reader *, struct s_csystem_emm_filter **, unsigned int *, uint16_t, uint32_t, uint16_t);
 	int32_t (*get_tunemm_filter)(struct s_reader *, struct s_csystem_emm_filter **, unsigned int *);
 };
 
@@ -1676,6 +1685,7 @@ struct s_reader                                     //contains device info, read
 #ifdef MODULE_GHTTP
 	uint8_t         ghttp_use_ssl;
 #endif
+	FTAB            emu_auproviders;
 	uint8_t cnxlastecm; // == 0 - las ecm has not been paired ecm, > 0 last ecm has been paired ecm
 	LLIST           *emmstat; //emm stats
 	CS_MUTEX_LOCK   emmstat_lock;
@@ -2143,6 +2153,18 @@ struct s_config
 	IN_ADDR_T   scam_srvip;
 	struct s_ip *scam_allowed;
 #endif
+
+#ifdef WITH_EMU
+	char        *emu_stream_source_host;
+	int32_t     emu_stream_source_port;
+	char        *emu_stream_source_auth_user;
+	char        *emu_stream_source_auth_password;
+	int32_t     emu_stream_relay_port;
+	uint32_t    emu_stream_ecm_delay;
+	int8_t      emu_stream_relay_enabled;
+	int8_t      emu_stream_emm_enabled;
+#endif
+
 	int32_t    max_cache_time;  //seconds ecms are stored in ecmcwcache
 	int32_t    max_hitcache_time;  //seconds hits are stored in cspec_hitcache (to detect dyn wait_time)
 
@@ -2314,5 +2336,7 @@ static inline bool caid_is_nagra(uint16_t caid) { return caid >> 8 == 0x18; }
 static inline bool caid_is_bulcrypt(uint16_t caid) { return caid == 0x5581 || caid == 0x4AEE; }
 static inline bool caid_is_dre(uint16_t caid) { return caid == 0x4AE0 || caid == 0x4AE1;}
 const char *get_cardsystem_desc_by_caid(uint16_t caid);
+
+FILTER* get_emu_prids_for_caid(struct s_reader *rdr, uint16_t caid);
 
 #endif

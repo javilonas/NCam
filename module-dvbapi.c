@@ -1440,7 +1440,15 @@ void dvbapi_start_emm_filter(int32_t demux_index)
 			}
 			if(match)
 			{
-				csystem = get_cardsystem_by_caid(caid);
+				if(rdr->typ == R_EMU)
+				{
+					csystem = rdr->csystem;
+				}
+				else
+				{
+					csystem = get_cardsystem_by_caid(caid);
+				}
+				
 				if(csystem)
 				{
 					if(caid != ncaid)
@@ -1459,7 +1467,14 @@ void dvbapi_start_emm_filter(int32_t demux_index)
 					}
 					else if (csystem->get_emm_filter)
 					{
-						csystem->get_emm_filter(rdr, &dmx_filter, &filter_count);
+						if(rdr->typ == R_EMU)
+						{
+							csystem->get_emm_filter_adv(rdr, &dmx_filter, &filter_count, caid, provid, demux[demux_index].program_number);
+						}
+						else
+						{
+							csystem->get_emm_filter(rdr, &dmx_filter, &filter_count);
+						}
 					}
 				}
 				else
@@ -1560,7 +1575,7 @@ void dvbapi_add_ecmpid_int(int32_t demux_id, uint16_t caid, uint16_t ecmpid, uin
 	demux[demux_id].ECMpids[demux[demux_id].ECMpidcount].table = 0;
 
 	cs_log("Demuxer %d ecmpid %d CAID: %04X ECM_PID: %04X PROVID: %06X %s", demux_id, demux[demux_id].ECMpidcount, caid, ecmpid, provid, txt);
-	if(caid_is_irdeto(caid)) { demux[demux_id].emmstart.time = 1; }  // marker to fetch emms early irdeto needs them!
+	if(caid_is_irdeto(caid) || caid_is_dre(caid)) { demux[demux_id].emmstart.time = 1; }  // marker to fetch emms early irdeto needs them!
 
 	demux[demux_id].ECMpidcount++;
 }
@@ -3038,7 +3053,7 @@ void dvbapi_try_next_caid(int32_t demux_id, int8_t checked)
 				openxcas_set_ecm_pid(demux[demux_id].ECMpids[found].ECM_PID);
 
 				// fixup for cas that need emm first!
-				if(caid_is_irdeto(demux[demux_id].ECMpids[found].CAID)) { demux[demux_id].emmstart.time = 0; }
+				if(caid_is_irdeto(demux[demux_id].ECMpids[found].CAID) || caid_is_dre(demux[demux_id].ECMpids[found].CAID)) { demux[demux_id].emmstart.time = 0; }
 				started = dvbapi_start_descrambling(demux_id, found, checked);
 				if(cfg.dvbapi_requestmode == 0 && started == 1) { return; }  // in requestmode 0 we only start 1 ecm request at the time
 			}
@@ -4287,6 +4302,7 @@ void dvbapi_process_input(int32_t demux_id, int32_t filter_num, uchar *buffer, i
 	if(filtertype == TYPE_ECM)
 	{
 		uint32_t chid = 0x10000;
+		int8_t pvu_skip = 0;
 		ECM_REQUEST *er;
 		
 		if(len != 0)  // len = 0 receiver encountered an internal bufferoverflow!
@@ -4313,11 +4329,26 @@ void dvbapi_process_input(int32_t demux_id, int32_t filter_num, uchar *buffer, i
 				return;
 			}
 
-			if(curpid->table == buffer[0] && !caid_is_irdeto(curpid->CAID))  // wait for odd / even ecm change (only not for irdeto!)
-			{ 
+			if(curpid->CAID>>8 == 0x0E)
+			{
+				pvu_skip = 1;
+				
+				if(sctlen > 0xb)
+				{
+					if(buffer[0xb] > curpid->pvu_counter || (curpid->pvu_counter == 255 && buffer[0xb] == 0)
+							|| ((curpid->pvu_counter - buffer[0xb]) > 5))
+					{
+						curpid->pvu_counter = buffer[0xb];
+						pvu_skip = 0;
+					}
+				}
+			}
+
+			if((curpid->table == buffer[0] && !caid_is_irdeto(curpid->CAID)) || pvu_skip)  // wait for odd / even ecm change (only not for irdeto!)
+			{
 				
 				if(!(er = get_ecmtask()))
-				{ 
+				{
 					return;
 				}
 
@@ -6088,6 +6119,7 @@ void dvbapi_send_dcw(struct s_client *client, ECM_REQUEST *er)
 
 		delayer(er, delay);
 
+		if(er->caid>>8 != 0x0E || !cfg.emu_stream_relay_enabled)
 		switch(selected_api)
 		{
 #if defined(WITH_STAPI) || defined(WITH_STAPI5)

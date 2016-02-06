@@ -398,9 +398,10 @@ void videoguard2_poll_status(struct s_reader *reader)
 	if (now >= reader->last_poll + poll_interval)
 	{
 		static const unsigned char ins5C[5] = { 0xD1, 0x5C, 0x00, 0x00, 0x04 };
+		unsigned char 5cbuff[4] = {0x00, 0x00, 0x00, 0x00};
 		unsigned char cta_res[CTA_RES_LEN];
 		int32_t l;
-		l = do_cmd(reader, ins5C, NULL, NULL, cta_res);
+		l = do_cmd(reader, ins5C, 5cbuff, NULL, cta_res);
 		if (l < 0 || !status_ok(cta_res + l))
 		{
 			rdr_log(reader, "classD1 ins5C: failed");

@@ -360,8 +360,8 @@ typedef unsigned char uchar;
 /* ===========================
  *         constants
  * =========================== */
-#define CS_VERSION    "0.8"
-#define DATE_BUILD    "15-02-2016"
+#define CS_VERSION    "0.9"
+#define DATE_BUILD    "16-02-2016"
 #ifndef CS_SVN_VERSION
 #   define CS_SVN_VERSION "test"
 #endif

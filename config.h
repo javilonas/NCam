@@ -25,7 +25,7 @@
 
 //#define MODULE_CAMD33 1
 //#define MODULE_CAMD35 1
-//#define MODULE_CAMD35_TCP 1
+#define MODULE_CAMD35_TCP 1
 #define MODULE_NEWCAMD 1
 #define MODULE_CCCAM 1
 #define MODULE_CCCSHARE 1

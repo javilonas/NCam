@@ -16,16 +16,16 @@
 #define CS_ANTICASC 1
 //#define WITH_DEBUG 1
 #define WITH_LB 1
-//#define CS_CACHEEX 1
-//#define CW_CYCLE_CHECK 1
+#define CS_CACHEEX 1
+#define CW_CYCLE_CHECK 1
 //#define LCDSUPPORT 1
 //#define LEDSUPPORT 1
 //#define IPV6SUPPORT 1
 //#define MODULE_MONITOR 1
 
 //#define MODULE_CAMD33 1
-//#define MODULE_CAMD35 1
-//#define MODULE_CAMD35_TCP 1
+#define MODULE_CAMD35 1
+#define MODULE_CAMD35_TCP 1
 #define MODULE_NEWCAMD 1
 #define MODULE_CCCAM 1
 #define MODULE_CCCSHARE 1

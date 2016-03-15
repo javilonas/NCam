@@ -834,7 +834,7 @@ void des_ede2_cbc_decrypt(uint8_t* data, const uint8_t* iv, const uint8_t* key1,
 		memcpy(civ[1-n],data,8);
 		des(data, schedule1, 0);
 		des(data, schedule2, 1);
-		des(data, schedule1, 0);		
+		des(data, schedule1, 0);
 		xxor(data,8,data,civ[n]);
 	}
 }

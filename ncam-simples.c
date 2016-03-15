@@ -63,7 +63,7 @@ static char *__get_servicename(struct s_client *cl, uint16_t srvid, uint32_t pro
 	for(this = cfg.srvid[srvid >> 12]; this; this = this->next)
 		if(this->srvid == srvid)
 			for(i = 0; i < this->ncaid; i++)
-			{			
+			{
 				if(this->caid[i].caid == caid && this->name)
 				{
 					provid_any_match = this;
@@ -82,9 +82,9 @@ static char *__get_servicename(struct s_client *cl, uint16_t srvid, uint32_t pro
 							}
 							cs_strncpy(buf, this->name, buflen);
 							return (buf);
-						}					
+						}
 					}
-											
+
 					for(j = 0; j < this->caid[i].nprovid; j++)
 					{
 						if(this->caid[i].provid[j] == 0)
@@ -110,18 +110,18 @@ static char *__get_servicename(struct s_client *cl, uint16_t srvid, uint32_t pro
 		if(provid != 0 && provid_zero_match != NULL)
 		{
 			if(cl)
-			{ 
+			{
 				cl_set_last_providptr(cl, provid, caid);
 				cl->last_srvidptr = provid_zero_match;
 				cl->last_srvidptr_search_provid = provid;
 			}
 			cs_strncpy(buf, provid_zero_match->name, buflen);
-			return (buf);			
-		}		
+			return (buf);
+		}
 		else if(provid == 0 && provid_any_match != NULL)
 		{
 			if(cl)
-			{ 
+			{
 				cl_set_last_providptr(cl, provid, caid);
 				cl->last_srvidptr = provid_any_match;
 				cl->last_srvidptr_search_provid = provid;
@@ -165,7 +165,7 @@ char *get_picon_servicename_or_null(struct s_client *cl, uint16_t srvid, uint32_
 		if(!cs_malloc(&tmp_buf, buflen))
 		{
 			buf[0] = '\0';
-			return (buf);	
+			return (buf);
 		}
 		
 		j = 0;
@@ -182,7 +182,7 @@ char *get_picon_servicename_or_null(struct s_client *cl, uint16_t srvid, uint32_
 				tmp_buf[j] = 's';
 				tmp_buf[j+1] = 't';
 				tmp_buf[j+2] = 'a';
-				tmp_buf[j+3] = 'r';						
+				tmp_buf[j+3] = 'r';
 				j += 4;
 			}
 			else if(buf[i] == '+')
@@ -190,16 +190,16 @@ char *get_picon_servicename_or_null(struct s_client *cl, uint16_t srvid, uint32_
 				tmp_buf[j] = 'p';
 				tmp_buf[j+1] = 'l';
 				tmp_buf[j+2] = 'u';
-				tmp_buf[j+3] = 's';				
+				tmp_buf[j+3] = 's';
 				j += 4;
 			}
 			else if(buf[i] == '&')
 			{
 				tmp_buf[j] = 'a';
 				tmp_buf[j+1] = 'n';
-				tmp_buf[j+2] = 'd';				
+				tmp_buf[j+2] = 'd';
 				j += 3;
-			}						
+			}
 		}
 		
 		tmp_buf[buflen-1] = '\0';
@@ -338,7 +338,7 @@ char *__get_providername(uint32_t provid, uint16_t caid, char *buf, uint32_t buf
 	if(!found && zero_match != NULL)
 	{
 		cs_strncpy(buf, zero_match->prov, buflen);
-		found = 1;		
+		found = 1;
 	}
 
 	if(!buf[0] && return_unknown) { snprintf(buf, buflen, "%04X@%06X unknown", caid, provid); }
@@ -363,7 +363,7 @@ const char *get_cl_lastprovidername(struct s_client *cl)
 	{
 		if(!cl->last_providptr)
 		{
-			return "";	
+			return "";
 		}
 		else
 		{

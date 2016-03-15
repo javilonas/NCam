@@ -29,6 +29,8 @@
 
 #define PING_INTVL     4
 
+int cspsock; // Output Socket
+
 static void *csp_server(struct s_client *client __attribute__((unused)), uchar *mbuf __attribute__((unused)), int32_t n __attribute__((unused)))
 {
 	return NULL;
@@ -195,6 +197,12 @@ static int32_t csp_recv(struct s_client *client, uchar *buf, int32_t l)
 		break;
 
 	case TYPE_PINGREQ:
+		//cs_ddump_mask(D_TRACE, buf, l, "received ping request from csp");
+		buf[0] = TYPE_PINGRPL;
+		int port = buf[11]<<8 | buf[12];
+		SIN_GET_PORT(client->udp_sa) = htons((uint16_t)port);
+		sendto( cspsock, buf, 9, 0, (struct sockaddr *)&client->udp_sa, client->udp_sa_len);
+
 		if(rs >= 13)
 		{
 			client->last = time((time_t *) 0);
@@ -263,6 +271,8 @@ void module_csp(struct s_module *ph)
 {
 	ph->ptab.nports = 1;
 	ph->ptab.ports[0].s_port = cfg.csp_port;
+
+	cspsock = socket(PF_INET,SOCK_DGRAM,IPPROTO_UDP);
 
 	ph->desc = "csp";
 	ph->type = MOD_CONN_UDP;

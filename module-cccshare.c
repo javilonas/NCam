@@ -876,7 +876,7 @@ void merge_sids(struct cc_card *carddst, struct cc_card *cardsrc)
 			while((srvidb = ll_iter_next(&it)))
 			{
 				{ add_sid_block(carddst, (struct cc_srvid*)srvidb, false); }
-			}			
+			}
 		}
 		else
 		{
@@ -886,7 +886,7 @@ void merge_sids(struct cc_card *carddst, struct cc_card *cardsrc)
 			{
 				if(!is_sid_blocked(cardsrc, srvid))
 					{ add_good_sid(carddst, srvid); }
-			}			
+			}
 		}
 	}
 	

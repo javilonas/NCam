@@ -42,12 +42,12 @@ typedef struct cw_t {
 	uint32_t 		count;				//count of same cws receved
 
 	//for push out
-	pthread_rwlock_t    pushout_client_lock;
-	struct s_pushclient *pushout_client;	//list of clients that pushing cw
+	pthread_rwlock_t	pushout_client_lock;
+	struct s_pushclient *pushout_client; //list of clients that pushing cw
 	//end push out
 
-	node		    ht_node;  //node for hash table
-	node		    ll_node;  //node for linked list
+	node			ht_node;  //node for hash table
+	node			ll_node;  //node for linked list
 } CW;
 
 typedef struct cache_t {
@@ -57,8 +57,8 @@ typedef struct cache_t {
 	struct timeb	first_recv_time;  //time of first cw received
 	int32_t			csp_hash;
 
-	node		    ht_node;  //node for hash table
-	node		    ll_node;  //node for linked list
+	node			ht_node;  //node for hash table
+	node			ll_node;  //node for linked list
 } ECMHASH;
 
 
@@ -186,9 +186,9 @@ static bool cwcycle_check_cache(struct s_client *cl, ECM_REQUEST *er, CW *cw)
  * IMPORTANT:
  * 		- If found, DON'T forget to free returned ecm, because it is a copy useful to get data
  * 		- If found, and cacheex_src client of returned ecm is not NULL, and we want to access it,
- *        remember to check for its validity (client structure is still existent)
- *        E.g.: if(ecm->cacheex_src && is_valid_client(ecm->cacheex_src) && !ecm->cacheex_src->kill)
- *        We don't want make this stuff here to avoid useless cpu time if outside function we would not access to it.
+ *		remember to check for its validity (client structure is still existent)
+ *		E.g.: if(ecm->cacheex_src && is_valid_client(ecm->cacheex_src) && !ecm->cacheex_src->kill)
+ *		We don't want make this stuff here to avoid useless cpu time if outside function we would not access to it.
  */
 struct ecm_request_t *check_cache(ECM_REQUEST *er, struct s_client *cl)
 {
@@ -207,9 +207,9 @@ struct ecm_request_t *check_cache(ECM_REQUEST *er, struct s_client *cl)
 		goto out_err;
 
 	if(
-			cw->csp    //csp have no grp!
+			cw->csp //csp have no grp!
 			||
-			!grp		   			     //csp client(no grp) searching for cache
+			!grp //csp client(no grp) searching for cache
 			||
 			(
 			  grp
@@ -426,30 +426,30 @@ void cleanup_cache(bool force){
 
 	i = get_first_node_list(&ll_cache);
 	while (i) {
-	    i_next = i->next;
-	    ecmhash = get_data_from_node(i);
+		i_next = i->next;
+		ecmhash = get_data_from_node(i);
 
 		if(!ecmhash){
 			i = i_next;
-			continue;	
+			continue;
 		}
 		
-	    cs_ftime(&now);
-	    gone_first = comp_timeb(&now, &ecmhash->first_recv_time);
-	    gone_upd = comp_timeb(&now, &ecmhash->upd_time);
+		cs_ftime(&now);
+		gone_first = comp_timeb(&now, &ecmhash->first_recv_time);
+		gone_upd = comp_timeb(&now, &ecmhash->upd_time);
 
-    	if(!force && gone_first<=(cfg.max_cache_time*1000)){ //not continue, useless check for nexts one!
-    		break;
-    	}
+		if(!force && gone_first<=(cfg.max_cache_time*1000)){ //not continue, useless check for nexts one!
+			break;
+		}
 
-    	if(force || gone_upd>(cfg.max_cache_time*1000)){
+		if(force || gone_upd>(cfg.max_cache_time*1000)){
 
-    		j = get_first_node_list(&ecmhash->ll_cw);
-    		while (j) {
-    			j_next = j->next;
+			j = get_first_node_list(&ecmhash->ll_cw);
+			while (j) {
+				j_next = j->next;
 
-    			cw = get_data_from_node(j);
-    			if(cw){
+				cw = get_data_from_node(j);
+				if(cw){
 					pthread_rwlock_destroy(&cw->pushout_client_lock);
 					pc = cw->pushout_client;
 					cw->pushout_client=NULL;
@@ -462,18 +462,18 @@ void cleanup_cache(bool force){
 					remove_elem_list(&ecmhash->ll_cw, &cw->ll_node);
 					remove_elem_hash_table(&ecmhash->ht_cw, &cw->ht_node);
 					NULLFREE(cw);
-    			}
+				}
 
 				j = j_next;
-    		}
+			}
 
-    		deinitialize_hash_table(&ecmhash->ht_cw);
-    		remove_elem_list(&ll_cache, &ecmhash->ll_node);
-    		remove_elem_hash_table(&ht_cache, &ecmhash->ht_node);
-	    	NULLFREE(ecmhash);
-    	}
+			deinitialize_hash_table(&ecmhash->ht_cw);
+			remove_elem_list(&ll_cache, &ecmhash->ll_node);
+			remove_elem_hash_table(&ht_cache, &ecmhash->ht_node);
+			NULLFREE(ecmhash);
+		}
 
-	    i = i_next;
+		i = i_next;
 	}
 
 	SAFE_RWLOCK_UNLOCK(&cache_lock);

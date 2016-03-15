@@ -1002,37 +1002,41 @@ static char *send_ncam_config_cccam(struct templatevars *vars, struct uriparams 
 
 	tpl_printf(vars, TPLADD, "RESHARE", "%d", cfg.cc_reshare);
 
-	if(!strcmp((char *)cfg.cc_version, "2.0.11"))
+	if(!strcmp((char *)cfg.cc_version, "2.0.9"))
 	{
 		tpl_addVar(vars, TPLADD, "VERSIONSELECTED0", "selected");
 	}
-	else if(!strcmp((char *)cfg.cc_version, "2.1.1"))
+	else if(!strcmp((char *)cfg.cc_version, "2.0.11"))
 	{
 		tpl_addVar(vars, TPLADD, "VERSIONSELECTED1", "selected");
 	}
-	else if(!strcmp((char *)cfg.cc_version, "2.1.2"))
+	else if(!strcmp((char *)cfg.cc_version, "2.1.1"))
 	{
 		tpl_addVar(vars, TPLADD, "VERSIONSELECTED2", "selected");
 	}
-	else if(!strcmp((char *)cfg.cc_version, "2.1.3"))
+	else if(!strcmp((char *)cfg.cc_version, "2.1.2"))
 	{
 		tpl_addVar(vars, TPLADD, "VERSIONSELECTED3", "selected");
 	}
-	else if(!strcmp((char *)cfg.cc_version, "2.1.4"))
+	else if(!strcmp((char *)cfg.cc_version, "2.1.3"))
 	{
 		tpl_addVar(vars, TPLADD, "VERSIONSELECTED4", "selected");
 	}
-	else if(!strcmp((char *)cfg.cc_version, "2.2.0"))
+	else if(!strcmp((char *)cfg.cc_version, "2.1.4"))
 	{
 		tpl_addVar(vars, TPLADD, "VERSIONSELECTED5", "selected");
 	}
-	else if(!strcmp((char *)cfg.cc_version, "2.2.1"))
+	else if(!strcmp((char *)cfg.cc_version, "2.2.0"))
 	{
 		tpl_addVar(vars, TPLADD, "VERSIONSELECTED6", "selected");
 	}
-	else if(!strcmp((char *)cfg.cc_version, "2.3.0"))
+	else if(!strcmp((char *)cfg.cc_version, "2.2.1"))
 	{
 		tpl_addVar(vars, TPLADD, "VERSIONSELECTED7", "selected");
+	}
+	else if(!strcmp((char *)cfg.cc_version, "2.3.0"))
+	{
+		tpl_addVar(vars, TPLADD, "VERSIONSELECTED8", "selected");
 	}
 
 	tpl_printf(vars, TPLADD, "UPDATEINTERVAL", "%d", cfg.cc_update_interval);

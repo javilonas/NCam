@@ -2376,6 +2376,8 @@ int32_t cc_parse_msg(struct s_client *cl, uint8_t *buf, int32_t l)
 			if(data[33] == 'M' && data[34] == 'C' && data[35] == 'S')
 			{
 				cc->multics_mode = 2; //multics server finaly confirmed.
+				cc->multics_version[0] = data[37];
+				cc->multics_version[1] = data[38];
 				cs_log_dbg(D_READER, "multics detected: %s!", getprefix());
 			}
 
@@ -2383,6 +2385,8 @@ int32_t cc_parse_msg(struct s_client *cl, uint8_t *buf, int32_t l)
 			if(data[33] == 'N' && data[34] == 'B' && data[35] == 'x')
 			{
 				cc->newbox_mode = 2; //newbox server finaly confirmed.
+				cc->newbox_version[0] = data[37];
+				cc->newbox_version[1] = data[38];
 				cs_log_dbg(D_READER, "newbox detected: %s!", getprefix());
 			}
 

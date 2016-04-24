@@ -361,7 +361,7 @@ typedef unsigned char uchar;
  *         constants
  * =========================== */
 #define CS_VERSION    "1.0"
-#define DATE_BUILD    "15-03-2016"
+#define DATE_BUILD    "25-04-2016"
 #ifndef CS_SVN_VERSION
 #   define CS_SVN_VERSION "stable"
 #endif
@@ -1586,6 +1586,10 @@ struct s_reader                                     //contains device info, read
 	int32_t         emmskipped[4];                  // count skipped EMM
 	int32_t         emmerror[4];                    // count error EMM
 	int32_t         emmblocked[4];                  // count blocked EMM
+	int32_t         webif_emmwritten[4];            // count written EMM for webif reader info
+	int32_t         webif_emmskipped[4];            // count skipped EMM for webif reader info
+	int32_t         webif_emmerror[4];              // count error EMM for reader webif info
+	int32_t         webif_emmblocked[4];            // count blocked EMM for reader webif info
 	int32_t         lbvalue;                        // loadbalance Value
 #endif
 #ifdef WITH_AZBOX
@@ -1648,12 +1652,19 @@ struct s_reader                                     //contains device info, read
 	 	                   	       // (everything below 60 ms is converted to ms by applying *1000)
 	struct timeb    lastdvbapirateoverride;
 	uint32_t        ecmsok;
+	uint32_t        webif_ecmsok;
 	uint32_t        ecmsnok;
+	uint32_t        webif_ecmsnok;
+	uint32_t        ecmstout;
+	uint32_t        webif_ecmstout;
 	uint32_t        ecmnotfoundlimit;                   // config setting. restart reader if ecmsnok >= ecmnotfoundlimit
 	int32_t         ecmsfilteredhead;                   // count filtered ECM's by ECM Headerwhitelist
 	int32_t         ecmsfilteredlen;                    // count filtered ECM's by ECM Whitelist
+	int32_t         webif_ecmsfilteredhead;             // count filtered ECM's by ECM Headerwhitelist to readers ecminfo
+	int32_t         webif_ecmsfilteredlen;              // count filtered ECM's by ECM Whitelist to readers ecm info
 	float           ecmshealthok;
 	float           ecmshealthnok;
+	float           ecmshealthtout;
 	int32_t         cooldown[2];
 	int8_t          cooldownstate;
 	struct timeb    cooldowntime;
@@ -1973,6 +1984,7 @@ struct s_config
 	int8_t          http_showecminfo;
 	int8_t          http_showloadinfo;
 	int8_t          http_showuserinfo;
+	int8_t          http_showreaderinfo;
 	int8_t          http_showcacheexinfo;
 	struct s_ip     *http_allowed;
 	int8_t          http_readonly;
@@ -2047,11 +2059,13 @@ struct s_config
 	int32_t         gbox_reconnect;
 	char            gbox_my_password[9];
 	unsigned long	gbox_proxy_card[CS_GBOX_MAX_PROXY_CARDS];
-	int8_t		gbox_proxy_cards_num;  
+	int8_t		gbox_proxy_cards_num;
 	char            gbox_my_vers[3];
 	char		gbox_my_cpu_api[3];
-	uint8_t		gsms_dis;
-	char            *gbox_tmp_dir;      
+	uint8_t                 gsms_dis;
+	uint8_t                 log_hello;
+	char                    *gbox_tmp_dir;
+	uint8_t                 ccc_reshare;
 #endif
 #ifdef MODULE_SERIAL
 	char            *ser_device;

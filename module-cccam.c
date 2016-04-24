@@ -3958,10 +3958,10 @@ int32_t cc_cli_connect(struct s_client *cl)
 	}
 
 	//detect newbox seed
-	uint8_t a = (data[0]^'N') + data[1] + data[2];
-	uint8_t b = data[4] + (data[5]^'B') + data[6];
-	uint8_t c = data[8] + data[9] + (data[10]^'x');
-	if((a == data[3]) && (b == data[7]) && (c == data[11]))
+	uint8_t d = (data[0]^'N') + data[1] + data[2];
+	uint8_t e = data[4] + (data[5]^'B') + data[6];
+	uint8_t f = data[8] + data[9] + (data[10]^'x');
+	if((d == data[3]) && (e == data[7]) && (f == data[11]))
 	{
 		cc->newbox_mode = 1; //detected newbox seed.
 		cs_log_dbg(D_READER, "newbox seed detected: %s", rdr->label);

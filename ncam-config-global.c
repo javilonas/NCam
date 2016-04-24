@@ -523,6 +523,7 @@ static const struct config_list webif_opts[] =
 	DEF_OPT_INT8("httppiconsize"            , OFS(http_picon_size),         0),
 	DEF_OPT_INT8("httpshowmeminfo"          , OFS(http_showmeminfo),        0),
 	DEF_OPT_INT8("httpshowuserinfo"         , OFS(http_showuserinfo),       0),
+	DEF_OPT_INT8("httpshowreaderinfo"       , OFS(http_showreaderinfo),     0),
 	DEF_OPT_INT8("httpshowcacheexinfo"      , OFS(http_showcacheexinfo),    0),
 	DEF_OPT_INT8("httpshowecminfo"          , OFS(http_showecminfo),        0),
 	DEF_OPT_INT8("httpshowloadinfo"         , OFS(http_showloadinfo),       0),
@@ -919,15 +920,17 @@ static bool gbox_should_save_fn(void *UNUSED(var))
 static const struct config_list gbox_opts[] =
 {
 	DEF_OPT_SAVE_FUNC(gbox_should_save_fn),
-	DEF_OPT_FUNC("port"		, OFS(gbx_port),		gbox_port_fn),
-	DEF_OPT_STR("hostname"		, OFS(gbox_hostname),		NULL),
+	DEF_OPT_FUNC("port"				, OFS(gbx_port),		gbox_port_fn),
+	DEF_OPT_STR("hostname"			, OFS(gbox_hostname),		NULL),
 	DEF_OPT_INT32("gbox_reconnect"	, OFS(gbox_reconnect),		DEFAULT_GBOX_RECONNECT),
-	DEF_OPT_FUNC("proxy_card"	, OFS(gbox_proxy_card),		gbox_proxy_card_fn ),
-	DEF_OPT_SSTR("my_password"	, OFS(gbox_my_password),	"", SIZEOF(gbox_my_password)),
-	DEF_OPT_SSTR("my_vers"		, OFS(gbox_my_vers),		"25", SIZEOF(gbox_my_vers)),
-	DEF_OPT_SSTR("my_cpu_api"	, OFS(gbox_my_cpu_api),		"40", SIZEOF(gbox_my_cpu_api)),
+	DEF_OPT_FUNC("proxy_card"		, OFS(gbox_proxy_card),		gbox_proxy_card_fn ),
+	DEF_OPT_SSTR("my_password"		, OFS(gbox_my_password),	"", SIZEOF(gbox_my_password)),
+	DEF_OPT_SSTR("my_vers"			, OFS(gbox_my_vers),		"25", SIZEOF(gbox_my_vers)),
+	DEF_OPT_SSTR("my_cpu_api"		, OFS(gbox_my_cpu_api),		"40", SIZEOF(gbox_my_cpu_api)),
 	DEF_OPT_UINT8("gsms_disable"	, OFS(gsms_dis),		0),
-	DEF_OPT_STR("tmp_dir"		, OFS(gbox_tmp_dir),		NULL),
+	DEF_OPT_UINT8("ccc_reshare"		, OFS(ccc_reshare),		0),
+	DEF_OPT_UINT8("log_hello"		, OFS(log_hello),		1),
+	DEF_OPT_STR("tmp_dir"			, OFS(gbox_tmp_dir),		NULL),
 	DEF_LAST_OPT
 };
 #else

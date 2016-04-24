@@ -1697,6 +1697,7 @@ int32_t write_ecm_answer(struct s_reader *reader, ECM_REQUEST *er, int8_t rc, ui
 				{ logCWtoFile(er, ea->cw); } /* CWL logging only if cwlogdir is set in config */
 
 			reader->ecmsok++;
+			reader->webif_ecmsok++;
 #ifdef CS_CACHEEX
 			struct s_client *eacl = reader->client;
 			if(cacheex_reader(reader) && check_client(eacl))
@@ -1710,6 +1711,7 @@ int32_t write_ecm_answer(struct s_reader *reader, ECM_REQUEST *er, int8_t rc, ui
 		else if(ea->rc == E_NOTFOUND)
 		{
 			reader->ecmsnok++;
+			reader->webif_ecmsnok++;
 			if(reader->ecmnotfoundlimit && reader->ecmsnok >= reader->ecmnotfoundlimit)
 			{
 				rdr_log(reader, "ECM not found limit reached %u. Restarting the reader.",
@@ -1720,7 +1722,7 @@ int32_t write_ecm_answer(struct s_reader *reader, ECM_REQUEST *er, int8_t rc, ui
 			}
 		}
 
-		// this fixes big oscam mistake - wrong reader status on web info aka not counted timeouts which dispalyed reader info 100 percent OK but reader had a ton of unhandled timeouts!
+		// this fixes big ncam mistake - wrong reader status on web info aka not counted timeouts which dispalyed reader info 100 percent OK but reader had a ton of unhandled timeouts!
 		else if(ea->rc == E_TIMEOUT)
 		{
 #ifdef WITH_LB
@@ -1734,13 +1736,15 @@ int32_t write_ecm_answer(struct s_reader *reader, ECM_REQUEST *er, int8_t rc, ui
 				readerinfofix_inc_fail(s); //now increase fail factor for unhandled timeouts
 			}
 #endif
-			reader->ecmsnok++; //now append timeouts to the readerinfo Total NOK count (aka sum of timeouts + not OK)
+			reader->ecmstout++; //now append timeouts to the readerinfo timeout count
+			reader->webif_ecmstout++;
 		}
 		//Reader ECMs Health Try (by Pickser)
-		if(reader->ecmsok != 0 || reader->ecmsnok != 0)
+		if(reader->ecmsok != 0 || reader->ecmsnok != 0 || reader->ecmstout != 0)
 		{
-			reader->ecmshealthok = ((double) reader->ecmsok / (reader->ecmsok + reader->ecmsnok)) * 100;
-			reader->ecmshealthnok = ((double) reader->ecmsnok / (reader->ecmsok + reader->ecmsnok)) * 100;
+			reader->ecmshealthok = ((double) reader->ecmsok / (reader->ecmsok + reader->ecmsnok + reader->ecmstout)) * 100;
+			reader->ecmshealthnok = ((double) reader->ecmsnok / (reader->ecmsok + reader->ecmsnok + reader->ecmstout)) * 100;
+			reader->ecmshealthtout = ((double) reader->ecmstout / (reader->ecmsok + reader->ecmsnok + reader->ecmstout)) * 100;
 		}
 
 		if(rc == E_FOUND && reader->resetcycle > 0)

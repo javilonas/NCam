@@ -1930,6 +1930,10 @@ static char *send_ncam_reader_config(struct templatevars *vars, struct uriparams
 	tpl_addVar(vars, TPLADD, "FALLBACK_PERCAID", value);
 	free_mk_t(value);
 
+#ifdef WITH_LB
+		tpl_addVar(vars, TPLADD, "LBFORCEFALLBACK", (rdr->lb_force_fallback == 1) ? "checked" : "");
+#endif
+
 #ifdef CS_CACHEEX
 	// Cacheex
 	if(!apicall)

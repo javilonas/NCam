@@ -836,6 +836,7 @@ function updateReaderpage(data) {
 		}
 		if (!is_nopoll('readercol12')) {
 			$(uid + " td.readercol12").text(item.stats.lbweight);
+		}
 
 		if (typeof custompoll == 'function') {
 			custompoll(item);

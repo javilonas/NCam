@@ -16,5 +16,5 @@ echo ""
 export TOOLCHAIN=/home/lonas/toolchains/i686-unknown-linux-gnu/bin/i686-unknown-linux-gnu-
 echo ""
 cmake -DCMAKE_TOOLCHAIN_FILE=../toolchains/toolchain-x86-tuxbox.cmake ..
-make -j6 ARCH=x32 target=x32 CROSS_COMPILE=$TOOLCHAIN
+make USE_PCSC=1 USE_LIBUSB=1 -j6 ARCH=x32 target=x32 CROSS_COMPILE=$TOOLCHAIN
 chmod 755 install_x86.sh > /dev/null 2>&1

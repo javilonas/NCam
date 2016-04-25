@@ -16,5 +16,5 @@ echo ""
 export TOOLCHAIN=/usr/bin/x86_64-linux-gnu-
 echo ""
 cmake -DCMAKE_TOOLCHAIN_FILE=../toolchains/toolchain-x86_64-tuxbox.cmake ..
-make -j6 ARCH=x64 target=x64 CROSS_COMPILE=$TOOLCHAIN
+make USE_PCSC=1 USE_LIBUSB=1 -j6 ARCH=x64 target=x64 CROSS_COMPILE=$TOOLCHAIN
 chmod 755 install_x86_64.sh > /dev/null 2>&1

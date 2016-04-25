@@ -1070,7 +1070,7 @@ static char *send_ncam_config_streamrelay(struct templatevars *vars, struct urip
 		{ tpl_printf(vars, TPLADD, "STREAM_SOURCE_AUTH_PASSWORD", "%s", cfg.emu_stream_source_auth_password); }
 	tpl_printf(vars, TPLADD, "STREAM_RELAY_PORT", "%d", cfg.emu_stream_relay_port);
 	tpl_printf(vars, TPLADD, "STREAM_ECM_DELAY", "%d", cfg.emu_stream_ecm_delay);
-	
+
 	tpl_printf(vars, TPLADD, "TMP", "STREAMRELAYENABLEDSELECTED%d", cfg.emu_stream_relay_enabled);
 	tpl_addVar(vars, TPLADD, tpl_getVar(vars, "TMP"), "selected");
 
@@ -2065,7 +2065,7 @@ static char *send_ncam_reader_config(struct templatevars *vars, struct uriparams
 	free_mk_t(value);
 
 #ifdef WITH_LB
-		tpl_addVar(vars, TPLADD, "LBFORCEFALLBACK", (rdr->lb_force_fallback == 1) ? "checked" : "");
+	tpl_addVar(vars, TPLADD, "LBFORCEFALLBACK", (rdr->lb_force_fallback == 1) ? "checked" : "");
 #endif
 
 #ifdef CS_CACHEEX
@@ -2638,7 +2638,7 @@ static char *send_ncam_reader_stats(struct templatevars *vars, struct uriparams 
 					"not found", "timeout", "sleeping",
 					"fake", "invalid", "corrupt", "no card", "expdate",
 					"disabled", "stopped"
-				   };
+					};
 
 	if(strcmp(getParam(params, "action"), "resetstat") == 0)
 	{
@@ -3378,11 +3378,7 @@ static void webif_add_client_proto(struct templatevars *vars, struct s_client *c
 			{
 				tpl_printf(vars, TPLADD, "CLIENTPROTOTITLE", "Multics, revision r%d", cc->multics_version[0] | (cc->multics_version[1] << 8));
 			}
-			else
-			{
-				tpl_addVar(vars, TPLADD, "CLIENTPROTOTITLE", cc->extended_mode ? cc->remote_ncam : "");
-			}
-			if(cccam_client_newbox_mode(cl))
+			else if(cccam_client_newbox_mode(cl))
 			{
 				tpl_printf(vars, TPLADD, "CLIENTPROTOTITLE", "Newbox, revision r%d", cc->newbox_version[0] | (cc->newbox_version[1] << 8));
 			}
@@ -4757,7 +4753,7 @@ static char *send_ncam_status(struct templatevars * vars, struct uriparams * par
 	if(cfg.http_hide_idle_clients > 0) { tpl_addVar(vars, TPLADD, "HIDEIDLECLIENTSSELECTED1", "selected"); }
 	else { tpl_addVar(vars, TPLADD, "HIDEIDLECLIENTSSELECTED0", "selected"); }
 
-	tpl_addVar(vars, TPLADD, "SRVIDFILE", use_srvid2 ? "ncam.srvid2" : "ncam.srvid");	 
+	tpl_addVar(vars, TPLADD, "SRVIDFILE", use_srvid2 ? "ncam.srvid2" : "ncam.srvid");
 
 	int32_t user_count_all = 0, user_count_shown = 0, user_count_active = 0;
 	int32_t reader_count_all = 0, reader_count_conn = 0, reader_count_off = 0;
@@ -5143,7 +5139,7 @@ static char *send_ncam_status(struct templatevars * vars, struct uriparams * par
 									if(picon_ok) tpl_addVar(vars, TPLADD, "PICONNAME", picon_name);
 								}
 								if(picon_ok)
-								{									
+								{
 									tpl_addVar(vars, TPLADDONCE, "CURRENTPICON", tpl_getTpl(vars, "CLIENTCURRENTCHANNELPIC"));
 								}
 								else
@@ -5205,7 +5201,7 @@ static char *send_ncam_status(struct templatevars * vars, struct uriparams * par
 #ifdef WITH_LB
 							if(rdr->lbvalue)
 							{
-								tpl_printf(vars, TPLADD, "LBLRPSTRVALUE", "%d", rdr->lbvalue);	
+								tpl_printf(vars, TPLADD, "LBLRPSTRVALUE", "%d", rdr->lbvalue);
 							}
 							else
 							{
@@ -5533,7 +5529,7 @@ static char *send_ncam_status(struct templatevars * vars, struct uriparams * par
 	int32_t expired_or_disabled_users = 0;
 	int32_t connected_users = 0;
 	int32_t online_users = 0;
-	
+
 	for(account = cfg.account; (account); account = account->next)
 	{
 		total_users++;
@@ -5650,36 +5646,36 @@ static char *send_ncam_status(struct templatevars * vars, struct uriparams * par
 	{
 		// Debuglevel Selector 
 		int32_t lvl; 
-		for(i = 0; i < MAX_DEBUG_LEVELS; i++) 
-		{ 
+		for(i = 0; i < MAX_DEBUG_LEVELS; i++)
+		{
 			lvl = 1 << i; 
 			tpl_printf(vars, TPLADD, "TMPC", "DCLASS%d", lvl); 
 			tpl_printf(vars, TPLADD, "TMPV", "DEBUGVAL%d", lvl); 
 			if(cs_dblevel & lvl) 
-			{ 
-				tpl_addVar(vars, TPLADD, tpl_getVar(vars, "TMPC"), "debugls"); 
-				tpl_printf(vars, TPLADD, tpl_getVar(vars, "TMPV"), "%d", cs_dblevel - lvl); 
-			} 
-			else 
-			{ 
-				tpl_addVar(vars, TPLADD, tpl_getVar(vars, "TMPC"), "debugl"); 
-				tpl_printf(vars, TPLADD, tpl_getVar(vars, "TMPV"), "%d", cs_dblevel + lvl); 
-			} 
-		} 
+			{
+				tpl_addVar(vars, TPLADD, tpl_getVar(vars, "TMPC"), "debugls");
+				tpl_printf(vars, TPLADD, tpl_getVar(vars, "TMPV"), "%d", cs_dblevel - lvl);
+			}
+			else
+			{
+				tpl_addVar(vars, TPLADD, tpl_getVar(vars, "TMPC"), "debugl");
+				tpl_printf(vars, TPLADD, tpl_getVar(vars, "TMPV"), "%d", cs_dblevel + lvl);
+			}
+		}
 
-		if(cs_dblevel == D_ALL_DUMP) 
-			{ tpl_addVar(vars, TPLADD, "DCLASS65535", "debugls"); } 
-		else 
-			{ tpl_addVar(vars, TPLADD, "DCLASS65535", "debugl"); } 
+		if(cs_dblevel == D_ALL_DUMP)
+			{ tpl_addVar(vars, TPLADD, "DCLASS65535", "debugls"); }
+		else
+			{ tpl_addVar(vars, TPLADD, "DCLASS65535", "debugl"); }
 
-		tpl_addVar(vars, TPLADD, "NEXTPAGE", "status.html"); 
-		tpl_addVar(vars, TPLADD, "DCLASS", "debugl"); //default 
-		tpl_printf(vars, TPLADD, "ACTDEBUG", "%d", cs_dblevel); 
-		tpl_addVar(vars, TPLADD, "SDEBUG", tpl_getTpl(vars, "DEBUGSELECT")); 
+		tpl_addVar(vars, TPLADD, "NEXTPAGE", "status.html");
+		tpl_addVar(vars, TPLADD, "DCLASS", "debugl"); //default
+		tpl_printf(vars, TPLADD, "ACTDEBUG", "%d", cs_dblevel);
+		tpl_addVar(vars, TPLADD, "SDEBUG", tpl_getTpl(vars, "DEBUGSELECT"));
 	}
-#endif 
+#endif
 
-	if(cfg.http_status_log || is_touch)	
+	if(cfg.http_status_log || is_touch)
 		tpl_addVar(vars, TPLADDONCE, "LOG_HISTORY", tpl_getTpl(vars, "LOGHISTORYBIT"));
 
 	if(apicall)
@@ -6024,7 +6020,7 @@ static char *send_ncam_script(struct templatevars * vars, struct uriparams * par
 				if(is_ext(namelist[i]->d_name, ".script") || is_ext(namelist[i]->d_name, ".sh"))
 				{
 					tpl_printf(vars, TPLAPPEND, "SCRIPTOPTIONS", "<option value=\"script.html?scriptname=%s\">%s</option>\n",namelist[i]->d_name,namelist[i]->d_name);
- 				}
+				}
 				free( namelist[i] );
 			}
 			free(namelist);
@@ -6073,7 +6069,7 @@ static char *send_ncam_script(struct templatevars * vars, struct uriparams * par
 		{
 			tpl_printf(vars, TPLADD, "SCRIPTRESULTOUT", "[Error]: Script \"%s\" not found!", scriptname);
 		}
-		
+
 	}
 	return tpl_getTpl(vars, "SCRIPT");
 }
@@ -8080,7 +8076,7 @@ static int32_t process_request(FILE * f, IN_ADDR_T in)
 			if(picon_exists("LOGO")||strlen(tpl_getTpl(vars, "IC_LOGO"))>3)
 			{
 				tpl_addVar(vars, TPLADD, "LOGO_INS", tpl_getTpl(vars, "LOGOBITIMG"));
-			}	
+			}
 			else
 			{
 				tpl_addVar(vars, TPLADD, "LOGO_INS", tpl_getTpl(vars, "LOGOBITSVG"));
@@ -8228,7 +8224,7 @@ static int32_t process_request(FILE * f, IN_ADDR_T in)
 			case 29:
 				result = send_ncam_logpoll(vars, &params);
 				break;
-#endif				
+#endif
 			default:
 				result = send_ncam_status(vars, &params, 0);
 				break;
@@ -8643,9 +8639,9 @@ void webif_init(void)
 		cs_log("http disabled");
 		return;
 	}
-	
+
 	get_config_filename(fname, sizeof(fname), "ncam.srvid2");
-	use_srvid2 = file_exists(fname);		
+	use_srvid2 = file_exists(fname);
 
 	if(start_thread("http", http_server, NULL, &httpthread, 0, 1) == 0)
 	{
@@ -8657,10 +8653,10 @@ void webif_close(void)
 {
 	if(!sock)
 		{ return; }
-		
+
 	shutdown(sock, 2);
 	close(sock);
-	
+
 	if(httpthread_running)
 		{ SAFE_THREAD_JOIN(httpthread, NULL); }
 }

@@ -16,5 +16,5 @@ echo ""
 export TOOLCHAIN=/home/lonas/toolchains/sh4-unknown-linux-gnu/bin/sh4-unknown-linux-gnu-
 echo ""
 cmake -DCMAKE_TOOLCHAIN_FILE=../toolchains/toolchain-sh4-tuxbox.cmake ..
-make -j6 ARCH=sh4 target=sh4 CROSS_COMPILE=$TOOLCHAIN
+make USE_PCSC=1 USE_LIBUSB=1 -j6 ARCH=sh4 target=sh4 CROSS_COMPILE=$TOOLCHAIN
 chmod 755 install_sh4.sh

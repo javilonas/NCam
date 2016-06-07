@@ -51,8 +51,8 @@ typedef struct cw_t {
 } CW;
 
 typedef struct cache_t {
-	hash_table 		ht_cw;
-	list 			ll_cw;
+	hash_table		ht_cw;
+	list			ll_cw;
 	struct timeb	upd_time; //updated time. Update time at each cw got
 	struct timeb	first_recv_time;  //time of first cw received
 	int32_t			csp_hash;
@@ -85,7 +85,7 @@ void free_cache(void){
 uint32_t cache_size(void){
 	if(!cache_init_done)
 		{ return 0; }
-	
+
 	return count_hash_table(&ht_cache);
 }
 
@@ -433,7 +433,7 @@ void cleanup_cache(bool force){
 			i = i_next;
 			continue;
 		}
-		
+
 		cs_ftime(&now);
 		gone_first = comp_timeb(&now, &ecmhash->first_recv_time);
 		gone_upd = comp_timeb(&now, &ecmhash->upd_time);

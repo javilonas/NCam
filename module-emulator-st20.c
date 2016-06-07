@@ -24,13 +24,13 @@
 
 typedef struct 
 {
-  uint32_t Iptr, Wptr;
-  uint8_t *flash, *ram;
-  uint32_t flashSize, ramSize;
-  int32_t sptr, stack[STACKMAX];
-  uint8_t iram[0x1800];
-  int32_t invalid;
-  int32_t verbose;
+	uint32_t Iptr, Wptr;
+	uint8_t *flash, *ram;
+	uint32_t flashSize, ramSize;
+	int32_t sptr, stack[STACKMAX];
+	uint8_t iram[0x1800];
+	int32_t invalid;
+	int32_t verbose;
 } st20_context_t;
 
 
@@ -85,75 +85,75 @@ void st20_wbyte(st20_context_t *ctx, uint32_t off, uint8_t val);
 
 uint32_t st20_get_reg(st20_context_t *ctx, int32_t reg)
 {
-  switch(reg) 
-  {
-    case IPTR: 
-		return ctx->Iptr;
-    case WPTR: 
-		return ctx->Wptr;
-    case AREG: 
-		return AAA;
-    case BREG: 
-		return BBB;
-    case CREG: 
-		return CCC;
-  }
-  return 0;
+	switch(reg) 
+	{
+		case IPTR: 
+			return ctx->Iptr;
+		case WPTR: 
+			return ctx->Wptr;
+		case AREG: 
+			return AAA;
+		case BREG: 
+			return BBB;
+		case CREG: 
+			return CCC;
+	}
+	return 0;
 }
 
 void st20_set_reg(st20_context_t *ctx, int32_t reg, uint32_t val)
 {
-  switch(reg)
-  {
-    case IPTR: ctx->Iptr = val; return;
-    case WPTR: ctx->Wptr = val; return;
-    case AREG: AAA=val; return;
-    case BREG: BBB=val; return;
-    case CREG: CCC=val; return;
-  }
+	switch(reg)
+	{
+		case IPTR: ctx->Iptr = val; return;
+		case WPTR: ctx->Wptr = val; return;
+		case AREG: AAA=val; return;
+		case BREG: BBB=val; return;
+		case CREG: CCC=val; return;
+	}
 }
 
 uint8_t *st20_addr(st20_context_t *ctx, uint32_t off)
 {
-  if(off >= FLASHS && off <= FLASHE) return &ctx->flash[off - FLASHS];
+	if(off >= FLASHS && off <= FLASHE) return &ctx->flash[off - FLASHS];
 
-  else if(off >= RAMS && off <= RAME) return &ctx->ram[off - RAMS];
+	else if(off >= RAMS && off <= RAME) return &ctx->ram[off - RAMS];
 
-  else if(off >= IRAMS && off <= IRAME) return &ctx->iram[off - IRAMS];
+	else if(off >= IRAMS && off <= IRAME) return &ctx->iram[off - IRAMS];
 
-  ctx->invalid = ERRORVAL;
-  return (uint8_t *)&ctx->invalid;
+	ctx->invalid = ERRORVAL;
+	return (uint8_t *)&ctx->invalid;
 
 }
 
 uint32_t st20_rword(st20_context_t *ctx, uint32_t off)
 {
-  return UINT32_LE(st20_addr(ctx, off));
+	return UINT32_LE(st20_addr(ctx, off));
 }
 
 uint16_t st20_rshort(st20_context_t *ctx, uint32_t off)
 {
-  return UINT16_LE(st20_addr(ctx, off));
+	return UINT16_LE(st20_addr(ctx, off));
 }
 
 uint8_t st20_rbyte(st20_context_t *ctx, uint32_t off)
 {
-  return UINT8_LE(st20_addr(ctx, off));
+	return UINT8_LE(st20_addr(ctx, off));
 }
 
 void st20_wword(st20_context_t *ctx, uint32_t off, uint32_t val)
 {
-  BYTE4_LE(st20_addr(ctx, off), val);
+	BYTE4_LE(st20_addr(ctx, off), val);
 }
 
 void st20_wshort(st20_context_t *ctx, uint32_t off, uint16_t val)
 {
-  BYTE2_LE(st20_addr(ctx, off), val);
+	BYTE2_LE(st20_addr(ctx, off), val);
 }
 
 void st20_wbyte(st20_context_t *ctx, uint32_t off, uint8_t val)
 {
-  BYTE1_LE(st20_addr(ctx, off), val);
+	BYTE1_LE(st20_addr(ctx, off), val);
 }
 
 #define OP_COL 20
@@ -161,94 +161,94 @@ void st20_wbyte(st20_context_t *ctx, uint32_t off, uint8_t val)
 
 int32_t st20_decode(st20_context_t *ctx, int32_t count)
 {
-  int32_t operand = 0;
-  
-  CLEAR_OP();
-  while(ctx->Iptr != 0)
-  {
-    int32_t a, op1 = RB(ctx->Iptr++);
-    GET_OP();
-    switch(op1 >> 4)
-    {
-      case 0x0: // j / jump
-        LOG_OP("j");
-        JUMP(operand);
-        CLEAR_OP();
-        break;
-      case 0x1: // ldlp
-        LOG_OP("ldlp");
-        PUSH(ctx->Wptr + (operand * 4));
-        CLEAR_OP();
-        break;
-      case 0x2: // positive prefix
-        LOG_OP("pfix");
-        operand <<= 4;
-        break;
-      case 0x3: // ldnl
-        LOG_OP("ldnl");
-        AAA=RW(AAA + (operand * 4));
-        CLEAR_OP();
-        break;
-      case 0x4: // ldc
-        LOG_OP("ldc");
-        PUSH(operand);
-        CLEAR_OP();
-        break;
-      case 0x5: // ldnlp
-        LOG_OP("ldnlp");
-        PUSHPOP(+, operand * 4);
-        CLEAR_OP();
-        break;
-      case 0x6: // negative prefix
-        LOG_OP("nfix");
-        operand = (~operand) << 4;
-        break;
-      case 0x7: // ldl
-        LOG_OP("ldl");
-        PUSH(RW(ctx->Wptr + (operand * 4)));
-        CLEAR_OP();
-        break;
-      case 0x8: // adc
-        LOG_OP("adc");
-        PUSHPOP(+, operand);
-        CLEAR_OP();
-        break;
-      case 0x9: // call
-        LOG_OP("call");
-        ctx->Wptr -= 16;
-        WW(ctx->Wptr, ctx->Iptr); WW(ctx->Wptr + 4, POP()); WW(ctx->Wptr + 8, POP()); WW(ctx->Wptr + 12, POP());
-        PUSH(ctx->Iptr);
-        JUMP(operand);
-        CLEAR_OP();
-        break;
-      case 0xA: // cj / conditional jump
-        LOG_OP("cj");
-        if(AAA) { DROP(1); } else { JUMP(operand); }
-        CLEAR_OP();
-        break;
-      case 0xB: // ajw / adjust workspace
-        LOG_OP("ajw");
-        ctx->Wptr += operand * 4;
-        CLEAR_OP();
-        break;
-      case 0xC: // eqc / equals constant
-        LOG_OP("eqc");
-        AAA = (operand == AAA ? 1 : 0);
-        CLEAR_OP();
-        break;
-      case 0xD: // stl
-        LOG_OP("stl");
-        WW(ctx->Wptr + (operand * 4), POP());
-        CLEAR_OP();
-        break;
-      case 0xE: // stnl
-        LOG_OP("stnl");
-        a = POP(); WW(a + (operand * 4), POP());
-        CLEAR_OP();
-        break;
-      case 0xF: // opr (secondary ins)
+	int32_t operand = 0;
+
+	CLEAR_OP();
+	while(ctx->Iptr != 0)
+	{
+		int32_t a, op1 = RB(ctx->Iptr++);
+		GET_OP();
+		switch(op1 >> 4)
+		{
+			case 0x0: // j / jump
+				LOG_OP("j");
+				JUMP(operand);
+				CLEAR_OP();
+				break;
+			case 0x1: // ldlp
+				LOG_OP("ldlp");
+				PUSH(ctx->Wptr + (operand * 4));
+				CLEAR_OP();
+				break;
+			case 0x2: // positive prefix
+				LOG_OP("pfix");
+				operand <<= 4;
+				break;
+			case 0x3: // ldnl
+				LOG_OP("ldnl");
+				AAA=RW(AAA + (operand * 4));
+				CLEAR_OP();
+				break;
+			case 0x4: // ldc
+				LOG_OP("ldc");
+				PUSH(operand);
+				CLEAR_OP();
+				break;
+			case 0x5: // ldnlp
+				LOG_OP("ldnlp");
+				PUSHPOP(+, operand * 4);
+				CLEAR_OP();
+				break;
+			case 0x6: // negative prefix
+				LOG_OP("nfix");
+				operand = (~operand) << 4;
+				break;
+			case 0x7: // ldl
+				LOG_OP("ldl");
+				PUSH(RW(ctx->Wptr + (operand * 4)));
+				CLEAR_OP();
+				break;
+			case 0x8: // adc
+				LOG_OP("adc");
+				PUSHPOP(+, operand);
+				CLEAR_OP();
+				break;
+			case 0x9: // call
+				LOG_OP("call");
+				ctx->Wptr -= 16;
+				WW(ctx->Wptr, ctx->Iptr); WW(ctx->Wptr + 4, POP()); WW(ctx->Wptr + 8, POP()); WW(ctx->Wptr + 12, POP());
+				PUSH(ctx->Iptr);
+				JUMP(operand);
+				CLEAR_OP();
+				break;
+			case 0xA: // cj / conditional jump
+				LOG_OP("cj");
+				if(AAA) { DROP(1); } else { JUMP(operand); }
+				CLEAR_OP();
+				break;
+			case 0xB: // ajw / adjust workspace
+				LOG_OP("ajw");
+				ctx->Wptr += operand * 4;
+				CLEAR_OP();
+				break;
+			case 0xC: // eqc / equals constant
+				LOG_OP("eqc");
+				AAA = (operand == AAA ? 1 : 0);
+				CLEAR_OP();
+				break;
+			case 0xD: // stl
+				LOG_OP("stl");
+				WW(ctx->Wptr + (operand * 4), POP());
+				CLEAR_OP();
+				break;
+			case 0xE: // stnl
+				LOG_OP("stnl");
+				a = POP(); WW(a + (operand * 4), POP());
+				CLEAR_OP();
+				break;
+			case 0xF: // opr (secondary ins)
 		switch(operand)
-        {
+		{
 			case  0x00: LOG_OP("rev");   a = AAA; AAA = BBB; BBB = a; break;
 			case  0x01: LOG_OP("lb");    AAA = RB(AAA); break;
 			case  0x02: LOG_OP("bsub");  PUSHPOP(+, POP()); break;
@@ -265,7 +265,7 @@ int32_t st20_decode(st20_context_t *ctx, int32_t count)
 			case  0x1F: LOG_OP("rem");   PUSHPOP(%, POP()); break;
 			case  0x20: LOG_OP("ret");   ctx->Iptr = RW(ctx->Wptr); ctx->Wptr = ctx->Wptr + 16; break;
 			case  0x2C: 
-					LOG_OP("div");   
+					LOG_OP("div");
 					PUSHPOP( /, POP());
 					break;
 			case  0x30: LOG_OP("nop");   break;
@@ -287,67 +287,67 @@ int32_t st20_decode(st20_context_t *ctx, int32_t count)
 			case  0x5F: LOG_OP("gtu");   a = POP(); AAA = ((uint32_t)AAA > (uint32_t)a); break;
 			case  0x78: LOG_OP("bitrevnbits");  { a = POP(); int32_t b = POP(); int32_t bb = 0; while(a--){bb <<= 1; bb |= b & 1; b >>= 1;} PUSH(bb);} break;
 			case  0xCA: LOG_OP("ls");  AAA = st20_rshort(ctx, AAA); break;
-	  default: 
-            //printf("unknown opcode %X\n", operand);
-            cs_log("[icg] unknown opcode %X", operand);
-            return ERR_ILL_OP;
-	  }
+		default:
+			//printf("unknown opcode %X\n", operand);
+			cs_log("[icg] unknown opcode %X", operand);
+			return ERR_ILL_OP;
+		}
 	CLEAR_OP();
 	break;
-  }
+	}
 
-  if(--count <= 0 && operand == 0)
-  {
-      return ERR_CNT;
-  }
+	if(--count <= 0 && operand == 0)
+	{
+		return ERR_CNT;
+	}
 }
-  return 0;
+	return 0;
 }
 
 void st20_set_flash(st20_context_t *ctx, uint8_t *m, int32_t len)
 {
-  if(ctx->flash) free(ctx->flash);
-  ctx->flash = malloc(len);
-  if(ctx->flash && m) memcpy(ctx->flash, m, len);
-  else memset(ctx->flash, 0, len);
-  ctx->flashSize = len;
+	if(ctx->flash) free(ctx->flash);
+	ctx->flash = malloc(len);
+	if(ctx->flash && m) memcpy(ctx->flash, m, len);
+	else memset(ctx->flash, 0, len);
+	ctx->flashSize = len;
 }
 
 void st20_set_ram(st20_context_t *ctx, uint8_t *m, int32_t len)
 {
-  if(ctx->ram) free(ctx->ram);
-  ctx->ram = malloc(len);
-  if(ctx->ram && m) memcpy(ctx->ram, m, len);
-  else memset(ctx->ram, 0, len);
-  ctx->ramSize = len;
+	if(ctx->ram) free(ctx->ram);
+	ctx->ram = malloc(len);
+	if(ctx->ram && m) memcpy(ctx->ram, m, len);
+	else memset(ctx->ram, 0, len);
+	ctx->ramSize = len;
 }
 
 void st20_init(st20_context_t *ctx, uint32_t IPtr, uint32_t WPtr, int32_t verbose)
 {
-  ctx->Wptr = WPtr; ctx->Iptr = IPtr;
-  memset(ctx->stack, INVALID_VALUE, sizeof(ctx->stack)); ctx->sptr = STACKMAX - 3;
-  memset(ctx->iram, 0, sizeof(ctx->iram));
-  ctx->verbose = verbose;
+	ctx->Wptr = WPtr; ctx->Iptr = IPtr;
+	memset(ctx->stack, INVALID_VALUE, sizeof(ctx->stack)); ctx->sptr = STACKMAX - 3;
+	memset(ctx->iram, 0, sizeof(ctx->iram));
+	ctx->verbose = verbose;
 }
 
 void st20_free(st20_context_t *ctx)
 {
-  if(ctx->flash) free(ctx->flash);
-  if(ctx->ram) free(ctx->ram);
-  ctx->flash = NULL;
-  ctx->ram = NULL;
+	if(ctx->flash) free(ctx->flash);
+	if(ctx->ram) free(ctx->ram);
+	ctx->flash = NULL;
+	ctx->ram = NULL;
 }
 
 void st20_set_call_frame(st20_context_t *ctx, uint32_t raddr, int32_t p1, int32_t p2, int32_t p3)
 {
-  ctx->Wptr -= 16;
-  st20_wword(ctx, ctx->Wptr, raddr); // RET
-  st20_wword(ctx, ctx->Wptr + 4, p1);  //Areg
-  st20_wword(ctx, ctx->Wptr + 8, p1);  //Breg
-  st20_wword(ctx, ctx->Wptr + 12, p1); //Creg
-  st20_wword(ctx, ctx->Wptr + 16, p2);
-  st20_wword(ctx, ctx->Wptr + 20, p3);
-  st20_set_reg(ctx, AREG, raddr);    // RET
+	ctx->Wptr -= 16;
+	st20_wword(ctx, ctx->Wptr, raddr); // RET
+	st20_wword(ctx, ctx->Wptr + 4, p1);  //Areg
+	st20_wword(ctx, ctx->Wptr + 8, p1);  //Breg
+	st20_wword(ctx, ctx->Wptr + 12, p1); //Creg
+	st20_wword(ctx, ctx->Wptr + 16, p2);
+	st20_wword(ctx, ctx->Wptr + 20, p3);
+	st20_set_reg(ctx, AREG, raddr);    // RET
 }
 
 int32_t st20_run(uint8_t* snip, uint32_t snip_len, int32_t addr, uint8_t *data, uint16_t overcryptId)
@@ -357,7 +357,7 @@ int32_t st20_run(uint8_t* snip, uint32_t snip_len, int32_t addr, uint8_t *data, 
 
 	//printf("exec_snip addr = 0x%X\n", addr);
 	cs_log("[icg] decrypt address = 0x%X, id = %04X", addr, overcryptId);
-	
+
 	//printf("CW: "); for(i = 0; i < 16; i++) printf("%02X ", data[i]); printf("\n");
 	cs_log("[icg] CW: %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X "
 											,data[0], data[1], data[2] , data[3] , data[4] , data[5] , data[6] , data[7]
@@ -376,12 +376,11 @@ int32_t st20_run(uint8_t* snip, uint32_t snip_len, int32_t addr, uint8_t *data, 
 		for(i = 0; i < 8; i++) data[i+n*8] = st20_rbyte(&ctx, RAMS + i);
 		st20_free(&ctx);
 	}
-	
+
 	//printf("DW: "); for(i = 0; i < 16; i++) printf("%02X ", data[i]); printf("\n");
 	cs_log("[icg] DW: %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X "
 											,data[0], data[1], data[2] , data[3] , data[4] , data[5] , data[6] , data[7]
 											,data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15]);
-	
 
 	if(error < 0)
 	{

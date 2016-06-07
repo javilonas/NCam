@@ -343,7 +343,7 @@ static void save_stat_to_file_thread(void)
 		if(rdr->lb_stat)
 		{
 			rdr->lb_stat_busy = 1;
-			
+
 			cs_writelock(__func__, &rdr->lb_stat_lock);
 			LL_ITER it = ll_iter_create(rdr->lb_stat);
 			READER_STAT *s;
@@ -412,7 +412,7 @@ static READER_STAT *get_add_stat(struct s_reader *rdr, STAT_QUERY *q)
 {
 	if (rdr->lb_stat_busy)
 		return NULL;
-		
+
 	if(!rdr->lb_stat)
 	{
 		rdr->lb_stat = ll_create("lb_stat");
@@ -596,7 +596,7 @@ static void add_stat(struct s_reader *rdr, ECM_REQUEST *er, int32_t ecm_time, in
 
 	struct timeb now;
 	cs_ftime(&now);
-	
+
 	cs_ftime(&s->last_received);
 
 	if(rc == E_FOUND)    //found
@@ -720,7 +720,7 @@ int32_t clean_stat_by_id(struct s_reader *rdr, uint16_t caid, uint32_t prid, uin
 	if(rdr && rdr->lb_stat)
 	{
 		if (rdr->lb_stat_busy) return 0;
-		
+
 		rdr->lb_stat_busy = 1;
 		cs_writelock(__func__, &rdr->lb_stat_lock);
 		READER_STAT *s;
@@ -1438,7 +1438,7 @@ void stat_get_best_reader(ECM_REQUEST *er)
 				if(retrylimit)
 				{
 					if(s->time_avg > retrylimit){  //set lowest value for reader with time-avg>retrylimit
-  					   current = s->time_avg;   //in this way, it will choose best time-avg reader among the worst ones
+					   current = s->time_avg;   //in this way, it will choose best time-avg reader among the worst ones
 					}else{
 					   current = current - 1;   //so when all have same current, it prioritizes the one with s->time_avg<=retrylimit! This avoid a loop!
 					}
@@ -1528,7 +1528,7 @@ void stat_get_best_reader(ECM_REQUEST *er)
 			nlocal_readers--;
 			reader_active++;
 			best->status |= READER_ACTIVE;
-		    best->value = 0;
+			best->value = 0;
 			cs_log_dbg(D_LB, "loadbalancer: reader %s --> ACTIVE", best_rdri->label);
 		}
 		else if(nbest_readers)   //primary readers, other
@@ -1536,7 +1536,7 @@ void stat_get_best_reader(ECM_REQUEST *er)
 			nbest_readers--;
 			reader_active++;
 			best->status |= READER_ACTIVE;
-		    best->value = 0;
+			best->value = 0;
 			cs_log_dbg(D_LB, "loadbalancer: reader %s --> ACTIVE", best_rdri->label);
 		}
 		else

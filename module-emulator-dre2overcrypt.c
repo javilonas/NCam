@@ -472,7 +472,7 @@ static int32_t load_sections(uint8_t *body)
 		i+=3;
 		memcpy(&sect_len, section + 1, 2);
 		sect_len = ntohs(sect_len) & 0xfff;
-		
+
 		memcpy(section + 3, raw_buffer.data+i, sect_len);
 		i+=sect_len;
 
@@ -484,7 +484,7 @@ static int32_t load_sections(uint8_t *body)
 		{
 			continue;
 		}
-		
+
 		//table_id_extension = (section[3] << 8) | section[4];
 		//version = (section[5] & 0x3e) >> 1;
 		//current_next_indicator = section[5] & 1;
@@ -507,7 +507,7 @@ static int32_t load_sections(uint8_t *body)
 		}
 		if(curr_sect_no > last_sect_no) break;
 	}
-	
+
 	return total_body_len;
 }
 
@@ -551,7 +551,7 @@ void Drecrypt2OverCW(uint16_t overcryptId, uint8_t *cw)
 void Drecrypt2OverEMM(uint8_t *emm)
 {
 	uint32_t dataLen;
-	
+
 	if(gVersion == (emm[5] & 0x3e) >> 1)
 	{
 		return;
@@ -601,37 +601,37 @@ void Drecrypt2OverEMM(uint8_t *emm)
 
 	int32_t patch_len, rcu_len, len, snip_len;
 	uint8_t *buf = malloc(0x1000), *snip = malloc(0x10000), *rcu = malloc(0x10000), *patch = malloc(0x10000);
-	
-	if(buf == NULL || snip == NULL || rcu == NULL || patch == NULL) {printf("can't allocate memory\n"); return;}
-	
-    snip_len = (initial_snippet[4] << 24) | (initial_snippet[5] << 16) | (initial_snippet[6] << 8) | initial_snippet[7];
-    
-    if(dre_unpack(snip, initial_snippet + 8, sizeof(initial_snippet) - 8) >= snip_len)
-    {
-      len = load_sections(buf);
 
-      patch_len = (buf[14] << 24) | (buf[15] << 16) | (buf[16] << 8) | buf[17];
-      if(dre_unpack(patch, buf + 18, len - 18) >= patch_len)
-      {
-        rcu_len = bspatch(rcu, snip, snip_len, patch);
-        if(rcu_len > 0)
-        {
-          rcu_load(rcu);
-          allocate_data_block(&code_buffer,rcu_len);
-          memcpy(code_buffer.data, rcu, rcu_len);
-          code_buffer.used = (uint32_t) rcu_len;
-        }
-      }
-    }
-    
+	if(buf == NULL || snip == NULL || rcu == NULL || patch == NULL) {printf("can't allocate memory\n"); return;}
+
+	snip_len = (initial_snippet[4] << 24) | (initial_snippet[5] << 16) | (initial_snippet[6] << 8) | initial_snippet[7];
+
+	if(dre_unpack(snip, initial_snippet + 8, sizeof(initial_snippet) - 8) >= snip_len)
+	{
+		len = load_sections(buf);
+
+		patch_len = (buf[14] << 24) | (buf[15] << 16) | (buf[16] << 8) | buf[17];
+		if(dre_unpack(patch, buf + 18, len - 18) >= patch_len)
+		{
+			rcu_len = bspatch(rcu, snip, snip_len, patch);
+			if(rcu_len > 0)
+			{
+				rcu_load(rcu);
+				allocate_data_block(&code_buffer,rcu_len);
+				memcpy(code_buffer.data, rcu, rcu_len);
+				code_buffer.used = (uint32_t) rcu_len;
+			}
+		}
+	}
+
 	//gId = (raw_buffer.data[13] << 8) | raw_buffer.data[14];
 	//gVersion = (emm[5] & 0x3e) >> 1;
-	
+
 	free(buf);
 	free(snip);
 	free(rcu);
 	free(patch);
-	
+
 	cs_log("[icg] snippet patch created. ICG algo %04X", gId);
 }
 

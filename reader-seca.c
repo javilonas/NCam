@@ -18,7 +18,7 @@ static uint64_t get_pbm(struct s_reader *reader, uint8_t idx)
 	unsigned char ins34[] = { 0xc1, 0x34, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00}; // set request options
 	unsigned char ins32[] = { 0xc1, 0x32, 0x00, 0x00, 0x0A };             // get PBM
 	uint64_t pbm = 0;
-         
+
 	ins32[2] = idx;
 	if (!idx){ // change request options for first (=managment) provider only
 		ins32[4] = 0x0D;
@@ -130,9 +130,9 @@ static int32_t get_maturity(struct s_reader *reader)
 {
 	// Get maturity on card
 	static const uchar ins16[] = { 0xC1, 0x16, 0x00, 0x00, 0x06 };
-	
+
 	def_resp;
-	
+
 	write_cmd(ins16, NULL);
 	if((cta_res[cta_lr - 2] == 0x90) && cta_res[cta_lr - 1] == 0x00)
 	{
@@ -146,7 +146,7 @@ static int32_t get_maturity(struct s_reader *reader)
 			{
 				rdr_log(reader, "Maturity level [%X]=no age limit", reader->maturity);
 			}
-	}	
+	}
 	rdr_log_dbg(reader, D_READER, "ins30_answer: %02x%02x", cta_res[0], cta_res[1]);
 	return 0;
 }
@@ -264,14 +264,14 @@ static int32_t seca_card_init(struct s_reader *reader, ATR *newatr)
 	{
 		rdr_log_dbg(reader, D_IFD, "parental locked");
 	}
-	
+
 	struct seca_data *csystem_data = reader->csystem_data;
 	//init ideakeys
 	unsigned char IdeaKey[16];
 	memcpy(IdeaKey, reader->boxkey, 16);
 	idea_set_encrypt_key(IdeaKey, &csystem_data->ks);
 	idea_set_decrypt_key(&csystem_data->ks, &csystem_data->ksSession);
-	
+
 	return OK;
 }
 
@@ -372,10 +372,10 @@ static int32_t seca_do_ecm(struct s_reader *reader, const ECM_REQUEST *er, struc
 	//TODO: if response is 9027 ppv mode is possible!
 	
 	if (er->ecm[5]==0x01 && ((reader->card_atr[9] & 0X0F) == 10)) // seca3: nano 01 in effect?
-	{ 
-		
+	{
+
 		if(reader->boxkey_length == 16)
-		{	
+		{
 			unsigned char v[8];
 			memset(v, 0, sizeof(v));
 			idea_cbc_encrypt(cta_res, ea->cw, 8, &csystem_data->ksSession, v, IDEA_DECRYPT);
@@ -589,7 +589,7 @@ static int32_t seca_card_info(struct s_reader *reader)
 		pmap = cta_res[2] << 8 | cta_res[3];
 		for(reader->nprov = 0, i = pmap; i; i >>= 1)
 			{ reader->nprov += i & 1; }
-		
+
 		if(reader->nprov == 0)
 		{
 			tries++;

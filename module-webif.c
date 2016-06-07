@@ -915,11 +915,11 @@ static char *send_ncam_config_cache(struct templatevars *vars, struct uriparams 
 	value = mk_t_cacheex_hitvaluetab(&cfg.csp.filter_caidtab);
 	tpl_addVar(vars, TPLADD, "CSP_ECM_FILTER", value);
 	free_mk_t(value);
-	
+
 	value = mk_t_cacheex_cwcheck_valuetab(&cfg.cacheex_cwcheck_tab);
 	tpl_addVar(vars, TPLADD, "CACHEEXCWCHECK", value);
 	free_mk_t(value);
-	
+
 	tpl_addVar(vars, TPLADD, "ARCHECKED", (cfg.csp.allow_request == 1) ? "checked" : "");
 	tpl_addVar(vars, TPLADD, "ARFCHECKED", (cfg.csp.allow_reforward == 1) ? "checked" : "");
 	tpl_addVar(vars, TPLADD, "BLOCKFAKECWSCHECKED", (cfg.csp.block_fakecws == 1) ? "checked" : "");
@@ -929,9 +929,9 @@ static char *send_ncam_config_cache(struct templatevars *vars, struct uriparams 
 #ifndef CS_CACHEEX
 	char *value = NULL;
 #endif
-	
+
 	tpl_addVar(vars, TPLADD, "CWCYCLECHECK", (cfg.cwcycle_check_enable == 1) ? "checked" : "");
-	
+
 	value = mk_t_caidtab(&cfg.cwcycle_check_caidtab);
 	tpl_addVar(vars, TPLADD, "CWCYCLECHECKCAID", value);
 	free_mk_t(value);
@@ -954,10 +954,10 @@ static char *send_ncam_config_cache(struct templatevars *vars, struct uriparams 
 	}
 
 	tpl_addVar(vars, TPLADD, "ALLOWBADFROMFFB", (cfg.cwcycle_allowbadfromffb == 1) ? "checked" : "");
-	
+
 	tpl_addVar(vars, TPLADD, "USECWCFROMCE", (cfg.cwcycle_usecwcfromce == 1) ? "checked" : "");
 
-	
+
 #endif
 
 	return tpl_getTpl(vars, "CONFIGCACHE");
@@ -1743,7 +1743,7 @@ static char *send_ncam_reader(struct templatevars *vars, struct uriparams *param
 			}
 			else
 				tpl_addVar(vars, TPLADD, "READERBIT", tpl_getTpl(vars, "READERLABEL"));
-			
+
 			char *value = mk_t_group(rdr->grp);
 			tpl_addVar(vars, TPLADD, "GROUPS", value);
 			free_mk_t(value);
@@ -2010,7 +2010,7 @@ static char *send_ncam_reader_config(struct templatevars *vars, struct uriparams
 
 	// Receive timeout
 	tpl_printf(vars, TPLADD, "RECEIVETIMEOUT", "%d", rdr->tcp_rto);
-	
+
 	// keepalive
 	tpl_addVar(vars, TPLADD, "RDRKEEPALIVE", (rdr->keepalive == 1) ? "checked" : "");
 
@@ -4079,7 +4079,7 @@ static void print_cards(struct templatevars *vars, struct uriparams *params, str
 						tpl_printf(vars, TPLAPPEND, "SERVICESGOOD", "%04X - %s<BR>", srv->sid, xml_encode(vars, get_servicename(cur_client(), srv->sid, 0, card->caid, channame, sizeof(channame))));
 					} else {
 						tpl_printf(vars, TPLAPPEND, "SERVICESGOOD", "%04X%s", srv->sid, ++n % 10 == 0 ? "<BR>\n" : " ");
-					} 	
+					}
 				}
 
 				its = ll_iter_create(card->badsids);
@@ -4092,7 +4092,7 @@ static void print_cards(struct templatevars *vars, struct uriparams *params, str
 						tpl_printf(vars, TPLAPPEND, "SERVICESBAD", "%04X - %s<BR>", srv->sid, xml_encode(vars, get_servicename(cur_client(), srv->sid, 0, card->caid, channame, sizeof(channame))));
 					} else {
 						tpl_printf(vars, TPLAPPEND, "SERVICESBAD", "%04X%s", srv->sid, ++n % 10 == 0 ? "<BR>\n" : " ");
-					} 	
+					}
 				}
 			}
 
@@ -4337,7 +4337,7 @@ static char *send_ncam_entitlement(struct templatevars *vars, struct uriparams *
 
 							if((strcmp(getParam(params, "hideexpired"), "1") != 0) || (item->end > now))
 								{ tpl_addVar(vars, TPLAPPEND, "READERENTENTRY", tpl_getTpl(vars, "ENTITLEMENTITEMBIT")); }
-						
+
 							continue;
 						}
 #endif
@@ -4490,7 +4490,7 @@ static char *send_ncam_entitlement(struct templatevars *vars, struct uriparams *
 						{
 							tpl_printf(vars, TPLAPPEND, "READERMATURITY", "%s ", "no limit");
 						}
-						else 
+						else
 							{
 								tpl_printf(vars, TPLAPPEND, "READERMATURITY", "%d+", rdr->maturity);
 							}
@@ -4578,17 +4578,17 @@ static char *send_ncam_logpoll(struct templatevars * vars, struct uriparams * pa
 	{
 		LL_ITER it = ll_iter_create(log_history);
 		struct s_log_history *hist;
-		
+
 		tpl_printf(vars, TPLAPPEND, "DATA", "%s\"lines\":[", dot);
 
 		dot = "";
-		
+
 		while((hist = (struct s_log_history*)ll_iter_next(&it)))
 		{
 			char p_usr[32];
 			size_t pos1 = strcspn(hist->txt, "\t") + 1;
 			cs_strncpy(p_usr, hist->txt , pos1 > sizeof(p_usr) ? sizeof(p_usr) : pos1);
-			
+
 			char *p_txt = hist->txt + pos1;
 
 			pos1 = strcspn(p_txt, "\n") + 1;
@@ -4614,7 +4614,7 @@ static char *send_ncam_logpoll(struct templatevars * vars, struct uriparams * pa
 			NULLFREE(b64_str_out_buf);
 		}
 	}
-	
+
 	tpl_addVar(vars, TPLAPPEND, "DATA", "]");
 	return tpl_getTpl(vars, "POLL");
 }
@@ -5105,14 +5105,14 @@ static char *send_ncam_status(struct templatevars * vars, struct uriparams * par
 							{
 								char picon_channame[128];
 								int8_t picon_ok = 0;
-								
+
 								get_picon_servicename_or_null(cl, cl->last_srvid, cl->last_provid, cl->last_caid, picon_channame, sizeof(picon_channame));
 								if(picon_channame[0])
 								{
 									snprintf(picon_name, sizeof(picon_name) / sizeof(char) - 1, "%s", picon_channame);
 									picon_ok = picon_exists(picon_name);
 									if(picon_ok) tpl_addVar(vars, TPLADD, "PICONNAME", picon_name);
-									
+
 									if(!picon_ok && picon_servicename_remve_hd(picon_channame, sizeof(picon_channame)))
 									{
 										snprintf(picon_name, sizeof(picon_name) / sizeof(char) - 1, "%s", picon_channame);
@@ -5470,7 +5470,7 @@ static char *send_ncam_status(struct templatevars * vars, struct uriparams * par
 
 	uint8_t is_touch = 0;
 	if(config_enabled(TOUCH) && streq(tpl_getVar(vars, "SUBDIR"), TOUCH_SUBDIR))
-	{is_touch=1;}	
+	{is_touch=1;}
 
 	if(cfg.http_status_log || (apicall == 1 && strcmp(getParam(params, "appendlog"), "1") == 0) || is_touch)
 	{
@@ -5478,17 +5478,17 @@ static char *send_ncam_status(struct templatevars * vars, struct uriparams * par
 		{
 			LL_ITER it = ll_iter_create(log_history);
 			struct s_log_history *hist;
-		
+
 			while((hist = (struct s_log_history*)ll_iter_next(&it)))
 			{
 				char p_usr[32];
 				size_t pos1 = strcspn(hist->txt, "\t") + 1;
 				cs_strncpy(p_usr, hist->txt , pos1 > sizeof(p_usr) ? sizeof(p_usr) : pos1);
-					
+
 				char *p_txt = hist->txt + pos1;
-				
+
 				if(!apicall)
-				{	
+				{
 					if(p_txt[0]) tpl_printf(vars, TPLAPPEND, "LOGHISTORY","\t\t<SPAN CLASS=\"%s\">%s\t\t</SPAN><BR>\n", xml_encode(vars, p_usr), xml_encode(vars, p_txt));
 				}
 				else
@@ -5640,7 +5640,7 @@ static char *send_ncam_status(struct templatevars * vars, struct uriparams * par
 	else{
 		tpl_addVar(vars, TPLADD, "DISPLAYCACHEEXINFO", "hidden");
 	}
-	
+
 #ifdef WITH_DEBUG 
 	if(cfg.http_status_log || is_touch)
 	{
@@ -6156,7 +6156,7 @@ static void webif_process_logfile(struct templatevars * vars, struct uriparams *
 		tpl_printf(vars, TPLADD, "SWITCH", "%d", 1);
 		tpl_addVar(vars, TPLADD, "TEXT", "Stop Log");
 		tpl_addVar(vars, TPLADD, "LOGMENU", tpl_getTpl(vars, "LOGMENUDISABLELOG"));
-		
+
 	}
 	else
 	{
@@ -6262,7 +6262,7 @@ static char *send_ncam_files(struct templatevars * vars, struct uriparams * para
 		config_files[4].menu_id = MNU_CFG_FSRVID2;
 		config_files[5].menu_id = MNU_CFG_FSRVID;
 	}
-	
+
 	if(cfg.http_css)
 	{
 		if(strchr(cfg.http_css,'/'))
@@ -6964,7 +6964,7 @@ static char *send_ncam_cacheex(struct templatevars * vars, struct uriparams * pa
 				if(cl->account->description) {
 					tpl_printf(vars, TPLADD, "CLIENTDESCRIPTION","%s(%s)",!apicall?"&#13;":"",xml_encode(vars, cl->account->description));
 				}
-			} else { 
+			} else {
 				tpl_addVar(vars, TPLADD, "NAME", cl->account->usr);
 				if(cl->account->description) {
 					tpl_addVar(vars, TPLADD, "CLIENTDESCRIPTION", cl->account->description);
@@ -6993,7 +6993,7 @@ static char *send_ncam_cacheex(struct templatevars * vars, struct uriparams * pa
 				if(cl->reader->description) {
 					tpl_printf(vars, TPLADD, "CLIENTDESCRIPTION","%s(%s)",!apicall?"&#13;":"",xml_encode(vars, cl->reader->description));
 				}
-			} else { 
+			} else {
 				tpl_addVar(vars, TPLADD, "NAME", cl->reader->label);
 				if(cl->reader->description) {
 					tpl_addVar(vars, TPLADD, "CLIENTDESCRIPTION", cl->reader->description);
@@ -7020,7 +7020,7 @@ static char *send_ncam_cacheex(struct templatevars * vars, struct uriparams * pa
 			if(!apicall) {
 				tpl_addVar(vars, TPLADD, "READERNAME", "csp");
 				tpl_addVar(vars, TPLADD, "READERNAMEENC", "csp");
-			} else { 
+			} else {
 				tpl_addVar(vars, TPLADD, "NAME", "csp");
 			}
 			tpl_addVar(vars, TPLADD, "IP", cs_inet_ntoa(cl->ip));
@@ -8487,7 +8487,7 @@ static void *http_server(void *UNUSED(d))
 	{
 		cs_log("Could not create getssl");
 	}
-	
+
 	SSL_CTX *ctx = NULL;
 	if(cfg.http_use_ssl)
 	{

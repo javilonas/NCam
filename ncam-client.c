@@ -127,12 +127,12 @@ static void cs_fake_client(struct s_client *client, char *usr, int32_t uniq, IN_
 				&& uniq < 5 && ((uniq % 2) || !IP_EQUAL(cl->ip, ip)))
 		{
 			char buf[20];
-			
+
 			con_count++;
-			
+
 			if(con_count <= account->max_connections)
 				{ continue; }
-			
+
 			if(uniq  == 3 || uniq == 4)
 			{
 				cl->dup = 1;
@@ -242,32 +242,32 @@ struct s_client *create_client(IN_ADDR_T ip)
 		cs_log("max connections reached (out of memory) -> reject client %s", IP_ISSET(ip) ? cs_inet_ntoa(ip) : "with null address");
 		return NULL;
 	}
-	
+
 	//client part
 	IP_ASSIGN(cl->ip, ip);
 	cl->account = first_client->account;
-	
+
 	//master part
 	SAFE_MUTEX_INIT(&cl->thread_lock, NULL);
 	cl->login = cl->last = time(NULL);
 	cl->tid = (uint32_t)rand();
-	
+
 	//Now add new client to the list:
 	struct s_client *last;
 	cs_writelock(__func__, &clientlist_lock);
-	
+
 	for(last = first_client; last && last->next; last = last->next)
 		{ ; } //ends with cl on last client
-		
+
 	if (last)
 		last->next = cl;
-		
+
 	int32_t bucket = (uintptr_t)cl / 16 % CS_CLIENT_HASHBUCKETS;
 	cl->nexthashed = first_client_hashed[bucket];
 	first_client_hashed[bucket] = cl;
-	
+
 	cs_writeunlock(__func__, &clientlist_lock);
-	
+
 	return cl;
 }
 

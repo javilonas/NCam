@@ -861,14 +861,14 @@ static int8_t newcamd_auth_client(IN_ADDR_T ip, uint8_t *deskey)
 			int32_t n;
 			if(!cfg.ncd_ptab.ports[cl->port_idx].ncd)
 				{ continue; }
-			
+
 			if(cfg.ncd_ptab.ports[cl->port_idx].ncd->ncd_ftab.filts[0].caid == 0
 				&& !rdr->audisabled && (is_network_reader(rdr) || rdr->card_status == CARD_INSERTED) )
-			{			
+			{
 				aureader = rdr;
-				break;				
+				break;
 			}
-			
+
 			for(n = 0; n < cfg.ncd_ptab.ports[cl->port_idx].ncd->ncd_ftab.filts[0].nprids; n++)
 			{
 				if(emm_reader_match(rdr, cfg.ncd_ptab.ports[cl->port_idx].ncd->ncd_ftab.filts[0].caid, cfg.ncd_ptab.ports[cl->port_idx].ncd->ncd_ftab.filts[0].prids[n]))
@@ -899,7 +899,7 @@ static int8_t newcamd_auth_client(IN_ADDR_T ip, uint8_t *deskey)
 	{
 		FILTER usr_filter;
 		FILTER *pufilt = &usr_filter;
-		
+
 		nc_des_login_key_get(deskey, passwdcrypt, strlen((char *)passwdcrypt), key);
 		memcpy(cl->ncd_skey, key, 16);
 
@@ -913,15 +913,15 @@ static int8_t newcamd_auth_client(IN_ADDR_T ip, uint8_t *deskey)
 							  MSG_CARD_DATA_REQ, mbuf[2]);
 				return -1;
 			}
-			
+
 			mk_user_ftab(&usr_filter);
-			
+
 			// set userfilter for au enabled clients
 			if(aureader)
 			{
 				mk_user_au_ftab(aureader, &usr_filter);
 			}
-			
+
 			ftab_clear(&cl->ftab);
 
 			if(!cfg.ncd_mgclient)
@@ -1110,7 +1110,7 @@ static void newcamd_process_ecm(struct s_client *cl, uchar *buf, int32_t len)
 	{
 		return;
 	}
-	
+
 	// save client ncd_msgid
 	er->msgid = cl->ncd_msgid;
 	er->ecmlen = ecmlen;

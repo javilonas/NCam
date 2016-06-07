@@ -88,7 +88,7 @@ struct emm_rass *find_rabuf(struct s_client *client, int32_t provid, uint8_t nan
 	LL_ITER it;
 
 	if(!client->ra_buf)
-	{ 
+	{
 		client->ra_buf = ll_create("client->ra_buf");
 	}
 
@@ -100,7 +100,7 @@ struct emm_rass *find_rabuf(struct s_client *client, int32_t provid, uint8_t nan
 		if(add && e->provid == provid && e->emm[0] == nano) { return e; }
 	}
 	if(!add) return NULL;
-	
+
 	if(!cs_malloc(&e, sizeof(struct emm_rass)))
 		{ return NULL; }
 	e->provid = provid;
@@ -192,12 +192,12 @@ static int8_t add_find_class(struct s_reader *reader, uint32_t provid, const uch
 					tm.tm_mon = vd.month_s - 1; // january is 0 in tm_mon
 					tm.tm_mday = vd.day_s;
 					start_t = cs_timegm(&tm);
-					
+
 					tm.tm_year = vd.year_e + 80; //via year starts in 1980, tm_year starts in 1900
 					tm.tm_mon = vd.month_e - 1; // january is 0 in tm_mon
 					tm.tm_mday = vd.day_e;
 					end_t = cs_timegm(&tm);
-					
+
 					if(cs_add_entitlement(reader, reader->caid, provid, cls, cls, start_t, end_t, 5, add) != NULL)
 					{
 						if(!add)
@@ -289,16 +289,16 @@ static int32_t chk_prov(struct s_reader *reader, uchar *id, uchar keynr)
 static int32_t get_maturity(struct s_reader *reader)
 {
 	/* retrieve maturity rating on the card */
-	
+
 	def_resp;
 
 	uchar insac[] = { 0xca, 0xac, 0x00, 0x00, 0x00 }; // select data
 	uchar insb8[] = { 0xca, 0xb8, 0x00, 0x00, 0x00 }; // read selected data
-	
+
 	insac[2]=0x06; write_cmd(insac, NULL); // request maturity rating
 	insb8[4]=0x02; write_cmd(insb8, NULL); // read maturity rating nano + len
 	insb8[4]=cta_res[1]; write_cmd(insb8, NULL); // read maturity rating
-	
+
 	reader->maturity= cta_res[cta_lr - 3] & 0x0F;
 	if (reader->maturity<0xF)
 	{
@@ -343,8 +343,8 @@ static int32_t unlock_parental(struct s_reader *reader)
 		}
 	}
 	else
-		{ 
-			rdr_log(reader, "Parental lock disabled"); 
+		{
+			rdr_log(reader, "Parental lock disabled");
 			get_maturity(reader);
 		}
 
@@ -818,7 +818,7 @@ void CommonMain_D2_13_15(const uint8_t *datain, uint8_t *dataout, int loopval)
 	uint8_t buff11[11+1]; // +1 to avoid func2 bug
 	int i1, i2;
 	buff11[11] = 0;
-	
+
 	CommonMain_1_D2_13_15(datain, buff11);
 	for (i1 = 0; i1 < 11; i1++)
 		{ buff11[i1] ^= Tab1_Comp[(loopval * 11) + i1]; }
@@ -1059,7 +1059,7 @@ static int32_t viaccess_do_ecm(struct s_reader *reader, const ECM_REQUEST *er, s
 	memset(DE04, 0, sizeof(DE04)); //fix dorcel de04 bug
 
 	nextEcm = ecm88Data;
-	
+
 	while(ecm88Len > 0 && !rc)
 	{
 
@@ -1207,14 +1207,13 @@ static int32_t viaccess_do_ecm(struct s_reader *reader, const ECM_REQUEST *er, s
 				memcpy(DE04, &ecm88Data[0], 6);
 				ecm88Data += 6;
 			}
-			
+
 			// E0 (seen so far in logs: E0020002 or E0022002, but not in all cases delivers invalid cw so just detect!)
 			if(ecm88Data[0] == 0xE0 && ecm88Data[1] == 0x02)
 			{
 				rdr_log_dbg(reader, D_READER,"[viaccess-reader] nano E0 ECM detected!");
 				hasE0=1;
 			}
-			
 
 			if(csystem_data->last_geo.provid != provid)
 			{
@@ -1223,7 +1222,7 @@ static int32_t viaccess_do_ecm(struct s_reader *reader, const ECM_REQUEST *er, s
 				csystem_data->last_geo.geo[0]  = 0;
 				write_cmd(insa4, ident); // set provider
 			}
-			
+
 			// Nano D2 0x0b, 0x0f, 0x13 -> pre AES decrypt CW
 
 			if(hasD2 && (nanoD2 == 0x0b|| nanoD2 == 0x0f|| nanoD2 == 0x13))
@@ -1336,7 +1335,7 @@ static int32_t viaccess_do_ecm(struct s_reader *reader, const ECM_REQUEST *er, s
 					rc = 1;
 				}
 				break;
-					
+
 			default :
 				ecm88Data = nextEcm;
 				ecm88Len -= curEcm88len;
@@ -1380,7 +1379,7 @@ static int32_t viaccess_do_ecm(struct s_reader *reader, const ECM_REQUEST *er, s
 			hdSurEncPhase2_D2_13_15(ea->cw);
 		}
 	}
-	
+
 	if ( hasE0 )
 	{	
 		if ( reader->initCA28 )
@@ -1397,9 +1396,9 @@ static int32_t viaccess_do_ecm(struct s_reader *reader, const ECM_REQUEST *er, s
 			des(returnedcw+8, reader->key_schedule1, 0);  //decrypt
 			des(returnedcw+8, reader->key_schedule2, 1);  //crypt
 			des(returnedcw+8, reader->key_schedule1, 0);  //decrypt
-		
+
 			// returning value
-			memcpy(ea->cw,returnedcw, 16);      
+			memcpy(ea->cw,returnedcw, 16);
 		}
 		else
 		{
@@ -1463,7 +1462,7 @@ static int32_t viaccess_get_emm_type(EMM_PACKET *ep, struct s_reader *rdr)
 		{
 			if(!memcmp(&rdr->prid[i][2], ep->hexserial+1, 2))
 				{ return 1; }
-			
+
 			return (!memcmp(&rdr->sa[0][0], ep->hexserial, 3));
 		}
 
@@ -1480,9 +1479,9 @@ static int32_t viaccess_get_emm_filter(struct s_reader *rdr, struct s_csystem_em
 	{
 		bool network = is_network_reader(rdr);
 		int8_t device_emm = ((rdr->deviceemm >0) ? 1 : 0); // set to 1 if device specific emms should be catched too
-		
+
 		const unsigned int max_filter_count = 4 + ((device_emm != 0 && rdr->nprov > 0) ? 1:0) + (3 * ((rdr->nprov > 0) ? (rdr->nprov - 1) : 0));
-		
+
 		if(!cs_malloc(emm_filters, max_filter_count * sizeof(struct s_csystem_emm_filter)))
 			{ return ERROR; }
 
@@ -1502,15 +1501,15 @@ static int32_t viaccess_get_emm_filter(struct s_reader *rdr, struct s_csystem_em
 			filters[idx].mask[3]   = 0x80;
 			idx++;
 		}
-		
+
 		// shared are most important put them on top, define first since viaccess produces a lot of filters!	
 		for(prov = 0; (prov < rdr->nprov); prov++)
-		{	
+		{
 			if((rdr->prid[prov][2] &0xF0) == 0xF0) // skip this not useful provider
 			{
 				continue;
 			}
-			
+
 			filters[idx].type = EMM_SHARED; // 8C or 8D always first part of shared, second part delivered by 8E!
 			filters[idx].enabled   = 1;
 			filters[idx].filter[0] = 0x8C;
@@ -1534,7 +1533,7 @@ static int32_t viaccess_get_emm_filter(struct s_reader *rdr, struct s_csystem_em
 			}
 			idx++;
 		}
-		
+
 		// globals are less important, define last since viaccess produces a lot of filters!
 		for(prov = 0; (prov < rdr->nprov); prov++)
 		{
@@ -1542,7 +1541,7 @@ static int32_t viaccess_get_emm_filter(struct s_reader *rdr, struct s_csystem_em
 			{
 				continue;
 			}
-			
+
 			filters[idx].type = EMM_GLOBAL;  // 8A or 8B no reassembly needed!
 			filters[idx].enabled   = 1;
 			filters[idx].filter[0] = 0x8A;
@@ -1560,7 +1559,7 @@ static int32_t viaccess_get_emm_filter(struct s_reader *rdr, struct s_csystem_em
 			}
 			idx++;
 		}
-		
+
 		filters[idx].type = EMM_UNIQUE;
 		filters[idx].enabled   = 1;
 		filters[idx].filter[0] = 0x88;
@@ -1696,11 +1695,11 @@ static int32_t viaccess_do_emm(struct s_reader *reader, EMM_PACKET *ep)
 				afd = (uchar *)emmParsed + 2;
 
 				if(afd[31 - custwp / 8] & (1 << (custwp & 7)))
-				{ 
+				{
 					rdr_log_dbg(reader, D_READER, "emm for our card %08X", b2i(4, &reader->sa[0][0]));
 				}
 				else
-				{ 
+				{
 					rdr_log_dbg(reader, D_READER, "emm not suitable for our card %08X", b2i(4, &reader->sa[0][0]));
 					return SKIPPED; 
 				}
@@ -1739,19 +1738,19 @@ static int32_t viaccess_do_emm(struct s_reader *reader, EMM_PACKET *ep)
 					NULLFREE(tmpbuf);
 				}
 			}
-		}	
+		}
 		else
 		{
 			/* other nanos */
 			show_subs(reader, emmParsed);
 			if(emmParsed[0] == 0xA9 && ep->type == SHARED) // check on shared (reassembled) emm if all classes are present and up to date on card: error 90 40 
-			{	
+			{
 				if(!emm_provid)
 				{
 					rdr_log(reader, "no provid in shared emm -> skipped!");
 					return SKIPPED;
 				}
-				
+
 				int8_t match = add_find_class(reader, emm_provid, emmParsed + 2, emmParsed[1], 0);
 				
 				// seems not all classes have to be present on card to accept the emm
@@ -1760,7 +1759,7 @@ static int32_t viaccess_do_emm(struct s_reader *reader, EMM_PACKET *ep)
 					rdr_log(reader, "shared emm provid %06X one or more classes of this emm do not match with your card -> skipped!", emm_provid);
 					return SKIPPED;
 				}*/
-				
+
 				if(match == -2)
 				{
 					rdr_log(reader, "shared emm provid %06X all classes have entitlementdate already same or newer -> skipped!", emm_provid);
@@ -1837,7 +1836,7 @@ static int32_t viaccess_do_emm(struct s_reader *reader, EMM_PACKET *ep)
 			{
 				add_find_class(reader, emm_provid, nanoA9Data + 2, nanoA9Data[1], 1);
 				rdr_log(reader, "Your subscription data was updated.");
-			} 
+			}
 			rc = 1; // written
 		}
 		else
@@ -2003,7 +2002,7 @@ static int32_t viaccess_card_info(struct s_reader *reader)
 		if(!reader->read_old_classes)
 		{
 			now = time(NULL) - (24*60*60);
-			cs_gmtime_r(&now, &timeinfo);		
+			cs_gmtime_r(&now, &timeinfo);
 			tmpdate = timeinfo.tm_mday | ((timeinfo.tm_mon + 1) << 5) | ((timeinfo.tm_year - 80) << 9);
 			cls[0] = tmpdate >> 8;
 			cls[1] = tmpdate & 0xff;
@@ -2067,9 +2066,9 @@ static int32_t viaccess_reassemble_emm(struct s_reader *rdr, struct s_client *cl
 	int16_t k;
 	int32_t prov, provid = 0;
 	struct emm_rass *r_emm = NULL;
-	
+
 	// Viaccess
-	if(*len > 500) { return 0; } 
+	if(*len > 500) { return 0; }
 
 	switch(buffer[0])
 	{
@@ -2078,7 +2077,7 @@ static int32_t viaccess_reassemble_emm(struct s_reader *rdr, struct s_client *cl
 			// emm-s part 1
 			provid = b2i(3, ep->emm+5); // extract provid from emm
 			provid &= 0xFFFFF0; // last digit is dont care
-			r_emm = find_rabuf(client, provid, (uint8_t) buffer[0], 1); 
+			r_emm = find_rabuf(client, provid, (uint8_t) buffer[0], 1);
 			if(!r_emm)
 			{
 				cs_log("[viaccess] ERROR: Can't allocate EMM reassembly buffer.");
@@ -2093,7 +2092,7 @@ static int32_t viaccess_reassemble_emm(struct s_reader *rdr, struct s_client *cl
 			r_emm->emmlen = *len; // put the emmlen indicating that this shared emm isnt being reassembled
 			rdr_log_dump_dbg(rdr, D_EMM, r_emm->emm, r_emm->emmlen, "%s: received fresh emm-gh for provid %06X", __func__, provid);
 			return 0;
-		
+
 		case 0x8e:
 			// emm-s part 2
 			for(prov = 0; prov < rdr->nprov ; prov++)
@@ -2112,8 +2111,8 @@ static int32_t viaccess_reassemble_emm(struct s_reader *rdr, struct s_client *cl
 						provid &= 0xFFFFF0; // last digit is dont care
 					}
 					r_emm = find_rabuf(client, provid, 0, 0); // nano = dont care, the shared 8c or 8d not been written gets returned!
-					if(!r_emm || !r_emm->emmlen) 
-					{ 
+					if(!r_emm || !r_emm->emmlen)
+					{
 						continue; // match but no emm-gh found for this provider 
 					}
 					else

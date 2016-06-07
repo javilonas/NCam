@@ -723,7 +723,7 @@ int32_t send_dcw(struct s_client *client, ECM_REQUEST *er)
 #ifdef CS_CACHEEX
 		  er->cacheex_wait_time ||
 #endif
-	     (ea_orig->status & READER_FALLBACK))
+		 (ea_orig->status & READER_FALLBACK))
 	 )
 	{
 		snprintf(srealecmtime, sizeof(srealecmtime) - 1, " (real %d ms)", ea_orig->ecm_time);
@@ -780,7 +780,7 @@ int32_t send_dcw(struct s_client *client, ECM_REQUEST *er)
 
 
 	if(er->rc < E_NOTFOUND)
-	{ 
+	{
 		er->rcEx = 0;
 		memset(er->msglog, 0, MSGLOGSIZE); // remove reader msglog from previous requests that failed, founds never give back msglog!
 	}
@@ -911,7 +911,7 @@ int32_t send_dcw(struct s_client *client, ECM_REQUEST *er)
 		char *info5 = NULL;
 
 
-  	//**global or user value?
+	//**global or user value?
 		cs_writelock(__func__, &clientlist_lock);
 
 		max_active_sids = client->account->acosc_max_active_sids == -1 ? cfg.acosc_max_active_sids : client->account->acosc_max_active_sids;
@@ -982,7 +982,7 @@ int32_t send_dcw(struct s_client *client, ECM_REQUEST *er)
 							{ cs_log("[zaplist] ACoSC for Client: %s  max_activ_sids reached: %i:%i(%s) penalty: 1(%s) send null CW", username(client), active_sid_count, max_active_sids, info1, info2); }
 						if(client->account->acosc_penalty_active == 2)
 							{ cs_log("[zaplist] ACoSC for Client: %s  zap_limit reached: %i:%i(%s) penalty: 1(%s) send null CW", username(client), client->account->acosc_user_zap_count, zap_limit, info5, info2); }
-						
+
 						break;
 					case 2: // ban
 						if(lt != LIS_DVBAPI)
@@ -1438,7 +1438,7 @@ uint32_t chk_provid(uint8_t *ecm, uint16_t caid)
 			}
 		}
 		break;
-		
+
 	case 0x18:
 		// nagra2
 		if (caid == 0x1801) // more safety
@@ -1589,8 +1589,8 @@ int32_t write_ecm_answer(struct s_reader *reader, ECM_REQUEST *er, int8_t rc, ui
 					if(er->caid == 0x100 && er->ecm[5] > 0x00)
 					{
 						nano = er->ecm[5]; // seca nano protection
-					}	
-						
+					}
+
 					if(reader->dropbadcws && !nano) // only drop controlword if no cw encryption is applied
 					{
 						rc = E_NOTFOUND;
@@ -1653,7 +1653,7 @@ int32_t write_ecm_answer(struct s_reader *reader, ECM_REQUEST *er, int8_t rc, ui
 	{
 		ea->cw_ex = *cw_ex;
 	}
-	
+
 	cs_writeunlock(__func__, &ea->ecmanswer_lock);
 
 	struct timeb tpe;
@@ -1894,7 +1894,7 @@ void write_ecm_answer_fromcache(struct s_write_from_cache *wfc)
 			er->cwc_next_cw_cycle = ecm->cwc_next_cw_cycle;
 		}else{
 			er->cacheex_src = NULL;
-	    }
+		}
 
 		int8_t cacheex = check_client(er->client) && er->client->account ? er->client->account->cacheex.mode : 0;
 		if(cacheex == 1 && check_client(er->client))
@@ -1974,7 +1974,7 @@ void get_cw(struct s_client *client, ECM_REQUEST *er)
 		{
 			er->rc = E_INVALID;
 			er->rcEx = E2_GLOBAL;
-			snprintf(er->msglog, sizeof(er->msglog), "Real ECM size %d > ECM size %d, ignored! client %s", sct_len, er->ecmlen, username(client));		
+			snprintf(er->msglog, sizeof(er->msglog), "Real ECM size %d > ECM size %d, ignored! client %s", sct_len, er->ecmlen, username(client));
 		}
 		er->ecmlen = sct_len;
 	}
@@ -2281,7 +2281,7 @@ void get_cw(struct s_client *client, ECM_REQUEST *er)
 		write_ecm_answer_fromcache(wfc);
 		NULLFREE(wfc);
 		NULLFREE(ecm);
-	  	free_ecm(er);
+		free_ecm(er);
 
 		return;
 	}
@@ -2488,7 +2488,7 @@ int32_t ecmfmt(char *result, size_t size, uint16_t caid, uint16_t onid, uint32_t
 #define ECMFMT_NUMBER 0
 #define ECMFMT_STRING 1
 #define ECMFMT_CHAR 2
-	
+
 	uint8_t type = 0;
 	uint32_t ivalue = 0;
 	char *ifmt = NULL, *sfmt = NULL;
@@ -2496,17 +2496,17 @@ int32_t ecmfmt(char *result, size_t size, uint16_t caid, uint16_t onid, uint32_t
 	uint8_t hide_if_zero = 0;
 	char *c;
 	uint32_t s = 0;
-		
+
 	for(c = cfg.ecmfmt; *c; c++)
-	{	
+	{
 		if(*c == '0')
 		{
 			hide_if_zero = 1;
 			continue;
 		}
-		
+
 		sfmt = NULL;
-		
+
 		switch(*c)
 		{
 		case 't':
@@ -2580,7 +2580,7 @@ int32_t ecmfmt(char *result, size_t size, uint16_t caid, uint16_t onid, uint32_t
 			c++;
 			type = ECMFMT_CHAR;
 			cvalue = *c;
-			
+
 			if(cvalue == '\0')
 				{ return s; }
 			break;
@@ -2631,25 +2631,25 @@ int32_t ecmfmt(char *result, size_t size, uint16_t caid, uint16_t onid, uint32_t
 			case ECMFMT_NUMBER:
 				s += snprintf(result + s, size - s, ifmt, ivalue);
 				break;
-			
+
 			case ECMFMT_STRING:
 				s += snprintf(result + s, size - s , sfmt != NULL ? sfmt : "%s", svalue);
 				break;
-				
+
 			case ECMFMT_CHAR:
 				if(size - s > 1)
-				{ 
+				{
 					result[s] = cvalue;
 					result[s+1] = '\0';
 					s++;
 				}
 				break;
-			
+
 			default:
-				break;		
+				break;
 		}
 	}
-	
+
 	return s;
 }
 
@@ -2673,9 +2673,9 @@ int32_t format_ecm(ECM_REQUEST *ecm, char *result, size_t size)
 	char payload_string[(6*2)+1];
 	char tier_string[83];
 	struct s_ecm_answer *ea;
-	
+
 	if(ecm->selected_reader && caid_is_videoguard(ecm->selected_reader->caid) && !is_network_reader(ecm->selected_reader))
-	{	
+	{
 		for(ea = ecm->matching_rdr; ea; ea = ea->next)
 		{
 			if(ea->tier && (ea->status & REQUEST_ANSWERED) && !is_network_reader(ea->reader))
@@ -2685,7 +2685,7 @@ int32_t format_ecm(ECM_REQUEST *ecm, char *result, size_t size)
 				break;
 			}
 		}
-		
+
 		cs_hexdump(0, ecm->selected_reader->VgLastPayload, 6, payload_string, sizeof(payload_string));
 		payload = payload_string;
 	}

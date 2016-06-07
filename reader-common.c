@@ -63,7 +63,7 @@ int32_t card_write(struct s_reader *reader, const uchar *cmd, const uchar *data,
 	{
 		if(cmd[4])
 		{
-			datalen = cmd[4];			
+			datalen = cmd[4];
 		}
 		memcpy(buf + CMD_LEN, data, datalen);
 		return (reader_cmd2icc(reader, buf, CMD_LEN + datalen, response, response_length));
@@ -142,7 +142,7 @@ void cardreader_poll_status(struct s_reader *reader)
 static int32_t reader_get_cardsystem(struct s_reader *reader, ATR *atr)
 {
 	int32_t i;
-	
+
 #ifdef WITH_EMU
 	if(reader->typ == R_EMU)
 	{
@@ -154,7 +154,7 @@ static int32_t reader_get_cardsystem(struct s_reader *reader, ATR *atr)
 		return (reader->csystem_active);
 	}
 #endif
-	
+
 	for(i = 0; cardsystems[i]; i++)
 	{
 		NULLFREE(reader->csystem_data);
@@ -386,7 +386,7 @@ bool cardreader_init(struct s_reader *reader)
 				if (reader->mhz == 357)  reader->mhz =  369; else // 357 not a default smartreader setting
 				if (reader->mhz >= 343)  reader->mhz =  343; else 
 				reader->mhz =  320;
-	    	}
+			}
 			if ((reader->typ == R_SMART || is_smargo_reader(reader)) && reader->autospeed == 1)
 			{
 				rdr_log(reader, "Reader initialized (device=%s, detect=%s%s, mhz= AUTO, cardmhz=%d)",
@@ -482,11 +482,11 @@ void cardreader_process_ecm(struct s_reader *reader, struct s_client *cl, ECM_RE
 	struct timeb tps, tpe;
 	struct s_ecm_answer ea;
 	memset(&ea, 0, sizeof(struct s_ecm_answer));
-	
+
 	cs_ftime(&tps);
 	int32_t rc = cardreader_do_ecm(reader, er, &ea);
 	cs_ftime(&tpe);
-	
+
 	rdr_log_dbg(reader, D_READER, "%s: cardreader_do_ecm returned rc=%d (ERROR=%d)", __func__, rc, ERROR);
 
 	ea.rc = E_FOUND; //default assume found
@@ -513,13 +513,13 @@ void cardreader_process_ecm(struct s_reader *reader, struct s_client *cl, ECM_RE
 	}
 
 	write_ecm_answer(reader, er, ea.rc, ea.rcEx, ea.cw, ea.msglog, ea.tier, &ea.cw_ex);
-	
+
 	cl->lastecm = time((time_t *)0);
 	char ecmd5[17 * 3];
 	cs_hexdump(0, er->ecmd5, 16, ecmd5, sizeof(ecmd5));
 
 	rdr_log_dbg(reader, D_READER, "ecm hash: %s real time: %"PRId64" ms", ecmd5, comp_timeb(&tpe, &tps));
-	
+
 	reader_post_process(reader);
 }
 

@@ -4317,7 +4317,7 @@ void dvbapi_process_input(int32_t demux_id, int32_t filter_num, uchar *buffer, i
 			if(curpid->CAID>>8 == 0x0E)
 			{
 				pvu_skip = 1;
-				
+
 				if(sctlen > 0xb)
 				{
 					if(buffer[0xb] > curpid->pvu_counter || (curpid->pvu_counter == 255 && buffer[0xb] == 0)
@@ -4579,7 +4579,7 @@ void dvbapi_process_input(int32_t demux_id, int32_t filter_num, uchar *buffer, i
 				return;
 			}
 		}
-		
+
 		if(er) curpid->table = er->ecm[0];
 		request_cw(dvbapi_client, er, demux_id, 1); // register this ecm for delayed ecm response check
 		return; // end of ecm filterhandling!
@@ -4590,7 +4590,7 @@ void dvbapi_process_input(int32_t demux_id, int32_t filter_num, uchar *buffer, i
 		if(len != 0)  // len = 0 receiver encountered an internal bufferoverflow!
 		{
 			cs_log_dump_dbg(D_DVBAPI, buffer, sctlen, "Demuxer %d Filter %d fetched EMM data (emmlength = 0x%03X):", demux_id, filter_num + 1, sctlen);
-			
+
 			if(sctlen > MAX_EMM_SIZE) // emm too long to handle!
 			{
 				cs_log_dbg(D_DVBAPI, "Received data with total length 0x%03X but maximum EMM length ncam can handle is 0x%03X -> Please report!", sctlen, MAX_EMM_SIZE);
@@ -4906,7 +4906,7 @@ static void dvbapi_handlesockmsg(uchar* mbuf, uint16_t chunksize, uint16_t data_
 				break;
 			}
 		}
-		
+
 		if(cfg.dvbapi_listenport && opcode == DVBAPI_AOT_CA_STOP)
 		{
 			(*add_to_poll) = 1;
@@ -5133,7 +5133,7 @@ static void *dvbapi_main_local(void *cli)
 		free(mbuf);
 		return NULL;
 	}
-	
+
 	if(cfg.dvbapi_pmtmode == 1)
 		{ disable_pmt_files = 1; }
 
@@ -5468,7 +5468,7 @@ static void *dvbapi_main_local(void *cli)
 						{
 							dvbapi_stop_descrambling(j);
 						}
-						
+
 						// remove from unassoc_fd when necessary
 						if (unassoc_fd[j] == pfd2[i].fd)
 						{
@@ -5481,7 +5481,7 @@ static void *dvbapi_main_local(void *cli)
 					{
 						listenfd = -1;
 					}
-					
+
 					cs_log_dbg(D_DVBAPI, "Socket %d reported hard connection close", pfd2[i].fd);
 				}
 				else   // type = 0
@@ -5507,7 +5507,7 @@ static void *dvbapi_main_local(void *cli)
 						if(ret != -1)
 						{
 							demux[demux_index].demux_fd[n].fd = ret;
-											
+
 							pid = demux[demux_index].curindex;
 
 							memset(filter, 0, 32);
@@ -5653,7 +5653,7 @@ static void *dvbapi_main_local(void *cli)
 				{
 					int32_t demux_index = ids[i];
 					int32_t n = fdn[i];
-					
+
 					if((int)demux[demux_index].demux_fd[n].fd != pfd2[i].fd) { continue; } // filter already killed, no need to process this data!
 
 					len = dvbapi_read_device(pfd2[i].fd, mbuf, mbuf_size);
@@ -5925,7 +5925,7 @@ void dvbapi_send_dcw(struct s_client *client, ECM_REQUEST *er)
 				if(oldpidindex != -1) 
 				{
 					for(k = 0; k < MAX_STREAM_INDICES; k++)
-					{	
+					{
 						demux[i].ECMpids[j].index[k] = demux[i].ECMpids[oldpidindex].index[k]; // swap index with lower status pid that was descrambling
 						demux[i].ECMpids[j].useMultipleIndices = demux[i].ECMpids[oldpidindex].useMultipleIndices;
 					}
@@ -6978,12 +6978,12 @@ void disable_unused_streampids(int16_t demux_id)
 			while((listitem = ll_iter_next(&itr)))
 			{
 				if (i != listitem->cadevice) continue; // ca doesnt match
-				
+
 				for(skip = 1, j = 0; j < MAX_STREAM_INDICES; j++)
 				{
 					idx = demux[demux_id].ECMpids[ecmpid].index[j];
 					if(idx == INDEX_INVALID) continue;
-					
+
 					if ((listitem->activeindexers & (1 << (idx))) == (uint64_t) (1 << (idx)))
 					{
 						skip = 0; // index match
@@ -6992,7 +6992,7 @@ void disable_unused_streampids(int16_t demux_id)
 				}
 
 				if(skip) continue;
-				
+
 				for(n = 0; n < demux[demux_id].STREAMpidcount; n++){
 					if(demux[demux_id].ECMpidcount == 0) // FTA? -> disable stream!
 					{
@@ -7023,7 +7023,7 @@ void disable_unused_streampids(int16_t demux_id)
 						{
 							idx = demux[demux_id].ECMpids[ecmpid].index[j];
 							if(idx == INDEX_INVALID) continue;
-							
+
 							if ((listitem->activeindexers & (1 << (idx))) == (uint64_t) (1 << (idx)))
 							{
 								skip = 0; // index match
@@ -7034,7 +7034,7 @@ void disable_unused_streampids(int16_t demux_id)
 						if(skip) continue;
 
 						if (listitem->streampid == demux[demux_id].STREAMpids[n]) // check if pid matches with current streampid on demuxer
-						{ 
+						{
 							break;
 						}
 					}
@@ -7079,7 +7079,7 @@ ca_index_t is_ca_used(uint8_t cadevice, int32_t pid)
 				}
 				i++;
 			}
-			
+
 			if(listitem->caindex == INDEX_INVALID)
 			{
 				ll_iter_remove_data(&itr);

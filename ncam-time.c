@@ -123,7 +123,7 @@ void cs_ftime(struct timeb *tp)
 		settimeofday(&tv, NULL); // set time back to last known valid time
 		//fprintf(stderr, "*** WARNING: BAD TIME AFFECTING WHOLE NCAM ECM HANDLING, SYSTEMTIME SET TO LAST KNOWN VALID TIME **** \n");
 	}
-#endif	
+#endif
 	tp->time    = tv.tv_sec;
 	tp->millitm = tv.tv_usec / 1000;
 }
@@ -142,7 +142,7 @@ void cs_ftimeus(struct timeb *tp)
 		settimeofday(&tv, NULL); // set time back to last known valid time
 		//fprintf(stderr, "*** WARNING: BAD TIME AFFECTING WHOLE NCAM ECM HANDLING, SYSTEMTIME SET TO LAST KNOWN VALID TIME **** \n");
 	}
-#endif	
+#endif
 	tp->time    = tv.tv_sec;
 	tp->millitm = tv.tv_usec;
 }

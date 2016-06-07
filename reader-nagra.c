@@ -44,7 +44,7 @@ static time_t tier_date(uint32_t date, char *buf, int32_t l)
 	if(buf)
 	{
 		struct tm t;
-        t.tm_isdst = -1;
+		t.tm_isdst = -1;
 		cs_gmtime_r(&ut, &t);
 		snprintf(buf, l, "%04d/%02d/%02d", t.tm_year + 1900, t.tm_mon + 1, t.tm_mday);
 	}
@@ -623,7 +623,7 @@ static int32_t ParseDataType(struct s_reader *reader, unsigned char dt, unsigned
 			int32_t id = (cta_res[7] * 256) | cta_res[8];
 			int32_t offset = ((reader->caid == 0x1830 || reader->caid == 0x1843)
 							&& chid == 0x0BEA) ? -21 : 0;
-            
+
 			// todo: add entitlements to list
 			cs_add_entitlement(reader,
 							   reader->caid,
@@ -662,7 +662,7 @@ static int32_t GetDataType(struct s_reader *reader, unsigned char dt, int32_t le
 			result = ERROR;
 			break;
 		}
-		
+
 		if((cta_res[2] == 0) && ((dt&0x80) == 0x80))
 		{
 			result = OK;
@@ -788,7 +788,7 @@ static int32_t nagra2_card_init(struct s_reader *reader, ATR *newatr)
 		return ERROR; // quitting csystem still not having needed commands to run on nagra layer
 	}
 	else { return ERROR; }
-	
+
 	// Private data may be already allocated, see above (the irdeto check).
 	if(!reader->csystem_data)
 	{

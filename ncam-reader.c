@@ -597,7 +597,7 @@ void newcamd_to_hexserial(uchar *source, uchar *dest, uint16_t caid)
 S_ENTITLEMENT *cs_add_entitlement(struct s_reader *rdr, uint16_t caid, uint32_t provid, uint64_t id, uint32_t class, time_t start, time_t end, uint8_t type, uint8_t add)
 {
 	if(!rdr->ll_entitlements)
-	{ 
+	{
 		rdr->ll_entitlements = ll_create("ll_entitlements"); 
 	}
 
@@ -606,7 +606,7 @@ S_ENTITLEMENT *cs_add_entitlement(struct s_reader *rdr, uint16_t caid, uint32_t 
 	
 	it = ll_iter_create(rdr->ll_entitlements);
 	while((item = ll_iter_next(&it)) != NULL)
-	{ 
+	{
 		if(
 			(caid && item->caid != caid) || 
 			(provid && item->provid != provid) || 
@@ -620,7 +620,7 @@ S_ENTITLEMENT *cs_add_entitlement(struct s_reader *rdr, uint16_t caid, uint32_t 
 		}
 		break; // match found!
 	}
-	
+
 	if(add && item == NULL)
 	{
 		if(cs_malloc(&item, sizeof(S_ENTITLEMENT)))
@@ -641,10 +641,10 @@ S_ENTITLEMENT *cs_add_entitlement(struct s_reader *rdr, uint16_t caid, uint32_t 
 		else
 		{
 			cs_log("ERROR: Can't allocate entitlement to reader!");
-			
+
 		}
 	}
-	
+
 	return item;
 }
 
@@ -1025,9 +1025,9 @@ int32_t casc_process_ecm(struct s_reader *reader, ECM_REQUEST *er)
 	{
 		rc = reader->ph.c_send_ecm(cl, &cl->ecmtask[n]);
 		if(rc != 0)
-		{ 
+		{
 			casc_check_dcw(reader, n, 0, cl->ecmtask[n].cw); // simulate "not found"
-		}  
+		}
 		else
 			{ cl->last_idx = cl->ecmtask[n].idx; }
 		reader->last_s = t;   // used for inactive_timeout and reconnect_timeout in TCP reader

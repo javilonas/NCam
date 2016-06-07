@@ -11,7 +11,7 @@
 #define EMU_MAX_EMM_LEN MAX_EMM_SIZE
 
 	typedef struct KeyData KeyData;
-	
+
 	struct KeyData {
 		char identifier;
 		uint32_t provider;
@@ -38,7 +38,7 @@
 	extern uint8_t viasat_const[];
 
 	uint32_t GetNemuVersion(void);
-	
+
 	void set_emu_keyfile_path(const char *path);
 	uint8_t read_emu_keyfile(const char *path);
 
@@ -47,7 +47,7 @@
 #endif
 
 	int32_t CharToBin(uint8_t *out, const char *in, uint32_t inLen);
-	
+
 	/* Error codes
 	0  OK
 	1  ECM not supported
@@ -77,24 +77,23 @@
 	5
 	6  Checksum error
 	7  Out of memory
-	*/	
+	*/
 	int8_t ProcessEMM(uint16_t caid, uint32_t provider, const uint8_t *emm, uint32_t *keysAdded);
-	
-	const char* GetProcessEMMErrorReason(int8_t result);			  
+
+	const char* GetProcessEMMErrorReason(int8_t result);
 
 	//hexserial must be of type "uint8_t hexserial[3]"
 	//returns 0 on error, 1 on success
 	int32_t GetIrdeto2Hexserial(uint16_t caid, uint8_t* hexserial);
-	
+
 	//hexserials must be of type "uint8_t hexserials[length][4]"
 	//if srvid == 0xFFFF all serials are returned (no srvid filtering)
 	//returns 0 on error, 1 on success
 	int32_t GetPowervuHexserials(uint16_t srvid, uint8_t hexserials[][4], int32_t length, int32_t* count);
-	
+
 	//hexserials must be of type "uint8_t hexserials[length]"
 	//returns 0 on error, 1 on success
 	int32_t GetDrecryptHexserials(uint16_t caid, uint8_t* hexserials, int32_t length, int32_t* count);
-	
 
 #define PVU_CW_VID 0	// VIDeo
 #define PVU_CW_HSD 1	// High Speed Data
@@ -110,5 +109,4 @@
 #else
 	int8_t PowervuECM(uint8_t *ecm, uint8_t *dw, emu_stream_client_key_data *cdata);
 #endif
-		
 #endif

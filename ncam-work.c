@@ -48,7 +48,7 @@ static void free_job_data(struct job_data *data)
 void free_joblist(struct s_client *cl)
 {
 	int32_t lock_status = pthread_mutex_trylock(&cl->thread_lock);
-	
+
 	LL_ITER it = ll_iter_create(cl->joblist);
 	struct job_data *data;
 	while((data = ll_iter_next(&it)))
@@ -60,10 +60,10 @@ void free_joblist(struct s_client *cl)
 	if(cl->work_job_data)  // Free job_data that was not freed by work_thread
 		{ free_job_data(cl->work_job_data); }
 	cl->work_job_data = NULL;
-	
+
 	if(lock_status == 0)
 		{ SAFE_MUTEX_UNLOCK(&cl->thread_lock); }
-	
+
 	pthread_mutex_destroy(&cl->thread_lock);
 }
 
@@ -88,13 +88,13 @@ static void set_work_thread_name(struct job_data *data)
 }
 
 #define __free_job_data(client, job_data) \
-    do { \
-        client->work_job_data = NULL; \
-        if (job_data && job_data != &tmp_data) { \
-            free_job_data(job_data); \
-        } \
-        job_data = NULL; \
-    } while(0)
+	do { \
+		client->work_job_data = NULL; \
+		if (job_data && job_data != &tmp_data) { \
+			free_job_data(job_data); \
+		} \
+		job_data = NULL; \
+	} while(0)
 
 void *work_thread(void *ptr)
 {
@@ -459,7 +459,7 @@ int32_t add_job(struct s_client *cl, enum actions action, void *ptr, int32_t len
 					  ll_count(cl->joblist), username(cl));
 		return 1;
 	}
-	
+
 	/* pcsc doesn't like this; segfaults on x86, x86_64 */
 	int8_t modify_stacksize = 0;
 	struct s_reader *rdr = cl->reader;

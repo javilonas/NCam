@@ -361,7 +361,7 @@ typedef unsigned char uchar;
  *         constants
  * =========================== */
 #define CS_VERSION    "1.1"
-#define DATE_BUILD    "07-06-2016"
+#define DATE_BUILD    "10-06-2016"
 #ifndef CS_SVN_VERSION
 #   define CS_SVN_VERSION "stable"
 #endif
@@ -376,7 +376,7 @@ typedef unsigned char uchar;
 #endif
 #define CS_QLEN       128 // size of request queue
 #define CS_MAXPROV    100
-#define CS_MAXPORTS   100  // max server ports
+#define CS_MAXPORTS   200  // max server ports
 #define CS_CLIENT_HASHBUCKETS 32
 #define CS_SERVICENAME_SIZE 32
 
@@ -602,15 +602,15 @@ enum {E2_GLOBAL = 0, E2_GROUP, E2_CAID, E2_IDENT, E2_CLASS, E2_CHID, E2_QUEUE, E
 /* ===========================
  *      Default Values
  * =========================== */
-#define DEFAULT_INACTIVITYTIMEOUT 0
-#define DEFAULT_TCP_RECONNECT_TIMEOUT 30
-#define DEFAULT_NCD_KEEPALIVE 0
+#define DEFAULT_INACTIVITYTIMEOUT 15 // default 0
+#define DEFAULT_TCP_RECONNECT_TIMEOUT 10 // default 15
+#define DEFAULT_NCD_KEEPALIVE 1 // default 0
 
-#define DEFAULT_CC_MAXHOPS  10
-#define DEFAULT_CC_RESHARE  -1 // Use global cfg
-#define DEFAULT_CC_IGNRSHR  -1 // Use global cfg
-#define DEFAULT_CC_STEALTH  -1 // Use global cfg
-#define DEFAULT_CC_KEEPALIVE 0
+#define DEFAULT_CC_MAXHOPS  2 // default 10
+#define DEFAULT_CC_RESHARE  1 // Use global cfg // default -1
+#define DEFAULT_CC_IGNRSHR  0 // Use global cfg // default -1
+#define DEFAULT_CC_STEALTH  1 // Use global cfg // default -1
+#define DEFAULT_CC_KEEPALIVE 1 // default 0
 #define DEFAULT_CC_RECONNECT 12000
 #define DEFAULT_CC_RECV_TIMEOUT 2000
 

@@ -51,32 +51,62 @@ static int32_t chk_class(ECM_REQUEST *er, CLASSTAB *clstab, const char *type, co
 	int32_t i, j, an, cl_n, l;
 	uchar ecm_class;
 
-	if(er->caid != 0x0500) { return 1; }
+	if(er->caid != 0x0500 && er->caid != 0x4AE1) { return 1; }
 	if(!clstab->bn && !clstab->an) { return 1; }
 
 	j = an = cl_n = l = 0;
-	while((j = find_nano(er->ecm, er->ecmlen, CS_NANO_CLASS, j)) > 0)
-	{
-		l = er->ecm[j];
-		if(l + j > er->ecmlen) { continue; }  // skip, this is not a valid class identifier!
-		ecm_class = er->ecm[j + l];
-		cs_log_dbg(D_CLIENT, "ecm class=%02X", ecm_class);
-		for(i = 0; i < clstab->bn; i++)    // search in blocked
-			if(ecm_class == clstab->bclass[i])
-			{
-				cs_log_dbg(D_CLIENT, "class %02X rejected by %s '%s' !%02X filter",
-							  ecm_class, type, name, ecm_class);
-				return 0;
-			}
 
+	if(er->caid == 0x0500)
+	{
+		while((j = find_nano(er->ecm, er->ecmlen, CS_NANO_CLASS, j)) > 0)
+		{
+			l = er->ecm[j];
+			if(l + j > er->ecmlen) { continue; }  // skip, this is not a valid class identifier!
+
+			ecm_class = er->ecm[j + l];
+			cs_log_dbg(D_CLIENT, "ecm class=%02X", ecm_class);
+
+			for(i = 0; i < clstab->bn; i++)    // search in blocked
+				if(ecm_class == clstab->bclass[i])
+				{
+					cs_log_dbg(D_CLIENT, "class %02X rejected by %s '%s' !%02X filter",
+								  ecm_class, type, name, ecm_class);
+					return 0;
+				}
+
+			cl_n++;
+			for(i = 0; i < clstab->an; i++)    // search in allowed
+				if(ecm_class == clstab->aclass[i])
+				{
+					an++;
+					break;
+				}
+			j += l;
+		}
+	}
+
+	else
+	{
+		if(er->prid != 0x11 || er->ecm[0] == 0) { return 1; }
+		
 		cl_n++;
+		ecm_class = er->ecm[5];
+		cs_log_dbg(D_CLIENT, "ecm class=%02X", ecm_class);
+
+		for(i = 0; i < clstab->bn; i++)    // search in blocked
+				if(ecm_class == clstab->bclass[i])
+				{
+					cs_log_dbg(D_CLIENT, "class %02X rejected by %s '%s' !%02X filter",
+								  ecm_class, type, name, ecm_class);
+					return 0;
+				}
+
 		for(i = 0; i < clstab->an; i++)    // search in allowed
-			if(ecm_class == clstab->aclass[i])
-			{
-				an++;
-				break;
-			}
-		j += l;
+				if(ecm_class == clstab->aclass[i])
+				{
+					an++;
+					break;
+				}
 	}
 
 	if(cl_n && clstab->an)
@@ -801,7 +831,7 @@ int32_t matching_reader(ECM_REQUEST *er, struct s_reader *rdr)
 	}
 
 	//Checking entitlements:
-	if(ll_count(rdr->ll_entitlements) > 0)
+	if(ll_count(rdr->ll_entitlements) > 0 && !(rdr->typ == R_EMU))
 	{
 		LL_ITER itr = ll_iter_create(rdr->ll_entitlements);
 		S_ENTITLEMENT *item;

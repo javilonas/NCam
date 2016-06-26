@@ -167,7 +167,7 @@ static void ParseTSData(uint8_t table_id, uint8_t table_mask, uint8_t min_table_
 
 static void ParsePATData(emu_stream_client_data *cdata)
 {
-	uint8_t* data = cdata->data;
+	uint8_t* data = cdata->pat_data;
 	uint16_t section_length = SCT_LEN(data);
 	uint16_t srvid;
 	int32_t i;
@@ -182,7 +182,7 @@ static void ParsePATData(emu_stream_client_data *cdata)
 		if(cdata->srvid == srvid)
 		{
 			cdata->pmt_pid = b2i(2, data+i+2) & 0x1FFF;
-			cs_log_dbg(D_READER, "[Emu] stream %i found pmt  pid : 0x%04X (%i)",cdata->connid, cdata->pmt_pid, cdata->pmt_pid);
+			cs_log_dbg(D_READER, "[Emu] stream %i found pmt pid : 0x%04X (%i)",cdata->connid, cdata->pmt_pid, cdata->pmt_pid);
 			break;
 		}
 	}
@@ -190,7 +190,7 @@ static void ParsePATData(emu_stream_client_data *cdata)
 
 static void ParsePMTData(emu_stream_client_data *cdata)
 {
-	uint8_t* data = cdata->data;
+	uint8_t* data = cdata->pmt_data;
 
 	uint16_t section_length = SCT_LEN(data);
 	int32_t i;
@@ -198,6 +198,12 @@ static void ParsePMTData(emu_stream_client_data *cdata)
 	uint8_t descriptor_tag = 0, descriptor_length = 0;
 	uint8_t stream_type;
 	uint16_t stream_pid, caid;
+
+	cdata->pcr_pid = b2i(2, data+8) &0x1FFF;
+	if(cdata->pcr_pid != 0x1FFF)
+	{
+		cs_log_dbg(D_READER, "[Emu] stream %i found pcr pid : 0x%04X (%i)",cdata->connid, cdata->pcr_pid, cdata->pcr_pid);
+	}
 
 	program_info_length = b2i(2, data+10) &0xFFF;
 
@@ -222,7 +228,7 @@ static void ParsePMTData(emu_stream_client_data *cdata)
 			if(caid>>8 == 0x0E)
 			{
 				cdata->ecm_pid = b2i(2, data+i+4) &0x1FFF;
-				cs_log_dbg(D_READER, "[Emu] stream %i found ecm  pid : 0x%04X (%i)",cdata->connid, cdata->ecm_pid, cdata->ecm_pid);
+				cs_log_dbg(D_READER, "[Emu] stream %i found ecm  pid : 0x%04X (%i)", cdata->connid, cdata->ecm_pid, cdata->ecm_pid);
 				break;
 			}
 		}
@@ -243,7 +249,7 @@ static void ParsePMTData(emu_stream_client_data *cdata)
 		}
 
 		else if(stream_type == 0x03 || stream_type == 0x04 || stream_type == 0x05 || stream_type == 0x06 ||
-				stream_type == 0x0F || stream_type == 0x11 || stream_type == 0x81 || stream_type == 0x87)
+				stream_type == 0x0F || stream_type == 0x11 || (stream_type >= 0x81 && stream_type <= 0x87) || stream_type == 0x8A)
 		{
 			if(cdata->audio_pid_count >= EMU_STREAM_MAX_AUDIO_SUB_TRACKS)
 				{ continue; }
@@ -255,9 +261,43 @@ static void ParsePMTData(emu_stream_client_data *cdata)
 	}
 }
 
+static void ParseCATData(emu_stream_client_data *cdata)
+{
+	uint8_t* data = cdata->cat_data;
+	uint32_t i;
+
+	for(i = 8; i < (b2i(2, data + 1)&0xFFF) - 1; i += data[i + 1] + 2)
+	{
+		if(data[i] != 0x09) { continue; }
+
+		uint16_t caid = b2i(2, data + i + 2);
+		uint16_t emm_pid = b2i(2, data + i +4)&0x1FFF;
+
+		if(caid>>8 == 0x0E)
+		{
+		   cdata->emm_pid = emm_pid;
+		   cs_log_dbg(D_READER, "[Emu] stream %i found audio pid: 0x%04X (%i)", cdata->connid, emm_pid, emm_pid);
+		   break;
+		}
+	}
+}
+
+static void ParseEMMData(emu_stream_client_data *cdata)
+{
+	uint8_t* data = cdata->emm_data;
+	uint32_t keysAdded = 0;
+
+	ProcessEMM(0x0E00, 0, data, NULL, &keysAdded);
+
+	if(keysAdded) 
+	{
+		cs_log("[Emu] stream %i found %i keys.", cdata->connid, keysAdded);
+	}
+}
+
 static void ParseECMData(emu_stream_client_data *cdata)
 {
-	uint8_t* data = cdata->data;
+	uint8_t* data = cdata->ecm_data;
 	uint16_t section_length = SCT_LEN(data);
 	uint8_t dcw[16];
 
@@ -276,11 +316,7 @@ static void ParseECMData(emu_stream_client_data *cdata)
 	}
 }
 
-//#ifdef WITH_EMU
-//static void ParseTSPackets(emu_stream_client_conn_data *conndata, emu_stream_client_data *data, uint8_t *stream_buf, uint32_t bufLength, uint16_t packetSize)
-//#else
 static void ParseTSPackets(emu_stream_client_data *data, uint8_t *stream_buf, uint32_t bufLength, uint16_t packetSize)
-//#endif
 {
 	uint32_t i, j, k;
 	uint32_t tsHeader;
@@ -300,8 +336,6 @@ static void ParseTSPackets(emu_stream_client_data *data, uint8_t *stream_buf, ui
 	uint32_t cs =0;  //video cluster start
 	uint32_t ce =1;  //video cluster end
 	uint32_t csa[EMU_STREAM_MAX_AUDIO_SUB_TRACKS] = {0};  //cluster index for audio tracks
-	uint32_t keysAdded = 0;
-	uint8_t *cptr;
 
 	for(i=0; i<bufLength; i+=packetSize)
 	{
@@ -318,61 +352,42 @@ static void ParseTSPackets(emu_stream_client_data *data, uint8_t *stream_buf, ui
 		if(packetSize-offset < 1)
 			{ continue; }
 
-		if( pid == 0x01 && emu_stream_emm_enabled && !data->emm_pid ) // CAT 
+		if(pid == 1)
 		{
-			cptr = stream_buf+i+offset;
-			j = 0;
-			while (cptr != NULL)
+			// set to null pid
+			stream_buf[i+1] |= 0x1f; 
+			stream_buf[i+2]  = 0xff;
+
+			if(emu_stream_emm_enabled && !data->emm_pid)
 			{
-				cptr = memchr (stream_buf+i+offset+j, 0x0E,100);
-				if (cptr != NULL)
-				{
-					if (*(cptr+1) == 00) 
-					{
-						data->emm_pid = (b2i(2,cptr+2) & 0x1FFF);
-							cs_log_dbg(D_READER|D_EMM, "[Emu] stream %i found emm  pid : 0x%04X (%i)",data->connid, data->emm_pid, data->emm_pid);
-						break;
-					}
-				j = cptr - stream_buf +i + 1;
-				}
+				ParseTSData(0x01, 0xFF, 8, &data->have_cat_data, data->cat_data, sizeof(data->cat_data), &data->cat_data_pos, payloadStart, 
+											stream_buf+i+offset, packetSize-offset, ParseCATData, data);
+				continue;
 			}
 		}
 
-		if(pid == data->emm_pid && data->emm_pid)
+		if(emu_stream_emm_enabled && data->emm_pid && pid == data->emm_pid)
 		{
-			ProcessEMM(0x0E00,0x0,stream_buf+i+offset+1, &keysAdded);
-			if(keysAdded) 
-			{
-				cs_log("[Emu] stream %i found %i keys.",data->connid, keysAdded);
-			}
+			// set to null pid
+			stream_buf[i+1] |= 0x1f; 
+			stream_buf[i+2]  = 0xff;
 
-		}
-
-		if(data->have_pat_data != 1)
-		{
-			if(pid == 0)
-			{
-				ParseTSData(0x00, 0xFF, 16, &data->have_pat_data, data->data, sizeof(data->data), &data->data_pos, payloadStart, 
-								stream_buf+i+offset, packetSize-offset, ParsePATData, data);
-			}
-
+			ParseTSData(0x80, 0xF0, 3, &data->have_emm_data, data->emm_data, sizeof(data->emm_data), &data->emm_data_pos, payloadStart, 
+										stream_buf+i+offset, packetSize-offset, ParseEMMData, data);
 			continue;
 		}
 
-		if(!data->pmt_pid)
+		if(pid == 0 && !data->pmt_pid)
 		{
-			data->have_pat_data = 0;
+			ParseTSData(0x00, 0xFF, 16, &data->have_pat_data, data->pat_data, sizeof(data->pat_data), &data->pat_data_pos, payloadStart, 
+										stream_buf+i+offset, packetSize-offset, ParsePATData, data);		
 			continue;
 		}
 
-		if(data->have_pmt_data != 1)
+		if(!data->ecm_pid && pid == data->pmt_pid)
 		{
-			if(pid == data->pmt_pid)
-			{
-				ParseTSData(0x02, 0xFF, 21, &data->have_pmt_data, data->data, sizeof(data->data), &data->data_pos, payloadStart, 
-								stream_buf+i+offset, packetSize-offset, ParsePMTData, data);
-			}
-
+			ParseTSData(0x02, 0xFF, 21, &data->have_pmt_data, data->pmt_data, sizeof(data->pmt_data), &data->pmt_data_pos, payloadStart, 
+										stream_buf+i+offset, packetSize-offset, ParsePMTData, data);	
 			continue;
 		}
 
@@ -382,14 +397,18 @@ static void ParseTSPackets(emu_stream_client_data *data, uint8_t *stream_buf, ui
 			stream_server_has_ecm[data->connid] = 1;
 #endif
 
-			ParseTSData(0x80, 0xFE, 10, &data->have_ecm_data, data->data, sizeof(data->data), &data->data_pos, payloadStart, 
-							stream_buf+i+offset, packetSize-offset, ParseECMData, data);
+			// set to null pid
+			stream_buf[i+1] |= 0x1f; 
+			stream_buf[i+2]  = 0xff;
+
+			ParseTSData(0x80, 0xFE, 3, &data->have_ecm_data, data->ecm_data, sizeof(data->ecm_data), &data->ecm_data_pos, payloadStart, 
+										stream_buf+i+offset, packetSize-offset, ParseECMData, data);
 			continue;
 		}
 
 		if(scramblingControl == 0)
 			{ continue; }
-		
+
 		if(!(stream_buf[i+3] & 0x10))
 		{
 			stream_buf[i+3] &= 0x3F;
@@ -398,7 +417,7 @@ static void ParseTSPackets(emu_stream_client_data *data, uint8_t *stream_buf, ui
 
 		oddKeyUsed = scramblingControl == 0xC0 ? 1 : 0;
 
-#ifdef WITH_EMU	
+#ifdef WITH_EMU
 		if(!stream_server_has_ecm[data->connid])
 		{
 			keydata = &emu_fixed_key_data[data->connid];
@@ -534,16 +553,18 @@ static void ParseTSPackets(emu_stream_client_data *data, uint8_t *stream_buf, ui
 						{ deskey = keydata->pvu_des_ks[PVU_CW_A1+j][oddKeyUsed]; }
 			}
 
-			if(deskey != NULL)
+			if(deskey == NULL)
 			{
-				for(j=offset; j+7<188; j+=8)
-				{
-					pdata = stream_buf+i+j;
-					des(pdata, deskey, 0);
-				}
-
-				stream_buf[i+3] &= 0x3F;
+				deskey = keydata->pvu_des_ks[PVU_CW_HSD][oddKeyUsed];
 			}
+
+			for(j=offset; j+7<188; j+=8)
+			{
+				pdata = stream_buf+i+j;
+				des(pdata, deskey, 0);
+			}
+
+			stream_buf[i+3] &= 0x3F;
 		}
 
 #ifdef WITH_EMU	
@@ -659,7 +680,7 @@ static void *stream_client_handler(void *arg)
 	int32_t i, srvidtmp;
 	char *saveptr, *token;
 	char http_version[4];
-	int32_t http_status_code = 0;	
+	int32_t http_status_code = 0;
 
 	cs_log("[Emu] stream client %i connected", conndata->connid);
 
@@ -777,18 +798,27 @@ static void *stream_client_handler(void *arg)
 			}
 
 			streamStatus = recv(streamfd, stream_buf+bytesRead, cur_dvb_buffer_size-bytesRead, MSG_WAITALL);
-			if(streamStatus == -1)
+			if(streamStatus == 0) // socket closed
 			{
-				streamDataErrorCount++;
+				cs_log("[Emu] warning: stream client %i - stream source closed connection", conndata->connid);
+				streamConnectErrorCount++;
+				cs_sleepms(100);
 				break;
 			}
 
-			if(streamStatus == 0)
+			if(streamStatus < 0) // error
 			{
-				cs_log("[Emu] warning: stream client %i no data from stream source", conndata->connid);
-				streamDataErrorCount++; // 2 sec timeout * 15 = 30 seconds no data -> close
+				if ((errno == EWOULDBLOCK) | (errno == EAGAIN)) {
+					cs_log("[Emu] warning: stream client %i no data from stream source", conndata->connid);
+					streamDataErrorCount++; // 2 sec timeout * 15 = 30 seconds no data -> close
+					cs_sleepms(100);
+					continue;
+				}
+
+				cs_log("[Emu] warning: stream client %i error receiving data from stream source", conndata->connid);
+				streamConnectErrorCount++;
 				cs_sleepms(100);
-				continue;
+				break;
 			}
 
 			if(streamStatus < cur_dvb_buffer_size-bytesRead) // probably just received header but no stream
@@ -805,11 +835,16 @@ static void *stream_client_handler(void *arg)
 				else
 				{
 					cs_log_dbg(0, "[Emu] warning: stream client %i non-full buffer from stream source", conndata->connid);
+					streamDataErrorCount++;
+					cs_sleepms(100);
 				}
+			}
+			else
+			{
+				streamDataErrorCount = 0;
 			}
 
 			streamConnectErrorCount = 0;
-			streamDataErrorCount = 0;
 			bytesRead += streamStatus;
 
 			if(bytesRead >= cur_dvb_buffer_wait)
@@ -826,12 +861,9 @@ static void *stream_client_handler(void *arg)
 				else
 				{
 					packetCount = ((bytesRead-startOffset) / packetSize);
-
-//#ifdef WITH_EMU
-//					ParseTSPackets(conndata, data, stream_buf+startOffset, packetCount*packetSize, packetSize);
-//#else
+					
 					ParseTSPackets(data, stream_buf+startOffset, packetCount*packetSize, packetSize);
-//#endif
+					
 					clientStatus = send(conndata->connfd, stream_buf+startOffset, packetCount*packetSize, 0);
 
 					remainingDataPos = startOffset+(packetCount*packetSize);

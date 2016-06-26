@@ -107,6 +107,7 @@ static void protocol_fn(const char *token, char *value, void *setting, FILE *f)
 			{ "newcamd",    R_NEWCAMD },
 			{ "newcamd525", R_NEWCAMD },
 			{ "newcamd524", R_NEWCAMD },
+			{ "drecas",     R_DRECAS },
 			{ "emu",        R_EMU },
 			{ NULL        , 0 }
 		}, *p;
@@ -265,7 +266,7 @@ static void deskey_fn(const char *token, char *value, void *setting, FILE *f)
 	if(value)
 	{
 		int32_t len = strlen(value);
-		if(((len % 16) != 0) || len == 0 || len > 64)
+		if(((len % 16) != 0) || len == 0 || len > 128*2)
 		{
 			rdr->des_key_length = 0;
 			memset(rdr->des_key, 0, sizeof(rdr->des_key));
@@ -446,7 +447,9 @@ void ftab_fn(const char *token, char *value, void *setting, long ftab_type, FILE
 		if(ftab_type & FTAB_CHID)       { rdr = container_of(setting, struct s_reader, fchid); }
 		if(ftab_type & FTAB_FBPCAID)    { rdr = container_of(setting, struct s_reader, fallback_percaid); }
 		if(ftab_type & FTAB_LOCALCARDS) { rdr = container_of(setting, struct s_reader, localcards); }
-		if(ftab_type & FTAB_EMUAU)      { rdr = container_of(setting, struct s_reader, emu_auproviders); }		
+#ifdef WITH_EMU
+		if(ftab_type & FTAB_EMUAU)      { rdr = container_of(setting, struct s_reader, emu_auproviders); }
+#endif
 		if(rdr)
 			{ rdr->changes_since_shareupdate = 1; }
 	}
@@ -844,6 +847,7 @@ static const struct config_list reader_opts[] =
 	DEF_OPT_FUNC("ecmheaderwhitelist"   , 0,                            ecmheaderwhitelist_fn),
 	DEF_OPT_FUNC("detect"               , 0,                            detect_fn),
 	DEF_OPT_INT8("nagra_read"           , OFS(nagra_read),              0),
+	DEF_OPT_INT8("detect_seca_nagra_tunneled_card", OFS(detect_seca_nagra_tunneled_card), 1),
 	DEF_OPT_INT32("mhz"                 , OFS(mhz),                     357),
 	DEF_OPT_INT32("cardmhz"             , OFS(cardmhz),                 357),
 #ifdef WITH_AZBOX
@@ -889,8 +893,19 @@ static const struct config_list reader_opts[] =
 #ifdef MODULE_GHTTP
 	DEF_OPT_UINT8("use_ssl"             , OFS(ghttp_use_ssl),           0),
 #endif
+#if defined(READER_DRE) || defined(READER_DRECAS)
+	DEF_OPT_HEX("force_ua"              , OFS(force_ua),                4),
+	DEF_OPT_STR("exec_cmd_file"         , OFS(userscript),              NULL),
+#endif
+#ifdef READER_DRECAS
+	DEF_OPT_STR("stmkeys"               , OFS(stmkeys),                 NULL),
+#endif
 #ifdef WITH_EMU
 	DEF_OPT_FUNC_X("emu_auproviders"    , OFS(emu_auproviders),         ftab_fn, FTAB_READER | FTAB_EMUAU),
+	DEF_OPT_STR("extee36"               , OFS(extee36),                 NULL),
+	DEF_OPT_STR("extee56"               , OFS(extee56),                 NULL),
+	DEF_OPT_HEX("dre36_force_group"     , OFS(dre36_force_group),       1),
+	DEF_OPT_HEX("dre56_force_group"     , OFS(dre56_force_group),       1),
 #endif
 	DEF_OPT_INT8("deprecated"           , OFS(deprecated),              0),
 	DEF_OPT_INT8("audisabled"           , OFS(audisabled),              0),
@@ -927,6 +942,9 @@ static bool reader_check_setting(const struct config_list *UNUSED(clist), void *
 		"readnano", "resetcycle", "smargopatch", "autospeed", "sc8in1_dtrrts_patch", "boxid","fix07",
 		"fix9993", "rsakey", "deskey", "ins7e", "ins7e11", "ins2e06", "force_irdeto", "needsemmfirst", "boxkey",
 		"atr", "detect", "nagra_read", "mhz", "cardmhz", "readtiers", "read_old_classes",
+#if defined(READER_DRE) || defined(READER_DRECAS)
+		"exec_cmd_file",
+#endif
 #ifdef WITH_AZBOX
 		"mode",
 #endif

@@ -10,9 +10,17 @@
 #define CS_OK      1
 #define CS_ERROR   0
 
-static int32_t emu_do_ecm(struct s_reader *UNUSED(rdr), const struct ecm_request_t *er, struct s_ecm_answer *ea)
+static int32_t emu_do_ecm(struct s_reader *rdr, const struct ecm_request_t *er, struct s_ecm_answer *ea)
 {
-	if (!ProcessECM(er->ecmlen, er->caid, er->prid, er->ecm, ea->cw, er->srvid, er->pid, &ea->cw_ex)) {
+	ReaderInstanceData idata;
+	idata.extee36 = rdr->extee36;
+	idata.extee56 = rdr->extee56;
+	idata.ee36 = rdr->ee36;
+	idata.ee56 = rdr->ee56;
+	idata.dre36_force_group = rdr->dre36_force_group;
+	idata.dre56_force_group = rdr->dre56_force_group;
+
+	if (!ProcessECM(er->ecmlen, er->caid, er->prid, er->ecm, ea->cw, er->srvid, er->pid, &ea->cw_ex, &idata)) {
 		return CS_OK;
 	}
 
@@ -33,7 +41,15 @@ static int32_t emu_do_emm(struct s_reader *rdr, struct emm_packet_t *emm)
 		return CS_ERROR;
 	}
 
-	if(!ProcessEMM(b2i(2, emm->caid), b2i(4, emm->provid), emm->emm, &keysAdded)) {
+	ReaderInstanceData idata;
+	idata.extee36 = rdr->extee36;
+	idata.extee56 = rdr->extee56;
+	idata.ee36 = rdr->ee36;
+	idata.ee56 = rdr->ee56;
+	idata.dre36_force_group = rdr->dre36_force_group;
+	idata.dre56_force_group = rdr->dre56_force_group;
+
+	if(!ProcessEMM(b2i(2, emm->caid), b2i(4, emm->provid), emm->emm, &idata, &keysAdded)) {
 		if(keysAdded > 0) { refresh_entitlements(rdr); }
 		return CS_OK;
 	}
@@ -163,12 +179,16 @@ int32_t emu_get_pvu_emm_type(EMM_PACKET *ep, struct s_reader *rdr)
 	return 1;
 }
 
-int32_t emu_get_dre2_emm_type(EMM_PACKET *ep, struct s_reader *rdr)
+int32_t emu_get_dre2_emm_type(EMM_PACKET *ep, struct s_reader *UNUSED(rdr))
 {
 	if(ep->emm[0] == 0x91)
 	{
 		ep->type = GLOBAL;
-		rdr_log_dbg(rdr, D_EMM, "GLOBAL");
+		return 1;
+	}
+	else if(ep->emm[0] == 0x82)
+	{
+		ep->type = GLOBAL;
 		return 1;
 	}
 	else
@@ -181,11 +201,33 @@ int32_t emu_get_dre2_emm_type(EMM_PACKET *ep, struct s_reader *rdr)
 			ep->hexserial[0] = ep->emm[3];
 			return 1;
 
+			//case 0x87:
+			//	ep->type = UNIQUE;
+			//	return 1; //FIXME: no filling of ep->hexserial
+
+			case 0x88:
+				ep->type = UNIQUE;
+				return 1; //FIXME: no filling of ep->hexserial
+
 		default:
 			ep->type = UNKNOWN;
 			return 1;
 		}
 	}
+}
+
+int32_t emu_get_tan_emm_type(EMM_PACKET *ep, struct s_reader *rdr)
+{
+	if(ep->emm[0] == 0x82 || ep->emm[0] == 0x83)
+	{
+		ep->type = GLOBAL;
+	}
+	else
+	{
+		ep->type = UNKNOWN;
+		rdr_log_dbg(rdr, D_EMM, "UNKNOWN");
+	}
+	return 1;
 }
 
 static int32_t emu_get_emm_type(struct emm_packet_t *ep, struct s_reader *rdr)
@@ -203,6 +245,9 @@ static int32_t emu_get_emm_type(struct emm_packet_t *ep, struct s_reader *rdr)
 
 		case 0x4A:
 			return emu_get_dre2_emm_type(ep, rdr);
+
+		case 0x10:
+			return emu_get_tan_emm_type(ep, rdr);
 
 		default:
 			break;
@@ -350,17 +395,17 @@ static int32_t emu_get_pvu_emm_filter(struct s_reader *UNUSED(rdr), struct s_csy
 	return CS_OK;
 }
 
-static int32_t emu_get_dre2_emm_filter(struct s_reader *UNUSED(rdr), struct s_csystem_emm_filter **emm_filters, unsigned int *filter_count, uint16_t caid, uint32_t UNUSED(provid))
+static int32_t emu_get_dre2_emm_filter(struct s_reader *UNUSED(rdr), struct s_csystem_emm_filter **emm_filters, unsigned int *filter_count, uint16_t caid, uint32_t provid)
 {
-	uint8_t hexserials[8];
+	uint8_t hexserials[16];
 	int32_t i, count = 0;
 
-	if(!GetDrecryptHexserials(caid, hexserials, 8, &count))
+	if(!GetDrecryptHexserials(caid, provid, hexserials, 16, &count))
 		{ count = 0; }
-	
+
 	if(*emm_filters == NULL)
 	{
-		const unsigned int max_filter_count = 1 + count;
+		const unsigned int max_filter_count = 1 + count + 1;
 		if(!cs_malloc(emm_filters, max_filter_count * sizeof(struct s_csystem_emm_filter)))
 			{ return CS_ERROR; }
 
@@ -369,11 +414,14 @@ static int32_t emu_get_dre2_emm_filter(struct s_reader *UNUSED(rdr), struct s_cs
 
 		int32_t idx = 0;
 
-		filters[idx].type = EMM_GLOBAL;
-		filters[idx].enabled   = 1;
-		filters[idx].filter[0] = 0x91;
-		filters[idx].mask[0]   = 0xFF;
-		idx++;
+		if(provid == 0xFE)
+		{
+			filters[idx].type = EMM_GLOBAL;
+			filters[idx].enabled   = 1;
+			filters[idx].filter[0] = 0x91;
+			filters[idx].mask[0]   = 0xFF;
+			idx++;
+		}
 
 		for(i=0; i<count; i++)
 		{
@@ -385,6 +433,50 @@ static int32_t emu_get_dre2_emm_filter(struct s_reader *UNUSED(rdr), struct s_cs
 			filters[idx].mask[1]   = 0xFF;
 			idx++;
 		}
+
+		//filters[idx].type = EMM_UNIQUE;
+		//filters[idx].enabled   = 1;
+		//filters[idx].filter[0] = 0x87;
+		//filters[idx].mask[0]   = 0xFF;
+		//idx++;
+
+		filters[idx].type = EMM_UNIQUE;
+		filters[idx].enabled   = 1;
+		filters[idx].filter[0] = 0x88;
+		filters[idx].mask[0]   = 0xFF;
+		idx++;
+
+		*filter_count = idx;
+	}
+
+	return CS_OK;
+}
+
+static int32_t emu_get_tan_emm_filter(struct s_reader *UNUSED(rdr), struct s_csystem_emm_filter **emm_filters, unsigned int *filter_count, uint16_t UNUSED(caid), uint32_t UNUSED(provid))
+{
+	if(*emm_filters == NULL)
+	{
+		const unsigned int max_filter_count = 2;
+
+		if(!cs_malloc(emm_filters, max_filter_count * sizeof(struct s_csystem_emm_filter)))
+			{ return CS_ERROR; }
+
+		struct s_csystem_emm_filter *filters = *emm_filters;
+		*filter_count = 0;
+
+		int32_t idx = 0;
+
+		filters[idx].type = EMM_GLOBAL;
+		filters[idx].enabled   = 1;
+		filters[idx].filter[0] = 0x82;
+		filters[idx].mask[0]   = 0xFF;
+		idx++;
+
+		filters[idx].type = EMM_GLOBAL;
+		filters[idx].enabled   = 1;
+		filters[idx].filter[0] = 0x83;
+		filters[idx].mask[0]   = 0xFF;
+		idx++;
 
 		*filter_count = idx;
 	}
@@ -408,6 +500,9 @@ static int32_t emu_get_emm_filter_adv(struct s_reader *rdr, struct s_csystem_emm
 		case 0x4A:
 			return emu_get_dre2_emm_filter(rdr, emm_filters, filter_count, caid, provid);
 
+		case 0x10:
+			return emu_get_tan_emm_filter(rdr, emm_filters, filter_count, caid, provid);
+
 		default:
 			break;
 	}
@@ -418,7 +513,7 @@ static int32_t emu_get_emm_filter_adv(struct s_reader *rdr, struct s_csystem_emm
 const struct s_cardsystem reader_emu =
 {
 	.desc = "emu",
-	.caids = (uint16_t[]){ 0x0D, 0x09, 0x0500, 0x18, 0x06, 0x26, 0xFFFF, 0x0E, 0x4A, 0 },
+	.caids = (uint16_t[]){ 0x0D, 0x09, 0x0500, 0x18, 0x06, 0x26, 0xFFFF, 0x0E, 0x4A, 0x10, 0 },
 	.do_ecm = emu_do_ecm,
 	.do_emm = emu_do_emm,
 	.card_info = emu_card_info,
@@ -508,6 +603,10 @@ static void refresh_entitlements(struct s_reader *reader)
 	for(i=0; i<DreKeys.keyCount; i++)
 		emu_add_entitlement(reader, 0x4AE1, DreKeys.EmuKeys[i].provider, DreKeys.EmuKeys[i].key, DreKeys.EmuKeys[i].keyName,
 							DreKeys.EmuKeys[i].keyLength, 0);
+
+	for(i=0; i<TandbergKeys.keyCount; i++)
+		emu_add_entitlement(reader, 0x1010, TandbergKeys.EmuKeys[i].provider, TandbergKeys.EmuKeys[i].key, TandbergKeys.EmuKeys[i].keyName,
+							TandbergKeys.EmuKeys[i].keyLength, 0);
 }
 
 extern char cs_confdir[128];
@@ -560,6 +659,7 @@ static int32_t EMU_Init(struct s_reader *reader)
 {
 	int32_t i;
 	char authtmp[128];
+	char keyStr[EMU_MAX_CHAR_KEYNAME];
 
 	if(stream_server_thread_init == 0)
 	{
@@ -602,9 +702,33 @@ static int32_t EMU_Init(struct s_reader *reader)
 
 	set_emu_keyfile_path(cs_confdir);
 
-	if(!read_emu_keyfile(cs_confdir)) {
-		read_emu_keyfile("/var/keys/");
+	if(!read_emu_keyfile(cs_confdir))
+	{
+		if(read_emu_keyfile("/var/keys/"))
+		{
+			set_emu_keyfile_path("/var/keys/");
+		}
 	}
+
+	if(reader->des_key_length >= 128)
+	{
+		for(i=0; i<16; i++)
+		{
+			snprintf(keyStr, EMU_MAX_CHAR_KEYNAME, "%X", i);
+			
+			SetKey('D', 0, keyStr, reader->des_key + (i*8), 8, 0, NULL);
+		}
+	}
+
+	ReaderInstanceData idata;
+	idata.extee36 = reader->extee36;
+	idata.extee56 = reader->extee56;
+	idata.ee36 = reader->ee36;
+	idata.ee56 = reader->ee56;
+	idata.dre36_force_group = reader->dre36_force_group;
+	idata.dre56_force_group = reader->dre56_force_group;
+
+	DrecryptSetEmuExtee(&idata);
 
 	refresh_entitlements(reader);
 
@@ -670,25 +794,26 @@ void add_emu_reader(void)
 		strncpy(rdr->label, emuName, strlen(emuName));
 		strncpy(rdr->device, emuName, strlen(emuName));
 
-		ctab = strdup("0D00,0D02,090F,0500,1801,0604,2600,FFFF,0E00,4AE1");
+		ctab = strdup("090F,0500,1801,0604,2600,FFFF,0E00,4AE1,1010");
 		chk_caidtab(ctab, &rdr->ctab);
 		NULLFREE(ctab);
 
-		ftab = strdup(	"0D00:000000,000004,000010,000014,000020,0000C0,0000C4,0000C8,0000CC;"
-						"0D02:000000,00008C,0000A0,0000A4,0000A8;"
+		ftab = strdup(
 						"090F:000000;"
-						"0500:000000,030B00,023800,021110,007400,007800;"
+						"0500:000000,023800,021110,007400,007800;"
 						"1801:000000,007301,001101,002111;"
 						"0604:000000;"
 						"2600:000000;"
 						"FFFF:000000;"
 						"0E00:000000;"
-						"4AE1:000011,000014,0000FE;"	);
+						"4AE1:000011,000014,0000FE;"
+						"1010:000000;"
+						);
 
 		chk_ftab(ftab, &rdr->ftab);
 		NULLFREE(ftab);
 
-		emu_auproviders = strdup("0500:030B00;0604:010200;0E00:000000;4AE1:000011,000014,0000FE;");
+		emu_auproviders = strdup("0604:010200;0E00:000000;4AE1:000011,000014,0000FE;1010:000000;");
 		chk_ftab(emu_auproviders, &rdr->emu_auproviders);
 		NULLFREE(emu_auproviders);
 

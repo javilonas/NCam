@@ -17,7 +17,7 @@
 #include "ncam-string.h"
 #include "ncam-time.h"
 
-const int32_t CWS_NETMSGSIZE = 500;  //csp 0.8.9 (default: 400). This is CWS_NETMSGSIZE. The old default was 240
+const int32_t CWS_NETMSGSIZE = 1024;  //csp 0.8.9 (default: 400). This is CWS_NETMSGSIZE. The old default was 240
 
 #define NCD_CLIENT_ID 0x0000
 
@@ -919,6 +919,13 @@ static int8_t newcamd_auth_client(IN_ADDR_T ip, uint8_t *deskey)
 			// set userfilter for au enabled clients
 			if(aureader)
 			{
+#ifdef WITH_EMU
+				if(aureader->typ == R_EMU)
+				{
+					usr_filter = * get_emu_prids_for_caid(aureader, cfg.ncd_ptab.ports[cl->port_idx].ncd->ncd_ftab.filts[0].caid);
+				}
+				else
+#endif
 				mk_user_au_ftab(aureader, &usr_filter);
 			}
 
@@ -948,6 +955,13 @@ static int8_t newcamd_auth_client(IN_ADDR_T ip, uint8_t *deskey)
 			else
 				{ memset(&mbuf[8], 0, 6); } //mbuf[8] - mbuf[13]
 
+#ifdef WITH_EMU
+			if(aureader && aureader->typ == R_EMU && caid_is_dre(pufilt->caid))
+			{
+				mbuf[10] = aureader->dre36_force_group;
+			}
+#endif
+
 			mbuf[14] = pufilt->nprids;
 			for(j = 0; j < pufilt->nprids; j++)
 			{
@@ -973,7 +987,7 @@ static int8_t newcamd_auth_client(IN_ADDR_T ip, uint8_t *deskey)
 					int32_t k, found;
 					uint32_t rprid;
 					found = 0;
-					if(pufilt->caid == aureader->caid)
+					if(pufilt->caid == aureader->caid && aureader->typ != R_EMU)
 					{
 						for(k = 0; (k < aureader->nprov); k++)
 						{
@@ -999,6 +1013,32 @@ static int8_t newcamd_auth_client(IN_ADDR_T ip, uint8_t *deskey)
 							}
 						}
 					}
+#ifdef WITH_EMU
+					else if(aureader->typ == R_EMU)
+					{
+						if(caid_is_dre(pufilt->caid))
+						{
+							found = 1;
+							memset(&mbuf[22 + 11 * j] ,0 ,4);
+							switch((uchar)(pufilt->prids[j]))
+							{
+								case 0x11:
+									mbuf[22 + 11 * j] = aureader->dre36_force_group;
+									break;
+								case 0x14:
+									mbuf[22 + 11 * j] = aureader->dre56_force_group;
+									break;
+								case 0xfe:
+									mbuf[22 + 11 * j] = 0xED;
+									mbuf[25 + 11 * j] = 0x02;
+									break;
+								default:
+									found = 0;
+							}
+						}
+					}
+#endif
+
 					if(!found)
 					{
 						mbuf[22 + 11 * j] = 0x00;
@@ -1130,30 +1170,31 @@ static void newcamd_process_ecm(struct s_client *cl, uchar *buf, int32_t len)
 
 static void newcamd_process_emm(uchar *buf, int32_t len)
 {
-	int32_t ok = 1;
+	int32_t ok = 1, provid;
 	uint16_t caid = 0;
 	struct s_client *cl = cur_client();
 	EMM_PACKET epg;
 
 	if(len < 3)
 		{ return; }
-	
+
 	memset(&epg, 0, sizeof(epg));
 
 	epg.emmlen = SCT_LEN(buf);
 	if(epg.emmlen > MAX_EMM_SIZE || epg.emmlen > len)
 		{ return; }
-	
+
 	caid = cfg.ncd_ptab.ports[cl->port_idx].ncd->ncd_ftab.filts[0].caid;
 	epg.caid[0] = (uchar)(caid >> 8);
 	epg.caid[1] = (uchar)(caid);
 
-	/*
-	  epg.provid[0] = (uchar)(aureader->auprovid>>24);
-	  epg.provid[1] = (uchar)(aureader->auprovid>>16);
-	  epg.provid[2] = (uchar)(aureader->auprovid>>8);
-	  epg.provid[3] = (uchar)(aureader->auprovid);
-	*/
+	provid = cfg.ncd_ptab.ports[cl->port_idx].ncd->ncd_ftab.filts[0].prids[0];
+
+	epg.provid[0] = (uchar)(provid>>24);
+	epg.provid[1] = (uchar)(provid>>16);
+	epg.provid[2] = (uchar)(provid>>8);
+	epg.provid[3] = (uchar)(provid);
+
 	/*  if (caid == 0x0500)
 	  {
 	    uint16_t emm_head;
@@ -1350,7 +1391,7 @@ static void *newcamd_server(struct s_client *client, uchar *mbuf, int32_t len)
 		break;
 
 	default:
-		if(mbuf[2] > 0x81 && mbuf[2] < 0x90)
+		if(mbuf[2] > 0x81 && mbuf[2] < 0x92)
 			{ newcamd_process_emm(mbuf + 2, len - 2); }
 		else
 		{
@@ -1496,7 +1537,7 @@ static int32_t newcamd_recv_chk(struct s_client *client, uchar *dcw, int32_t *rc
 		return -1;
 
 	default:
-		if(buf[2] > 0x81 && buf[2] < 0x90)  //answer to emm
+		if(buf[2] > 0x81 && buf[2] < 0x92)  //answer to emm
 		{
 			return -1;
 		}

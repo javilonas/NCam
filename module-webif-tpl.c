@@ -400,6 +400,7 @@ char *tpl_getUnparsedTpl(const char *name, int8_t removeHeader, const char *subd
 											size_t len = strlen(ptr2);
 											check_conf(WITH_CARDREADER, ptr2);
 											check_conf(CARDREADER_PHOENIX, ptr2);
+											check_conf(CARDREADER_DRECAS, ptr2);
 											check_conf(CARDREADER_INTERNAL_AZBOX, ptr2);
 											check_conf(CARDREADER_INTERNAL_COOLAPI, ptr2);
 											check_conf(CARDREADER_INTERNAL_SCI, ptr2);
@@ -450,9 +451,6 @@ char *tpl_getUnparsedTpl(const char *name, int8_t removeHeader, const char *subd
 											check_conf(READER_VIACCESS, ptr2);
 											check_conf(READER_VIDEOGUARD, ptr2);
 											check_conf(WITH_CARDREADER, ptr2);
-											check_conf(WITH_DEBUG, ptr2);
-											check_conf(WITH_LB, ptr2);
-											check_conf(WITH_LIBCRYPTO, ptr2);
 											check_conf(WITH_SSL, ptr2);
 											check_conf(WITH_STAPI, ptr2);
 											check_conf(WITH_STAPI5, ptr2);
@@ -591,7 +589,7 @@ int32_t tpl_saveIncludedTpls(const char *path)
 		{
 			if(strncmp(tpl->tpl_name, "IC", 2) != 0)
 			{
-				fprintf(fp, "<!--NCAm;%lu;%s;%s-->\n", crc32(0L, (unsigned char *)tpl->tpl_data, tpl->tpl_data_len), CS_VERSION, tpl->tpl_deps);
+				fprintf(fp, "<!--NCAm;%d;%s;%s-->\n", crc32(0, (uint8_t *)tpl->tpl_data, tpl->tpl_data_len), CS_VERSION, tpl->tpl_deps);
 			}
 			fwrite(tpl->tpl_data, tpl->tpl_data_len, 1, fp);
 			fclose(fp);

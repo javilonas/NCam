@@ -26,9 +26,7 @@
 #include "ncam-work.h"
 
 //Mode names for CMD_05 command:
-static const char *cmd05_mode_name[] = { "UNKNOWN", "PLAIN", "AES", "CC_CRYPT", "RC4",
-									   "LEN=0"
-									   };
+static const char *cmd05_mode_name[] = { "UNKNOWN", "PLAIN", "AES", "CC_CRYPT", "RC4", "LEN=0"};
 
 //Mode names for CMD_0C command:
 static const char *cmd0c_mode_name[] = { "NONE", "RC6", "RC4", "CC_CRYPT", "AES", "IDEA" };
@@ -2577,6 +2575,10 @@ int32_t cc_parse_msg(struct s_client *cl, uint8_t *buf, int32_t l)
 		}
 
 		cs_writeunlock(__func__, &cc->cards_busy);
+
+#ifdef MODULE_CCCSHARE
+		cccam_refresh_share();
+#endif
 
 		break;
 	}

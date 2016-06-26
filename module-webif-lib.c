@@ -864,19 +864,34 @@ SSL_CTX *SSL_Webif_Init(void)
 	CRYPTO_set_dynlock_lock_callback(SSL_dyn_lock_function);
 	CRYPTO_set_dynlock_destroy_callback(SSL_dyn_destroy_function);
 
-	if(cfg.http_force_sslv3)
+	ctx = SSL_CTX_new(SSLv23_server_method());
+
+#if defined(SSL_CTX_set_ecdh_auto)
+		SSL_CTX_set_ecdh_auto(ctx, 1);
+#elif defined(EC_PKEY_NO_PARAMETERS) && defined(NID_X9_62_prime256v1)
+		EC_KEY *ecdh = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1);
+		if(ecdh)
+		{
+			SSL_CTX_set_tmp_ecdh(ctx, ecdh);
+			EC_KEY_free(ecdh);
+		}
+#endif
+
+	if(cfg.https_force_secure_mode)
 	{
-		ctx = SSL_CTX_new(SSLv3_server_method());
+
 #ifdef SSL_CTX_clear_options
 		SSL_CTX_clear_options(ctx, SSL_OP_ALL); //we CLEAR all bug workarounds! This is for security reason
 #else
-		cs_log("WARNING: You enabled to force sslv3 but your system does not support to clear the ssl workarounds! SSL security will be reduced!");
+		cs_log("WARNING: You enabled to force secure HTTPS but your system does not support to clear the ssl workarounds! SSL security will be reduced!");
 #endif
-		SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv2); // we force SSL v3 !
-		SSL_CTX_set_cipher_list(ctx, SSL_TXT_RC4);
 	}
-	else
-		{ ctx = SSL_CTX_new(SSLv23_server_method()); }
+
+#ifdef SSL_OP_NO_TLSv1_1
+	SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 | SSL_OP_NO_TLSv1);
+#else
+	SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3);
+#endif
 
 	char path[128];
 

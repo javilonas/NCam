@@ -6,11 +6,8 @@
 #define DES_IP_1            2
 #define DES_RIGHT           4
 
-#define DES_ECM_CRYPT       0
-#define DES_ECM_HASH        DES_HASH
 #define DES_ECS2_DECRYPT    (DES_IP | DES_IP_1 | DES_RIGHT)
 #define DES_ECS2_CRYPT      (DES_IP | DES_IP_1)
-
 
 #define CRYPT           0
 #define HASH            1

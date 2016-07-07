@@ -1,0 +1,6 @@
+python
+import sys
+sys.path.insert(0, '/home/christophe/x-tools/mipsel-tuxbox-linux-gnu/share/gcc-4.8.1/python')
+from libstdcxx.v6.printers import register_libstdcxx_printers
+register_libstdcxx_printers (None)
+end

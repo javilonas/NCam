@@ -1,0 +1,13 @@
+prefix=/home/lonas/toolchains/mipsel-tuxbox-linux-gnu/mipsel-tuxbox-linux-gnu/sysroot/usr
+exec_prefix=/home/lonas/toolchains/mipsel-tuxbox-linux-gnu/mipsel-tuxbox-linux-gnu/sysroot/usr
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include/PCSC
+usbdropdir=/home/lonas/toolchains/mipsel-tuxbox-linux-gnu/mipsel-tuxbox-linux-gnu/sysroot/usr/lib/pcsc/drivers
+serialconfdir=/home/lonas/toolchains/mipsel-tuxbox-linux-gnu/mipsel-tuxbox-linux-gnu/sysroot/usr/etc/reader.conf.d
+
+Name: PCSC Lite
+Description: PC/SC smart card interface
+Version: 1.8.11
+Libs: -L${libdir} -lpcsclite
+Libs.private: 
+Cflags: -I${includedir} -pthread

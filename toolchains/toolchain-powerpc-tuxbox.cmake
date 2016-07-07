@@ -1,4 +1,4 @@
-SET(CMAKE_FIND_ROOT_PATH /home/lonas/toolchains/powerpc-tuxbox-linux-gnu/powerpc-linux)
+SET(CMAKE_FIND_ROOT_PATH /home/*/NCam/cross/powerpc-tuxbox-linux-gnu/powerpc-linux)
 SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)

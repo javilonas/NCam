@@ -1,0 +1,6 @@
+Move dm500 directory under /opt/cross otherwise it would not work, because
+GCC 3.4 have hardcoded include search PATHs. The tree should look like this:
+
+  /opt/cross/dm500/cdk
+  /opt/cross/dm500/cdkroot
+  /opt/cross/dm500/README

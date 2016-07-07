@@ -1,0 +1,11 @@
+prefix=/home/bixio/x-tools/sh4-unknown-linux-gnu/sh4-unknown-linux-gnu/sysroot/usr
+exec_prefix=/home/bixio/x-tools/sh4-unknown-linux-gnu/sh4-unknown-linux-gnu/sysroot/usr
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libusbx-1.0
+Description: C API for USB device access from Linux, Mac OS X, Windows and OpenBSD/NetBSD userspace
+Version: 1.0.12
+Libs: -L${libdir} -lusb-1.0
+Libs.private: -lrt -pthread
+Cflags: -I${includedir}/libusb-1.0

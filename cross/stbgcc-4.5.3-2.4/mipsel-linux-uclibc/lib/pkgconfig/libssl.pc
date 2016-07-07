@@ -1,0 +1,11 @@
+prefix=/home/lonas/toolchains/stbgcc-4.5.3-2.4
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: OpenSSL
+Description: Secure Sockets Layer and cryptography libraries
+Version: 0.9.8x
+Requires: 
+Libs: -L${libdir} -lssl -lcrypto -ldl
+Cflags: -I${includedir} 

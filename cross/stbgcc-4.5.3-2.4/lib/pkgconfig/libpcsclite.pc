@@ -1,0 +1,12 @@
+prefix=/home/lonas/toolchains/stbgcc-4.5.3-2.4
+exec_prefix=/home/lonas/toolchains/stbgcc-4.5.3-2.4
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include/PCSC
+usbdropdir=/home/lonas/toolchains/stbgcc-4.5.3-2.4/lib/pcsc/drivers
+
+Name: PCSC Lite
+Description: PC/SC smart card interface
+Version: 1.8.6
+Libs: -L${libdir} -lpcsclite
+Libs.private: 
+Cflags: -I${includedir} -pthread

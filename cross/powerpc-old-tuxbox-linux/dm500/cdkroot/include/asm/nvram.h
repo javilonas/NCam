@@ -1,0 +1,5 @@
+/*
+ * PreP compliant NVRAM access
+ */
+
+

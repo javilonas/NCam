@@ -1,0 +1,5 @@
+/* GNU ld script
+   Use the shared library, but some functions are only in
+   the static library, so try that secondarily.  */
+OUTPUT_FORMAT(elf32-powerpc)
+GROUP ( /opt/cross/dm500/cdkroot/lib/libpthread.so.0 /opt/cross/dm500/cdkroot/lib/libpthread_nonshared.a )

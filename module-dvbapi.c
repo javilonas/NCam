@@ -4662,6 +4662,40 @@ void dvbapi_process_input(int32_t demux_id, int32_t filter_num, uchar *buffer, i
 			dvbapi_stop_filternum(demux_id, filter_num);
 			return;
 		}
+
+#ifdef WITH_EMU
+		if((demux[demux_id].demux_fd[filter_num].caid>>8)==0x10)
+		{
+			uint32_t i;
+			uint32_t emmhash;
+
+			if(sctlen < 4)
+			{
+				return;
+			}
+
+			for(i=0; i+2<sctlen; i++)
+			{
+				if(buffer[i]==0xF0 && (buffer[i+2]==0xE1 || buffer[i+2]==0xE4))
+				{
+					emmhash = (buffer[3]<<8) | buffer[sctlen-2];
+
+					if(demux[demux_id].demux_fd[filter_num].cadata == emmhash)
+					{
+						return;
+					}
+
+					demux[demux_id].demux_fd[filter_num].cadata = emmhash;
+
+					dvbapi_process_emm(demux_id, filter_num, buffer, sctlen);
+					return;
+				}
+			}
+
+			return;
+		}
+#endif
+
 		dvbapi_process_emm(demux_id, filter_num, buffer, sctlen);
 	}
 	

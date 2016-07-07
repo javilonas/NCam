@@ -134,10 +134,18 @@ cross-mips-sgi-irix6.5:
 		EXTRA_FLAGS="-static-libgcc" \
 		$(MAKEFLAGS)
 
+cross-mipsel-router-linux-uclibc-libusb:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		EXTRA_FLAGS="-static-libgcc -I. -s" \
+		USE_LIBUSB=1 \
+		LIBUSB_LIB=$(LIBUSB_LIB) \
+		$(MAKEFLAGS)
+
 cross-mipsel-router-linux-uclibc:
 	$(MAKE) --no-print-directory \
-		CROSS=mipsel-linux-uclibc- \
-		EXTRA_FLAGS="-static-libgcc" \
+		CROSS=$(CROSS) \
+		EXTRA_FLAGS="-static-libgcc -I. -s" \
 		$(MAKEFLAGS)
 
 cross-mipsel-router-linux-uclibc927: cross-mipsel-router-linux-uclibc
@@ -161,9 +169,45 @@ cross-mips-router-linux-uclibc930: cross-mips-router-linux-uclibc
 cross-mips-router-linux-uclibc931: cross-mips-router-linux-uclibc930
 cross-mipsel-fonera2: cross-mips-router-linux-uclibc
 
+cross-mipsel-tuxbox-linux-gnu-libusb-pcsc:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		CONF_DIR=/var/tuxbox/config \
+		USE_PCSC=1 \
+		PCSC_LIB=$(PCSC_LIB) \
+		EXTRA_FLAGS="-mips1 -static-libgcc -EL -I. -s" \
+		USE_LIBUSB=1 \
+		LIBUSB_LIB=$(LIBUSB_LIB) \
+		$(MAKEFLAGS)
+
+cross-mipsel-tuxbox-linux-gnu:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		CONF_DIR=/var/tuxbox/config \
+		EXTRA_FLAGS="-mips1 -static-libgcc -EL -I. -s" \
+		$(MAKEFLAGS)
+
 cross-mipsel-tuxbox-linux:
 	$(MAKE) --no-print-directory \
 		CROSS=mipsel-unknown-linux-gnu- \
+		CONF_DIR=/var/tuxbox/config \
+		EXTRA_FLAGS="-mips1 -static-libgcc -EL -I. -s" \
+		$(MAKEFLAGS)
+
+cross-mipsel-linux-uclibc-libusb-pcsc:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		CONF_DIR=/var/tuxbox/config \
+		USE_PCSC=1 \
+		PCSC_LIB=$(PCSC_LIB) \
+		EXTRA_FLAGS="-mips1 -static-libgcc -EL -I. -s" \
+		USE_LIBUSB=1 \
+		LIBUSB_LIB=$(LIBUSB_LIB) \
+		$(MAKEFLAGS)
+
+cross-mipsel-linux-uclibc:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
 		CONF_DIR=/var/tuxbox/config \
 		EXTRA_FLAGS="-mips1 -static-libgcc -EL -I. -s" \
 		$(MAKEFLAGS)
@@ -175,44 +219,95 @@ cross-mipsel-tuxbox-linux-glibc:
 		EXTRA_FLAGS="-mips1 -static-libgcc -EL -I. -s" \
 		$(MAKEFLAGS)
 
+cross-arm-tuxbox-linux-libusb:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		CONF_DIR=/var/tuxbox/config \
+		EXTRA_FLAGS="-mtune=cortex-a9 -mcpu=cortex-a9 -mfpu=neon-vfpv4 -static-libgcc -I. -s" \
+		USE_LIBUSB=1 \
+		LIBUSB_LIB=$(LIBUSB_LIB) \
+		$(MAKEFLAGS)
+
 cross-arm-tuxbox-linux:
 	$(MAKE) --no-print-directory \
-		CROSS=arm-unknown-linux-gnueabi- \
+		CROSS=$(CROSS) \
 		CONF_DIR=/var/tuxbox/config \
 		EXTRA_FLAGS="-mtune=cortex-a9 -mcpu=cortex-a9 -mfpu=neon-vfpv4 -static-libgcc -I. -s" \
 		$(MAKEFLAGS)
 
+cross-sh4-tuxbox-linux-libusb-pcsc:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		CONF_DIR=/var/tuxbox/config \
+		USE_PCSC=1 \
+		PCSC_LIB=$(PCSC_LIB) \
+		EXTRA_FLAGS="-static-libgcc -I. -s" \
+		USE_LIBUSB=1 \
+		LIBUSB_LIB=$(LIBUSB_LIB) \
+		$(MAKEFLAGS)
+
 cross-sh4-tuxbox-linux:
 	$(MAKE) --no-print-directory \
-		CROSS=sh4-unknown-linux-gnu- \
+		CROSS=$(CROSS) \
 		CONF_DIR=/var/tuxbox/config \
 		EXTRA_FLAGS="-static-libgcc -I. -s" \
 		$(MAKEFLAGS)
 
+cross-x86_64-tuxbox-linux-libusb-pcsc:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		CONF_DIR=/var/tuxbox/config \
+		USE_PCSC=1 \
+		PCSC_LIB=$(PCSC_LIB) \
+		EXTRA_FLAGS="-m64 -I. -s" \
+		USE_LIBUSB=1 \
+		LIBUSB_LIB=$(LIBUSB_LIB) \
+		$(MAKEFLAGS)
+
 cross-x86_64-tuxbox-linux:
 	$(MAKE) --no-print-directory \
-		CROSS=x86_64-linux-gnu- \
+		CROSS=$(CROSS) \
 		CONF_DIR=/var/tuxbox/config \
 		EXTRA_FLAGS="-m64 -I. -s" \
 		$(MAKEFLAGS)
 
+cross-x86-tuxbox-linux-libusb-pcsc:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		CONF_DIR=/var/tuxbox/config \
+		USE_PCSC=1 \
+		PCSC_LIB=$(PCSC_LIB) \
+		EXTRA_FLAGS="-m32 -I. -s" \
+		USE_LIBUSB=1 \
+		LIBUSB_LIB=$(LIBUSB_LIB) \
+		$(MAKEFLAGS)
+
 cross-x86-tuxbox-linux:
 	$(MAKE) --no-print-directory \
-		CROSS=i686-unknown-linux-gnu- \
+		CROSS=$(CROSS) \
 		CONF_DIR=/var/tuxbox/config \
 		EXTRA_FLAGS="-m32 -I. -s" \
 		$(MAKEFLAGS)
 
+cross-powerpc-tuxbox-linux-libusb:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		CONF_DIR=/var/tuxbox/config \
+		EXTRA_FLAGS="-I. -s" \
+		USE_LIBUSB=1 \
+		LIBUSB_LIB=$(LIBUSB_LIB) \
+		$(MAKEFLAGS)
+
 cross-powerpc-tuxbox-linux:
 	$(MAKE) --no-print-directory \
-		CROSS=powerpc-tuxbox-linux-gnu- \
+		CROSS=$(CROSS) \
 		CONF_DIR=/var/tuxbox/config \
 		EXTRA_FLAGS="-I. -s" \
 		$(MAKEFLAGS)
 
 cross-ppc-tuxbox-linux:
 	$(MAKE) --no-print-directory \
-		CROSS=powerpc-linux- \
+		CROSS=$(CROSS) \
 		CONF_DIR=/var/tuxbox/config \
 		EXTRA_FLAGS="-I. -s" \
 		$(MAKEFLAGS)

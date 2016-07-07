@@ -179,7 +179,7 @@ static void cacheex_del_hitcache(struct s_client *cl, ECM_REQUEST *er)
 
 	SAFE_RWLOCK_WRLOCK(&hitcache_lock);
 	search_remove_elem_hash_table(&ht_hitcache, &search, sizeof(HIT_KEY), &cacheex_compare_hitkey);
-    SAFE_RWLOCK_UNLOCK(&hitcache_lock);
+	SAFE_RWLOCK_UNLOCK(&hitcache_lock);
 }
 
 void cacheex_cleanup_hitcache(bool force)
@@ -408,9 +408,9 @@ int32_t cacheex_add_stats(struct s_client *cl, uint16_t caid, uint16_t srvid, ui
 	while((cacheex_stats_entry = ll_iter_next(&itr)))
 	{
 		if(cacheex_stats_entry->cache_srvid == srvid &&
-				cacheex_stats_entry->cache_caid == caid &&
-				cacheex_stats_entry->cache_prid == prid &&
-				cacheex_stats_entry->cache_direction == direction)
+			cacheex_stats_entry->cache_caid == caid &&
+			cacheex_stats_entry->cache_prid == prid &&
+			cacheex_stats_entry->cache_direction == direction)
 		{
 			// we already have this entry - just add count and time
 			cacheex_stats_entry->cache_count++;
@@ -511,7 +511,7 @@ void cacheex_cache_push(ECM_REQUEST *er)
 						&& chk_ctab(er->caid, &cl->ctab)  					 //Caid-check
 						&& (!checkECMD5(er) || chk_ident_filter(er->caid, er->prid, &cl->ftab))	 	 //Ident-check (not for csp: prid=0 always!)
 						&& chk_srvid(cl, er) //Service-check
-						&& chk_csp_ctab(er, &cl->account->cacheex.filter_caidtab) //cacheex_ecm_filter			
+						&& chk_csp_ctab(er, &cl->account->cacheex.filter_caidtab) //cacheex_ecm_filter
 				  )
 				{
 					cacheex_cache_push_to_client(cl, er);
@@ -540,7 +540,7 @@ void cacheex_cache_push(ECM_REQUEST *er)
 					&& chk_ctab(er->caid, &rdr->ctab)  					 //Caid-check
 					&& (!checkECMD5(er) || chk_ident_filter(er->caid, er->prid, &rdr->ftab))	 	 //Ident-check (not for csp: prid=0 always!)
 					&& chk_srvid(cl, er) //Service-check
-					&& chk_csp_ctab(er, &rdr->cacheex.filter_caidtab) //cacheex_ecm_filter					
+					&& chk_csp_ctab(er, &rdr->cacheex.filter_caidtab) //cacheex_ecm_filter
 			  )
 			{
 				cacheex_cache_push_to_client(cl, er);

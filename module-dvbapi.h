@@ -159,6 +159,9 @@ typedef struct filter_s
 	uint32_t    SlotHandle[10];
 	uint32_t    BufferHandle[10];
 #endif
+#ifdef WITH_EMU
+	uint32_t cadata;
+#endif
 } FILTERTYPE;
 
 struct s_emmpids

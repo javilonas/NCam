@@ -457,6 +457,10 @@ static int32_t emu_get_tan_emm_filter(struct s_reader *UNUSED(rdr), struct s_csy
 	if(*emm_filters == NULL)
 	{
 		const unsigned int max_filter_count = 2;
+		uint8_t buf[8];
+		
+		if(!FindKey('T', 0x40, 0, "MK", buf, 8, 0, 0, 0, NULL))
+			{ return CS_ERROR; }
 
 		if(!cs_malloc(emm_filters, max_filter_count * sizeof(struct s_csystem_emm_filter)))
 			{ return CS_ERROR; }

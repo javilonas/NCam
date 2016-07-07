@@ -29,7 +29,7 @@
 
 #define PING_INTVL     4
 
-int cspsock; // Output Socket
+int32_t cspsock; // Output Socket
 
 static void *csp_server(struct s_client *client __attribute__((unused)), uchar *mbuf __attribute__((unused)), int32_t n __attribute__((unused)))
 {
@@ -105,6 +105,12 @@ static int32_t csp_cache_push_out(struct s_client *cl, struct ecm_request_t *er)
 	SIN_GET_PORT(peer_sa) = htons(12346);
 	int32_t status = sendto(cl->udp_fd, buf, size, 0, (struct sockaddr *)&peer_sa, sizeof(peer_sa));
 	 */
+	// In Test
+	struct sockaddr_in peer_sa;
+	SIN_GET_FAMILY(peer_sa) = SIN_GET_FAMILY(cl->udp_sa);
+	inet_pton(AF_INET, "127.0.0.1", &SIN_GET_ADDR(peer_sa));
+	SIN_GET_PORT(peer_sa) = htons(12346);
+	sendto(cl->udp_fd, buf, size, 0, (struct sockaddr *) &peer_sa, sizeof(peer_sa));
 
 	int32_t status = sendto(cl->udp_fd, buf, size, 0, (struct sockaddr *) &cl->udp_sa, cl->udp_sa_len);
 	NULLFREE(buf);
@@ -117,7 +123,7 @@ static uint8_t parse_request(struct ecm_request_t *er, uchar *buf)
 	uint16_t srvid = b2i(2, buf + 1);
 	uint16_t onid = b2i(2, buf + 3);
 	uint16_t caid = b2i(2, buf + 5);
-	int32_t hash = b2i(4, buf + 7);
+	uint32_t hash = b2i(4, buf + 7);
 
 	er->caid = caid;
 	er->onid = onid;
@@ -197,12 +203,6 @@ static int32_t csp_recv(struct s_client *client, uchar *buf, int32_t l)
 		break;
 
 	case TYPE_PINGREQ:
-		//cs_ddump_mask(D_TRACE, buf, l, "received ping request from csp");
-		buf[0] = TYPE_PINGRPL;
-		int port = buf[11]<<8 | buf[12];
-		SIN_GET_PORT(client->udp_sa) = htons((uint16_t)port);
-		sendto( cspsock, buf, 9, 0, (struct sockaddr *)&client->udp_sa, client->udp_sa_len);
-
 		if(rs >= 13)
 		{
 			client->last = time((time_t *) 0);
@@ -214,6 +214,14 @@ static int32_t csp_recv(struct s_client *client, uchar *buf, int32_t l)
 			memcpy(pingrpl + 1, buf + 1, 8);
 			int32_t status = sendto(client->udp_fd, pingrpl, sizeof(pingrpl), 0, (struct sockaddr *) &client->udp_sa, client->udp_sa_len);
 			cs_log_dbg(D_TRACE, "received ping from cache peer: %s:%d (replied: %d)", cs_inet_ntoa(SIN_GET_ADDR(client->udp_sa)), port, status);
+		}
+		else
+		{
+			//cs_ddump_mask(D_TRACE, buf, l, "received ping request from csp");
+			buf[0] = TYPE_PINGRPL;
+			int32_t port = buf[11]<<8 | buf[12];
+			SIN_GET_PORT(client->udp_sa) = htons((uint16_t)port);
+			sendto( cspsock, buf, 9, 0, (struct sockaddr *)&client->udp_sa, client->udp_sa_len);
 		}
 		break;
 
@@ -272,7 +280,7 @@ void module_csp(struct s_module *ph)
 	ph->ptab.nports = 1;
 	ph->ptab.ports[0].s_port = cfg.csp_port;
 
-	cspsock = socket(PF_INET,SOCK_DGRAM,IPPROTO_UDP);
+	cspsock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
 	ph->desc = "csp";
 	ph->type = MOD_CONN_UDP;

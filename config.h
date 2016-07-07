@@ -32,7 +32,7 @@
 //#define MODULE_GBOX 1
 //#define MODULE_RADEGAST 1
 #define MODULE_SERIAL 1
-//#define MODULE_CONSTCW 1
+#define MODULE_CONSTCW 1
 //#define MODULE_PANDORA 1
 //#define MODULE_GHTTP 1
 //#define MODULE_SCAM 1

@@ -361,7 +361,7 @@ typedef unsigned char uchar;
  *         constants
  * =========================== */
 #define CS_VERSION    "1.1"
-#define DATE_BUILD    "26-06-2016"
+#define DATE_BUILD    "07-07-2016"
 #ifndef CS_SVN_VERSION
 #   define CS_SVN_VERSION "stable"
 #endif
@@ -378,7 +378,7 @@ typedef unsigned char uchar;
 #define CS_MAXPROV    100
 #define CS_MAXPORTS   200  // max server ports
 #define CS_CLIENT_HASHBUCKETS 32
-#define CS_SERVICENAME_SIZE 64
+#define CS_SERVICENAME_SIZE 32
 
 #define CS_ECMSTORESIZE   16  // use MD5()
 #define CS_EMMSTORESIZE   16  // use MD5()
@@ -1061,7 +1061,7 @@ typedef struct ecm_request_t
 #endif
 
 	void            *src_data;
-	int32_t         csp_hash; 					// csp has its own hash
+	uint32_t         csp_hash; 					// csp has its own hash
 
 	struct s_client *cacheex_src;               // Cacheex origin
 #ifdef CS_CACHEEX

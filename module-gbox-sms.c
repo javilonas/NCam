@@ -37,7 +37,7 @@ static int32_t poll_gsms_data (uint16_t *boxid, uint8_t *num, char *text)
 		return -1;
 		}
 	if(fgets(buffer,140,fhandle) != NULL)
-		{	
+		{
 		*boxid = strtol (buffer, &tail, 16);
 		*num = atoi (tail);
 		}
@@ -57,9 +57,9 @@ static int32_t poll_gsms_data (uint16_t *boxid, uint8_t *num, char *text)
 }
 static void write_gsms_to_osd_file(struct s_client *cli, unsigned char *gsms)
 {
-#ifdef GBOX_ENABLE_UNSAFE_OSD
+#ifdef GBOX_ENABLE_UNSAFE_EXTENDED_OSD
 	char *fext= FILE_OSD_MSG; 
-	char *fname = get_gbox_tmp_fname(fext); 
+	char *fname = get_gbox_tmp_fname(fext);
 	if (file_exists(fname))
 	{
 	char gsms_buf[150];
@@ -67,17 +67,16 @@ static void write_gsms_to_osd_file(struct s_client *cli, unsigned char *gsms)
 	snprintf(gsms_buf, sizeof(gsms_buf), "%s %s:%s %s", fname, username(cli), cli->reader->device, gsms);
 	cs_log_dbg(D_READER, "found OSD 'driver' %s - write gsms to OSD", fname);
 	char *cmd = gsms_buf;
-              FILE *p;
-              if ((p = popen(cmd, "w")) == NULL)
-		{	
+	FILE *p;
+	if ((p = popen(cmd, "w")) == NULL)
+	{
 		cs_log("Error %s",fname);
 		return;
-		}
-              pclose(p);
+	}
+	pclose(p);
 	}
 #else
-	cs_log("OSD: username=%s dev=%s msg=%s", username(cli), cli->reader->device, gsms);
-	cs_log_dbg(D_READER, "OSD is disabled because it is a security risk, to enable it recompile NCAM.");
+	cs_log_dbg(D_READER, "Extended OSD disabled. OSD: username=%s dev=%s msg=%s", username(cli), cli->reader->device, gsms);
 #endif
 	return;
 }
@@ -187,7 +186,7 @@ static void gbox_send_gsms2peer(struct s_client *cl, char *gsms, uint8_t msg_typ
 				outbuf[10] = (peer->gbox.id >> 8) & 0xff;
 				outbuf[11] = peer->gbox.id & 0xff;
 				outbuf[12] = (local_gbox_id >> 8) & 0xff;
-				outbuf[13] = local_gbox_id & 0xff;								
+				outbuf[13] = local_gbox_id & 0xff;
 				outbuf[14] = msg_type; //msg type
 				outbuf[15] = gsms_len; // gsms length
 				memcpy(&outbuf[16], gsms,gsms_len);
@@ -244,12 +243,12 @@ void gbox_init_send_gsms(void)
 			struct gbox_peer *peer = cl->gbox;
 			if (peer->online && boxid == 0xFFFF) //send gsms to all peers online
 			{
-			gbox_send_gsms2peer(cl, text, msg_type, gsms_prot, gsms_len); 
+			gbox_send_gsms2peer(cl, text, msg_type, gsms_prot, gsms_len);
 			}
 			if (!peer->online && boxid == 0xFFFF)
 			{
 			cs_log("Info: peer %04X is OFFLINE",peer->gbox.id); 
-			write_gsms_nack( cl, gsms_prot, 1); 
+			write_gsms_nack( cl, gsms_prot, 1);
 			}
 			if (peer->online && boxid == peer->gbox.id)
 			{
@@ -258,7 +257,7 @@ void gbox_init_send_gsms(void)
 			if (!peer->online && boxid == peer->gbox.id)
 			{
 			cs_log("WARNING: send GSMS failed - peer %04X is OFFLINE",peer->gbox.id);
-			write_gsms_nack( cl, gsms_prot, 0);  
+			write_gsms_nack( cl, gsms_prot, 0);
 			}
 		}
 	}
@@ -284,7 +283,7 @@ void gbox_send_gsms_ack(struct s_client *cli, uint8_t gsms_prot)
 		outbuf[10] = 0;
 		outbuf[11] = 0;
 		outbuf[12] = (local_gbox_id >> 8) & 0xff;
-		outbuf[13] = local_gbox_id & 0xff;									
+		outbuf[13] = local_gbox_id & 0xff;
 		outbuf[14] = 0x1;
 		outbuf[15] = 0;
 		cs_log_dbg(D_READER,"<-[gbx] send GSMS_ACK_2 to %s:%d id: %04X",rdr->device, rdr->r_port, peer->gbox.id);
@@ -301,27 +300,27 @@ static pthread_mutex_t sms_mutex;
 static void sms_mutex_init(void)
 {
 	static int8_t mutex_init = 0;
-	
+
 	if(!mutex_init)
 	{
 		SAFE_MUTEX_INIT(&sms_mutex, NULL);
 		cs_pthread_cond_init(__func__, &sleep_cond_mutex, &sleep_cond);
 		mutex_init = 1;
-	}	
+	}
 }
 
 static void sms_sender(void)
 {
- 	char *fext= FILE_GSMS_TXT;
+	char *fext= FILE_GSMS_TXT;
 	char *fname = get_gbox_tmp_fname(fext);
-			
+
 	while(sms_sender_active)
 	{
-    	if (file_exists(fname))
-        {
+		if (file_exists(fname))
+		{
 			gbox_init_send_gsms();
-        } 		
-		
+		}
+
 		sleepms_on_cond(__func__, &sleep_cond_mutex, &sleep_cond, 1000);
 	}
 	pthread_exit(NULL);
@@ -330,44 +329,44 @@ static void sms_sender(void)
 void start_sms_sender(void)
 {
 	int32_t is_active;
-	
+
 	sms_mutex_init();
-	
+
 	SAFE_MUTEX_LOCK(&sms_mutex);
 	is_active = sms_sender_active;
 	if(!sms_sender_active)
 	{
 		sms_sender_active = 1;
 	}
-	
+
 	if(is_active || cfg.gsms_dis)
 	{
 		SAFE_MUTEX_UNLOCK(&sms_mutex);
-		return;	
+		return;
 	}
-	
+
 	int32_t ret = start_thread("sms sender", (void *)&sms_sender, NULL, &sms_sender_thread, 0, 1);
 	if(ret)
 	{
 		sms_sender_active = 0;
 	}
-	
+
 	SAFE_MUTEX_UNLOCK(&sms_mutex);
 }
 
 void stop_sms_sender(void)
 {
 	sms_mutex_init();
-	
+
 	SAFE_MUTEX_LOCK(&sms_mutex);
-	
+
 	if(sms_sender_active)
 	{
 		sms_sender_active = 0;
 		SAFE_COND_SIGNAL(&sleep_cond);
 		SAFE_THREAD_JOIN(sms_sender_thread, NULL);
 	}
-	
+
 	SAFE_MUTEX_UNLOCK(&sms_mutex);
 }
 

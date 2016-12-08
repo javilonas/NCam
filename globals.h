@@ -676,14 +676,14 @@ typedef struct cs_mutexlock
 
 typedef struct s_caidvaluetab_data
 {
-	uint16_t			caid;
-	uint16_t			value;
+	uint16_t           caid;
+	uint16_t           value;
 } CAIDVALUETAB_DATA;
 
 typedef struct s_caidvaluetab
 {
-	int32_t				cvnum;
-	CAIDVALUETAB_DATA	*cvdata;
+	int32_t             cvnum;
+	CAIDVALUETAB_DATA   *cvdata;
 } CAIDVALUETAB;
 
 typedef struct s_classtab
@@ -696,15 +696,15 @@ typedef struct s_classtab
 
 typedef struct s_caidtab_data
 {
-	uint16_t		caid;
-	uint16_t		mask;
-	uint16_t		cmap;
+	uint16_t        caid;
+	uint16_t        mask;
+	uint16_t        cmap;
 } CAIDTAB_DATA;
 
 typedef struct s_caidtab
 {
-	int32_t			ctnum;
-	CAIDTAB_DATA	*ctdata;
+	int32_t         ctnum;
+	CAIDTAB_DATA    *ctdata;
 } CAIDTAB;
 
 typedef struct s_tuntab_data
@@ -809,10 +809,10 @@ struct s_emmstat
 
 struct s_emmcache
 {
-	uchar			emmd5[CS_EMMSTORESIZE];
-	uchar			type;
-	uint16_t		len;
-	uchar			emm[MAX_EMM_SIZE];
+	uchar           emmd5[CS_EMMSTORESIZE];
+	uchar           type;
+	uint16_t        len;
+	uchar           emm[MAX_EMM_SIZE];
 	struct timeb    firstseen;
 	struct timeb    lastseen;
 };
@@ -831,8 +831,8 @@ typedef struct v_ban                    // Failban listmember
 	IN_ADDR_T       v_ip;
 	int32_t         v_port;
 	struct timeb    v_time;
-	bool			acosc_entry;
-	int32_t			acosc_penalty_dur;
+	bool            acosc_entry;
+	int32_t         acosc_penalty_dur;
 	char            *info;
 } V_BAN;
 
@@ -979,9 +979,9 @@ struct s_cardsystem
 	int32_t (*card_init)(struct s_reader *reader, struct s_ATR *);
 	void    (*card_done)(struct s_reader *reader);
 	int32_t (*card_info)(struct s_reader *);
-	void	(*poll_status)(struct s_reader *);
+	void    (*poll_status)(struct s_reader *);
 	int32_t (*do_ecm)(struct s_reader *, const struct ecm_request_t *, struct s_ecm_answer *);
-	int32_t (*do_emm_reassembly)(struct s_reader *, struct s_client *, struct emm_packet_t *);     // Returns 1/true if the EMM is ready to be written in the card
+	int32_t (*do_emm_reassembly)(struct s_reader *, struct s_client *, struct emm_packet_t *); // Returns 1/true if the EMM is ready to be written in the card
 	int32_t (*do_emm)(struct s_reader *, struct emm_packet_t *);
 	void (*post_process)(struct s_reader *);
 	int32_t (*get_emm_type)(struct emm_packet_t *, struct s_reader *);
@@ -1002,7 +1002,7 @@ typedef struct cw_extendted_t
 #else
 typedef struct cw_extendted_t
 {
-	uchar			disabled;
+	uchar           disabled;
 } EXTENDED_CW;
 #endif
 
@@ -1026,9 +1026,9 @@ typedef struct ecm_request_t
 	uint16_t        idx;
 	uint32_t        prid;
 	struct s_reader *selected_reader;
-	struct s_ecm_answer *matching_rdr;      //list of matching readers
-	const struct s_reader   *fallback;      //fallback is the first fallback reader in the list matching_rdr
-	struct s_client *client;            //contains pointer to 'c' client while running in 'r' client
+	struct s_ecm_answer *matching_rdr;      // list of matching readers
+	const struct s_reader   *fallback;      // fallback is the first fallback reader in the list matching_rdr
+	struct s_client *client;                // contains pointer to 'c' client while running in 'r' client
 	uint64_t        grp;
 	int32_t         msgid;              // client pending table index
 	uint8_t         stage;              // processing stage in server module
@@ -1044,24 +1044,24 @@ typedef struct ecm_request_t
 	uint16_t            fallback_reader_count;      // count of selected fb readers
 	uint16_t            reader_count;               // count of selected not fb readers
 	int8_t          preferlocalcards;
-	int8_t          checked;                //for doublecheck
-	uchar           cw_checked[16];     //for doublecheck
-	int8_t          readers_timeout_check;  // set to 1 after ctimeout occurs and readers not answered are checked
+	int8_t          checked;                        // for doublecheck
+	uchar           cw_checked[16];                 // for doublecheck
+	int8_t          readers_timeout_check;          // set to 1 after ctimeout occurs and readers not answered are checked
 	struct s_reader     *origin_reader;
 
 #if defined MODULE_CCCAM
-	void            *origin_card;       // CCcam preferred card!
+	void            *origin_card;               // CCcam preferred card!
 #endif
 
 #if defined MODULE_GBOX
-	uint32_t        gbox_crc;       // rcrc for gbox, used to identify ECM task in peer responses
+	uint32_t        gbox_crc;                   // rcrc for gbox, used to identify ECM task in peer responses
 	uint16_t        gbox_ecm_id;
 	uint8_t         gbox_ecm_status;
-	LLIST		*gbox_cards_pending; //type gbox_card_pending
+	LLIST           *gbox_cards_pending;        //type gbox_card_pending
 #endif
 
 	void            *src_data;
-	uint32_t         csp_hash; 					// csp has its own hash
+	uint32_t         csp_hash;                  // csp has its own hash
 
 	struct s_client *cacheex_src;               // Cacheex origin
 #ifdef CS_CACHEEX
@@ -1072,20 +1072,20 @@ typedef struct ecm_request_t
 	uint8_t         cacheex_wait_time_expired;  // =1 if cacheex wait_time expires
 	uint16_t        cacheex_mode1_delay;        // cacheex mode 1 delay
 	uint8_t         cacheex_hitcache;           // =1 if wait_time due hitcache
-	void            *cw_cache;					//pointer to cw stored in cache
+	void            *cw_cache;                  // pointer to cw stored in cache
 #endif
 	uint32_t        cw_count;
 	uint8_t         from_csp;                   // =1 if er from csp cache
 	uint8_t         from_cacheex;               // =1 if er from cacheex client pushing cache
 	uint8_t         from_cacheex1_client;       // =1 if er from cacheex-1 client
 	char            msglog[MSGLOGSIZE];
-	uint8_t			cwc_cycletime;
-	uint8_t			cwc_next_cw_cycle;
+	uint8_t         cwc_cycletime;
+	uint8_t         cwc_next_cw_cycle;
 #ifdef CW_CYCLE_CHECK
 	char            cwc_msg_log[MSGLOGSIZE];
 #endif
 #ifdef WITH_STAPI5
-	char			dev_name[20];
+	char            dev_name[20];
 #endif
 	struct ecm_request_t    *parent;
 	struct ecm_request_t    *next;
@@ -1098,7 +1098,7 @@ struct s_ecm_answer
 	struct s_reader *reader;
 	ECM_REQUEST     *er;
 	int8_t          rc;
-	uint8_t     rcEx;
+	uint8_t         rcEx;
 	uchar           cw[16];
 	EXTENDED_CW     cw_ex;
 	char            msglog[MSGLOGSIZE];
@@ -1152,19 +1152,19 @@ typedef struct sidtabs
 
 struct s_zap_list
 {
-	uint16_t	caid;
-	uint32_t	provid;
-	uint16_t	chid;
-	uint16_t	sid;
-	int8_t		request_stage;
-	time_t		lasttime;
+	uint16_t        caid;
+	uint32_t        provid;
+	uint16_t        chid;
+	uint16_t        sid;
+	int8_t          request_stage;
+	time_t          lasttime;
 };
 
 // EMM reassemply
 struct emm_rass
 {
 	int16_t         emmlen;
-	int32_t			provid;
+	int32_t         provid;
 	uint8_t         emm[MAX_EMM_SIZE];
 };
 
@@ -1219,50 +1219,50 @@ struct s_client
 	int8_t          tcp_nodelay;
 	int8_t          log;
 	int32_t         logcounter;
-	int32_t         cwfound;            // count found ECMs per client
-	int32_t         cwcache;            // count ECMs from cache1/2 per client
-	int32_t         cwnot;              // count not found ECMs per client
-	int32_t         cwtun;              // count betatunneled ECMs per client
-	int32_t         cwignored;          // count ignored  ECMs per client
-	int32_t         cwtout;             // count timeouted ECMs per client
-	int32_t         cwlastresptime;     // last Responsetime (ms)
+	int32_t         cwfound;             // count found ECMs per client
+	int32_t         cwcache;             // count ECMs from cache1/2 per client
+	int32_t         cwnot;               // count not found ECMs per client
+	int32_t         cwtun;               // count betatunneled ECMs per client
+	int32_t         cwignored;           // count ignored  ECMs per client
+	int32_t         cwtout;              // count timeouted ECMs per client
+	int32_t         cwlastresptime;      // last Responsetime (ms)
 #ifdef CW_CYCLE_CHECK
-	int32_t         cwcycledchecked;    // count checked cwcycles per client
-	int32_t         cwcycledok;     // count pos checked cwcycles per client
-	int32_t         cwcyclednok;        // count neg checked cwcycles per client
-	int32_t         cwcycledign;        // count ign cwcycles per client
+	int32_t         cwcycledchecked;     // count checked cwcycles per client
+	int32_t         cwcycledok;          // count pos checked cwcycles per client
+	int32_t         cwcyclednok;         // count neg checked cwcycles per client
+	int32_t         cwcycledign;         // count ign cwcycles per client
 #endif
-	int32_t         emmok;              // count EMM ok
-	int32_t         emmnok;             // count EMM nok
-	int8_t          pending;            // number of ECMs pending
+	int32_t         emmok;               // count EMM ok
+	int32_t         emmnok;              // count EMM nok
+	int8_t          pending;             // number of ECMs pending
 #ifdef CS_CACHEEX
-	int32_t         cwcacheexpush;      // count pushed ecms/cws
-	int32_t         cwcacheexgot;       // count got ecms/cws
-	int32_t         cwcacheexhit;       // count hit ecms/cws
-	LLIST           *ll_cacheex_stats;  // list for Cacheex statistics
+	int32_t         cwcacheexpush;       // count pushed ecms/cws
+	int32_t         cwcacheexgot;        // count got ecms/cws
+	int32_t         cwcacheexhit;        // count hit ecms/cws
+	LLIST           *ll_cacheex_stats;   // list for Cacheex statistics
 	int8_t          cacheex_maxhop;
-	int32_t         cwcacheexerr;       // cw=00 or chksum wrong
-	int32_t         cwcacheexerrcw;     // same Hex, different CW
-	int16_t         cwcacheexping;      // peer ping in ms, only used by csp
-	int32_t			cwc_info;			// count of in/out comming cacheex ecms with CWCinfo
-	uint8_t         cacheex_needfilter; // flag for cachex mode 3 used with camd35
+	int32_t         cwcacheexerr;        // cw=00 or chksum wrong
+	int32_t         cwcacheexerrcw;      // same Hex, different CW
+	int16_t         cwcacheexping;       // peer ping in ms, only used by csp
+	int32_t         cwc_info;            // count of in/out comming cacheex ecms with CWCinfo
+	uint8_t         cacheex_needfilter;  // flag for cachex mode 3 used with camd35
 #endif
 #ifdef CS_ANTICASC
-	struct s_zap_list	client_zap_list[15]; //15 last zappings from client used for ACoSC
+	struct s_zap_list client_zap_list[15]; //15 last zappings from client used for ACoSC
 #endif
 #ifdef WEBIF
 	struct s_cwresponse cwlastresptimes[CS_ECM_RINGBUFFER_MAX]; //ringbuffer for last 20 times
 	int32_t         cwlastresptimes_last; // ringbuffer pointer
-	int8_t          wihidden;           // hidden in webinterface status
-	char            lastreader[64];     // last cw got from this reader
+	int8_t          wihidden;             // hidden in webinterface status
+	char            lastreader[64];       // last cw got from this reader
 #endif
 
-	uchar           ucrc[4];            // needed by monitor and used by camd35
-	uint32_t        pcrc;               // password crc
-	struct aes_keys *aes_keys;          // used by camd33 and camd35
+	uchar           ucrc[4];              // needed by monitor and used by camd35
+	uint32_t        pcrc;                 // password crc
+	struct aes_keys *aes_keys;            // used by camd33 and camd35
 	uint16_t        ncd_msgid;
 	uint16_t        ncd_client_id;
-	uchar           ncd_skey[16];       //Also used for camd35 Cacheex to store remote node id
+	uchar           ncd_skey[16];         // Also used for camd35 Cacheex to store remote node id
 
 #ifdef MODULE_CCCAM
 	void            *cc;
@@ -1270,7 +1270,7 @@ struct s_client
 
 #ifdef MODULE_GBOX
 	void            *gbox;
-	uint16_t	gbox_peer_id;
+	uint16_t        gbox_peer_id;
 #endif
 
 #ifdef MODULE_GHTTP
@@ -1321,9 +1321,9 @@ struct s_client
 	// Failban value set bitwise - compared with BAN_
 	int32_t         failban;
 
-	LLIST           *cascadeusers; //s_cascadeuser
+	LLIST           *cascadeusers;      // s_cascadeuser
 
-	int32_t			n_request[2];  //count for number of request per minute by client
+	int32_t         n_request[2];       // count for number of request per minute by client
 
 	void            *work_mbuf;         // Points to local data allocated in work_thread when the thread is running
 	void            *work_job_data;     // Points to current job_data when work_thread is running
@@ -1338,37 +1338,37 @@ struct s_client
 #ifdef MODULE_SCAM
 	void            *scam;
 #endif
-	void            *module_data;       // private module data
+	void            *module_data;        // private module data
 
-	struct s_client *next;                          //make client a linked list
+	struct s_client *next;               // make client a linked list
 	struct s_client *nexthashed;
 };
 
 typedef struct s_ecm_whitelist_data
 {
-	uint16_t		len;
-	uint16_t		caid;
-	uint32_t		ident;
+	uint16_t        len;
+	uint16_t        caid;
+	uint32_t        ident;
 } ECM_WHITELIST_DATA;
 
 typedef struct s_ecm_whitelist
 {
-	int32_t				ewnum;
-	ECM_WHITELIST_DATA	*ewdata;
+	int32_t         ewnum;
+	ECM_WHITELIST_DATA *ewdata;
 } ECM_WHITELIST;
 
 typedef struct s_ecm_hdr_whitelist_data
 {
-	uint16_t		len;
-	uint16_t		caid;
-	uint32_t		provid;
-	uint8_t			header[20];
+	uint16_t        len;
+	uint16_t        caid;
+	uint32_t        provid;
+	uint8_t         header[20];
 } ECM_HDR_WHITELIST_DATA;
 
 typedef struct s_ecm_hdr_whitelist
 {
-	int32_t						ehnum;
-	ECM_HDR_WHITELIST_DATA		*ehdata;
+	int32_t         ehnum;
+	ECM_HDR_WHITELIST_DATA *ehdata;
 } ECM_HDR_WHITELIST;
 
 //ratelimit
@@ -1376,7 +1376,7 @@ struct ecmrl
 {
 	struct timeb    last;
 	uchar           kindecm;
-	bool			once;
+	bool            once;
 	uchar           ecmd5[CS_ECMSTORESIZE];
 	uint16_t        caid;
 	uint32_t        provid;
@@ -1464,7 +1464,7 @@ typedef struct opkeys
 } opkeys_t;
 #endif
 
-struct s_reader                                     //contains device info, reader info and card info
+struct s_reader                                     // contains device info, reader info and card info
 {
 	uint8_t         keepalive;
 	uint8_t         changes_since_shareupdate;
@@ -1529,8 +1529,8 @@ struct s_reader                                     //contains device info, read
 	int32_t         nprov;
 	uchar           prid[CS_MAXPROV][8];
 	uchar           sa[CS_MAXPROV][4];              // viaccess & seca
-	uint8_t			read_old_classes;               // viaccess
-	uint8_t			maturity;						// viaccess & seca maturity level
+	uint8_t         read_old_classes;               // viaccess
+	uint8_t         maturity;                       // viaccess & seca maturity level
 	uint16_t        caid;
 	uint16_t        b_nano;
 	uint16_t        s_nano;
@@ -1544,7 +1544,7 @@ struct s_reader                                     //contains device info, read
 	int8_t          logemm;
 	int8_t          cachemm;
 	int16_t         rewritemm;
-	int16_t			deviceemm;						// catch device specific emms (so far only used for viaccess)
+	int16_t         deviceemm;                      // catch device specific emms (so far only used for viaccess)
 	int8_t          card_status;
 	int8_t          deprecated;                     //if 0 ATR obeyed, if 1 default speed (9600) is chosen; for devices that cannot switch baudrate
 	struct s_module ph;
@@ -1576,14 +1576,14 @@ struct s_reader                                     //contains device info, read
 	int8_t          tcp_connected;
 	int32_t         tcp_ito;                        // inactivity timeout
 	int32_t         tcp_rto;                        // reconnect timeout
-	int32_t         tcp_reconnect_delay;			// max tcp connection block delay
+	int32_t         tcp_reconnect_delay;            // max tcp connection block delay
 
 	struct timeb    tcp_block_connect_till;         //time tcp connect ist blocked
 	int32_t         tcp_block_delay;                //incrementing block time
 	time_t          last_g;                         // get (if last_s-last_g>tcp_rto - reconnect )
 	time_t          last_s;                         // send
 	time_t          last_check;                     // last checked
-	time_t			last_poll;						// last poll
+	time_t          last_poll;                      // last poll
 	FTAB            fchid;
 	FTAB            ftab;
 	CLASSTAB        cltab;
@@ -1620,33 +1620,33 @@ struct s_reader                                     //contains device info, read
 	int32_t         convention;                     // Convention of this ICC
 	unsigned char   protocol_type;                  // Type of protocol
 	uint32_t        current_baudrate;               // (for overclocking uncorrected) baudrate to prevent unnecessary conversions from/to termios structure
-	double      worketu;            // in us for internal and external readers calculated (1/D)*(F/cardclock)*1000000
-	uint32_t        read_timeout;                   // Max timeout (ETU) to receive characters
-	uint32_t        char_delay;                     // Delay (ETU) after transmiting each successive char
-	uint32_t    block_delay;          // Delay (ms) after starting to transmit
-	uint32_t    BWT, CWT;           // (for overclocking uncorrected) block waiting time, character waiting time, in ETU
+	double          worketu;          // in us for internal and external readers calculated (1/D)*(F/cardclock)*1000000
+	uint32_t        read_timeout;     // Max timeout (ETU) to receive characters
+	uint32_t        char_delay;       // Delay (ETU) after transmiting each successive char
+	uint32_t        block_delay;      // Delay (ms) after starting to transmit
+	uint32_t        BWT, CWT;         // (for overclocking uncorrected) block waiting time, character waiting time, in ETU
 	////variables from io_serial.h
-	int32_t         written;                        // keep score of how much bytes are written to serial port, since they are echoed back they have to be read
+	int32_t         written;          // keep score of how much bytes are written to serial port, since they are echoed back they have to be read
 	////variables from protocol_t1.h
-	uint16_t    ifsc;             // Information field size for the ICC
-	unsigned char ns;               // Send sequence number
-	int16_t             smartdev_found;
-	int16_t				smart_type;
-	uint16_t   statuscnt;
-	uint16_t   modemstat;
+	uint16_t        ifsc;             // Information field size for the ICC
+	unsigned char   ns;               // Send sequence number
+	int16_t         smartdev_found;
+	int16_t         smart_type;
+	uint16_t        statuscnt;
+	uint16_t        modemstat;
 #endif
 	unsigned char   rom[15];
 	unsigned char   irdId[4];
-	unsigned char	payload4C[15];
-	uint16_t		VgCredit;
+	unsigned char   payload4C[15];
+	uint16_t        VgCredit;
 	uint16_t        VgPin;
 	unsigned char   VgFuse;
-	unsigned char	VgCountryC[3];
+	unsigned char   VgCountryC[3];
 	unsigned char   VgRegionC[8];
-	unsigned char	VgLastPayload[6];
+	unsigned char   VgLastPayload[6];
 #ifdef WITH_LB
 	int32_t         lb_weight;                      //loadbalance weight factor, if unset, weight=100. The higher the value, the higher the usage-possibility
-	int8_t          lb_force_fallback;				//force this reader as fallback if fallback or fallback_percaid paramters set
+	int8_t          lb_force_fallback;              //force this reader as fallback if fallback or fallback_percaid paramters set
 	int32_t         lb_usagelevel;                  //usagelevel for loadbalancer
 	int32_t         lb_usagelevel_ecmcount;
 	struct timeb    lb_usagelevel_time;             //time for counting ecms, this creates usagelevel
@@ -1664,7 +1664,7 @@ struct s_reader                                     //contains device info, read
 	int32_t         ratelimittime; // ratelimit time in ms (everything below 60 ms is converted to ms by applying *1000)
 	int8_t          ecmunique; // check for matching ecm hash in ratelimitslot
 	int32_t         srvidholdtime; // time in ms to keep srvid in ratelimitslot (during this time not checked for ecmunique!)
-	 	                   	       // (everything below 60 ms is converted to ms by applying *1000)
+		                           // (everything below 60 ms is converted to ms by applying *1000)
 	struct timeb    lastdvbapirateoverride;
 	uint32_t        ecmsok;
 	uint32_t        webif_ecmsok;
@@ -1709,11 +1709,11 @@ struct s_reader                                     //contains device info, read
 #endif
 
 #ifdef MODULE_GBOX
-	uint8_t		gbox_maxdist;
-	uint8_t		gbox_maxecmsend;
-	uint8_t		gbox_reshare;
-	uint8_t		gbox_cccam_reshare;
-	char		last_gsms[128];
+	uint8_t         gbox_maxdist;
+	uint8_t         gbox_maxecmsend;
+	uint8_t         gbox_reshare;
+	uint8_t         gbox_cccam_reshare;
+	char            last_gsms[128];
 #endif
 
 #ifdef MODULE_PANDORA
@@ -1780,15 +1780,15 @@ struct s_auth
 	int32_t         ac_users;                       // 0 - unlimited
 	int8_t          ac_penalty;                     // 0 - log, >0 - fake dw
 	struct s_acasc  ac_stat;
-	int8_t			acosc_max_active_sids;			// user value 0 - unlimited
-	int8_t			acosc_zap_limit; 				// user value 0 - unlimited
-	int8_t			acosc_penalty;					//user value penalty
-	int32_t			acosc_penalty_duration;			// user value how long is penalty activ in sek.
-	time_t			acosc_penalty_until;
-	int8_t			acosc_penalty_active; 			// 0-deaktiv 1-max_active_sids 2-zap_limit 3-penaly_duration
-	int32_t			acosc_delay; 					//user value
-	int8_t			acosc_user_zap_count;
-	time_t			acosc_user_zap_count_start_time;
+	int8_t          acosc_max_active_sids;          // user value 0 - unlimited
+	int8_t          acosc_zap_limit;                // user value 0 - unlimited
+	int8_t          acosc_penalty;                  //user value penalty
+	int32_t         acosc_penalty_duration;         // user value how long is penalty activ in sek.
+	time_t          acosc_penalty_until;
+	int8_t          acosc_penalty_active;           // 0-deaktiv 1-max_active_sids 2-zap_limit 3-penaly_duration
+	int32_t         acosc_delay;                    //user value
+	int8_t          acosc_user_zap_count;
+	time_t          acosc_user_zap_count_start_time;
 #endif
 #ifdef WITH_LB
 	int32_t         lb_nbest_readers;               // When this is -1, the global lb_nbest_readers is used
@@ -1820,10 +1820,10 @@ struct s_auth
 	int32_t         cwtout;
 #ifdef CW_CYCLE_CHECK
 	int32_t         cwcycledchecked;    // count checked cwcycles per client
-	int32_t         cwcycledok;     // count pos checked cwcycles per client
+	int32_t         cwcycledok;         // count pos checked cwcycles per client
 	int32_t         cwcyclednok;        // count neg checked cwcycles per client
 	int32_t         cwcycledign;        // count ign cwcycles per client
-	int8_t			cwc_disable;			// disable cwc checking for this Client
+	int8_t          cwc_disable;        // disable cwc checking for this Client
 #endif
 	int32_t         emmok;
 	int32_t         emmnok;
@@ -1831,9 +1831,9 @@ struct s_auth
 	int32_t         cwcacheexpush;      // count pushed ecms/cws
 	int32_t         cwcacheexgot;       // count got ecms/cws
 	int32_t         cwcacheexhit;       // count hit ecms/cws
-	int32_t         cwcacheexerr; //cw=00 or chksum wrong
-	int32_t         cwcacheexerrcw; //Same Hex, different CW
-	int32_t			cwc_info;			// count of in/out comming cacheex ecms with CWCinfo
+	int32_t         cwcacheexerr;       // cw=00 or chksum wrong
+	int32_t         cwcacheexerrcw;     // Same Hex, different CW
+	int32_t         cwc_info;           // count of in/out comming cacheex ecms with CWCinfo
 #endif
 	struct s_auth   *next;
 };
@@ -1971,8 +1971,8 @@ struct s_config
 	uint8_t         logtosyslog;
 	int8_t          logduplicatelines;
 	int32_t         initial_debuglevel;
-	char			*sysloghost;
-	int32_t			syslogport;
+	char            *sysloghost;
+	int32_t         syslogport;
 #if defined(WEBIF) || defined(MODULE_MONITOR)
 	uint32_t        loghistorylines;
 #endif
@@ -2036,9 +2036,10 @@ struct s_config
 #endif
 	int8_t          http_full_cfg;
 	int8_t          http_overwrite_bak_file;
+	int32_t         http_utf8;
 	int32_t         failbantime;
 	int32_t         failbancount;
-	LLIST           *v_list;                        // Failban list
+	LLIST           *v_list; // Failban list
 #ifdef MODULE_CAMD33
 	int32_t         c33_port;
 	IN_ADDR_T       c33_srvip;
@@ -2056,8 +2057,8 @@ struct s_config
 	IN_ADDR_T       c35_tcp_srvip;
 #endif
 	int8_t          c35_suppresscmd08; // used in cccam module
-	int8_t		getblockemmauprovid;
-	int32_t		umaxidle; //User max Idle
+	int8_t          getblockemmauprovid;
+	int32_t         umaxidle; //User max Idle
 #ifdef MODULE_NEWCAMD
 	PTAB            ncd_ptab;
 	IN_ADDR_T       ncd_srvip;
@@ -2092,14 +2093,14 @@ struct s_config
 	char            *gbox_hostname;
 	int32_t         gbox_reconnect;
 	char            gbox_my_password[9];
-	unsigned long	gbox_proxy_card[CS_GBOX_MAX_PROXY_CARDS];
-	int8_t		gbox_proxy_cards_num;
+	unsigned long   gbox_proxy_card[CS_GBOX_MAX_PROXY_CARDS];
+	int8_t          gbox_proxy_cards_num;
 	char            gbox_my_vers[3];
-	char		gbox_my_cpu_api[3];
-	uint8_t                 gsms_dis;
-	uint8_t                 log_hello;
-	char                    *gbox_tmp_dir;
-	uint8_t                 ccc_reshare;
+	char            gbox_my_cpu_api[3];
+	uint8_t         gsms_dis;
+	uint8_t         log_hello;
+	char            *gbox_tmp_dir;
+	uint8_t         ccc_reshare;
 #endif
 #ifdef MODULE_SERIAL
 	char            *ser_device;
@@ -2167,12 +2168,12 @@ struct s_config
 	int32_t     ac_denysamples;
 	char        *ac_logfile;
 	struct      s_cpmap *cpmap;
-	int8_t		acosc_enabled;
-	int8_t		acosc_max_active_sids;	// global value 0 - unlimited
-	int8_t		acosc_zap_limit;	// global value 0 - unlimited
-	int32_t		acosc_penalty_duration;	// global value how long is penalty activ in sek.
-	int8_t		acosc_penalty;	//global value
-	int32_t		acosc_delay;	//global value
+	int8_t      acosc_enabled;
+	int8_t      acosc_max_active_sids;	// global value 0 - unlimited
+	int8_t      acosc_zap_limit;	// global value 0 - unlimited
+	int32_t     acosc_penalty_duration;	// global value how long is penalty activ in sek.
+	int8_t      acosc_penalty;	//global value
+	int32_t     acosc_delay;	//global value
 #endif
 
 #ifdef LEDSUPPORT
@@ -2216,14 +2217,14 @@ struct s_config
 	int32_t    max_cache_time;  //seconds ecms are stored in ecmcwcache
 	int32_t    max_hitcache_time;  //seconds hits are stored in cspec_hitcache (to detect dyn wait_time)
 
-    int8_t      reload_useraccounts;
-    int8_t      reload_readers;
-    int8_t      reload_provid;
-    int8_t      reload_services_ids;
-    int8_t      reload_tier_ids;
-    int8_t      reload_fakecws;
-    int8_t      reload_ac_stat;
-    int8_t      reload_log;
+	int8_t      reload_useraccounts;
+	int8_t      reload_readers;
+	int8_t      reload_provid;
+	int8_t      reload_services_ids;
+	int8_t      reload_tier_ids;
+	int8_t      reload_fakecws;
+	int8_t      reload_ac_stat;
+	int8_t      reload_log;
 
 	int8_t      block_same_ip;   //0=allow all, 1=block client requests to reader with same ip   (default=1)
 	int8_t      block_same_name; //0=allow all, 1=block client requests to reader with same name (default=1)
@@ -2241,15 +2242,15 @@ struct s_config
 #endif
 
 #ifdef CW_CYCLE_CHECK
-	int8_t          cwcycle_check_enable;       // on or off
-	CAIDTAB         cwcycle_check_caidtab;      // Caid for CW Cycle Check
-	int32_t         keepcycletime;          // how long stay the learned Cycletime in Memory
-	int32_t         maxcyclelist;           // max size of cwcyclelist
-	int8_t          onbadcycle;         // what to do on bad cwcycle
-	int8_t          cwcycle_dropold;        // what to do on old ecmd5/cw
+	int8_t          cwcycle_check_enable;        // on or off
+	CAIDTAB         cwcycle_check_caidtab;       // Caid for CW Cycle Check
+	int32_t         keepcycletime;               // how long stay the learned Cycletime in Memory
+	int32_t         maxcyclelist;                // max size of cwcyclelist
+	int8_t          onbadcycle;                  // what to do on bad cwcycle
+	int8_t          cwcycle_dropold;             // what to do on old ecmd5/cw
 	int8_t          cwcycle_sensitive;
-	int8_t          cwcycle_allowbadfromffb;        //allow Bad cycles from Fixed Fallbackreader
-	int8_t			cwcycle_usecwcfromce;		//Use CWC Info from Cacheex Sources for CWC Checking
+	int8_t          cwcycle_allowbadfromffb;     // allow Bad cycles from Fixed Fallbackreader
+	int8_t          cwcycle_usecwcfromce;        // Use CWC Info from Cacheex Sources for CWC Checking
 #endif
 
 	//Global whitelist:
@@ -2320,7 +2321,7 @@ typedef struct emm_packet_t
 	int16_t         emmlen;
 	uchar           caid[2];
 	uchar           provid[4];
-	uchar           hexserial[8];                   //contains hexserial or SA of EMM
+	uchar           hexserial[8]; //contains hexserial or SA of EMM
 	uchar           type;
 	uint8_t         skip_filter_check;
 	struct s_client *client;
@@ -2341,7 +2342,7 @@ extern struct s_client *first_client;
 extern CS_MUTEX_LOCK config_lock;
 extern CS_MUTEX_LOCK clientlist_lock;
 extern CS_MUTEX_LOCK readerlist_lock;
-extern struct s_reader *first_active_reader;        //points to list of _active_ readers (enable = 1, deleted = 0)
+extern struct s_reader *first_active_reader; //points to list of _active_ readers (enable = 1, deleted = 0)
 extern LLIST *configured_readers;
 
 // These are used pretty much everywhere

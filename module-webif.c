@@ -1248,6 +1248,9 @@ static char *send_ncam_config_webif(struct templatevars *vars, struct uriparams 
 	if(cfg.http_prepend_embedded_css)
 		{ tpl_addVar(vars, TPLADD, "HTTPPREPENDEMBEDDEDCSS", "checked"); }
 
+	if(cs_http_use_utf8)
+		tpl_addVar(vars,TPLADD,"HTTPUTF8","selected");
+
 	tpl_addVar(vars, TPLADD, "HTTPHELPLANG", cfg.http_help_lang);
 	tpl_addVar(vars, TPLADD, "HTTPLOCALE", cfg.http_locale);
 	tpl_printf(vars, TPLADD, "HTTPEMMUCLEAN", "%d", cfg.http_emmu_clean);

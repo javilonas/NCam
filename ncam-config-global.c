@@ -16,6 +16,7 @@
 #define DEFAULT_HTTP_PORT   8181
 #define DEFAULT_HTTP_ALLOW  "127.0.0.1,192.168.0.0-192.168.255.255,10.0.0.0-10.255.255.255,::1"
 
+extern uint8_t cs_http_use_utf8;
 static void disablelog_fn(const char *token, char *value, void *UNUSED(setting), FILE *f)
 {
 	if(value)
@@ -503,6 +504,17 @@ static void http_dyndns_fn(const char *token, char *value, void *UNUSED(setting)
 	}
 }
 
+static void http_utf8_fn(const char *token, char *value, void *UNUSED(setting), FILE *f)
+{
+	if(value)
+	{
+		cfg.http_utf8 = strtoul(value, NULL, 10);
+		cs_http_use_utf8 = cfg.http_utf8;
+		return;
+	}
+	fprintf(f, token, "%d\n",cfg.http_utf8);
+}
+
 static bool webif_should_save_fn(void *UNUSED(var))
 {
 	return cfg.http_port;
@@ -511,50 +523,51 @@ static bool webif_should_save_fn(void *UNUSED(var))
 static const struct config_list webif_opts[] =
 {
 	DEF_OPT_SAVE_FUNC(webif_should_save_fn),
-	DEF_OPT_FUNC("httpport"                 , OFS(http_port),               http_port_fn),
-	DEF_OPT_FUNC("serverip"                 , OFS(http_srvip),              serverip_fn),
-	DEF_OPT_STR("httpuser"                  , OFS(http_user),               NULL),
-	DEF_OPT_STR("httppwd"                   , OFS(http_pwd),                NULL),
-	DEF_OPT_STR("httpcss"                   , OFS(http_css),                NULL),
-	DEF_OPT_STR("httpjscript"               , OFS(http_jscript),            NULL),
-	DEF_OPT_STR("httpscript"                , OFS(http_script),             NULL),
-	DEF_OPT_STR("httptpl"                   , OFS(http_tpl),                NULL),
-	DEF_OPT_STR("httppiconpath"             , OFS(http_piconpath),          NULL),
-	DEF_OPT_STR("httphelplang"              , OFS(http_help_lang),          "en"),
-	DEF_OPT_STR("httplocale"                , OFS(http_locale),             NULL),
-	DEF_OPT_INT8("http_prepend_embedded_css"   , OFS(http_prepend_embedded_css), 0),
-	DEF_OPT_INT32("httprefresh"             , OFS(http_refresh),            0),
-	DEF_OPT_INT32("httppollrefresh"         , OFS(poll_refresh),            60),
-	DEF_OPT_INT8("httphideidleclients"      , OFS(http_hide_idle_clients),  1),
-	DEF_OPT_STR("httphidetype"              , OFS(http_hide_type),          NULL),
-	DEF_OPT_INT8("httpshowpicons"           , OFS(http_showpicons),         0),
-	DEF_OPT_INT8("httppiconsize"            , OFS(http_picon_size),         0),
-	DEF_OPT_INT8("httpshowmeminfo"          , OFS(http_showmeminfo),        0),
-	DEF_OPT_INT8("httpshowuserinfo"         , OFS(http_showuserinfo),       0),
-	DEF_OPT_INT8("httpshowreaderinfo"       , OFS(http_showreaderinfo),     0),
-	DEF_OPT_INT8("httpshowcacheexinfo"      , OFS(http_showcacheexinfo),    0),
-	DEF_OPT_INT8("httpshowecminfo"          , OFS(http_showecminfo),        0),
-	DEF_OPT_INT8("httpshowloadinfo"         , OFS(http_showloadinfo),       0),
-	DEF_OPT_FUNC("httpallowed"              , OFS(http_allowed),            iprange_fn, .free_value = iprange_free_fn),
-	DEF_OPT_INT8("httpreadonly"             , OFS(http_readonly),           0),
-	DEF_OPT_INT8("httpsavefullcfg"          , OFS(http_full_cfg),           0),
-	DEF_OPT_INT8("httpoverwritebakfile"     , OFS(http_overwrite_bak_file), 0),
-	DEF_OPT_STR("httpcert"                  , OFS(http_cert),               NULL),
-	DEF_OPT_INT8("https_force_secure_mode"  , OFS(https_force_secure_mode), 1),
-	DEF_OPT_FUNC("httpdyndns"               , OFS(http_dyndns),             http_dyndns_fn),
-	DEF_OPT_INT32("aulow"                   , OFS(aulow),                   30),
-	DEF_OPT_INT32("hideclient_to"           , OFS(hideclient_to),           25),
-	DEF_OPT_STR("httpncamlabel"            , OFS(http_ncam_label),        "NCAm"),
-	DEF_OPT_INT32("httpemmuclean"           , OFS(http_emmu_clean),         256),
-	DEF_OPT_INT32("httpemmsclean"           , OFS(http_emms_clean),         -1),
-	DEF_OPT_INT32("httpemmgclean"           , OFS(http_emmg_clean),         -1),
+	DEF_OPT_FUNC("httpport"                  , OFS(http_port),                 http_port_fn),
+	DEF_OPT_FUNC("serverip"                  , OFS(http_srvip),                serverip_fn),
+	DEF_OPT_STR("httpuser"                   , OFS(http_user),                 NULL),
+	DEF_OPT_STR("httppwd"                    , OFS(http_pwd),                  NULL),
+	DEF_OPT_STR("httpcss"                    , OFS(http_css),                  NULL),
+	DEF_OPT_STR("httpjscript"                , OFS(http_jscript),              NULL),
+	DEF_OPT_STR("httpscript"                 , OFS(http_script),               NULL),
+	DEF_OPT_STR("httptpl"                    , OFS(http_tpl),                  NULL),
+	DEF_OPT_STR("httppiconpath"              , OFS(http_piconpath),            NULL),
+	DEF_OPT_STR("httphelplang"               , OFS(http_help_lang),            "en"),
+	DEF_OPT_STR("httplocale"                 , OFS(http_locale),               NULL),
+	DEF_OPT_INT8("http_prepend_embedded_css" , OFS(http_prepend_embedded_css), 0),
+	DEF_OPT_INT32("httprefresh"              , OFS(http_refresh),              0),
+	DEF_OPT_INT32("httppollrefresh"          , OFS(poll_refresh),              60),
+	DEF_OPT_INT8("httphideidleclients"       , OFS(http_hide_idle_clients),    1),
+	DEF_OPT_STR("httphidetype"               , OFS(http_hide_type),            NULL),
+	DEF_OPT_INT8("httpshowpicons"            , OFS(http_showpicons),           0),
+	DEF_OPT_INT8("httppiconsize"             , OFS(http_picon_size),           0),
+	DEF_OPT_INT8("httpshowmeminfo"           , OFS(http_showmeminfo),          0),
+	DEF_OPT_INT8("httpshowuserinfo"          , OFS(http_showuserinfo),         0),
+	DEF_OPT_INT8("httpshowreaderinfo"        , OFS(http_showreaderinfo),       0),
+	DEF_OPT_INT8("httpshowcacheexinfo"       , OFS(http_showcacheexinfo),      0),
+	DEF_OPT_INT8("httpshowecminfo"           , OFS(http_showecminfo),          0),
+	DEF_OPT_INT8("httpshowloadinfo"          , OFS(http_showloadinfo),         0),
+	DEF_OPT_FUNC("httpallowed"               , OFS(http_allowed),              iprange_fn, .free_value = iprange_free_fn),
+	DEF_OPT_INT8("httpreadonly"              , OFS(http_readonly),             0),
+	DEF_OPT_INT8("httpsavefullcfg"           , OFS(http_full_cfg),             0),
+	DEF_OPT_INT8("httpoverwritebakfile"      , OFS(http_overwrite_bak_file),   0),
+	DEF_OPT_STR("httpcert"                   , OFS(http_cert),                 NULL),
+	DEF_OPT_INT8("https_force_secure_mode"   , OFS(https_force_secure_mode),   1),
+	DEF_OPT_FUNC("httpdyndns"                , OFS(http_dyndns),               http_dyndns_fn),
+	DEF_OPT_INT32("aulow"                    , OFS(aulow),                     30),
+	DEF_OPT_INT32("hideclient_to"            , OFS(hideclient_to),             25),
+	DEF_OPT_STR("httpncamlabel"              , OFS(http_ncam_label),           "NCAm"),
+	DEF_OPT_INT32("httpemmuclean"            , OFS(http_emmu_clean),           256),
+	DEF_OPT_INT32("httpemmsclean"            , OFS(http_emms_clean),           -1),
+	DEF_OPT_INT32("httpemmgclean"            , OFS(http_emmg_clean),           -1),
+	DEF_OPT_FUNC("httputf8"                  , OFS(http_utf8),                 http_utf8_fn),
 #ifdef WEBIF_LIVELOG
- 	DEF_OPT_INT8("http_status_log"          , OFS(http_status_log),         0),
+ 	DEF_OPT_INT8("http_status_log"           , OFS(http_status_log),           0),
 #else
-	DEF_OPT_INT8("http_status_log"          , OFS(http_status_log),         1),
+	DEF_OPT_INT8("http_status_log"           , OFS(http_status_log),           1),
 #endif
 #ifndef WEBIF_JQUERY
-	DEF_OPT_STR("http_extern_jquery"        , OFS(http_extern_jquery),      "//code.jquery.com/jquery-1.11.0.min.js"),
+	DEF_OPT_STR("http_extern_jquery"         , OFS(http_extern_jquery),        "//code.jquery.com/jquery-1.11.0.min.js"),
 #endif
 	DEF_LAST_OPT
 };

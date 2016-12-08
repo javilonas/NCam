@@ -4594,7 +4594,6 @@ void dvbapi_process_input(int32_t demux_id, int32_t filter_num, uchar *buffer, i
 		// we have an ecm with the correct irdeto index (or fakechid)
 		for(p = dvbapi_priority; p != NULL ; p = p->next)  // check for ignore!
 		{
-
 			if((p->type != 'i')
 					|| (p->caid && p->caid != curpid->CAID)
 					|| (p->provid && p->provid != curpid->PROVID)

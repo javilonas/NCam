@@ -1,4 +1,4 @@
-prefix=/home/newmake/oscam-toolchains/powerpc-tuxbox-linux-gnu/powerpc-linux
+prefix=/home/*/NCam/cross/powerpc-tuxbox-linux-gnu/powerpc-linux
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include

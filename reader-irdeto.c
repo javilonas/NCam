@@ -158,18 +158,18 @@ static time_t chid_date(struct s_reader *reader, uint32_t date, char *buf, int32
 	//
 	// this is the known default value.
 	uint32_t date_base;
-	
+
 	if((reader->caid>>8) == 0x06)
 		{ date_base = 946598400L; } // this is actually 31.12.1999, 00:00 default for irdeto card
 	else
 		{ date_base = 870393600L; } // this is actually 01.08.1997, 00:00 default for betacrypt cards
-		
+
 	// CAID, ACS, Country, base date       D . M.   Y, h : m
-	CHID_BASE_DATE table[] = { 
-		
+	CHID_BASE_DATE table[] = {
+
 		{0x0662, 0x0608, "ITA", 944110500L},    // 01.12.1999, 23.55
 		{0x0616, 0x0608, "ITA", 944110500L},    // 01.12.1999, 23.55    //nitegate
-	
+
 		{0x0647, 0x0005, "ITA", 946598400L},    // 31.12.1999, 00:00    //Redlight irdeto
 		{0x0664, 0x0608, "TUR", 946598400L},    // 31.12.1999, 00:00
 		{0x0624, 0x0006, "CZE", 946598400L},    // 30.12.1999, 16:00    //skyklink irdeto
@@ -177,16 +177,18 @@ static time_t chid_date(struct s_reader *reader, uint32_t date, char *buf, int32
 		{0x0666, 0x0006, "SVK", 946598400L},    // 30.12.1999, 16:00    //cslink irdeto
 		{0x0668, 0x0006, "SVK", 946598400L},    // 30.12.1999, 00:00    //Towercom Irdeto
 		{0x0666, 0x0006, "CZE", 946598400L},    // 30.12.1999, 16:00    //cslink irdeto
+		{0x0650, 0x0608, "AUT", 946598400L},    // 31.12.1999, 00:00    //orf P410 irdeto
+		{0x0650, 0x0005, "AUT", 946598400L},    // 31.12.1999, 00:00    //orf P410 irdeto
 		{0x0648, 0x0608, "AUT", 946598400L},    // 31.12.1999, 00:00    //orf ice irdeto
-		{0x0648, 0x0005, "AUT", 946598400L},    // 31.12.1999, 00:00    //orf ice irdeto	
+		{0x0648, 0x0005, "AUT", 946598400L},    // 31.12.1999, 00:00    //orf ice irdeto
 		{0x0627, 0x0608, "EGY", 946598400L},    // 30.12.1999, 16:00
 		{0x0602, 0x0606, "NLD", 946598400L},    // 31.12.1999, 08:00    //Ziggo irdeto caid: 0602, acs: 6.06
 		{0x0602, 0x0505, "NLD", 946598400L},    // 31.12.1999, 00:00    //Ziggo irdeto caid: 0602, acs: 5.05
 		{0x0606, 0x0005, "NLD", 946598400L},    // 31.12.1999, 00:00    //Caiway irdeto card caid: 0606, acs: 0.05
 		{0x0606, 0x0605, "NLD", 946598400L},    // 31.12.1999, 00:00    //Caiway irdeto card caid: 0606, acs: 6.05
 		{0x0606, 0x0606, "NLD", 946598400L},    // 31.12.1999, 00:00    //Caiway irdeto card caid: 0606, acs: 6.06
-		{0x0606, 0x0006, "ZAF", 946598400L}, 	// 31.12.1999, 00:00 	//dstv irdeto
-						
+		{0x0606, 0x0006, "ZAF", 946598400L},    // 31.12.1999, 00:00    //dstv irdeto
+
 		{0x0604, 0x1541, "GRC", 977817600L},    // 26.12.2000, 00:00
 		{0x0604, 0x1542, "GRC", 977817600L},    // 26.12.2000, 00:00
 		{0x0604, 0x1543, "GRC", 977817600L},    // 26.12.2000, 00:00
@@ -201,15 +203,15 @@ static time_t chid_date(struct s_reader *reader, uint32_t date, char *buf, int32
 		{0x0604, 0x0607, "GRC", 1011052800L},   // 15.01.2002, 00:00    //nova irdeto
 		{0x0604, 0x0608, "GRC", 1011052800L},   // 15.01.2002, 00:00    //nova irdeto
 		{0x0604, 0x0005, "GRC", 1011052800L},   // 15.01.2002, 00:00    //mova irdeto
-				
+
 		{0x0604, 0x0606, "NLD", 1066089600L},   // 14.10.2003, 00:00
 		{0x0610, 0x0608, "NLD", 1066089600L},   // 14.10.2003, 00:00    //Ziggo irdeto caid: 0610, acs: 6.08
 		{0x0604, 0x0608, "NLD", 1066089600L},   // 14.10.2003, 00:00    //Ziggo irdeto caid: 0604, acs: 6.08
 		{0x0604, 0x0605, "NLD", 1066089600L},   // 14.10.2003, 00:00    //Ziggo irdeto caid: 0604, acs: 6.05
 		{0x0604, 0x0005, "NLD", 1066089600L},   // 14.10.2003, 00:00    //Ziggo irdeto caid: 0604, acs: 0.05
-		
+
 		{0x0628, 0x0606, "MCR", 1159574400L},   // 29.09.2006, 00:00
-		
+
 		{0x0652, 0x0005, "MCR", 1206662400L},   // 28.03.2008, 00:00    //Raduga caid:0652, acs: 0.05
 		{0x0652, 0x0608, "MCR", 1206662400L},   // 28.03.2008, 00:00    //Raduga caid:0652, acs: 6.08
 
@@ -314,7 +316,6 @@ static int32_t irdeto_card_init_provider(struct s_reader *reader)
 
 	return OK;
 }
-
 
 
 static int32_t irdeto_card_init(struct s_reader *reader, ATR *newatr)
@@ -509,18 +510,18 @@ static int32_t irdeto_card_init(struct s_reader *reader, ATR *newatr)
 		}
 	}
 
-	if((reader->caid == 0x0648) || (reader->caid == 0x0666) || (reader->caid == 0x0624 && csystem_data->acs57 == 1))    // acs 6.08 and ice 0D96/0624
+	if((reader->caid == 0x0648) || (reader->caid == 0x0650) || (reader->caid == 0x0666) || (reader->caid == 0x0624 && csystem_data->acs57 == 1))    // acs 6.08 and ice 0D96/0624
 	{
 		camkey = 4;
 		sc_Acs57CamKey[2] = 0;
 	}
 // Dirthy hack for Ziggo will be removed when optimum values are find on these T14 cards for v2 and triple
 // There are also other readers suffering from simmilar issue for those cards.
-    if(((reader->caid == 0x0604) || (reader->caid == 0x1722)) && (reader->typ == R_SMART) &&  (reader->smart_type >= 2)) 
-    { 
-        // Quick and dirty containment for the SmargoV2,Triple and Ziggo irdeto caid: 0604 using smartreader protocol 
-        camkey = 999; 
-    } // end dirthy hack
+	if(((reader->caid == 0x0604) || (reader->caid == 0x1722)) && (reader->typ == R_SMART) &&  (reader->smart_type >= 2))
+	{
+		// Quick and dirty containment for the SmargoV2,Triple and Ziggo irdeto caid: 0604 using smartreader protocol
+		camkey = 999;
+	} // end dirthy hack
 	rdr_log_dbg(reader, D_READER, "set camkey for type=%d", camkey);
 
 	switch(camkey)
@@ -542,7 +543,7 @@ static int32_t irdeto_card_init(struct s_reader *reader, ATR *newatr)
 		for(i = 5; i < (int)sizeof(sc_Acs57CamKey) - 1; i++)
 			{ crc ^= sc_Acs57CamKey[i]; }
 		sc_Acs57CamKey[69] = crc;
-		if((reader->caid == 0x0648) || (reader->caid == 0x0666) || (reader->caid == 0x0624 && csystem_data->acs57 == 1))
+		if((reader->caid == 0x0648) || (reader->caid == 0x0650) || (reader->caid == 0x0666) || (reader->caid == 0x0624 && csystem_data->acs57 == 1))
 		{
 			sc_Acs57CamKey[69] = XorSum(sc_Acs57CamKey, 69) ^ 0x3f ^(sc_Acs57CamKey[0] & 0xf0) ^ 0x1b;
 			if(irdeto_do_cmd(reader, sc_Acs57CamKey, 0x9011, cta_res, &cta_lr))
@@ -609,7 +610,7 @@ int32_t irdeto_do_ecm(struct s_reader *reader, const ECM_REQUEST *er, struct s_e
 	{
 		int32_t crc = 63;
 		sc_Acs57Ecm[4] = er->ecm[2] - 2;
-		if((reader->caid == 0x0648) || (reader->caid == 0x0666) || (reader->caid == 0x0624 && csystem_data->acs57 == 1))    //crc for orf, cslink, skylink
+		if((reader->caid == 0x0648) || (reader->caid == 0x0650) || (reader->caid == 0x0666) || (reader->caid == 0x0624 && csystem_data->acs57 == 1))    //crc for orf, cslink, skylink
 		{
 			sc_Acs57Ecm[2] = 0;
 			crc ^= 0x01;
@@ -729,14 +730,14 @@ int32_t irdeto_do_ecm(struct s_reader *reader, const ECM_REQUEST *er, struct s_e
 						break;
 					}
 				}
-			} 
+			}
 			try++;
 		}
 		while((try < 3) && (ret));
 		if(ret)
 			{ return ERROR; }
 	}
-	
+
 	if(cta_res[5]== 0x36 || cta_res[5]== 0x37 || cta_res[5]== 0x24 || cta_res[5]== 0x25)
 	{
 		snprintf(ea->msglog, MSGLOGSIZE, "cw needs tweaking");
@@ -1078,7 +1079,7 @@ static int32_t irdeto_do_emm(struct s_reader *reader, EMM_PACKET *ep)
 					rdr_log_dbg(reader, D_EMM, "dataLen %d seems wrong, faulty EMM?", dataLen);
 					return ERROR;
 				}
-				if(ep->type == GLOBAL && ((reader->caid == 0x0624 && csystem_data->acs57 == 1) || reader->caid == 0x0648 || reader->caid == 0x0666)) { dataLen += 2; }
+				if(ep->type == GLOBAL && ((reader->caid == 0x0624 && csystem_data->acs57 == 1) || reader->caid == 0x0648 || reader->caid == 0x0650 || reader->caid == 0x0666)) { dataLen += 2; }
 				int32_t crc = 63;
 				sc_Acs57Emm[4] = dataLen;
 				memcpy(&cta_cmd, sc_Acs57Emm, sizeof(sc_Acs57Emm));
@@ -1095,13 +1096,13 @@ static int32_t irdeto_do_emm(struct s_reader *reader, EMM_PACKET *ep)
 				}
 				else
 				{
-					if(ep->type == GLOBAL && ((reader->caid == 0x0624 && csystem_data->acs57 == 1) || reader->caid == 0x0648 || reader->caid == 0x0666))
+					if(ep->type == GLOBAL && ((reader->caid == 0x0624 && csystem_data->acs57 == 1) || reader->caid == 0x0648 || reader->caid == 0x0650 || reader->caid == 0x0666))
 					{
 						memcpy(&cta_cmd[9], &ep->emm[6], 1);
 						memcpy(&cta_cmd[10], &ep->emm[7], dataLen - 6);
 						//                      cta_cmd[9]=0x00;
 					}
-					else if((reader->caid == 0x0624 && csystem_data->acs57 == 1) || reader->caid == 0x0648 || reader->caid == 0x0666)     //only orf, cslink, skylink
+					else if((reader->caid == 0x0624 && csystem_data->acs57 == 1) || reader->caid == 0x0648 || reader->caid == 0x0650 || reader->caid == 0x0666)     //only orf, cslink, skylink
 					{
 						memcpy(&cta_cmd[9], &ep->emm[8], dataLen - 4);
 					}
@@ -1124,7 +1125,7 @@ static int32_t irdeto_do_emm(struct s_reader *reader, EMM_PACKET *ep)
 					return SKIPPED;
 				}
 				if(cta_res[2] == 0x00)
-				{ 
+				{
 					return OK;
 				}
 				return ERROR; // all other 
@@ -1156,14 +1157,14 @@ static int32_t irdeto_do_emm(struct s_reader *reader, EMM_PACKET *ep)
 					return SKIPPED;
 				}
 				if(cta_res[cta_lr-2] == 0x00)
-				{ 
+				{
 					return OK;
 				}
 				return ERROR; // all other
 			}
 		}
 		else
-		{ 
+		{
 			rdr_log_dbg(reader, D_EMM, "addrlen %d > %d", l, ADDRLEN);
 			return ERROR;
 		}

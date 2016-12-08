@@ -104,8 +104,8 @@
 
 #if !(defined(VMS) || defined(__VMS)) /* VMS uses logical names instead */
 #if defined(HEADER_CRYPTLIB_H) && !defined(OPENSSLDIR)
-#define ENGINESDIR "/home/newmake/oscam-toolchains/powerpc-tuxbox-linux-gnu/powerpc-linux/lib/engines"
-#define OPENSSLDIR "/home/newmake/oscam-toolchains/powerpc-tuxbox-linux-gnu/powerpc-linux"
+#define ENGINESDIR "/home/*/NCam/cross/powerpc-tuxbox-linux-gnu/powerpc-linux/lib/engines"
+#define OPENSSLDIR "/home/*/NCam/cross/powerpc-tuxbox-linux-gnu/powerpc-linux"
 #endif
 #endif
 

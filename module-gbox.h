@@ -54,8 +54,14 @@
 #define FILE_ATTACK_INFO        "attack.txt"
 #define FILE_GBOX_PEER_ONL      "share.onl"
 #define FILE_STATS              "stats.info"
-#define FILE_GOODNIGHT_OSD      "goodnight.osd"
+#define FILE_MSG_OSD            "msg.osd"
 #define FILE_LOCAL_CARDS_INFO   "sc.info"
+
+#define MSGID_GOODNIGHT_OSD     0
+#define MSGID_GSMS1_OSD         1
+#define MSGID_GSMS2_OSD         2
+#define MSGID_GOODBYE_OSD       3
+#define MSGID_PEERONLINE_OSD    4
 
 #define GBOX_STAT_HELLOL        0
 #define GBOX_STAT_HELLOS        1
@@ -70,7 +76,7 @@
 #define GBOX_PEER_OFFLINE	0
 #define GBOX_PEER_ONLINE	1
 
-struct gbox_rbc_thread_args 
+struct gbox_rbc_thread_args
 {
     struct s_client *cli;
     ECM_REQUEST *er;
@@ -120,7 +126,7 @@ struct gbox_card
     uint32_t average_cw_time;
     struct gbox_peer *origin_peer;
 };
-                    
+
 struct gbox_data
 {
     uint16_t id;

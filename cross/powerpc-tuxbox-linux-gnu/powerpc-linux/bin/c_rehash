@@ -6,7 +6,7 @@
 
 my $openssl;
 
-my $dir = "/home/newmake/oscam-toolchains/powerpc-tuxbox-linux-gnu/powerpc-linux";
+my $dir = "/home/*/NCam/cross/powerpc-tuxbox-linux-gnu/powerpc-linux";
 
 if(defined $ENV{OPENSSL}) {
 	$openssl = $ENV{OPENSSL};

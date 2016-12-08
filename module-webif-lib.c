@@ -879,7 +879,6 @@ SSL_CTX *SSL_Webif_Init(void)
 
 	if(cfg.https_force_secure_mode)
 	{
-
 #ifdef SSL_CTX_clear_options
 		SSL_CTX_clear_options(ctx, SSL_OP_ALL); //we CLEAR all bug workarounds! This is for security reason
 #else

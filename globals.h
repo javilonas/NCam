@@ -376,7 +376,7 @@ typedef unsigned char uchar;
 #define CS_LOGFILE    "/tmp/ncam.log"
 #endif
 #define CS_QLEN       128 // size of request queue
-#define CS_MAXPROV    128
+#define CS_MAXPROV    100
 #define CS_MAXPORTS   200  // max server ports
 #define CS_CLIENT_HASHBUCKETS 32
 #define CS_SERVICENAME_SIZE 32
@@ -394,7 +394,7 @@ typedef unsigned char uchar;
 
 #define MAX_ECM_SIZE 1024
 #define MAX_EMM_SIZE 1024
-#define MAX_SCT_SIZE 1024  // smaller or equal to the minial one of MAX_ECM_SIZE and MAX_EMM_SIZE
+#define MAX_SCT_SIZE 596  // smaller or equal to the minial one of MAX_ECM_SIZE and MAX_EMM_SIZE
 
 #define CS_EMMCACHESIZE 1024 //nr of EMMs that each reader will cache
 #define MSGLOGSIZE 64       // size of string buffer for a ecm to return messages
@@ -554,7 +554,7 @@ enum {E2_GLOBAL = 0, E2_GROUP, E2_CAID, E2_IDENT, E2_CLASS, E2_CHID, E2_QUEUE, E
 #define MAX_ATR_LEN     33          // max. ATR length
 #define MAX_HIST        15          // max. number of historical characters
 
-#define MAX_SIDBITS     (64+64)     // max services
+#define MAX_SIDBITS     64     // max services
 #define SIDTABBITS      uint64_t    // 64bit type for services, if a system does not support this type,
 // please use a define and define it as uint32_t / MAX_SIDBITS 32
 
@@ -1143,7 +1143,6 @@ struct s_cascadeuser
 
 typedef struct sidtabs
 {
-	long long int SIDTABBITS;
 	SIDTABBITS      ok;         // positive services
 	SIDTABBITS      no;         // negative services
 } SIDTABS;

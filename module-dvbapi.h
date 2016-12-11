@@ -26,10 +26,10 @@
 #define ECMINFO_FILE    "/tmp/ecm.info"
 #endif
 
-#define MAX_DEMUX 16
+#define MAX_DEMUX 64
 #define MAX_CAID 50
-#define ECM_PIDS 30
-#define MAX_FILTER 64
+#define ECM_PIDS 32
+#define MAX_FILTER (64+64)
 
 #ifdef WITH_EXTENDED_CW
 #define MAX_STREAM_INDICES 32
@@ -93,7 +93,7 @@
 #define DVBAPI_SERVER_INFO        0xFFFF0002
 #define DVBAPI_ECM_INFO           0xFFFF0003
 
-#define DVBAPI_MAX_PACKET_SIZE 262         //maximum possible packet size
+#define DVBAPI_MAX_PACKET_SIZE 264         //maximum possible packet size
 
 #define DVBAPI_INDEX_DISABLE      0xFFFFFFFF // only used for ca_pid_t
 

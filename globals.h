@@ -1,6 +1,7 @@
 #ifndef GLOBALS_H_
 #define GLOBALS_H_
 
+#undef _GNU_SOURCE
 #define _GNU_SOURCE //needed for PTHREAD_MUTEX_RECURSIVE on some plattforms and maybe other things; do not remove
 #include <stdlib.h>
 #include <stdio.h>
@@ -379,7 +380,7 @@ typedef unsigned char uchar;
 #define CS_MAXPROV    100
 #define CS_MAXPORTS   200  // max server ports
 #define CS_CLIENT_HASHBUCKETS 32
-#define CS_SERVICENAME_SIZE 32
+#define CS_SERVICENAME_SIZE 48
 
 #define CS_ECMSTORESIZE   16  // use MD5()
 #define CS_EMMSTORESIZE   16  // use MD5()
@@ -392,9 +393,15 @@ typedef unsigned char uchar;
 // Support for multiple CWs per channel and other encryption algos
 #define WITH_EXTENDED_CW 1
 
+#if defined(READER_DRE) || defined(READER_DRECAS) || defined(READER_VIACCESS)
 #define MAX_ECM_SIZE 1024
 #define MAX_EMM_SIZE 1024
-#define MAX_SCT_SIZE 596  // smaller or equal to the minial one of MAX_ECM_SIZE and MAX_EMM_SIZE
+#define MAX_SCT_SIZE 1024  // smaller or equal to the minial one of MAX_ECM_SIZE and MAX_EMM_SIZE 
+#else
+#define MAX_ECM_SIZE 1024
+#define MAX_EMM_SIZE 1024
+#define MAX_SCT_SIZE 1024  // smaller or equal to the minial one of MAX_ECM_SIZE and MAX_EMM_SIZE 
+#endif
 
 #define CS_EMMCACHESIZE 1024 //nr of EMMs that each reader will cache
 #define MSGLOGSIZE 64       // size of string buffer for a ecm to return messages
@@ -518,9 +525,9 @@ typedef unsigned char uchar;
 #define READER_DEVICE_ERROR   5
 
 // moved from stats
-#define DEFAULT_REOPEN_SECONDS 30
+#define DEFAULT_REOPEN_SECONDS 12
 #define DEFAULT_MIN_ECM_COUNT 5
-#define DEFAULT_MAX_ECM_COUNT 500
+#define DEFAULT_MAX_ECM_COUNT 600
 #define DEFAULT_NBEST 1
 #define DEFAULT_NFB 1
 #define DEFAULT_RETRYLIMIT 0
@@ -531,8 +538,8 @@ typedef unsigned char uchar;
 #define DEFAULT_LB_AUTO_BETATUNNEL_MODE 0
 #define DEFAULT_LB_AUTO_BETATUNNEL_PREFER_BETA 50
 
-#define DEFAULT_MAX_CACHE_TIME 15
-#define DEFAULT_MAX_HITCACHE_TIME 15
+#define DEFAULT_MAX_CACHE_TIME 12
+#define DEFAULT_MAX_HITCACHE_TIME 12
 
 #define DEFAULT_LB_AUTO_TIMEOUT 0
 #define DEFAULT_LB_AUTO_TIMEOUT_P 30
@@ -554,7 +561,7 @@ enum {E2_GLOBAL = 0, E2_GROUP, E2_CAID, E2_IDENT, E2_CLASS, E2_CHID, E2_QUEUE, E
 #define MAX_ATR_LEN     33          // max. ATR length
 #define MAX_HIST        15          // max. number of historical characters
 
-#define MAX_SIDBITS     64     // max services
+#define MAX_SIDBITS     (64+64)     // max services
 #define SIDTABBITS      uint64_t    // 64bit type for services, if a system does not support this type,
 // please use a define and define it as uint32_t / MAX_SIDBITS 32
 
@@ -609,7 +616,7 @@ enum {E2_GLOBAL = 0, E2_GROUP, E2_CAID, E2_IDENT, E2_CLASS, E2_CHID, E2_QUEUE, E
 #define DEFAULT_TCP_RECONNECT_TIMEOUT 10 // default 15
 #define DEFAULT_NCD_KEEPALIVE 1 // default 0
 
-#define DEFAULT_CC_MAXHOPS  2   // default 10
+#define DEFAULT_CC_MAXHOPS  3   // default 10
 #define DEFAULT_CC_RESHARE  1   // Use global cfg // default -1
 #define DEFAULT_CC_IGNRSHR  0   // Use global cfg // default -1
 #define DEFAULT_CC_STEALTH  1   // Use global cfg // default -1
@@ -625,7 +632,7 @@ enum {E2_GLOBAL = 0, E2_GROUP, E2_CAID, E2_IDENT, E2_CLASS, E2_CHID, E2_QUEUE, E
 // Return MPEG section length
 #define SCT_LEN(sct) (3+((sct[1]&0x0f)<<8)+sct[2])
 // Used by readers
-#define MAX_LEN      256
+#define MAX_LEN      (256+3)
 
 #define NO_CAID_VALUE  0xfffe
 #define NO_PROVID_VALUE  0xfffffe
@@ -1456,8 +1463,8 @@ struct s_emmlen_range
 #ifdef WITH_EMU
 typedef struct opkeys
 {
-	uint8_t key3b[32][32]; 
-	uint8_t key56[32][32]; 
+	uint8_t key3b[32][32];
+	uint8_t key56[32][32];
 } opkeys_t;
 #endif
 
@@ -1877,7 +1884,7 @@ struct s_cw
 struct s_fakecws
 {
 	uint32_t count;
-	struct s_cw *data;	
+	struct s_cw *data;
 };
 
 #ifdef MODULE_SERIAL
@@ -2220,8 +2227,8 @@ struct s_config
 	int8_t      emu_stream_emm_enabled;
 #endif
 
-	int32_t    max_cache_time;  //seconds ecms are stored in ecmcwcache
-	int32_t    max_hitcache_time;  //seconds hits are stored in cspec_hitcache (to detect dyn wait_time)
+	int32_t     max_cache_time;  //seconds ecms are stored in ecmcwcache
+	int32_t     max_hitcache_time;  //seconds hits are stored in cspec_hitcache (to detect dyn wait_time)
 
 	int8_t      reload_useraccounts;
 	int8_t      reload_readers;

@@ -204,12 +204,12 @@ void cc_crypt_cmd0c(struct s_client *cl, uint8_t *buf, int32_t len)
 		// buf may be unaligned, 
 		// so we use malloc() memory for the uint32_t* cast
 		uint8_t *tmp;
-		int32_t i;	
-		
+		int32_t i;
+
 		if(!cs_malloc(&tmp, len))
 			{ return; }
 		memcpy(tmp, buf, len);
-		
+
 		SwapLBi(tmp, len);
 		for(i = 0; i < len / 16; i++)
 			{ rc6_block_decrypt((uint32_t *)(tmp + i * 16), (uint32_t *)(out + i * 16), 1, cc->cmd0c_RC6_cryptkey); }
@@ -780,7 +780,7 @@ int32_t cc_cmd_send(struct s_client *cl, uint8_t *buf, int32_t len, cc_msg_type_
 	return n;
 }
 
-#define CC_DEFAULT_VERSION 1
+#define CC_DEFAULT_VERSION 4
 #define CC_VERSIONS 9
 static char *version[CC_VERSIONS]  = { "2.0.9", "2.0.11", "2.1.1", "2.1.2", "2.1.3", "2.1.4", "2.2.0", "2.2.1", "2.3.0"};
 static char *build[CC_VERSIONS]    = { "2816",   "2892",   "2971",  "3094",  "3165",  "3191",  "3290",  "3316",  "3367"};

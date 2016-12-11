@@ -26,12 +26,12 @@
 #define ECMINFO_FILE    "/tmp/ecm.info"
 #endif
 
-#define MAX_DEMUX 16
-#define MAX_CAID 50
-#define ECM_PIDS 30
-#define MAX_FILTER 64
+#define MAX_DEMUX 32
+#define MAX_CAID 100
+#define ECM_PIDS 60
+#define MAX_FILTER (64+64)
 
-#ifdef WITH_EXTENDED_CW	
+#ifdef WITH_EXTENDED_CW
 #define MAX_STREAM_INDICES 32
 #else
 #define MAX_STREAM_INDICES 1
@@ -80,7 +80,7 @@
 #define DVBAPI_PROTOCOL_VERSION         2
 
 #define DVBAPI_CA_SET_PID         0x40086f87
-#define DVBAPI_CA_SET_DESCR       0x40106f86                         
+#define DVBAPI_CA_SET_DESCR       0x40106f86
 #define DVBAPI_CA_SET_DESCR_MODE  0x400c6f88
 #define DVBAPI_DMX_SET_FILTER     0x403c6f2b
 #define DVBAPI_DMX_STOP           0x00006f2a
@@ -93,7 +93,7 @@
 #define DVBAPI_SERVER_INFO        0xFFFF0002
 #define DVBAPI_ECM_INFO           0xFFFF0003
 
-#define DVBAPI_MAX_PACKET_SIZE 262         //maximum possible packet size
+#define DVBAPI_MAX_PACKET_SIZE 326         //maximum possible packet size
 
 #define DVBAPI_INDEX_DISABLE      0xFFFFFFFF // only used for ca_pid_t
 
@@ -148,11 +148,11 @@ typedef struct filter_s
 	uint32_t provid;
 	uint16_t type;
 	int32_t count;
-	uchar	filter[16];
-	uchar	mask[16];
+	uchar   filter[16];
+	uchar   mask[16];
 	uchar   lastecmd5[CS_ECMSTORESIZE]; // last requested ecm md5
 	int32_t lastresult;
-	uchar	prevecmd5[CS_ECMSTORESIZE]; // previous requested ecm md5
+	uchar   prevecmd5[CS_ECMSTORESIZE]; // previous requested ecm md5
 	int32_t prevresult;
 #if defined(WITH_STAPI) || defined(WITH_STAPI5)
 	int32_t NumSlots;
@@ -227,11 +227,11 @@ typedef struct demux_s
 
 typedef struct s_streampid
 {
-	uint8_t		cadevice; // holds ca device
-	uint16_t 	streampid; // holds pids
-	uint64_t	activeindexers; // bitmask indexers if streampid enabled for index bit is set
-	ca_index_t	caindex; // holds index that is used to decode on ca device
-	bool		use_des;
+	uint8_t     cadevice; // holds ca device
+	uint16_t    streampid; // holds pids
+	uint64_t    activeindexers; // bitmask indexers if streampid enabled for index bit is set
+	ca_index_t  caindex; // holds index that is used to decode on ca device
+	bool        use_des;
 }STREAMPIDTYPE;
 
 struct s_dvbapi_priority
@@ -254,6 +254,7 @@ struct s_dvbapi_priority
 	char pmtfile[30];
 	int8_t disablefilter;
 #endif
+	struct s_dvbapi_priority *last;
 	struct s_dvbapi_priority *next;
 };
 
@@ -299,7 +300,7 @@ typedef struct dmx_filter
 struct dmx_sct_filter_params
 {
 	uint16_t        pid;
-	dmx_filter_t        filter;
+	dmx_filter_t    filter;
 	uint32_t        timeout;
 	uint32_t        flags;
 #define DMX_CHECK_CRC       1
@@ -326,7 +327,7 @@ enum ca_descr_algo {
 	CA_ALGO_DES,
 	CA_ALGO_AES128,
 };
- 
+
 enum ca_descr_cipher_mode {
 	CA_MODE_ECB,
 	CA_MODE_CBC,
@@ -354,6 +355,8 @@ int32_t dvbapi_open_device(int32_t, int32_t, int);
 int32_t dvbapi_stop_filternum(int32_t demux_index, int32_t num);
 int32_t dvbapi_stop_filter(int32_t demux_index, int32_t type);
 struct s_dvbapi_priority *dvbapi_check_prio_match(int32_t demux_id, int32_t pidindex, char type);
+void dvbapi_adjust_prioritytab(int demux_index);
+void dvbapi_write_prio(void);
 void dvbapi_send_dcw(struct s_client *client, ECM_REQUEST *er);
 void dvbapi_write_cw(int32_t demux_id, uchar *cw, int32_t pid, int32_t stream_id, enum ca_descr_algo algo, enum ca_descr_cipher_mode cipher_mode);
 int32_t dvbapi_parse_capmt(unsigned char *buffer, uint32_t length, int32_t connfd, char *pmtfile, int8_t is_real_pmt, uint16_t existing_demux_id, uint16_t client_proto_version);

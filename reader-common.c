@@ -19,12 +19,12 @@
 extern const struct s_cardsystem *cardsystems[];
 extern char *RDR_CD_TXT[];
 
-int32_t check_sct_len(const uchar *data, int32_t off)
+int32_t check_sct_len(const uchar *data, int32_t off, size_t maxSize)
 {
-	int32_t len = SCT_LEN(data);
-	if(len + off > MAX_LEN)
+	size_t len = SCT_LEN(data);
+	if(len + off > maxSize)
 	{
-		cs_log_dbg(D_TRACE | D_READER, "check_sct_len(): smartcard section too long %d > %d", len, MAX_LEN - off);
+		cs_log_dbg(D_TRACE | D_READER, "check_sct_len(): smartcard section too long %zd > %zd", len, maxSize - off);
 		len = -1;
 	}
 	return len;
@@ -34,8 +34,8 @@ static void reader_nullcard(struct s_reader *reader)
 {
 	reader->csystem_active = false;
 	reader->csystem = NULL;
-	memset(reader->hexserial, 0   , sizeof(reader->hexserial));
-	memset(reader->prid     , 0xFF, sizeof(reader->prid));
+	memset(reader->hexserial, 0, sizeof(reader->hexserial));
+	memset(reader->prid, 0xFF, sizeof(reader->prid));
 	reader->caid = 0;
 	reader->nprov = 0;
 	cs_clear_entitlement(reader);

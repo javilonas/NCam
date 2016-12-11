@@ -1161,6 +1161,7 @@ static char *send_ncam_config_cccam(struct templatevars *vars, struct uriparams 
 
 	tpl_addVar(vars, TPLADD, "STEALTH", (cfg.cc_stealth == 1) ? "checked" : "");
 
+	tpl_printf(vars, TPLADD, "CCCFGFILE", "%s", cfg.cc_cfgfile);
 	tpl_printf(vars, TPLADD, "NODEID", "%02X%02X%02X%02X%02X%02X%02X%02X",
 			   cfg.cc_fixed_nodeid[0], cfg.cc_fixed_nodeid[1], cfg.cc_fixed_nodeid[2], cfg.cc_fixed_nodeid[3],
 			   cfg.cc_fixed_nodeid[4], cfg.cc_fixed_nodeid[5], cfg.cc_fixed_nodeid[6], cfg.cc_fixed_nodeid[7]);
@@ -1177,6 +1178,9 @@ static char *send_ncam_config_cccam(struct templatevars *vars, struct uriparams 
 	tpl_addVar(vars, TPLADD, "FORWARDORIGINCARD", (cfg.cc_forward_origin_card == 1) ? "checked" : "");
 
 	tpl_addVar(vars, TPLADD, "KEEPCONNECTED", (cfg.cc_keep_connected == 1) ? "checked" : "");
+
+	if (cfg.cc_autosidblock)
+		tpl_printf(vars, TPLADD, "AUTOSIDBLOCK", "selected");
 
 	tpl_addVar(vars, TPLADDONCE, "CONFIG_CONTROL", tpl_getTpl(vars, "CONFIGCCCAMCTRL"));
 
@@ -2037,6 +2041,11 @@ static char *send_ncam_reader_config(struct templatevars *vars, struct uriparams
 
 	// Reset Cycle
 	tpl_printf(vars, TPLADD, "RESETCYCLE", "%d", rdr->resetcycle);
+	// reset cycle mode
+	tpl_addVar(vars, TPLADD, "RESTARTFORRESETCYCLECHCECKED", (rdr->restartforresetcycle == 1) ? "checked" : "");
+
+	// Auto Restart after
+	tpl_printf(vars, TPLADD, "AUTORESTARTSECONDS", "%d", rdr->autorestartseconds);
 
 	// Disable Serverfilter
 	if(!apicall)
@@ -2523,6 +2532,11 @@ static char *send_ncam_reader_config(struct templatevars *vars, struct uriparams
 
 	if(rdr->detect_seca_nagra_tunneled_card)
 		{ tpl_addVar(vars, TPLADD, "NAGRADETECTSECACARDCHECKED", "checked"); }
+#ifdef READER_TONGFANG
+	if(rdr->tongfang3_calibsn)
+		{ tpl_printf(vars, TPLADD, "TONGFANGCALIBSN", "%08X", rdr->tongfang3_calibsn); }
+
+#endif
 
 #ifdef MODULE_CCCAM
 	tpl_printf(vars, TPLADD, "CCCMAXHOPS",   "%d", rdr->cc_maxhops);

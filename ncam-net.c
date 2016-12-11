@@ -174,6 +174,30 @@ int32_t check_ip(struct s_ip *ip, IN_ADDR_T n)
 	return ok;
 }
 
+#if defined cross-mipsel-linux-uclibc-libusb-pcsc || cross-mipsel-linux-uclibc
+uint32_t cs_getIPfromHost(const char *hostname)
+{
+	uint32_t result = 0;
+	struct addrinfo hints, *res = NULL;
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_family = AF_INET;
+	hints.ai_protocol = IPPROTO_TCP;
+
+	int32_t err = getaddrinfo(hostname, NULL, &hints, &res);
+	if(err != 0 || !res || !res->ai_addr)
+	{
+		cs_log("can't resolve %s, error: %s", hostname, err ? gai_strerror(err) : "unknown");
+	}
+	else
+	{
+		result = ((struct sockaddr_in *)(res->ai_addr))->sin_addr.s_addr;
+	}
+	if(res)
+		{ freeaddrinfo(res); }
+	return result;
+}
+#else
 /* Returns the ip from the given hostname. If gethostbyname is configured in the config file, a lock
    will be held until the ip has been resolved. */
 uint32_t cs_getIPfromHost(const char *hostname)
@@ -211,6 +235,8 @@ uint32_t cs_getIPfromHost(const char *hostname)
 	}
 	return result;
 }
+#endif
+
 
 #ifdef IPV6SUPPORT
 void cs_getIPv6fromHost(const char *hostname, struct in6_addr *addr, struct sockaddr_storage *sa, socklen_t *sa_len)

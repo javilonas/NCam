@@ -55,7 +55,7 @@ override STD_DEFS := -D'CS_SVN_VERSION="$(SVN_REV)"'
 override STD_DEFS += -D'CS_CONFDIR="$(CONF_DIR)"'
 
 # Compiler warnings
-CC_WARN = -W -Wall -Wshadow -Wredundant-decls -Wstrict-prototypes -Wold-style-definition
+CC_WARN = -W -Wall -Wshadow -Wno-shadow -Wredundant-decls -Wstrict-prototypes -Wold-style-definition
 
 # Compiler optimizations
 CC_OPTS = -Os -ggdb -pipe -ffunction-sections -fdata-sections -fwrapv -fomit-frame-pointer
@@ -236,6 +236,7 @@ SRC-$(CONFIG_LIB_BIGNUM) += cscrypt/bn_sqr.c
 SRC-$(CONFIG_LIB_BIGNUM) += cscrypt/bn_word.c
 SRC-$(CONFIG_LIB_BIGNUM) += cscrypt/mem.c
 SRC-$(CONFIG_LIB_DES) += cscrypt/des.c
+SRC-$(CONFIG_LIB_TWOFISH) += cscrypt/twofish.c
 SRC-$(CONFIG_LIB_IDEA) += cscrypt/i_cbc.c
 SRC-$(CONFIG_LIB_IDEA) += cscrypt/i_ecb.c
 SRC-$(CONFIG_LIB_IDEA) += cscrypt/i_skey.c
@@ -335,6 +336,7 @@ SRC-$(CONFIG_READER_IRDETO) += reader-irdeto.c
 SRC-$(CONFIG_READER_NAGRA) += reader-nagra.c
 SRC-$(CONFIG_READER_SECA) += reader-seca.c
 SRC-$(CONFIG_READER_TONGFANG) += reader-tongfang.c
+SRC-$(CONFIG_READER_STREAMGUARD) += reader-streamguard.c
 SRC-$(CONFIG_READER_VIACCESS) += reader-viaccess.c
 SRC-$(CONFIG_READER_VIDEOGUARD) += reader-videoguard-common.c
 SRC-$(CONFIG_READER_VIDEOGUARD) += reader-videoguard1.c

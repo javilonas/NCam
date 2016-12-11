@@ -2,7 +2,7 @@
 
 addons="WEBIF WEBIF_LIVELOG WEBIF_JQUERY TOUCH WITH_SSL HAVE_DVBAPI READ_SDT_CHARSETS IRDETO_GUESSING CS_ANTICASC WITH_DEBUG MODULE_MONITOR WITH_LB CS_CACHEEX CW_CYCLE_CHECK LCDSUPPORT LEDSUPPORT CLOCKFIX IPV6SUPPORT WITH_EMU"
 protocols="MODULE_CAMD33 MODULE_CAMD35 MODULE_CAMD35_TCP MODULE_NEWCAMD MODULE_CCCAM MODULE_CCCSHARE MODULE_GBOX MODULE_RADEGAST MODULE_SCAM MODULE_SERIAL MODULE_CONSTCW MODULE_PANDORA MODULE_GHTTP"
-readers="READER_NAGRA READER_IRDETO READER_CONAX READER_CRYPTOWORKS READER_SECA READER_VIACCESS READER_VIDEOGUARD READER_DRE READER_TONGFANG READER_BULCRYPT READER_GRIFFIN READER_DGCRYPT"
+readers="READER_NAGRA READER_IRDETO READER_CONAX READER_CRYPTOWORKS READER_SECA READER_VIACCESS READER_VIDEOGUARD READER_DRE READER_TONGFANG READER_STREAMGUARD READER_BULCRYPT READER_GRIFFIN READER_DGCRYPT"
 card_readers="CARDREADER_PHOENIX CARDREADER_INTERNAL CARDREADER_SC8IN1 CARDREADER_MP35 CARDREADER_SMARGO CARDREADER_DB2COM CARDREADER_STAPI CARDREADER_STAPI5 CARDREADER_STINGER CARDREADER_DRECAS"
 
 defconfig="
@@ -48,6 +48,7 @@ CONFIG_READER_VIACCESS=y
 CONFIG_READER_VIDEOGUARD=y
 CONFIG_READER_DRE=y
 CONFIG_READER_TONGFANG=y
+CONFIG_READER_STREAMGUARD=y
 CONFIG_READER_BULCRYPT=y
 CONFIG_READER_GRIFFIN=y
 CONFIG_READER_DGCRYPT=y
@@ -348,7 +349,7 @@ list_config() {
 	not_have_flag USE_LIBCRYPTO && echo "CONFIG_LIB_AES=y" || echo "# CONFIG_LIB_AES=n"
 	enabled MODULE_CCCAM && echo "CONFIG_LIB_RC6=y" || echo "# CONFIG_LIB_RC6=n"
 	not_have_flag USE_LIBCRYPTO && enabled MODULE_CCCAM && echo "CONFIG_LIB_SHA1=y" || echo "# CONFIG_LIB_SHA1=n"
-	enabled_any READER_DRE MODULE_SCAM READER_VIACCESS WITH_EMU && echo "CONFIG_LIB_DES=y" || echo "# CONFIG_LIB_DES=n"
+	enabled_any READER_DRE MODULE_SCAM READER_VIACCESS READER_TONGFANG READER_STREAMGUARD WITH_EMU && echo "CONFIG_LIB_DES=y" || echo "# CONFIG_LIB_DES=n"
 	enabled_any MODULE_CCCAM READER_NAGRA READER_SECA WITH_EMU && echo "CONFIG_LIB_IDEA=y" || echo "# CONFIG_LIB_IDEA=n"
 	not_have_flag USE_LIBCRYPTO && enabled_any READER_CONAX READER_CRYPTOWORKS READER_NAGRA WITH_EMU && echo "CONFIG_LIB_BIGNUM=y" || echo "# CONFIG_LIB_BIGNUM=n"
 }
@@ -506,6 +507,7 @@ menu_readers() {
 		READER_VIDEOGUARD	"NDS Videoguard"	$(check_test "READER_VIDEOGUARD") \
 		READER_DRE			"DRE Crypt"			$(check_test "READER_DRE") \
 		READER_TONGFANG		"Tongfang"			$(check_test "READER_TONGFANG") \
+		READER_STREAMGUARD	"Streamguard"		$(check_test "READER_STREAMGUARD") \
 		READER_BULCRYPT		"Bulcrypt"			$(check_test "READER_BULCRYPT") \
 		READER_GRIFFIN		"Griffin"			$(check_test "READER_GRIFFIN") \
 		READER_DGCRYPT		"DGCrypt"			$(check_test "READER_DGCRYPT") \
@@ -694,7 +696,18 @@ do
 		break
 	;;
 	'-r'|'--ncam-revision')
-		(svnversion -n . 2>/dev/null || printf 0) | sed 's/.*://; s/[^0-9]*$//; s/^$/0/'
+		revision=`(svnversion -n . 2>/dev/null || printf 0) | sed 's/.*://; s/[^0-9]*$//; s/^$/0/'`
+		if [ "$revision" = "" -o "$revision" = "0" ]; then
+			nrevision=$(grep CS_REVISION globals.h | cut -d\" -f2)
+			gitrevision=$(git log 2>/dev/null | sed -n 1p|cut -d' ' -f2 | cut -c1-5 )
+			if [ "$nrevision" = "" -o "$gitrevision" = "0" ]; then
+				[ -f .revision ] && revision=$(cat .revision)
+			fi
+			[ "$nrevision" = "0" ] || revision=$nrevision
+			[ "$gitrevision" = "0" ] || revision=${revision}_${gitrevision}
+		fi
+		echo $revision > .revision
+		echo $revision
 		break
 	;;
 	'-O'|'--detect-osx-sdk-version')

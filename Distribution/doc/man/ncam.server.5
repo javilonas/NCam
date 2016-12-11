@@ -477,7 +477,12 @@ number of ECMs with "not found" answer until the reader will be restarted, 0 = n
 .PP
 \fBresetcycle\fP = \fBcount\fP
 .RS 3n
-number of ECMs until SC reset is performed, 0 = disabled, valid for physical readers only, default:0
+number of ECMs until reader reset is performed, 0 = disabled, default:0
+.RE
+.PP
+\fBrestartforresetcycle\fP = \fB0|1\fP
+.RS 3n
+restart instead of reset for resetcycle, default:0
 .RE
 .PP
 \fBratelimitseconds\fP = \fBseconds\fP
@@ -584,6 +589,11 @@ write file (usually a copy of a file saved by savenano) to your smartcard, if no
 
  example: readnano = write.emm
           readnano = /var/ncam/write.emm
+.RE
+.PP
+\fBautorestartseconds\fP = \fBseconds\fP
+.RS 3n
+force restart reader after seconds,default 0 disabled.
 .RE
 .PP
 \fBdropbadcws\fP = \fB0\fP|\fB1\fP

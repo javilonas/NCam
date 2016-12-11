@@ -64,7 +64,8 @@ static void azbox_openxcas_ecm_callback(int32_t stream_id, uint32_t UNUSED(seq),
 	tp.time += 500;
 }
 
-
+#pragma GCC diagnostic pop
+#pragma GCC diagnostic ignored "-Wunused-function"
 static void azbox_openxcas_ex_callback(int32_t stream_id, uint32_t seq, int32_t idx, uint32_t pid, unsigned char *ecm_data, int32_t l)
 {
 	cs_log_dbg(D_DVBAPI, "ex callback received");
@@ -76,7 +77,7 @@ static void azbox_openxcas_ex_callback(int32_t stream_id, uint32_t seq, int32_t 
 	if(l < 0 || l > MAX_ECM_SIZE)
 		{ return; }
 
-	ECM_REQUEST *er;	
+	ECM_REQUEST *er;
 	if(!(er = get_ecmtask()))
 		{ return; }
 
@@ -96,7 +97,6 @@ static void azbox_openxcas_ex_callback(int32_t stream_id, uint32_t seq, int32_t 
 		{ cs_log_dbg(D_DVBAPI, "ex filter stopped"); }
 
 
-
 	unsigned char mask[12];
 	unsigned char comp[12];
 	memset(&mask, 0x00, sizeof(mask));
@@ -110,6 +110,7 @@ static void azbox_openxcas_ex_callback(int32_t stream_id, uint32_t seq, int32_t 
 	else
 		{ cs_log_dbg(D_DVBAPI, "ex filter started, pid = %x", openxcas_ecm_pid); }
 }
+#pragma GCC diagnostic push
 
 static void *azbox_main_thread(void *cli)
 {
@@ -241,7 +242,7 @@ void azbox_send_dcw(struct s_client *client, ECM_REQUEST *er)
 	uint32_t delay = 0;
 
 	cs_log_dbg(D_DVBAPI, "send_dcw");
-		
+
 	if(delayentry)
 	{
 		if(delayentry->delay < 1000)
@@ -255,7 +256,7 @@ void azbox_send_dcw(struct s_client *client, ECM_REQUEST *er)
 		delay = cfg.dvbapi_delayer;
 		cs_log_dbg(D_DVBAPI, "generic delay: write cw %d ms after ecmrequest", delay);
 	}
-		
+
 	delayer(er, delay);
 
 	dvbapi_write_ecminfo_file(client, er, demux[0].lastcw[0], demux[0].lastcw[1]);

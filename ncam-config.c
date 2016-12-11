@@ -296,7 +296,7 @@ int32_t init_provid(void)
 		int32_t i, l;
 		struct s_provid *new_provid = NULL;
 		char *tmp, *ptr1;
-		
+
 		tmp = trim(token);
 
 		if(tmp[0] == '#') { continue; }
@@ -304,23 +304,23 @@ int32_t init_provid(void)
 		if(!(payload = strchr(token, '|'))) { continue; }
 
 		*payload++ = '\0';
-		
+
 		if(!cs_malloc(&new_provid, sizeof(struct s_provid)))
 		{
 			NULLFREE(token);
 			fclose(fp);
 			return (1);
 		}
-				
+
 		new_provid->nprovid = 0;
 		for(i = 0, ptr1 = strtok_r(token, ":@", &saveptr1); ptr1; ptr1 = strtok_r(NULL, ":@", &saveptr1), i++)
 		{
 			if(i==0)
 			{
 				new_provid->caid = a2i(ptr1, 3);
-				continue;	
+				continue;
 			}
-			
+
 			new_provid->nprovid++;
 		}
 
@@ -336,10 +336,10 @@ int32_t init_provid(void)
 		for(i = 0; i < new_provid->nprovid ; i++)
 		{
 			new_provid->provid[i] = a2i(ptr1, 3);
-			
+
 			ptr1 = ptr1 + strlen(ptr1) + 1;
 		}
-		
+
 		for(i = 0, ptr1 = strtok_r(payload, "|", &saveptr1); ptr1; ptr1 = strtok_r(NULL, "|", &saveptr1), i++)
 		{
 			switch(i)
@@ -355,43 +355,43 @@ int32_t init_provid(void)
 				break;
 			}
 		}
-		
+
 		if(strlen(new_provid->prov) == 0)
 		{
 			NULLFREE(new_provid->provid);
 			NULLFREE(new_provid);
 			continue;
 		}
-		
+
 		nr++;
-				
+
 		if(provid_ptr)
 		{
 			provid_ptr->next = new_provid;
 		}
 		else
-		{ 
+		{
 			new_cfg_provid = new_provid;
-		}	
+		}
 		provid_ptr = new_provid;
 	}
-	
+
 	NULLFREE(token);
 	fclose(fp);
-	
+
 	if(nr > 0)
 		{ cs_log("%d provid's loaded", nr); }
-	
+
 	if(new_cfg_provid == NULL)
 	{
 		if(!cs_malloc(&new_cfg_provid, sizeof(struct s_provid)))
 		{
 			return (1);
-		}		
+		}
 	}
-	
+
 	cs_writelock(__func__, &config_lock);
-	
+
 	//this allows reloading of provids, so cleanup of old data is needed:
 	last_provid = cfg.provid; //old data
 	cfg.provid = new_cfg_provid; //assign after loading, so everything is in memory
@@ -403,7 +403,7 @@ int32_t init_provid(void)
 		{ cl->last_providptr = NULL; }
 
 	struct s_provid *ptr, *nptr;
-	
+
 	if(last_provid)
 	{
 		ptr = last_provid;
@@ -415,7 +415,7 @@ int32_t init_provid(void)
 			ptr = nptr;
 		}
 	}
-			
+
 	return (0);
 }
 
@@ -424,7 +424,7 @@ int32_t init_srvid(void)
 	int8_t new_syntax = 1;
 	FILE *fp = open_config_file("ncam.srvid2");
 	if(!fp)
-	{ 
+	{
 		fp = open_config_file(cs_srid);
 		if(fp)
 		{
@@ -433,13 +433,13 @@ int32_t init_srvid(void)
 	}
 
 	if(!fp)
-	{ 
+	{
 		fp = create_config_file("ncam.srvid2");
 		if(fp)
 		{
 			flush_config_file(fp, "ncam.srvid2");
 		}
-		
+
 		return 0;
 	}
 
@@ -473,7 +473,7 @@ int32_t init_srvid(void)
 		if(!(srvidasc = strchr(token, ':'))) { continue; }
 		if(!(payload = strchr(token, '|'))) { continue; }
 		*payload++ = '\0';
-		
+
 		if(!cs_malloc(&srvid, sizeof(struct s_srvid)))
 		{
 			NULLFREE(token);
@@ -488,7 +488,7 @@ int32_t init_srvid(void)
 		const char *searchptr[4] = { NULL, NULL, NULL, NULL };
 		const char **ptrs[4] = { &srvid->prov, &srvid->name, &srvid->type, &srvid->desc };
 		uint32_t max_payload_length = MAXLINESIZE - (payload - token);
-		
+
 		if(new_syntax)
 		{
 			ptrs[0] = &srvid->name;
@@ -496,14 +496,14 @@ int32_t init_srvid(void)
 			ptrs[2] = &srvid->desc;
 			ptrs[3] = &srvid->prov;
 		}
-		
+
 		// allow empty strings as "||"
 		if(payload[0] == '|' && (strlen(payload)+2 < max_payload_length))
 		{
 			memmove(payload+1, payload, strlen(payload)+1);
 			payload[0] = ' ';
 		}
-		
+
 		for(k=1; ((k < max_payload_length) && (payload[k] != '\0')); k++)
 		{
 			if(payload[k-1] == '|' && payload[k] == '|')
@@ -516,10 +516,10 @@ int32_t init_srvid(void)
 				else
 				{
 					break;
-				}	
+				}
 			}
 		}
-	
+
 		for(i = 0, ptr1 = strtok_r(payload, "|", &saveptr1); ptr1 && (i < 4) ; ptr1 = strtok_r(NULL, "|", &saveptr1), ++i)
 		{
 			// check if string is in cache
@@ -589,7 +589,7 @@ int32_t init_srvid(void)
 			{ srvidtmp = dyn_word_atob(token) & 0xFFFF; }
 		else
 			{ srvidtmp = dyn_word_atob(srvidasc) & 0xFFFF; }
-			
+
 		if(srvidtmp < 0)
 		{
 			NULLFREE(tmpptr);
@@ -599,28 +599,28 @@ int32_t init_srvid(void)
 		else
 		{
 			srvid->srvid = srvidtmp;
-		}		
-		
+		}
+
 		srvid->ncaid = 0;
 		for(i = 0, ptr1 = strtok_r(new_syntax ? srvidasc : token, ",", &saveptr1); (ptr1); ptr1 = strtok_r(NULL, ",", &saveptr1), i++)
 		{
 			srvid->ncaid++;
 		}
-		
+
 		if(!cs_malloc(&srvid->caid, sizeof(struct s_srvid_caid) * srvid->ncaid))
 		{
 			NULLFREE(tmpptr);
 			NULLFREE(srvid);
 			return 0;
 		}
-		
+
 		ptr1 = new_syntax ? srvidasc : token;
 		for(i = 0; i < srvid->ncaid; i++)
 		{
 			prov = strchr(ptr1,'@');
-						
+
 			srvid->caid[i].nprovid = 0;
-			
+
 			if(prov)
 			{
 				if(prov[1] != '\0')
@@ -629,7 +629,7 @@ int32_t init_srvid(void)
 					{
 						srvid->caid[i].nprovid++;
 					}
-		    		
+
 					if(!cs_malloc(&srvid->caid[i].provid, sizeof(uint32_t) * srvid->caid[i].nprovid))
 					{
 						for(j = 0; j < i; j++)
@@ -639,7 +639,7 @@ int32_t init_srvid(void)
 						NULLFREE(srvid);
 						return 0;
 					}
-					
+
 					ptr2 = prov+1;
 					for(j = 0;  j < srvid->caid[i].nprovid; j++)
 					{
@@ -651,7 +651,7 @@ int32_t init_srvid(void)
 				{
 					ptr2 = prov+2;
 				}
-				
+
 				prov[0] = '\0';
 			}
 
@@ -661,7 +661,7 @@ int32_t init_srvid(void)
 			else 
 				{ ptr1 = ptr1 + strlen(ptr1) + 1; }
 		}
-			
+
 		nr++;
 
 		if(new_cfg_srvid[srvid->srvid >> 12])
@@ -702,7 +702,7 @@ int32_t init_srvid(void)
 		{ cl->last_srvidptr = NULL; }
 
 	struct s_srvid *ptr, *nptr;
-	
+
 	for(i = 0; i < 16; i++)
 	{
 		ptr = last_srvid[i];
@@ -739,14 +739,14 @@ int32_t init_fakecws(void)
 		NULLFREE(cfg.fakecws[i].data);
 	}
 	cs_writeunlock(__func__, &config_lock);
-	
+
 	fp = open_config_file(cs_fakecws);
 	if(!fp)
 		{ return 0; }
-	
+
 	if(!cs_malloc(&token, MAXLINESIZE))
 		{ return 0; }
-	
+
 	while(fgets(token, MAXLINESIZE, fp))
 	{
 		if(sscanf(token, " %62s ", cw_string) == 1)
@@ -765,7 +765,7 @@ int32_t init_fakecws(void)
 							wrong_checksum = 1;
 						}
 					}
-					
+
 					if(wrong_checksum)
 					{
 						cs_log("skipping fake cw %s because of wrong checksum!", cw_string);
@@ -803,7 +803,7 @@ int32_t init_fakecws(void)
 			alloccount[i] = 0;
 		}
 	}
-	
+
 	fseek(fp, 0, SEEK_SET);
 
 	while(fgets(token, MAXLINESIZE, fp))
@@ -824,11 +824,11 @@ int32_t init_fakecws(void)
 							wrong_checksum = 1;
 						}
 					}
-					
+
 					if(!wrong_checksum)
 					{
 						idx = ((cw[0]&0xF)<<4) | (cw[8]&0xF);
-						
+
 						if(count[idx] < alloccount[idx])
 						{
 							memcpy(cfg.fakecws[idx].data[count[idx]].cw, cw, 16);
@@ -840,28 +840,26 @@ int32_t init_fakecws(void)
 			}
 		}
 	}
-	
+
 	NULLFREE(token);
 	fclose(fp);
-	
+
 	if(nr > 0)
 		{ cs_log("%d fakecws's loaded", nr); }
-		
-	
+
 	cs_writelock(__func__, &config_lock);
 	for(i=0; i<0x100; i++)
 	{
 		cfg.fakecws[i].count = count[i];
 	}
 	cs_writeunlock(__func__, &config_lock);
-	
-	
+
 	for(i=0; i<0x100; i++)
 	{
 		if(count[i] > max_compares)
 			{ max_compares = count[i]; }
 	}
-	
+
 	for(i=0; i<(0x100-1); i++) {
 		for(j=i+1; j<0x100; j++) {
 			if(count[j] < count[i]) {
@@ -871,11 +869,10 @@ int32_t init_fakecws(void)
 			}
 		}
 	}
-    average_compares = ((count[0x100/2] + count[0x100/2 - 1]) / 2);
+	average_compares = ((count[0x100/2] + count[0x100/2 - 1]) / 2);
 
 
 	cs_log("max %d fakecw compares required, on average: %d compares", max_compares, average_compares);
-			
 	return 0;
 }
 
@@ -1466,3 +1463,254 @@ struct ecmtw get_twin(ECM_REQUEST *er)
 	return (tmp);
 }
 #endif
+
+int32_t chk_cccam_cfg_F_more(char *line,struct s_auth * account)
+{
+	int32_t p1=0,off=0,no=0,cno=0,dno=0,reshare=0;
+	char *p=NULL,*sline=NULL,*p2=NULL,*p3=NULL;
+	char *optr=NULL,*iptr=NULL;
+	for(p=line;*p;p++){
+		if(*p=='{'){
+			p1=1;
+			sline=p+1;
+			off=0;
+			continue;
+		}
+
+		if(*p=='}' && p1==1){
+			sline[off]='\0';
+//			cs_debug_mask(D_TRACE,"parase CCcam.cfg F line:part{%s}",sline);
+			p1=0;
+			no++;
+			cno=0;
+			while((p2=strtok_r(sline,",",&optr))){
+				dno=0;
+				uint16_t caid=0,srvid=0;
+				uint32_t provid=0;
+//				cs_debug_mask(D_TRACE,"CHILD:%s",p2);
+				while((p3=strtok_r(p2,":",&iptr))){
+					if(!dno){
+						caid=(uint16_t)a2i(p3,4);
+						account->ftab.filts[dno].caid=caid;
+					}
+					if(dno==1){
+						provid=(uint32_t)a2i(p3,6);
+						account->ftab.filts[dno].prids[account->ftab.filts[dno].nprids]=provid;
+						account->ftab.filts[dno].nprids++;
+					}
+					if(dno==2){
+						if(!cno && !(account->cccreshare)){
+							sscanf(p3,"%d",&reshare);
+							account->cccreshare=(int32_t)reshare;
+						}
+						if(cno==1){
+							srvid=(uint16_t)a2i(p3,4);
+
+							struct s_sidtab *sp,*sidtab=cfg.sidtab;
+							uint32_t sppos=0;
+							for(sp=cfg.sidtab;sp;sp=sp->next,sppos++){
+								uint32_t j,found;
+
+								sidtab=sp;
+								for(j=0,found=0;!found && j<sp->num_caid;j++)
+									if(sp->caid[j]==caid)
+										found=1;
+								if(!found)continue;
+
+								for(j=0,found=0;!found && j<sp->num_provid;j++)
+									if(sp->provid[j]==provid)
+										found=1;
+								if(!found)continue;
+
+								for(j=0,found=0;!found && j<sp->num_srvid;j++)
+									if(sp->srvid[j]==srvid)
+										found=1;
+								if(!found)continue;
+
+							}
+							if(sp){
+								account->sidtabs.ok |= (1<<sppos);
+								continue;
+							}
+
+							if (!cs_malloc(&sp, sizeof(struct s_sidtab)) || !sp)continue;
+							if (sidtab)
+								sidtab->next=sp;
+							else
+								cfg.sidtab=sp;
+							sppos++;
+							memset(sp, 0, sizeof(struct s_sidtab));
+							snprintf(sp->label, sizeof(sp->label),"%04x_%06X_%04X",caid,provid,srvid);
+							char scaid[5],sprovid[7],ssrvid[5];
+							snprintf(scaid,sizeof(scaid),"%04X",caid);
+							snprintf(sprovid,sizeof(sprovid),"%04X",provid);
+							snprintf(scaid,sizeof(scaid),"%04X",provid);
+
+							chk_sidtab("caid",scaid, sp);
+							chk_sidtab("provid",sprovid,sp);
+							chk_sidtab("caid",ssrvid, sp);
+							account->sidtabs.ok |= (1<<sppos);
+						}
+					}
+					dno++;
+					p2=NULL;
+				}
+				cno++;
+				sline=NULL;
+			}
+			continue;
+		}
+		off++;
+	}
+	return 0;
+}
+
+void * read_cccamcfg(int32_t mode)
+{
+	struct s_auth *authptr = NULL;
+	FILE *fp;
+	char token[MAXLINESIZE];
+	char line[MAXLINESIZE];
+	char host[256],uname[128],upass[128],uhops[128],uemu[128],uemm[128];
+	char typ;
+	static int32_t readed_cccamcfg=0;
+	int32_t port,ret;
+	int32_t caid,prid;
+
+	if(!readed_cccamcfg)
+		cs_log("load CCcam config file: %s",cfg.cc_cfgfile);
+
+	if(!cfg.cc_cfgfile || (mode != CCCAMCFGREADER && mode != CCCAMCFGUSER))
+			return NULL;
+
+	readed_cccamcfg=1;
+
+	if(!(fp=fopen(cfg.cc_cfgfile,"r"))){
+		cs_log("can't open file \"%s\" (errno=%d)\n", cfg.cc_cfgfile, errno);
+		return NULL;
+	}
+
+	struct s_auth *account=NULL;
+	struct s_reader *rdr;
+
+	while (fgets(token,sizeof(token),fp)) {
+		void *ptr;
+		char *p=strchr(token,'#');
+		if(p)
+			*p='\0';
+		strncpy(line,trim(token),MAXLINESIZE-1);
+		if(!line[0])continue;
+		if((line[0] == 'C' || line[0] == 'L' || line[0] == 'N' || line[0] == 'R' ) && line[1] == ':' && (mode == CCCAMCFGREADER)){
+
+			int32_t paracount=0;
+			char * proto=0;
+			ret=0;
+			uchar ncd_key[13+sizeof(uint)];
+			memset(ncd_key,0,sizeof(ncd_key));
+			int32_t reshare=-1;
+			switch(line[0]){
+				case 'C':
+					proto = "cccam";
+					ret=sscanf(line,"%c:%s%d%s%s",&typ,host,&port,uname,upass);
+					paracount=5;
+					break;
+				case 'L':
+					proto = "camd35";
+					ret=sscanf(line,"%c:%s%d%s%s%x%x%d",&typ,host,&port,uname,upass,&caid,&prid,&reshare);
+					paracount=5;
+					break;
+				case 'N':
+					proto = "newcamd";
+					ret=sscanf(line,"%c:%s%d%s%s%x%x%x%x%x%x%x%x%x%x%x%x%x%x%d",&typ,host,&port,uname,upass,
+						(uint*) &ncd_key[0], (uint*) &ncd_key[1], (uint*) &ncd_key[2], (uint*) &ncd_key[3],(uint*) &ncd_key[4],
+						(uint*) &ncd_key[5], (uint*) &ncd_key[6], (uint*) &ncd_key[7], (uint*) &ncd_key[8],(uint*) &ncd_key[9],
+						(uint*) &ncd_key[10],(uint*) &ncd_key[11],(uint*) &ncd_key[12],(uint*) &ncd_key[13],&reshare);
+					paracount=5;
+					break;
+				case 'R':
+					proto = "radegast";
+					ret=sscanf(line,"%c:%s%d%x%x%d",&typ,host,&port,&caid,&prid,&reshare);
+					paracount=3;
+					break;
+			}
+
+			if(!proto || ret<paracount)continue;
+
+			int32_t found=0;
+			LL_ITER itr = ll_iter_create(configured_readers);
+			struct s_reader *prdr=NULL;
+			while((prdr = ll_iter_next(&itr))){
+				if( strcasecmp(prdr->device,host) == 0 && prdr->r_port == port &&
+				    strcmp(prdr->r_usr,uname) == 0  && strcmp(prdr->r_pwd,upass) == 0 &&
+				    host[0] && port && uname[0] && upass[0] ){
+					found=1;
+					break;
+				}
+			}
+			if(found)
+				continue;
+
+			if(!cs_malloc(&rdr,sizeof(struct s_reader)))
+					continue;
+
+			memset(rdr, 0, sizeof(struct s_reader));
+
+			reader_set_defaults(rdr);
+
+			chk_reader("protocol",proto,rdr);
+			cs_strncpy(rdr->device,host,sizeof(rdr->device));
+			rdr->r_port = port;
+			cs_strncpy(rdr->r_usr,uname,sizeof(rdr->r_usr));
+			cs_strncpy(rdr->r_pwd,upass,sizeof(rdr->r_pwd));
+			snprintf(token,sizeof(token),"%s_%d",host,port);
+			cs_strncpy(rdr->label,token,sizeof(rdr->label));
+			rdr->grp = 1;
+
+			ll_append(configured_readers, rdr);
+			cs_debug_mask(D_READER,"Add reader device=%s,%d(type:0x%X,protocol=%s)from CCcam.cfg",rdr->device,rdr->r_port,rdr->typ,proto);
+		}
+		else if (line[0]=='F' && line[1]==':' && mode==CCCAMCFGUSER){
+			ret=sscanf(line,"F:%126s%126s%126s%126s%126s",uname,upass,uhops,uemu,uemm);
+			if(ret<2)continue;
+			if(ret<5)cs_strncpy(uemm,"1",sizeof(uemm));
+			if(ret<4)cs_strncpy(uemu,"1",sizeof(uemu));
+			if(ret<3)cs_strncpy(uhops,"10",sizeof(uhops));
+
+			//cs_log("Read Line:%s",line);
+			int32_t found=0;
+			struct s_auth *pusr=NULL;
+			for(pusr=authptr;pusr;pusr=pusr->next){
+				if(!strcmp(pusr->usr,uname)){
+					found=1;
+					break;
+				}
+			}
+			if(found)
+				continue;
+
+			if(!cs_malloc(&ptr, sizeof(struct s_auth))) return (void *)authptr;
+			if (account)
+				account->next = ptr;
+			else
+				authptr = ptr;
+
+			account = ptr;
+			account_set_defaults(account);
+
+			chk_account("user",uname,account);
+			chk_account("pwd",upass,account);
+			chk_account("cccmaxhops",uhops,account);
+			chk_account("au",uemu,account);
+			chk_cccam_cfg_F_more(line,account);
+			cs_debug_mask(D_TRACE,"Add usr: %s from CCcam.cfg",account->usr);
+
+		}
+	}
+	fclose(fp);
+	if(mode == CCCAMCFGREADER)
+		return (void *)configured_readers;
+	else if(mode == CCCAMCFGUSER)
+		return (void *)authptr;
+
+	return NULL;
+}

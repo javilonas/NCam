@@ -52,10 +52,10 @@ void b64prepare(void);
 int32_t b64decode(unsigned char *result);
 
 #ifdef READ_SDT_CHARSETS
-size_t ISO6937toUTF8( const unsigned char **inbuf, size_t *inbytesleft,
-                             unsigned char **outbuf, size_t *outbytesleft );
+size_t ISO6937toUTF8(const unsigned char **inbuf, size_t *inbytesleft,
+							unsigned char **outbuf, size_t *outbytesleft);
 size_t ISO8859toUTF8(int8_t iso_table_number, const unsigned char **inbuf, size_t *inbytesleft,
-                             unsigned char **outbuf, size_t *outbytesleft );
+							unsigned char **outbuf, size_t *outbytesleft);
 #endif
 
 size_t UnicodetoUTF8(const unsigned char **inbuf, size_t *inbytesleft,

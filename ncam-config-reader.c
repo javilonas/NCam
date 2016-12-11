@@ -224,6 +224,22 @@ static void boxid_fn(const char *token, char *value, void *setting, FILE *f)
 		{ fprintf_conf(f, token, "\n"); }
 }
 
+#ifdef READER_TONGFANG
+static void tongfang3_calibsn_fn(const char *token, char *value, void *setting, FILE *f)
+{
+	struct s_reader *rdr = setting;
+	if(value)
+	{
+		rdr->tongfang3_calibsn = strlen(value) ? a2i(value, 4) : 0;
+		return;
+	}
+	if(rdr->tongfang3_calibsn)
+		fprintf_conf(f, token, "%08X\n", rdr->tongfang3_calibsn);
+	else if(cfg.http_full_cfg)
+		{ fprintf_conf(f, token, "\n"); }
+}
+#endif
+
 static void rsakey_fn(const char *token, char *value, void *setting, FILE *f)
 {
 	struct s_reader *rdr = setting;
@@ -798,18 +814,20 @@ static const struct config_list reader_opts[] =
 	DEF_OPT_SSTR("password"             , OFS(r_pwd),                   "", SIZEOF(r_pwd)),
 	DEF_OPT_SSTR("pincode"              , OFS(pincode),                 "none", SIZEOF(pincode)),
 #ifdef MODULE_GBOX
-	DEF_OPT_UINT8("gbox_max_distance"	, OFS(gbox_maxdist),		DEFAULT_GBOX_MAX_DIST),
-	DEF_OPT_UINT8("gbox_max_ecm_send"	, OFS(gbox_maxecmsend),		DEFAULT_GBOX_MAX_ECM_SEND),
-	DEF_OPT_UINT8("gbox_reshare"		, OFS(gbox_reshare),		DEFAULT_GBOX_RESHARE),
-	DEF_OPT_UINT8("cccam_reshare"		, OFS(gbox_cccam_reshare),	DEFAULT_GBOX_RESHARE),
+	DEF_OPT_UINT8("gbox_max_distance"   , OFS(gbox_maxdist),        DEFAULT_GBOX_MAX_DIST),
+	DEF_OPT_UINT8("gbox_max_ecm_send"   , OFS(gbox_maxecmsend),     DEFAULT_GBOX_MAX_ECM_SEND),
+	DEF_OPT_UINT8("gbox_reshare"        , OFS(gbox_reshare),        DEFAULT_GBOX_RESHARE),
+	DEF_OPT_UINT8("cccam_reshare"       , OFS(gbox_cccam_reshare),  DEFAULT_GBOX_RESHARE),
 #endif
 	DEF_OPT_STR("readnano"              , OFS(emmfile),                 NULL),
 	DEF_OPT_FUNC("services"             , OFS(sidtabs),                 reader_services_fn),
 	DEF_OPT_FUNC("lb_whitelist_services"    , OFS(lb_sidtabs),              reader_lb_services_fn),
 	DEF_OPT_INT32("inactivitytimeout"   , OFS(tcp_ito),                 DEFAULT_INACTIVITYTIMEOUT),
 	DEF_OPT_INT32("reconnecttimeout"    , OFS(tcp_rto),                 DEFAULT_TCP_RECONNECT_TIMEOUT),
-	DEF_OPT_INT32("reconnectdelay"		, OFS(tcp_reconnect_delay),		60000),
+	DEF_OPT_INT32("reconnectdelay"      , OFS(tcp_reconnect_delay),     60000),
 	DEF_OPT_INT32("resetcycle"          , OFS(resetcycle),              0),
+	DEF_OPT_INT32("autorestartseconds"  , OFS(autorestartseconds),      0),
+	DEF_OPT_INT8("restartforresetcycle" , OFS(restartforresetcycle),    0),
 	DEF_OPT_INT8("disableserverfilter"  , OFS(ncd_disable_server_filt), 0),
 	DEF_OPT_INT8("connectoninit"        , OFS(ncd_connect_on_init),     0),
 	DEF_OPT_UINT8("keepalive"           , OFS(keepalive),               0),
@@ -818,7 +836,7 @@ static const struct config_list reader_opts[] =
 	DEF_OPT_UINT8("sc8in1_dtrrts_patch" , OFS(sc8in1_dtrrts_patch),     0),
 	DEF_OPT_INT8("fallback"             , OFS(fallback),                0),
 	DEF_OPT_FUNC_X("fallback_percaid"   , OFS(fallback_percaid),        ftab_fn, FTAB_READER | FTAB_FBPCAID),
-	DEF_OPT_FUNC_X("localcards"         , OFS(localcards),        		ftab_fn, FTAB_READER | FTAB_LOCALCARDS),
+	DEF_OPT_FUNC_X("localcards"         , OFS(localcards),              ftab_fn, FTAB_READER | FTAB_LOCALCARDS),
 #ifdef CS_CACHEEX
 	DEF_OPT_INT8("cacheex"              , OFS(cacheex.mode),            0),
 	DEF_OPT_INT8("cacheex_maxhop"       , OFS(cacheex.maxhop),          0),
@@ -831,6 +849,9 @@ static const struct config_list reader_opts[] =
 	DEF_OPT_FUNC("caid"                 , OFS(ctab),                    reader_caid_fn),
 	DEF_OPT_FUNC("atr"                  , 0,                            atr_fn),
 	DEF_OPT_FUNC("boxid"                , 0,                            boxid_fn),
+#ifdef READER_TONGFANG
+	DEF_OPT_FUNC("tongfang3_calibsn"    , 0,                            tongfang3_calibsn_fn),
+#endif
 	DEF_OPT_FUNC("boxkey"               , 0,                            boxkey_fn),
 	DEF_OPT_FUNC("rsakey"               , 0,                            rsakey_fn),
 	DEF_OPT_FUNC("deskey"               , 0,                            deskey_fn),
@@ -839,7 +860,7 @@ static const struct config_list reader_opts[] =
 	DEF_OPT_FUNC_X("ins2e06"            , OFS(ins2e06),                 ins7E_fn, SIZEOF(ins2e06)),
 	DEF_OPT_INT8("fix07"                , OFS(fix_07),                  1),
 	DEF_OPT_INT8("fix9993"              , OFS(fix_9993),                0),
-	DEF_OPT_INT8("readtiers"           	, OFS(readtiers),              	1),
+	DEF_OPT_INT8("readtiers"           	, OFS(readtiers),               1),
 	DEF_OPT_INT8("force_irdeto"         , OFS(force_irdeto),            0),
 	DEF_OPT_INT8("needsemmfirst"        , OFS(needsemmfirst),           0),
 	DEF_OPT_UINT32("ecmnotfoundlimit"   , OFS(ecmnotfoundlimit),        0),
@@ -1041,6 +1062,12 @@ int32_t init_readerdb(void)
 
 	if(!cs_malloc(&token, MAXLINESIZE))
 		{ return 1; }
+
+	if(!configured_readers)
+		configured_readers = ll_create("configured_readers");
+
+	if(cfg.cc_cfgfile)
+		read_cccamcfg(CCCAMCFGREADER);
 
 	struct s_reader *rdr;
 	if(!cs_malloc(&rdr, sizeof(struct s_reader)))

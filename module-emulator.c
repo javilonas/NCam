@@ -1,3 +1,5 @@
+#define MODULE_LOG_PREFIX "emu"
+
 #include "globals.h"
 #include "ncam-string.h"
 #include "ncam-config.h"
@@ -840,5 +842,5 @@ void add_emu_reader(void)
 	}
 #endif
 
-	cs_log("[Emu] ncam-emu version %d", GetNemuVersion());
+	cs_log("ncam-emu version %d", GetNemuVersion());
 }

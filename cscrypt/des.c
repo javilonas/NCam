@@ -158,7 +158,7 @@ static const uint8_t weak_keys[16][8] = {
 		{0xFE,0xE0,0xFE,0xE0,0xFE,0xF1,0xFE,0xF1}};
 
 static const uint8_t odd_parity[] ={
- 		1,  1,  2,  2,  4,  4,  7,  7,  8,  8, 11, 11, 13, 13, 14, 14,
+		1,  1,  2,  2,  4,  4,  7,  7,  8,  8, 11, 11, 13, 13, 14, 14,
 		16, 16, 19, 19, 21, 21, 22, 22, 25, 25, 26, 26, 28, 28, 31, 31,
 		32, 32, 35, 35, 37, 37, 38, 38, 41, 41, 42, 42, 44, 44, 47, 47,
 		49, 49, 50, 50, 52, 52, 55, 55, 56, 56, 59, 59, 61, 61, 62, 62,
@@ -484,7 +484,7 @@ int8_t check_parity(const uint8_t* key)
 	int32_t i;
 	
 	for (i=0; i < DES_KEY_SZ; i++) {
-            if (key[i] != odd_parity[key[i]&0xff])
+		if (key[i] != odd_parity[key[i]&0xff])
 			return 0;
 	}
 	return 1;
@@ -587,7 +587,7 @@ int8_t des_set_key(const uint8_t* key, uint32_t* schedule)
 
 		schedule[kIndex++]=s&0xffffffff;
 	}
-	
+
 	return 1;
 }
 
@@ -738,11 +738,11 @@ void des_ecb_encrypt(uint8_t* data, const uint8_t* key, int32_t len)
 {
 	uint32_t schedule[32];
 	int32_t i; 
-	
+
 	des_set_key(key, schedule);
-	
+
 	len&=~7;
-	
+
 	for(i=0; i<len; i+=8) {
 		des(&data[i], schedule, 1);
 	}
@@ -752,9 +752,9 @@ void des_ecb_decrypt(uint8_t* data, const uint8_t* key, int32_t len)
 {
 	uint32_t schedule[32];
 	int32_t i; 
-	
+
 	des_set_key(key, schedule);
-	
+
 	len&=~7;
 
 	for(i=0; i<len; i+=8) {
@@ -769,7 +769,7 @@ void des_cbc_encrypt(uint8_t* data, const uint8_t* iv, const uint8_t* key, int32
 	int32_t i; 
 
 	des_set_key(key, schedule);
-	
+
 	len&=~7;
 
 	for(i=0; i<len; i+=8) {
@@ -799,9 +799,9 @@ void des_cbc_decrypt(uint8_t* data, const uint8_t* iv, const uint8_t* key, int32
 
 void des_ede2_cbc_encrypt(uint8_t* data, const uint8_t* iv, const uint8_t* key1, const uint8_t* key2, int32_t len)
 {
-	const uint8_t *civ = iv; 
+	const uint8_t *civ = iv;
 	uint32_t schedule1[32], schedule2[32];
-	int32_t i; 
+	int32_t i;
 
 	des_set_key(key1, schedule1);
 	des_set_key(key2, schedule2);
@@ -811,7 +811,7 @@ void des_ede2_cbc_encrypt(uint8_t* data, const uint8_t* iv, const uint8_t* key1,
 	for(i=0; i<len; i+=8) {
 		xxor(&data[i],8,&data[i],civ);
 		civ=&data[i];
-		
+
 		des(&data[i], schedule1, 1);
 		des(&data[i], schedule2, 0);
 		des(&data[i], schedule1, 1);
@@ -826,7 +826,7 @@ void des_ede2_cbc_decrypt(uint8_t* data, const uint8_t* iv, const uint8_t* key1,
 
 	des_set_key(key1, schedule1);
 	des_set_key(key2, schedule2);
-	
+
 	len&=~7;
 
 	memcpy(civ[n],iv,8);

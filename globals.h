@@ -361,7 +361,8 @@ typedef unsigned char uchar;
  *         constants
  * =========================== */
 #define CS_VERSION    "1.1"
-#define DATE_BUILD    "08-12-2016"
+#define DATE_BUILD    "11-12-2016"
+#define CS_REVISION   "r1"
 #ifndef CS_SVN_VERSION
 #   define CS_SVN_VERSION "stable"
 #endif
@@ -375,7 +376,7 @@ typedef unsigned char uchar;
 #define CS_LOGFILE    "/tmp/ncam.log"
 #endif
 #define CS_QLEN       128 // size of request queue
-#define CS_MAXPROV    100
+#define CS_MAXPROV    128
 #define CS_MAXPORTS   200  // max server ports
 #define CS_CLIENT_HASHBUCKETS 32
 #define CS_SERVICENAME_SIZE 32
@@ -391,16 +392,12 @@ typedef unsigned char uchar;
 // Support for multiple CWs per channel and other encryption algos
 #define WITH_EXTENDED_CW 1
 
-#if defined(READER_DRE) || defined(READER_DRECAS) || defined(READER_VIACCESS)
 #define MAX_ECM_SIZE 1024
 #define MAX_EMM_SIZE 1024
-#else
-#define MAX_ECM_SIZE 1024
-#define MAX_EMM_SIZE 1024
-#endif
+#define MAX_SCT_SIZE 1024  // smaller or equal to the minial one of MAX_ECM_SIZE and MAX_EMM_SIZE
 
-#define CS_EMMCACHESIZE  1024 //nr of EMMs that each reader will cache
-#define MSGLOGSIZE 64   //size of string buffer for a ecm to return messages
+#define CS_EMMCACHESIZE 1024 //nr of EMMs that each reader will cache
+#define MSGLOGSIZE 64       // size of string buffer for a ecm to return messages
 
 #define D_TRACE     0x0001  // Generate very detailed error/trace messages per routine
 #define D_ATR       0x0002  // Debug ATR parsing, dump of ecm, cw
@@ -529,7 +526,7 @@ typedef unsigned char uchar;
 #define DEFAULT_RETRYLIMIT 0
 #define DEFAULT_LB_MODE 0
 #define DEFAULT_LB_STAT_CLEANUP 336
-#define DEFAULT_UPDATEINTERVAL 240
+#define DEFAULT_UPDATEINTERVAL 120
 #define DEFAULT_LB_AUTO_BETATUNNEL 1
 #define DEFAULT_LB_AUTO_BETATUNNEL_MODE 0
 #define DEFAULT_LB_AUTO_BETATUNNEL_PREFER_BETA 50
@@ -557,7 +554,7 @@ enum {E2_GLOBAL = 0, E2_GROUP, E2_CAID, E2_IDENT, E2_CLASS, E2_CHID, E2_QUEUE, E
 #define MAX_ATR_LEN     33          // max. ATR length
 #define MAX_HIST        15          // max. number of historical characters
 
-#define MAX_SIDBITS     64          // max services
+#define MAX_SIDBITS     (64+64)     // max services
 #define SIDTABBITS      uint64_t    // 64bit type for services, if a system does not support this type,
 // please use a define and define it as uint32_t / MAX_SIDBITS 32
 
@@ -570,7 +567,7 @@ enum {E2_GLOBAL = 0, E2_GROUP, E2_CAID, E2_IDENT, E2_CLASS, E2_CHID, E2_QUEUE, E
 
 #define CHECK_WAKEUP            1
 #define CHECK_ANTICASCADER      2
-#define CHECK_ECMCACHE      3
+#define CHECK_ECMCACHE          3
 
 #define AVAIL_CHECK_CONNECTED   0
 #define AVAIL_CHECK_LOADBALANCE 1
@@ -588,11 +585,11 @@ enum {E2_GLOBAL = 0, E2_GROUP, E2_CAID, E2_IDENT, E2_CLASS, E2_CHID, E2_QUEUE, E
 
 #define READER_ACTIVE       0x01
 #define READER_FALLBACK     0x02
-#define READER_LOCAL            0x04
-#define READER_CACHEEX          0x08
+#define READER_LOCAL        0x04
+#define READER_CACHEEX      0x08
 
-#define REQUEST_SENT            0x10
-#define REQUEST_ANSWERED        0x20
+#define REQUEST_SENT        0x10
+#define REQUEST_ANSWERED    0x20
 
 #define CW_MODE_ONE_CW 0
 #define CW_MODE_MULTIPLE_CW 1
@@ -608,19 +605,19 @@ enum {E2_GLOBAL = 0, E2_GROUP, E2_CAID, E2_IDENT, E2_CLASS, E2_CHID, E2_QUEUE, E
 /* ===========================
  *      Default Values
  * =========================== */
-#define DEFAULT_INACTIVITYTIMEOUT 15 // default 0
+#define DEFAULT_INACTIVITYTIMEOUT 15     // default 0
 #define DEFAULT_TCP_RECONNECT_TIMEOUT 10 // default 15
 #define DEFAULT_NCD_KEEPALIVE 1 // default 0
 
-#define DEFAULT_CC_MAXHOPS  2 // default 10
-#define DEFAULT_CC_RESHARE  1 // Use global cfg // default -1
-#define DEFAULT_CC_IGNRSHR  0 // Use global cfg // default -1
-#define DEFAULT_CC_STEALTH  1 // Use global cfg // default -1
-#define DEFAULT_CC_KEEPALIVE 1 // default 0
+#define DEFAULT_CC_MAXHOPS  2   // default 10
+#define DEFAULT_CC_RESHARE  1   // Use global cfg // default -1
+#define DEFAULT_CC_IGNRSHR  0   // Use global cfg // default -1
+#define DEFAULT_CC_STEALTH  1   // Use global cfg // default -1
+#define DEFAULT_CC_KEEPALIVE 1  // default 0
 #define DEFAULT_CC_RECONNECT 12000
 #define DEFAULT_CC_RECV_TIMEOUT 2000
 
-#define CS_GBOX_MAX_PROXY_CARDS	32
+#define CS_GBOX_MAX_PROXY_CARDS 32
 
 #define DEFAULT_AC_USERS   -1 // Use global cfg
 #define DEFAULT_AC_PENALTY -1 // Use global cfg
@@ -1146,6 +1143,7 @@ struct s_cascadeuser
 
 typedef struct sidtabs
 {
+	long long int SIDTABBITS;
 	SIDTABBITS      ok;         // positive services
 	SIDTABBITS      no;         // negative services
 } SIDTABS;
@@ -1509,6 +1507,11 @@ struct s_reader                                     // contains device info, rea
 	int32_t         l_port;
 	CAIDTAB         ctab;
 	uint32_t        boxid;
+#ifdef READER_TONGFANG
+	uint32_t        tongfang3_calibsn;
+	uchar           tongfang3_commkey[8];
+#endif
+	uint32_t        cas_version;
 	int8_t          nagra_read;                     // read nagra ncmed records: 0 Disabled (default), 1 read all records, 2 read valid records only
 	int8_t          detect_seca_nagra_tunneled_card;
 	int8_t          force_irdeto;
@@ -1673,6 +1676,8 @@ struct s_reader                                     // contains device info, rea
 	uint32_t        ecmstout;
 	uint32_t        webif_ecmstout;
 	uint32_t        ecmnotfoundlimit;                   // config setting. restart reader if ecmsnok >= ecmnotfoundlimit
+	uint32_t        autorestartseconds;                 // auto restart reader after login ,default 0  disable
+	uint8_t         restartforresetcycle;               // restart instead of reset for resetcycle.
 	int32_t         ecmsfilteredhead;                   // count filtered ECM's by ECM Headerwhitelist
 	int32_t         ecmsfilteredlen;                    // count filtered ECM's by ECM Whitelist
 	int32_t         webif_ecmsfilteredhead;             // count filtered ECM's by ECM Headerwhitelist to readers ecminfo
@@ -1766,7 +1771,7 @@ struct s_auth
 	int8_t          monlvl;
 	uint64_t        grp;
 	int32_t         tosleep;
-	int32_t      umaxidle;
+	int32_t         umaxidle;
 	CAIDTAB         ctab;
 	SIDTABS         sidtabs;
 	FTAB            fchid;
@@ -2086,7 +2091,9 @@ struct s_config
 	int8_t          cc_reshare_services;
 	int8_t          cc_forward_origin_card;
 	uint8_t         cc_fixed_nodeid[8];
-	uint32_t        cc_recv_timeout;                // The poll() timeout parameter in ms. Default: DEFAULT_CC_RECV_TIMEOUT (2000 ms).
+	int8_t          cc_autosidblock;
+	char            *cc_cfgfile;                // CCcam.cfg file path
+	uint32_t        cc_recv_timeout;            // The poll() timeout parameter in ms. Default: DEFAULT_CC_RECV_TIMEOUT (2000 ms).
 #endif
 #ifdef MODULE_GBOX
 	uint32_t        gbx_port[CS_MAXPORTS];
@@ -2392,7 +2399,9 @@ static inline bool caid_is_cryptoworks(uint16_t caid) { return caid >> 8 == 0x0D
 static inline bool caid_is_betacrypt(uint16_t caid) { return caid >> 8 == 0x17; }
 static inline bool caid_is_nagra(uint16_t caid) { return caid >> 8 == 0x18; }
 static inline bool caid_is_bulcrypt(uint16_t caid) { return caid == 0x5581 || caid == 0x4AEE; }
-static inline bool caid_is_dre(uint16_t caid) { return caid == 0x4AE0 || caid == 0x4AE1 || caid == 0x2710;}
+static inline bool caid_is_dre(uint16_t caid) { return caid == 0x4AE0 || caid == 0x4AE1 || caid == 0x2710; }
+static inline bool caid_is_streamguard(uint16_t caid) { return caid == 0x4AD2; }
+static inline bool caid_is_tongfang(uint16_t caid) { return (caid == 0x4A02) || (caid >= 0x4B00 && caid <= 0x4BFF); }
 const char *get_cardsystem_desc_by_caid(uint16_t caid);
 
 #ifdef WITH_EMU

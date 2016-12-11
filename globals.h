@@ -525,7 +525,7 @@ typedef unsigned char uchar;
 #define READER_DEVICE_ERROR   5
 
 // moved from stats
-#define DEFAULT_REOPEN_SECONDS 12
+#define DEFAULT_REOPEN_SECONDS 16
 #define DEFAULT_MIN_ECM_COUNT 5
 #define DEFAULT_MAX_ECM_COUNT 600
 #define DEFAULT_NBEST 1

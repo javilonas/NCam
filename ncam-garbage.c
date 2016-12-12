@@ -190,7 +190,7 @@ void stop_garbage_collector(void)
 
 		garbage_collector_active = 0;
 		SAFE_COND_SIGNAL(&sleep_cond);
-		cs_sleepms(300);
+		cs_sleepms(1024 / MAX_ECM_SIZE * 250);
 		SAFE_COND_SIGNAL(&sleep_cond);
 		SAFE_THREAD_JOIN(garbage_thread, NULL);
 		for(i = 0; i < HASH_BUCKETS; ++i)
@@ -208,7 +208,7 @@ void stop_garbage_collector(void)
 		}
 
 		for(i = 0; i < HASH_BUCKETS; ++i)
-		{ 
+		{
 			cs_writeunlock(__func__, &garbage_lock[i]);
 			cs_lock_destroy(__func__, &garbage_lock[i]);
 		}

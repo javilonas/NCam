@@ -362,7 +362,7 @@ typedef unsigned char uchar;
  *         constants
  * =========================== */
 #define CS_VERSION    "1.1"
-#define DATE_BUILD    "11-12-2016"
+#define DATE_BUILD    "12-12-2016"
 #define CS_REVISION   "r1"
 #ifndef CS_SVN_VERSION
 #   define CS_SVN_VERSION "stable"
@@ -377,10 +377,10 @@ typedef unsigned char uchar;
 #define CS_LOGFILE    "/tmp/ncam.log"
 #endif
 #define CS_QLEN       128 // size of request queue
-#define CS_MAXPROV    100
+#define CS_MAXPROV    128
 #define CS_MAXPORTS   200  // max server ports
 #define CS_CLIENT_HASHBUCKETS 32
-#define CS_SERVICENAME_SIZE 48
+#define CS_SERVICENAME_SIZE 32
 
 #define CS_ECMSTORESIZE   16  // use MD5()
 #define CS_EMMSTORESIZE   16  // use MD5()
@@ -394,17 +394,22 @@ typedef unsigned char uchar;
 #define WITH_EXTENDED_CW 1
 
 #if defined(READER_DRE) || defined(READER_DRECAS) || defined(READER_VIACCESS)
-#define MAX_ECM_SIZE 1024
+#define MAX_ECM_SIZE 1108
 #define MAX_EMM_SIZE 1024
 #define MAX_SCT_SIZE 1024  // smaller or equal to the minial one of MAX_ECM_SIZE and MAX_EMM_SIZE 
 #else
-#define MAX_ECM_SIZE 1024
-#define MAX_EMM_SIZE 1024
-#define MAX_SCT_SIZE 1024  // smaller or equal to the minial one of MAX_ECM_SIZE and MAX_EMM_SIZE 
+#define MAX_ECM_SIZE 680
+#define MAX_EMM_SIZE 512
+#define MAX_SCT_SIZE 384  // smaller or equal to the minial one of MAX_ECM_SIZE and MAX_EMM_SIZE 
 #endif
 
+#if defined(READER_DRE) || defined(READER_DRECAS) || defined(READER_VIACCESS)
 #define CS_EMMCACHESIZE 1024 //nr of EMMs that each reader will cache
+#define MSGLOGSIZE 96       // size of string buffer for a ecm to return messages
+#else
+#define CS_EMMCACHESIZE 512 //nr of EMMs that each reader will cache
 #define MSGLOGSIZE 64       // size of string buffer for a ecm to return messages
+#endif
 
 #define D_TRACE     0x0001  // Generate very detailed error/trace messages per routine
 #define D_ATR       0x0002  // Debug ATR parsing, dump of ecm, cw
@@ -525,9 +530,9 @@ typedef unsigned char uchar;
 #define READER_DEVICE_ERROR   5
 
 // moved from stats
-#define DEFAULT_REOPEN_SECONDS 16
-#define DEFAULT_MIN_ECM_COUNT 5
-#define DEFAULT_MAX_ECM_COUNT 600
+#define DEFAULT_REOPEN_SECONDS 30
+#define DEFAULT_MIN_ECM_COUNT 3
+#define DEFAULT_MAX_ECM_COUNT 900
 #define DEFAULT_NBEST 1
 #define DEFAULT_NFB 1
 #define DEFAULT_RETRYLIMIT 0
@@ -538,8 +543,8 @@ typedef unsigned char uchar;
 #define DEFAULT_LB_AUTO_BETATUNNEL_MODE 0
 #define DEFAULT_LB_AUTO_BETATUNNEL_PREFER_BETA 50
 
-#define DEFAULT_MAX_CACHE_TIME 12
-#define DEFAULT_MAX_HITCACHE_TIME 12
+#define DEFAULT_MAX_CACHE_TIME 13
+#define DEFAULT_MAX_HITCACHE_TIME 13
 
 #define DEFAULT_LB_AUTO_TIMEOUT 0
 #define DEFAULT_LB_AUTO_TIMEOUT_P 30
@@ -621,7 +626,7 @@ enum {E2_GLOBAL = 0, E2_GROUP, E2_CAID, E2_IDENT, E2_CLASS, E2_CHID, E2_QUEUE, E
 #define DEFAULT_CC_IGNRSHR  0   // Use global cfg // default -1
 #define DEFAULT_CC_STEALTH  1   // Use global cfg // default -1
 #define DEFAULT_CC_KEEPALIVE 1  // default 0
-#define DEFAULT_CC_RECONNECT 12000
+#define DEFAULT_CC_RECONNECT 10000
 #define DEFAULT_CC_RECV_TIMEOUT 2000
 
 #define CS_GBOX_MAX_PROXY_CARDS 32
@@ -632,7 +637,7 @@ enum {E2_GLOBAL = 0, E2_GROUP, E2_CAID, E2_IDENT, E2_CLASS, E2_CHID, E2_QUEUE, E
 // Return MPEG section length
 #define SCT_LEN(sct) (3+((sct[1]&0x0f)<<8)+sct[2])
 // Used by readers
-#define MAX_LEN      (256+3)
+#define MAX_LEN      256
 
 #define NO_CAID_VALUE  0xfffe
 #define NO_PROVID_VALUE  0xfffffe
@@ -875,7 +880,7 @@ struct emm_packet_t ;
 struct s_ecm_answer ;
 struct demux_s ;
 
-#define DEFAULT_MODULE_BUFSIZE 1024
+#define DEFAULT_MODULE_BUFSIZE 1088
 
 struct s_module
 {

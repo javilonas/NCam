@@ -1048,7 +1048,7 @@ int32_t dvbapi_open_device(int32_t type, int32_t num, int32_t adapter)
 	}
 
 	if (cfg.dvbapi_boxtype == BOXTYPE_SAMYGO) {
-		
+
 		if(type == 0)
 		{
 			struct sockaddr_un saddr;

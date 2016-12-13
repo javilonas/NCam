@@ -703,7 +703,7 @@ DESCRIPTIONS
 	    0 = disconnect client when maximum idle time is reached
 	    1 = keep client connected (default)
 
-       cccamcfgfile = filename
+       cccfgfile = filename
 	  enable to read reader from CCcam Config File filename,default to NULL string.
 
        autosidblock = value

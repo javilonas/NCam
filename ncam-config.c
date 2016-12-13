@@ -1578,10 +1578,10 @@ void * read_cccamcfg(int32_t mode)
 	int32_t caid,prid;
 
 	if(!readed_cccamcfg)
-		cs_log("load CCcam config file: %s",cfg.cc_cfgfile);
+		cs_log("load CCcam config file: %s", cfg.cc_cfgfile);
 
 	if(!cfg.cc_cfgfile || (mode != CCCAMCFGREADER && mode != CCCAMCFGUSER))
-			return NULL;
+		return NULL;
 
 	readed_cccamcfg=1;
 
@@ -1651,7 +1651,7 @@ void * read_cccamcfg(int32_t mode)
 				continue;
 
 			if(!cs_malloc(&rdr,sizeof(struct s_reader)))
-					continue;
+				continue;
 
 			memset(rdr, 0, sizeof(struct s_reader));
 

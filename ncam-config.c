@@ -871,7 +871,6 @@ int32_t init_fakecws(void)
 	}
 	average_compares = ((count[0x100/2] + count[0x100/2 - 1]) / 2);
 
-
 	cs_log("max %d fakecw compares required, on average: %d compares", max_compares, average_compares);
 	return 0;
 }
@@ -1600,7 +1599,7 @@ void * read_cccamcfg(int32_t mode)
 			*p='\0';
 		strncpy(line,trim(token),MAXLINESIZE-1);
 		if(!line[0])continue;
-		if((line[0] == 'C' || line[0] == 'L' || line[0] == 'N' || line[0] == 'R' ) && line[1] == ':' && (mode == CCCAMCFGREADER)){
+		if((line[0] == 'N' || line[0] == 'C' || line[0] == 'L' || line[0] == 'R' ) && line[1] == ':' && (mode == CCCAMCFGREADER)){
 
 			int32_t paracount=0;
 			char * proto=0;
@@ -1609,6 +1608,14 @@ void * read_cccamcfg(int32_t mode)
 			memset(ncd_key,0,sizeof(ncd_key));
 			int32_t reshare=-1;
 			switch(line[0]){
+				case 'N':
+					proto = "newcamd";
+					ret=sscanf(line,"%c:%s%d%s%s%x%x%x%x%x%x%x%x%x%x%x%x%x%x%d",&typ,host,&port,uname,upass,
+						(uint*) &ncd_key[0], (uint*) &ncd_key[1], (uint*) &ncd_key[2], (uint*) &ncd_key[3],(uint*) &ncd_key[4],
+						(uint*) &ncd_key[5], (uint*) &ncd_key[6], (uint*) &ncd_key[7], (uint*) &ncd_key[8],(uint*) &ncd_key[9],
+						(uint*) &ncd_key[10],(uint*) &ncd_key[11],(uint*) &ncd_key[12],(uint*) &ncd_key[13],&reshare);
+					paracount=5;
+					break;
 				case 'C':
 					proto = "cccam";
 					ret=sscanf(line,"%c:%s%d%s%s",&typ,host,&port,uname,upass);
@@ -1617,14 +1624,6 @@ void * read_cccamcfg(int32_t mode)
 				case 'L':
 					proto = "camd35";
 					ret=sscanf(line,"%c:%s%d%s%s%x%x%d",&typ,host,&port,uname,upass,&caid,&prid,&reshare);
-					paracount=5;
-					break;
-				case 'N':
-					proto = "newcamd";
-					ret=sscanf(line,"%c:%s%d%s%s%x%x%x%x%x%x%x%x%x%x%x%x%x%x%d",&typ,host,&port,uname,upass,
-						(uint*) &ncd_key[0], (uint*) &ncd_key[1], (uint*) &ncd_key[2], (uint*) &ncd_key[3],(uint*) &ncd_key[4],
-						(uint*) &ncd_key[5], (uint*) &ncd_key[6], (uint*) &ncd_key[7], (uint*) &ncd_key[8],(uint*) &ncd_key[9],
-						(uint*) &ncd_key[10],(uint*) &ncd_key[11],(uint*) &ncd_key[12],(uint*) &ncd_key[13],&reshare);
 					paracount=5;
 					break;
 				case 'R':

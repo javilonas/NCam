@@ -232,7 +232,7 @@ int32_t cs_open_logfiles(void)
 	// according to syslog docu: calling closelog is not necessary and calling openlog multiple times is safe
 	// We use openlog to set the default syslog settings so that it's possible to allow switching syslog on and off
 	openlog(syslog_ident, LOG_NDELAY | LOG_PID, LOG_DAEMON);
-	cs_log(">> NCAm <<  cardserver %s, version " CS_VERSION ", build " DATE_BUILD " (" CS_TARGET ")", starttext);
+	cs_log(">> NCAm <<  cardserver %s, version " CS_VERSION ", revision "CS_REVISION " build " DATE_BUILD " (" CS_TARGET ")", starttext);
 
 	return (fp <= (FILE *)0);
 }
@@ -303,7 +303,7 @@ static uint8_t get_log_header(char *txt, int32_t txt_size, uint8_t* hdr_logcount
 		
 		return (uint8_t)tmp;
 	}
-	
+
 	if(hdr_logcount_offset != NULL)
 	{
 		(*hdr_logcount_offset) = 0;
@@ -319,8 +319,8 @@ static uint8_t get_log_header(char *txt, int32_t txt_size, uint8_t* hdr_logcount
 	if(hdr_info_offset != NULL)
 	{
 		(*hdr_info_offset) = 0;
-	}	
-	
+	}
+
 	return 0;
 }
 
@@ -328,7 +328,7 @@ static void write_to_log(char *txt, struct s_log *log, int8_t do_flush)
 {
 	if(logStarted == 0)
 		{ return; }
-	
+
 	(void)log; // Prevent warning when WEBIF, MODULE_MONITOR and CS_ANTICASC are disabled
 
 	// anticascading messages go to their own log
@@ -338,16 +338,16 @@ static void write_to_log(char *txt, struct s_log *log, int8_t do_flush)
 		{
 			syslog(LOG_INFO, "%s", txt + log->header_info_offset);
 		}
-			
+
 		if (cfg.sysloghost != NULL && syslog_socket != -1)
-		{	
-			char tmp[128+LOG_BUF_SIZE];			
+		{
+			char tmp[128+LOG_BUF_SIZE];
 			static char hostname[64];
 			static uint8_t have_hostname = 0;
 			time_t walltime;
 			struct tm lt;
 			char timebuf[32];
-						
+
 			if(!have_hostname)
 			{
 				if(gethostname(hostname, 64) != 0)
@@ -357,20 +357,20 @@ static void write_to_log(char *txt, struct s_log *log, int8_t do_flush)
 				
 				have_hostname = 1;
 			}
-										
+
 			walltime = cs_time();
 			localtime_r(&walltime, &lt);
 
 			if(strftime(timebuf, 32, "%b %d %H:%M:%S", &lt) == 0)
 			{
 				cs_strncpy(timebuf, "unknown", 32);
-			}			
-			
+			}
+
 			snprintf(tmp, sizeof(tmp), "%s %s ncam[%u]: %s", timebuf, hostname, getpid(), txt + log->header_info_offset);
 			sendto(syslog_socket, tmp, strlen(tmp), 0, (struct sockaddr*) &syslog_addr, sizeof(syslog_addr));
 		}
 	}
-	
+
 	strcat(txt, "\n");
 	cs_write_log(txt, do_flush, log->header_date_offset, log->header_time_offset);
 
@@ -378,7 +378,7 @@ static void write_to_log(char *txt, struct s_log *log, int8_t do_flush)
 	if(!exit_ncam && cfg.loghistorylines && log_history)
 	{
 		struct s_log_history *hist;
-		
+
 		while((uint32_t)ll_count(log_history) >= cfg.loghistorylines)
 		{
 			hist = ll_remove_first(log_history);
@@ -389,21 +389,21 @@ static void write_to_log(char *txt, struct s_log *log, int8_t do_flush)
 				hist = NULL;
 			}
 		}
-		
+
 		if(cs_malloc(&hist, sizeof(struct s_log_history)))
 		{
 			int32_t target_len = strlen(log->cl_text) + strlen(txt+log->header_date_offset) + 1;
-			
+
 			if(cs_malloc(&hist->txt, sizeof(char) * (target_len + 1)))
 			{
 				hist->counter = counter++;
 				snprintf(hist->txt, target_len + 1, "%s\t%s", log->cl_text, txt + log->header_date_offset);
-				
+
 				ll_append(log_history, hist);
 			}
 			else
 			{
-				NULLFREE(hist);	
+				NULLFREE(hist);
 			}
 		}
 	}
@@ -423,7 +423,7 @@ static void write_to_log(char *txt, struct s_log *log, int8_t do_flush)
 				if(log->cl_usr && cl->account && strcmp(log->cl_usr, cl->account->usr))
 					{ continue; }
 			}
-			
+
 			if(log->header_len > 0)
 			{
 				snprintf(sbuf, sizeof(sbuf), "%03d", cl->logcounter);
@@ -462,7 +462,7 @@ static void write_to_log_int(char *txt, uint8_t header_len, uint8_t hdr_logcount
 	log->header_logcount_offset = hdr_logcount_offset;
 	log->header_date_offset = hdr_date_offset;
 	log->header_time_offset = hdr_time_offset;
-	log->header_info_offset = hdr_info_offset;		
+	log->header_info_offset = hdr_info_offset;
 	log->direct_log = 0;
 	struct s_client *cl = cur_client();
 	log->cl_usr = "";
@@ -575,7 +575,7 @@ void cs_log_txt(const char *log_prefix, const char *fmt, ...)
 {
 	if(logStarted == 0)
 		{ return; }
-	
+
 	SAFE_MUTEX_LOCK_NOLOG(&log_mutex);
 	__do_log();
 	SAFE_MUTEX_UNLOCK_NOLOG(&log_mutex);
@@ -585,7 +585,7 @@ void cs_log_hex(const char *log_prefix, const uint8_t *buf, int32_t n, const cha
 {
 	if(logStarted == 0)
 		{ return; }
-	
+
 	SAFE_MUTEX_LOCK_NOLOG(&log_mutex);
 	__do_log();
 	if(buf)
@@ -728,24 +728,24 @@ void log_list_thread(void)
 static void init_syslog_socket(void)
 {
 	if(cfg.sysloghost != NULL && syslog_socket == -1)
-	{	
+	{
 		IN_ADDR_T in_addr;
-		
+
 		if ((syslog_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)
 		{
 			perror("Socket create error!");
 		}
-		
+
 		memset((char *) &syslog_addr, 0, sizeof(syslog_addr));
 		syslog_addr.sin_family = AF_INET;
 		syslog_addr.sin_port = htons(cfg.syslogport);
 		cs_resolve(cfg.sysloghost, &in_addr, NULL, NULL);
 		SIN_GET_ADDR(syslog_addr) = in_addr;
-	}		
+	}
 }
 
 int32_t cs_init_log(void)
-{	
+{
 	if(logStarted == 0)
 	{
 		init_syslog_socket();
@@ -764,15 +764,15 @@ int32_t cs_init_log(void)
 		{
 			cs_exit(1);
 		}
-		
+
 		logStarted = 1;
 	}
 	int32_t rc = 0;
 	if(!cfg.disablelog) { rc = cs_open_logfiles(); }
 	logStarted = 1;
-	
-	if(cfg.initial_debuglevel > 0) 
-	{ 
+
+	if(cfg.initial_debuglevel > 0)
+	{
 		cs_dblevel = cfg.initial_debuglevel;
 		cs_log("debug_level=%d", cs_dblevel);
 	}
@@ -799,7 +799,7 @@ void cs_disable_log(int8_t disabled)
 					close(syslog_socket);
 					syslog_socket = -1;
 				}
-				
+
 				cs_sleepms(20);
 				cs_close_log();
 			}

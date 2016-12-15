@@ -12,7 +12,7 @@
 
 #define CC_MAXMSGSIZE 0x400 //by Project::Keynation: Buffer size is limited on "O" CCCam to 1024 bytes
 #define CC_MAX_PROV   64
-#define CC_MAX_ECMS   50  // before reconnect
+#define CC_MAX_ECMS   64  // before reconnect
 
 #define SWAPC(X, Y) do { char p; p = *X; *X = *Y; *Y = p; } while(0)
 

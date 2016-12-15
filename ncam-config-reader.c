@@ -98,12 +98,14 @@ static void protocol_fn(const char *token, char *value, void *setting, FILE *f)
 			{ "cs357x",     R_CAMD35 },
 			{ "camd33",     R_CAMD33 },
 			{ "gbox",       R_GBOX },
+			{ "mbox",       R_GBOX },
 			{ "cccam",      R_CCCAM },
 			{ "cccam_ext",  R_CCCAM },
 			{ "constcw",    R_CONSTCW },
 			{ "radegast",   R_RADEGAST },
 			{ "scam",       R_SCAM },
 			{ "ghttp",      R_GHTTP },
+			{ "mgcamd",     R_NEWCAMD },
 			{ "newcamd",    R_NEWCAMD },
 			{ "newcamd525", R_NEWCAMD },
 			{ "newcamd524", R_NEWCAMD },
@@ -133,6 +135,8 @@ static void protocol_fn(const char *token, char *value, void *setting, FILE *f)
 		}
 		if(rdr->typ == R_NEWCAMD)
 			{ rdr->ncd_proto = streq(value, "newcamd524") ? NCD_524 : NCD_525; }
+		else if(rdr->typ == R_NEWCAMD)
+			{ rdr->ncd_proto = streq(value, "mgcamd") ? NCD_524 : NCD_525; }
 		if(!rdr->typ)
 			{
 				fprintf(stderr, "ERROR: '%s' is unsupported reader protocol!\n", value);
@@ -261,7 +265,7 @@ static void rsakey_fn(const char *token, char *value, void *setting, FILE *f)
 			}
 			else
 			{
-				rdr->rsa_mod_length = len/2;	
+				rdr->rsa_mod_length = len/2;
 			}
 		}
 		return;
@@ -318,7 +322,7 @@ static void boxkey_fn(const char *token, char *value, void *setting, FILE *f)
 	if(value)
 	{
 		int32_t len = strlen(value);
-		if(((len % 8) != 0) || len == 0 || len > 32)
+		if(((len % 8) != 0) || len == 0 || len > 64)
 		{
 			rdr->boxkey_length = 0;
 			memset(rdr->boxkey, 0, sizeof(rdr->boxkey));
@@ -828,13 +832,13 @@ static const struct config_list reader_opts[] =
 	DEF_OPT_INT32("resetcycle"          , OFS(resetcycle),              0),
 	DEF_OPT_INT32("autorestartseconds"  , OFS(autorestartseconds),      0),
 	DEF_OPT_INT8("restartforresetcycle" , OFS(restartforresetcycle),    0),
-	DEF_OPT_INT8("disableserverfilter"  , OFS(ncd_disable_server_filt), 0),
-	DEF_OPT_INT8("connectoninit"        , OFS(ncd_connect_on_init),     0),
+	DEF_OPT_INT8("disableserverfilter"  , OFS(ncd_disable_server_filt), 1),
+	DEF_OPT_INT8("connectoninit"        , OFS(ncd_connect_on_init),     1),
 	DEF_OPT_UINT8("keepalive"           , OFS(keepalive),               0),
 	DEF_OPT_INT8("smargopatch"          , OFS(smargopatch),             0),
 	DEF_OPT_INT8("autospeed"            , OFS(autospeed),               1),
 	DEF_OPT_UINT8("sc8in1_dtrrts_patch" , OFS(sc8in1_dtrrts_patch),     0),
-	DEF_OPT_INT8("fallback"             , OFS(fallback),                0),
+	DEF_OPT_INT8("fallback"             , OFS(fallback),                1),
 	DEF_OPT_FUNC_X("fallback_percaid"   , OFS(fallback_percaid),        ftab_fn, FTAB_READER | FTAB_FBPCAID),
 	DEF_OPT_FUNC_X("localcards"         , OFS(localcards),              ftab_fn, FTAB_READER | FTAB_LOCALCARDS),
 #ifdef CS_CACHEEX
@@ -960,7 +964,7 @@ static bool reader_check_setting(const struct config_list *UNUSED(clist), void *
 	// These are written only when the reader is physical reader
 	static const char *hw_only_settings[] =
 	{
-		"readnano", "resetcycle", "smargopatch", "autospeed", "sc8in1_dtrrts_patch", "boxid","fix07",
+		"readnano", "resetcycle", "smargopatch", "autospeed", "sc8in1_dtrrts_patch", "boxid", "fix07",
 		"fix9993", "rsakey", "deskey", "ins7e", "ins7e11", "ins2e06", "force_irdeto", "needsemmfirst", "boxkey",
 		"atr", "detect", "nagra_read", "mhz", "cardmhz", "readtiers", "read_old_classes",
 #if defined(READER_DRE) || defined(READER_DRECAS)

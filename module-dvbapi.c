@@ -37,8 +37,8 @@ extern int32_t exit_ncam;
 #define DN_MULTISHOT 0
 #endif
 
-int32_t priority_is_changed=0;
-extern char cs_confdir[];
+//int32_t priority_is_changed=0;
+//extern char cs_confdir[];
 
 const char *streamtxt_00_to_1B[] = {
 								"Reserved",			 																		// 00
@@ -522,7 +522,7 @@ int32_t dvbapi_net_send(uint32_t request, int32_t socket_fd, int32_t demux_index
 			unsigned char *info_len = &packet[size];   //info string length
 			size += 1;
 
-			*info_len = snprintf((char *) &packet[size], sizeof(packet) - size, "NCAm v%s, build: %s (%s)", CS_VERSION, DATE_BUILD, CS_TARGET);
+			*info_len = snprintf((char *) &packet[size], sizeof(packet) - size, "NCAm v%s-%s, build: %s (%s)", CS_VERSION, CS_REVISION, DATE_BUILD, CS_TARGET);
 			size += *info_len;
 			break;
 		}
@@ -1645,8 +1645,7 @@ void dvbapi_add_emmpid(int32_t demux_id, uint16_t caid, uint16_t emmpid, uint32_
 		demux[demux_id].EMMpids[demux[demux_id].EMMpidcount].PROVID = provid;
 		demux[demux_id].EMMpids[demux[demux_id].EMMpidcount].type = type;
 		demux[demux_id].EMMpids[demux[demux_id].EMMpidcount++].cadata = cadata;
-		cs_log_dbg(D_DVBAPI, "Added new emmpid %d CAID: %04X EMM_PID: %04X PROVID: %06X%sTYPE %s", demux[demux_id].EMMpidcount - 1, caid, emmpid, provid,
-			cadatatext, typetext);
+		cs_log_dbg(D_DVBAPI, "Added new emmpid %d CAID: %04X EMM_PID: %04X PROVID: %06X%sTYPE %s", demux[demux_id].EMMpidcount - 1, caid, emmpid, provid, cadatatext, typetext);
 	}
 	else
 	{
@@ -2166,7 +2165,7 @@ int32_t dvbapi_start_descrambling(int32_t demux_id, int32_t pid, int8_t checked)
 		dvbapi_edit_channel_cache(demux_id, pid, 0); // remove this pid from channelcache
 	}
 	if(!fake_ecm) { NULLFREE(er); }
-	dvbapi_adjust_prioritytab(demux_id);
+//	dvbapi_adjust_prioritytab(demux_id);
 	return started;
 }
 
@@ -2364,9 +2363,9 @@ void dvbapi_read_priority(void)
 			return;
 		}
 
-		entry->type=type;
-		entry->last=NULL;
-		entry->next=NULL;
+		entry->type = type;
+//		entry->last=NULL;
+		entry->next = NULL;
 
 		count++;
 
@@ -2515,7 +2514,7 @@ void dvbapi_read_priority(void)
 	return;
 }
 
-void dvbapi_write_prio(void) {
+/*void dvbapi_write_prio(void) {
 	FILE *fp;
 	char token[128];
 
@@ -2635,8 +2634,7 @@ void dvbapi_adjust_prioritytab(int32_t demux_index){
 		}
 	}
 
-}
-
+}*/
 
 void dvbapi_resort_ecmpids(int32_t demux_index)
 {
@@ -7494,7 +7492,7 @@ void module_dvbapi(struct s_module *ph)
 	ph->desc = "dvbapi";
 	ph->type = MOD_CONN_SERIAL;
 	ph->listenertype = LIS_DVBAPI;
-	ph->cleanup = dvbapi_cleanup;
+//	ph->cleanup = dvbapi_cleanup;
 #if defined(WITH_AZBOX)
 	ph->s_handler = azbox_handler;
 	ph->send_dcw = azbox_send_dcw;

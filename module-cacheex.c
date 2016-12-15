@@ -664,6 +664,10 @@ static int32_t cacheex_add_to_cache_int(struct s_client *cl, ECM_REQUEST *er, in
 		null |= (er->cw[i] | er->cw[i + 1] | er->cw[i + 2]);
 		if(er->cw[i + 3] != c)
 		{
+			if(er->prid == 0x030B00 || er->prid == 0x032830) {
+				cs_log_dbg(D_TRACE, "notice: CW checksum check disabled for %d", er->prid);
+				break;
+			}
 			cs_log_dump_dbg(D_CACHEEX, er->cw, 16, "push received cw with chksum error from %s", csp ? "csp" : username(cl));
 			cl->cwcacheexerr++;
 			if(cl->account)

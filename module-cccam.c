@@ -2291,8 +2291,6 @@ void move_card_to_end(struct s_client *cl, struct cc_card *card_to_move)
 	}
 }
 
-
-
 /*void fix_dcw(uchar *dcw)
 {
     int32_t i;
@@ -2427,7 +2425,7 @@ int32_t cc_parse_msg(struct s_client *cl, uint8_t *buf, int32_t l)
 			{
 				uint8_t token[256];
 				snprintf((char *)token, sizeof(token),
-						 "PARTNER: NCAm v%s, build: %s (%s) [EXT,SID,SLP]", CS_VERSION,
+						 "PARTNER: NCAm v%s-%s, build: %s (%s) [EXT,SID,SLP]", CS_VERSION, CS_REVISION,
 						 DATE_BUILD, CS_TARGET);
 				cc_cmd_send(cl, token, strlen((char *)token) + 1, MSG_CW_NOK1);
 			}

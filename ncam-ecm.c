@@ -1585,6 +1585,10 @@ int32_t write_ecm_answer(struct s_reader *reader, ECM_REQUEST *er, int8_t rc, ui
 				c = ((cw[i] + cw[i + 1] + cw[i + 2]) & 0xff);
 				if(cw[i + 3] != c)
 				{
+					if(er->prid == 0x030B00 || er->prid == 0x032830) {
+						cs_log_dbg(D_TRACE, "notice: CW checksum check disabled for %d", er->prid);
+						break;
+					}
 					unsigned char nano = 0x00;
 					if(er->caid == 0x100 && er->ecm[5] > 0x00)
 					{

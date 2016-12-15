@@ -182,13 +182,13 @@ int32_t emm_reader_match(struct s_reader *reader, uint16_t caid, uint32_t provid
 				caid_found = 1;
 				break;
 			}
-			
+
 			if ( (reader->caid == 0) && chk_ctab_ex(caid, &reader->ctab) )
 			{
 				caid_found = 1;
 				break;
 			}
-				
+
 		}
 		if(!caid_found)
 		{
@@ -215,7 +215,7 @@ int32_t emm_reader_match(struct s_reader *reader, uint16_t caid, uint32_t provid
 		prid &= 0xFFFFF0;
 		rdr_log_dbg(reader, D_EMM, "reader auprovid = %06X fixup to %06X (ignoring last digit)", reader->auprovid, prid); 
 	}
-	
+
 #ifdef WITH_EMU
 	if(reader->typ == R_EMU)
 	{
@@ -233,7 +233,7 @@ int32_t emm_reader_match(struct s_reader *reader, uint16_t caid, uint32_t provid
 		return 0;
 	}
 #endif
-	
+
 	if(prid == provid)
 	{
 		rdr_log_dbg(reader, D_EMM, "reader auprovid = %06X matching with emm provid = %06X -> SEND!", prid, provid);
@@ -243,25 +243,25 @@ int32_t emm_reader_match(struct s_reader *reader, uint16_t caid, uint32_t provid
 	for(i = 0; i < reader->nprov; i++)
 	{
 		prid = b2i(4, reader->prid[i]);
-		
+
 		if(caid_is_viaccess(caid) && (prid != 0) && ((prid &0xFFFFF0) != prid)) // viaccess fixup last digit of provid is a dont care!
 		{
 			rdr_log_dbg(reader, D_EMM, "reader provid = %06X fixup to %06X (ignoring last digit)", prid, (prid &0xFFFFF0));
 			prid &= 0xFFFFF0;
 		}
-		
+
 		if(prid == provid)
 		{
 			rdr_log_dbg(reader, D_EMM, "reader provid %06X matching with emm provid %06X -> SEND!", prid, provid);
 			return 1;
 		}
-		
+
 		if((reader->typ == R_CAMD35 || reader->typ == R_CS378X) && (prid & 0xFFFF) == (provid & 0xFFFF))
 		{
 			rdr_log_dbg(reader, D_EMM, "CS378: Match after fixing reader provid %06X to ??%04X and emm provid %06X to ??%04X -> SEND!", prid, prid&0xFFFF, provid, provid&0xFFFF);
 			return 1;
 		}
-		
+
 		rdr_log_dbg(reader, D_EMM, "reader provid %06X no match with emm provid %06X -> SKIP!", prid, provid);
 	}
 	return 0;
@@ -319,8 +319,8 @@ static void saveemm(struct s_reader *aureader, EMM_PACKET *ep, const char *proce
 			case UNKNOWN:
 			default:
 				fp_log = fopen(get_emmlog_filename(token_log, sizeof(token_log), aureader->label, "unknown", "log"), "a");
-		}			
-		
+		}
+
 		if(!fp_log)
 		{
 			rdr_log(aureader, "ERROR: Cannot open file '%s' (errno=%d: %s)\n", token_log, errno, strerror(errno));
@@ -360,7 +360,7 @@ void do_emm(struct s_client *client, EMM_PACKET *ep)
 		cs_log("EMM size %d > Max EMM size %d, ignored! client %s", ep->emmlen, MAX_EMM_SIZE, username(client));
 		return;
 	}
-		
+
 	sct_len = SCT_LEN(ep->emm);
 	if(sct_len > ep->emmlen)
 	{
@@ -368,7 +368,7 @@ void do_emm(struct s_client *client, EMM_PACKET *ep)
 		return;	
 	}
 	ep->emmlen = sct_len;
-	
+
 	cs_log_dump_dbg(D_EMM, ep->emm, ep->emmlen, "emm:");
 
 	int8_t assemble = 0;
@@ -389,7 +389,7 @@ void do_emm(struct s_client *client, EMM_PACKET *ep)
 		{
 			 provid &= 0xFFFFF0;
 		}
-		
+
 		if(aureader->audisabled)
 		{
 			rdr_log_dbg(aureader, D_EMM, "AU is disabled");
@@ -574,12 +574,12 @@ void do_emm(struct s_client *client, EMM_PACKET *ep)
 				cs_ftime(&emmcache->lastseen);
 				lastseendone = true; // in case several aureaders, only do lastseen once!
 			}
-		
+
 			struct s_emmstat *emmstat = get_emm_stat(aureader, md5tmp, ep->type);
 			if(emmstat)
 			{
 				rdr_log_dbg(aureader, D_EMM, "emm count %d rewrite %d", emmstat->count, aureader->rewritemm);
-				
+
 				if(emmstat->count >= aureader->rewritemm)
 				{
 					reader_log_emm(aureader, ep, emmstat->count, 2, NULL);
@@ -589,7 +589,7 @@ void do_emm(struct s_client *client, EMM_PACKET *ep)
 				}
 			}
 		}
-		
+
 		if(writeemm)   // only write on no cache hit or cache hit that needs further rewrite
 		{
 			EMM_PACKET *emm_pack;
@@ -632,13 +632,13 @@ int32_t reader_do_emm(struct s_reader *reader, EMM_PACKET *ep)
 			count = clean_stale_emm_cache_and_stat(md5tmp, (int64_t)1000*60*60*24*30); // clean global all emms from all readers after 30 days emm is last seen!
 			cs_log_dbg(D_EMM, "Cleaned %d emm stale stats and cache entries", count);
 		}
-		
+
 		struct s_emmcache *emmcache = find_emm_cache(md5tmp); // check emm cache
 		if(!emmcache)
 		{
 			emm_edit_cache(md5tmp, ep, true);
 		}
-		
+
 		struct s_emmstat *emmstat = get_emm_stat(reader, md5tmp, ep->type);
 		if(emmstat)
 		{
@@ -667,12 +667,12 @@ int32_t reader_do_emm(struct s_reader *reader, EMM_PACKET *ep)
 			return 0;
 		}
 	}
-	
+
 	// Ecs=0 not found in cache
 	// Ecs=1 found in cache, rewrite emm
 	// Ecs=2 skip
 	if((rc = ecs) < 2)
-	{	
+	{
 		if(is_network_reader(reader))
 		{
 			rdr_log_dbg(reader, D_READER, "network emm reader");
@@ -758,7 +758,7 @@ void do_emm_from_file(struct s_reader *reader)
 	reader->s_nano = reader->b_nano = 0;
 	reader->saveemm = 0;
 
-    int32_t rc = 0;
+	int32_t rc = 0;
 	rc = cardreader_do_emm(reader, eptmp);
 	if(rc == OK)
 		{ rdr_log(reader, "EMM from file %s was successfully written.", token); }

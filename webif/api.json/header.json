@@ -1,6 +1,7 @@
 ##CALLBACK##{
 "ncam": {
 	"version": "##CS_VERSION##",
+	"revision": "##CS_REVISION##",
 	"build": "##DATE_BUILD##",
 	"starttime": "##APISTARTTIME##",
 	"apiruntime": "##APIRUNTIME##",

@@ -1161,7 +1161,9 @@ static char *send_ncam_config_cccam(struct templatevars *vars, struct uriparams 
 
 	tpl_addVar(vars, TPLADD, "STEALTH", (cfg.cc_stealth == 1) ? "checked" : "");
 
-	tpl_printf(vars, TPLADD, "CCCFGFILE", "%s", cfg.cc_cfgfile);
+	if (cfg.cc_cfgfile)
+		tpl_printf(vars, TPLADD, "CCCFGFILE", "%s", cfg.cc_cfgfile);
+
 	tpl_printf(vars, TPLADD, "NODEID", "%02X%02X%02X%02X%02X%02X%02X%02X",
 			   cfg.cc_fixed_nodeid[0], cfg.cc_fixed_nodeid[1], cfg.cc_fixed_nodeid[2], cfg.cc_fixed_nodeid[3],
 			   cfg.cc_fixed_nodeid[4], cfg.cc_fixed_nodeid[5], cfg.cc_fixed_nodeid[6], cfg.cc_fixed_nodeid[7]);
@@ -1180,7 +1182,7 @@ static char *send_ncam_config_cccam(struct templatevars *vars, struct uriparams 
 	tpl_addVar(vars, TPLADD, "KEEPCONNECTED", (cfg.cc_keep_connected == 1) ? "checked" : "");
 
 	if (cfg.cc_autosidblock)
-		tpl_printf(vars, TPLADD, "AUTOSIDBLOCK", "selected");
+		tpl_addVar(vars, TPLADD, "AUTOSIDBLOCK", (cfg.cc_autosidblock == 1) ? "checked" : "");
 
 	tpl_addVar(vars, TPLADDONCE, "CONFIG_CONTROL", tpl_getTpl(vars, "CONFIGCCCAMCTRL"));
 
@@ -1884,12 +1886,14 @@ static char *send_ncam_reader(struct templatevars *vars, struct uriparams *param
 #ifdef MODULE_NEWCAMD
 		tpl_addVar(vars, TPLAPPEND, "ADDPROTOCOL", "<option>newcamd</option>\n");
 		tpl_addVar(vars, TPLAPPEND, "ADDPROTOCOL", "<option>newcamd524</option>\n");
+		tpl_addVar(vars, TPLAPPEND, "ADDPROTOCOL", "<option>mgcamd</option>\n");
 #endif
 #ifdef MODULE_CCCAM
 		tpl_addVar(vars, TPLAPPEND, "ADDPROTOCOL", "<option>cccam</option>\n");
 #endif
 #ifdef MODULE_GBOX
 		tpl_addVar(vars, TPLAPPEND, "ADDPROTOCOL", "<option>gbox</option>\n");
+		tpl_addVar(vars, TPLAPPEND, "ADDPROTOCOL", "<option>mbox</option>\n");
 #endif
 #ifdef MODULE_RADEGAST
 		tpl_addVar(vars, TPLAPPEND, "ADDPROTOCOL", "<option>radegast</option>\n");
@@ -6273,9 +6277,9 @@ static char *send_ncam_files(struct templatevars * vars, struct uriparams * para
 		{ "ncam.server",    MNU_CFG_FSERVER,   FTYPE_CONFIG },		// id 3
 		{ "ncam.srvid",     MNU_CFG_FSRVID,    FTYPE_CONFIG },		// id 4
 		{ "ncam.srvid2",    MNU_CFG_FSRVID2,   FTYPE_CONFIG },		// id 5
-		{ "logfile",         MNU_CFG_FLOGFILE,  FTYPE_LOGFILE },	// id 6
-		{ "userfile",        MNU_CFG_FUSERFILE, FTYPE_USERFILE },	// id 7
-		{ "css_file_name",   MNU_CFG_FCSS,      FTYPE_CONFIG },		// id 8
+		{ "logfile",        MNU_CFG_FLOGFILE,  FTYPE_LOGFILE },		// id 6
+		{ "userfile",       MNU_CFG_FUSERFILE, FTYPE_USERFILE },	// id 7
+		{ "css_file_name",  MNU_CFG_FCSS,      FTYPE_CONFIG },		// id 8
 		{ "ncam.services",  MNU_CFG_FSERVICES, FTYPE_CONFIG },		// id 9
 		{ "ncam.provid",    MNU_CFG_FPROVID,   FTYPE_CONFIG },		// id 10
 		{ "ncam.tiers",     MNU_CFG_FTIERS,    FTYPE_CONFIG },		// id 11
@@ -8077,6 +8081,7 @@ static int32_t process_request(FILE * f, IN_ADDR_T in)
 			localtime_r(&t, &lt);
 
 			tpl_addVar(vars, TPLADD, "CS_VERSION", CS_VERSION);
+			tpl_addVar(vars, TPLADD, "CS_REVISION", CS_REVISION);
 			tpl_addVar(vars, TPLADD, "DATE_BUILD", DATE_BUILD);
 			tpl_addVar(vars, TPLADD, "CS_TARGET", CS_TARGET);
 			tpl_addVar(vars, TPLADD, "HTTPNCAMLABEL", xml_encode(vars,cfg.http_ncam_label));

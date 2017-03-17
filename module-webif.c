@@ -221,6 +221,7 @@ static void cacheex_clear_all_stats(void)
 		cacheex_clear_client_stats(cl);
 		ll_clear_data(cl->ll_cacheex_stats);
 	}
+
 	cacheex_clear_client_stats(first_client);
 }
 #endif
@@ -231,7 +232,7 @@ static void clear_info_clients_stats(void)
 	first_client->cwcache = 0;
 	first_client->cwnot = 0;
 	first_client->cwtun = 0;
-	first_client->cwignored  = 0;
+	first_client->cwignored = 0;
 	first_client->cwtout = 0;
 	first_client->emmok = 0;
 	first_client->emmnok = 0;
@@ -453,6 +454,7 @@ static void refresh_ncam(enum refreshtypes refreshtype)
 				cl->ac_limit   = (account->ac_users * 100 + 80) * cfg.ac_stime;
 			}
 		}
+
 		break;
 #endif
 	default:
@@ -614,7 +616,10 @@ static char *send_ncam_config_global(struct templatevars *vars, struct uriparams
 		{ tpl_addVar(vars, TPLADD, "SERVERIP", cs_inet_ntoa(cfg.srvip)); }
 	tpl_printf(vars, TPLADD, "NICE", "%d", cfg.nice);
 	tpl_printf(vars, TPLADD, "BINDWAIT", "%d", cfg.bindwait);
-	tpl_printf(vars, TPLADD, "NETPRIO", "%d", cfg.netprio);
+
+	tpl_printf(vars, TPLADD, "TMP", "NETPRIO%d", cfg.netprio);
+	tpl_addVar(vars, TPLADD, tpl_getVar(vars, "TMP"), "selected");
+
 	tpl_printf(vars, TPLADD, "PIDFILE", "%s", ESTR(cfg.pidfile));
 
 
@@ -645,6 +650,8 @@ static char *send_ncam_config_global(struct templatevars *vars, struct uriparams
 	tpl_printf(vars, TPLADD, "FALLBACKTIMEOUT", "%u", cfg.ftimeout);
 	tpl_printf(vars, TPLADD, "CLIENTMAXIDLE", "%u", cfg.cmaxidle);
 
+	tpl_addVar(vars, TPLADD, "MAXECMTIME", (cfg.maxecmtime == 1) ? "checked" : "");
+	tpl_addVar(vars, TPLADD, "MAXECMTIME_NOTFOUND", (cfg.maxecmtimenotfound == 1) ? "checked" : "");
 
 	value = mk_t_caidvaluetab(&cfg.ftimeouttab);
 	tpl_addVar(vars, TPLADD, "FALLBACKTIMEOUT_PERCAID", value);
@@ -701,6 +708,12 @@ static char *send_ncam_config_global(struct templatevars *vars, struct uriparams
 
 	value = mk_t_caidtab(&cfg.double_check_caid);
 	tpl_addVar(vars, TPLADD, "DOUBLECHECKCAID", value);
+	free_mk_t(value);
+
+	tpl_addVar(vars, TPLADD, "DISABLECRCCWSCHECKEDGLOBAL", (cfg.disablecrccws == 1) ? "checked" : "");
+
+	value = mk_t_ftab(&cfg.disablecrccws_only_for);
+	tpl_addVar(vars, TPLADD, "IGNCHKSUMONLYFORGLOBAL", value);
 	free_mk_t(value);
 
 #ifdef LEDSUPPORT
@@ -790,6 +803,13 @@ static char *send_ncam_config_loadbalancer(struct templatevars *vars, struct uri
 	tpl_printf(vars, TPLADD, "LBREOPENSECONDS", "%d", cfg.lb_reopen_seconds);
 	tpl_printf(vars, TPLADD, "LBCLEANUP", "%d", cfg.lb_stat_cleanup);
 
+	tpl_addVar(vars, TPLADD, "LBREOPENSECONDS_NEVER", (cfg.lb_reopen_seconds_never == 1) ? "checked" : "");
+	if (cfg.lb_reopen_seconds_never_group != NULL)
+	{
+		tpl_addVar(vars, TPLADD, "LBREOPENSECONDS_NEVER_GROUP", cfg.lb_reopen_seconds_never_group);
+		tpl_addVar(vars, TPLADD, "LBREOPENSECONDS_NEVER", "");  //unset global never_reopen since we using now only specific group.
+	}
+
 	tpl_addVar(vars, TPLADD, "LBREOPENINVALID", (cfg.lb_reopen_invalid == 1) ? "checked" : "");
 	tpl_addVar(vars, TPLADD, "LBFORCEALWAYS", (cfg.lb_force_reopen_always == 1) ? "checked" : "");
 
@@ -813,6 +833,11 @@ static char *send_ncam_config_loadbalancer(struct templatevars *vars, struct uri
 	tpl_printf(vars, TPLADD, "LBAUTOTIMEOUTT", "%d", cfg.lb_auto_timeout_t);
 
 	tpl_addVar(vars, TPLADDONCE, "CONFIG_CONTROL", tpl_getTpl(vars, "CONFIGLOADBALANCERCTRL"));
+
+	if (cfg.forcereopenusernames != NULL)
+	{
+		tpl_addVar(vars, TPLADD, "FORCEREOPENUSERNAMES", cfg.forcereopenusernames);
+	}
 
 	return tpl_getTpl(vars, "CONFIGLOADBALANCER");
 }
@@ -1299,6 +1324,7 @@ static char *send_ncam_config_webif(struct templatevars *vars, struct uriparams 
 
 	tpl_addVar(vars, TPLADD, "HTTPSAVEFULLSELECT", (cfg.http_full_cfg == 1) ? "checked" : "");
 	tpl_addVar(vars, TPLADD, "HTTPOVERWRITEBAKFILE", (cfg.http_overwrite_bak_file == 1) ? "checked" : "");
+	tpl_addVar(vars, TPLADD, "HTTPREADONLY", (cfg.http_readonly == 1) ? "checked" : "");
 
 
 #ifdef WITH_SSL
@@ -1458,7 +1484,9 @@ static char *send_ncam_config_anticasc(struct templatevars *vars, struct uripara
 
 	webif_save_config("anticasc", vars, params);
 
-	if(cfg.ac_enabled > 0) { tpl_addVar(vars, TPLADD, "CHECKED", "checked"); }
+	if(cfg.ac_enabled > 0)
+		{ tpl_addVar(vars, TPLADD, "ANTCHECKED", "checked"); }
+
 	tpl_printf(vars, TPLADD, "NUMUSERS", "%d", cfg.ac_users);
 	tpl_printf(vars, TPLADD, "SAMPLETIME", "%d", cfg.ac_stime);
 	tpl_printf(vars, TPLADD, "SAMPLES", "%d", cfg.ac_samples);
@@ -1468,11 +1496,13 @@ static char *send_ncam_config_anticasc(struct templatevars *vars, struct uripara
 
 	if(cfg.ac_logfile)
 		{ tpl_addVar(vars, TPLADD, "ACLOGFILE", cfg.ac_logfile); }
+
 	tpl_printf(vars, TPLADD, "FAKEDELAY", "%d", cfg.ac_fakedelay);
 	tpl_printf(vars, TPLADD, "DENYSAMPLES", "%d", cfg.ac_denysamples);
 
 	if(cfg.acosc_enabled == 1)
 		{ tpl_addVar(vars, TPLADD, "ACOSC_CHECKED", "checked"); }
+
 	tpl_printf(vars, TPLADD, "ACOSC_MAX_ACTIVE_SIDS", "%d", cfg.acosc_max_active_sids);
 	tpl_printf(vars, TPLADD, "ACOSC_ZAP_LIMIT", "%d", cfg.acosc_zap_limit);
 	tpl_printf(vars, TPLADD, "TMP", "ACOSC_PENALTY%d", cfg.acosc_penalty);
@@ -1965,6 +1995,7 @@ static char *send_ncam_reader_config(struct templatevars *vars, struct uriparams
 		//  inactivate_reader(rdr); //Stop reader before reinitialization
 		char servicelabels[1024] = "";
 		char servicelabelslb[1024] = "";
+		char servicelabelslbprio[1024] = "";
 
 		for(i = 0; i < (*params).paramcount; ++i)
 		{
@@ -1974,6 +2005,8 @@ static char *send_ncam_reader_config(struct templatevars *vars, struct uriparams
 					{ snprintf(servicelabels + strlen(servicelabels), sizeof(servicelabels) - strlen(servicelabels), "%s,", (*params).values[i]); }
 				else if(!strcmp((*params).params[i], "lb_whitelist_services"))
 					{ snprintf(servicelabelslb + strlen(servicelabelslb), sizeof(servicelabelslb) - strlen(servicelabelslb), "%s,", (*params).values[i]); }
+				else if(!strcmp((*params).params[i], "lb_priority_services"))
+					{ snprintf(servicelabelslbprio + strlen(servicelabelslbprio), sizeof(servicelabelslbprio) - strlen(servicelabelslbprio), "%s,", (*params).values[i]); }
 				else
 					/*if(strlen((*params).values[i]) > 0)*/
 					{ chk_reader((*params).params[i], (*params).values[i], rdr); }
@@ -1982,6 +2015,7 @@ static char *send_ncam_reader_config(struct templatevars *vars, struct uriparams
 		}
 		chk_reader("services", servicelabels, rdr);
 		chk_reader("lb_whitelist_services", servicelabelslb, rdr);
+		chk_reader("lb_priority_services", servicelabelslbprio, rdr);
 
 		if(is_network_reader(rdr) || rdr->typ == R_EMU)    //physical readers make trouble if re-started
 		{
@@ -2088,6 +2122,11 @@ static char *send_ncam_reader_config(struct templatevars *vars, struct uriparams
 	tpl_addVar(vars, TPLADD, "FALLBACK_PERCAID", value);
 	free_mk_t(value);
 
+	// disable checksum test only for selected caid/provid
+	value = mk_t_ftab(&rdr->disablecrccws_only_for);
+	tpl_addVar(vars, TPLADD, "IGN_CHKSUM_ONLYFOR", value);
+	free_mk_t(value);
+
 #ifdef WITH_LB
 	tpl_addVar(vars, TPLADD, "LBFORCEFALLBACK", (rdr->lb_force_fallback == 1) ? "checked" : "");
 #endif
@@ -2186,6 +2225,9 @@ static char *send_ncam_reader_config(struct templatevars *vars, struct uriparams
 
 	if(rdr->ecmnotfoundlimit)
 		{ tpl_printf(vars, TPLADD, "ECMNOTFOUNDLIMIT", "%u", rdr->ecmnotfoundlimit); }
+
+	if(rdr->ecmtimeoutlimit)
+		{ tpl_printf(vars, TPLADD, "ECMTIMEOUTLIMIT", "%u", rdr->ecmtimeoutlimit); }
 
 	// Force Irdeto
 	if(!apicall)
@@ -2321,8 +2363,6 @@ static char *send_ncam_reader_config(struct templatevars *vars, struct uriparams
 	if(rdr->ratelimitecm)
 	{
 		tpl_printf(vars, TPLADD, "RATELIMITECM", "%d", rdr->ratelimitecm);
-		tpl_printf(vars, TPLADD, "RATELIMITTIME", "%d", rdr->ratelimittime);
-		tpl_printf(vars, TPLADD, "SRVIDHOLDTIME", "%d", rdr->srvidholdtime);
 		// ECMUNIQUE
 		if(!apicall)
 		{
@@ -2332,6 +2372,8 @@ static char *send_ncam_reader_config(struct templatevars *vars, struct uriparams
 		{
 			tpl_addVar(vars, TPLADD, "ECMUNIQUE", (rdr->ecmunique == 1) ? "1" : "0");
 		}
+		tpl_printf(vars, TPLADD, "RATELIMITTIME", "%d", rdr->ratelimittime);
+		tpl_printf(vars, TPLADD, "SRVIDHOLDTIME", "%d", rdr->srvidholdtime);
 	}
 	// Cooldown
 	if(rdr->cooldown[0] && rdr->cooldown[1])
@@ -2391,6 +2433,9 @@ static char *send_ncam_reader_config(struct templatevars *vars, struct uriparams
 			if(rdr->lb_sidtabs.ok & ((SIDTABBITS)1 << i)) { tpl_addVar(vars, TPLADD, "CHECKED", "checked"); }
 			else { tpl_addVar(vars, TPLADD, "CHECKED", ""); }
 			tpl_addVar(vars, TPLAPPEND, "SIDS", tpl_getTpl(vars, "READERCONFIGSIDLBOKBIT"));
+			if(rdr->lb_prio_sidtabs.ok & ((SIDTABBITS)1 << i)) { tpl_addVar(vars, TPLADD, "CHECKED", "checked"); }
+			else { tpl_addVar(vars, TPLADD, "CHECKED", ""); }
+			tpl_addVar(vars, TPLAPPEND, "SIDS", tpl_getTpl(vars, "READERCONFIGSIDLBPRIOOKBIT"));
 			sidtab = sidtab->next;
 			i++;
 		}
@@ -2548,6 +2593,7 @@ static char *send_ncam_reader_config(struct templatevars *vars, struct uriparams
 	tpl_printf(vars, TPLADD, "CCCRESHARE",   "%d", rdr->cc_reshare);
 	tpl_printf(vars, TPLADD, "RESHARE",      "%d", cfg.cc_reshare);
 	tpl_printf(vars, TPLADD, "CCCRECONNECT", "%d", rdr->cc_reconnect);
+	tpl_printf(vars, TPLADD, "CCCKEEPALIVEPING",   "%d", rdr->cc_keepaliveping);
 
 	if(rdr->cc_want_emu)
 		{ tpl_addVar(vars, TPLADD, "CCCWANTEMUCHECKED", "checked"); }
@@ -3067,14 +3113,9 @@ static char *send_ncam_user_config_edit(struct templatevars *vars, struct uripar
 	if(strcmp(buf, "1970-01-01")) { tpl_addVar(vars, TPLADD, "EXPDATE", buf); }
 
 	//Allowed TimeFrame
-	if(account->allowedtimeframe[0] && account->allowedtimeframe[1])
-	{
-		tpl_printf(vars, TPLADD, "ALLOWEDTIMEFRAME", "%02d:%02d-%02d:%02d",
-				   account->allowedtimeframe[0] / 60,
-				   account->allowedtimeframe[0] % 60,
-				   account->allowedtimeframe[1] / 60,
-				   account->allowedtimeframe[1] % 60);
-	}
+	char *allowedtf = mk_t_allowedtimeframe(account);
+	tpl_printf(vars, TPLADD, "ALLOWEDTIMEFRAME", "%s", allowedtf);
+	free_mk_t(allowedtf);
 
 	//Group
 	char *value = mk_t_group(account->grp);
@@ -3266,7 +3307,11 @@ static char *send_ncam_user_config_edit(struct templatevars *vars, struct uripar
 	tpl_addVar(vars, TPLADD, "AFCHECKED", (account->cacheex.allow_filter == 1) ? "checked" : "");
 	tpl_addVar(vars, TPLADD, "BLOCKFAKECWSCHECKED", (account->cacheex.block_fakecws == 1) ? "checked" : "");
 	tpl_addVar(vars, TPLADD, "NWTCHECKED", (account->no_wait_time == 1) ? "checked" : "");
-	
+	tpl_addVar(vars, TPLADD, "DISABLECRCCEX4USER", (account->disablecrccacheex == 1) ? "checked" : "");
+	value = mk_t_ftab(&account->disablecrccacheex_only_for);
+	tpl_addVar(vars, TPLADD, "IGNCRCCEX4USERONLYFOR", value);
+	free_mk_t(value);
+
 #endif
 
 #ifdef CW_CYCLE_CHECK
@@ -3419,7 +3464,7 @@ static void webif_add_client_proto(struct templatevars *vars, struct s_client *c
 	if(strncmp(proto, "cccam", 5) == 0)
 	{
 		struct cc_data *cc = cl->cc;
-		if(cc && cc->remote_version && cc->remote_build)
+		if(cc && *cc->remote_version && *cc->remote_build)
 		{
 			tpl_printf(vars, TPLADD, "CLIENTPROTO", "%s (%s-%s)", proto, cc->remote_version, cc->remote_build);
 			tpl_printf(vars, TPLADD, "CLIENTPROTOSORT", "%s (%s-%s)", proto, cc->remote_version, cc->remote_build);
@@ -3806,7 +3851,17 @@ static char *send_ncam_user_config(struct templatevars *vars, struct uriparams *
 			char channame[CS_SERVICENAME_SIZE];
 			status = (!apicall) ? "<B>connected</B>" : "connected";
 			if(account->expirationdate && account->expirationdate < now) { classname = "expired"; }
-			else { classname = "connected";conn = 1; }
+			else
+			{
+				classname = "connected";conn = 1;
+				if (cfg.forcereopenusernames != NULL)
+				{
+					if (strstr(cfg.forcereopenusernames, account->usr))
+					{
+						classname = "forcereopenuserconnected";
+					}
+				}
+			}
 
 			proto = client_get_proto(latestclient);
 			int clientcaid = latestclient->last_caid;
@@ -3835,13 +3890,13 @@ static char *send_ncam_user_config(struct templatevars *vars, struct uriparams *
 				char picon_name[128];
 				char picon_channame[128];
 				int8_t picon_ok = 0;
-				
+
 				get_picon_servicename_or_null(latestclient, clientsrvid, clientprovid, clientcaid, picon_channame, sizeof(picon_channame));
 				if(picon_channame[0])
 				{
 					snprintf(picon_name, sizeof(picon_name) / sizeof(char) - 1, "%s", picon_channame);
 					picon_ok = picon_exists(picon_name);
-					
+
 					if(!picon_ok && picon_servicename_remve_hd(picon_channame, sizeof(picon_channame)))
 					{
 						snprintf(picon_name, sizeof(picon_name) / sizeof(char) - 1, "%s", picon_channame);
@@ -3898,7 +3953,17 @@ static char *send_ncam_user_config(struct templatevars *vars, struct uriparams *
 					isactive = 1;
 					status = (!apicall) ? "<B>online</B>" : "online";
 					if(account->expirationdate && account->expirationdate < now) { classname = "expired"; }
-					else { classname = "online"; }
+					else
+					{
+						classname = "online";
+						if (cfg.forcereopenusernames != NULL)
+						{
+							if (strstr(cfg.forcereopenusernames, account->usr))
+							{
+								classname = "forcereopenuseronline";
+							}
+						}
+					}
 					if(latestclient->cwfound + latestclient->cwnot + latestclient->cwcache > 0)
 					{
 						cwrate2 = now - latestclient->login;
@@ -4588,9 +4653,9 @@ static char *send_ncam_logpoll(struct templatevars * vars, struct uriparams * pa
 	uint64_t lastid = 0;
 
 #ifdef WITH_DEBUG
-	tpl_addVar(vars, TPLADD, "LOG_DEBUGMENU", tpl_getTpl(vars, "LOGDEBUGMENU"));
+	//tpl_addVar(vars, TPLADD, "LOG_DEBUGMENU", tpl_getTpl(vars, "LOGDEBUGMENU"));
 #endif
-	tpl_addVar(vars, TPLADD, "LOG_SIZEMENU", tpl_getTpl(vars, "LOGSIZEMENU"));
+	//tpl_addVar(vars, TPLADD, "LOG_SIZEMENU", tpl_getTpl(vars, "LOGSIZEMENU"));
 	tpl_addVar(vars, TPLADD, "TITLEADD1", "Move mouse over log-window to stop scroll");
 
 	if(strcmp(getParam(params, "lastid"), "start") == 0){
@@ -6941,7 +7006,9 @@ static char *send_ncam_EMM(struct templatevars * vars, struct uriparams * params
 static uint64_t get_cacheex_node(struct s_client * cl)
 {
 	uint64_t node = 0x00;
+#if defined(MODULE_CCCAM) || defined(MODULE_CAMD35) || defined(MODULE_CAMD35_TCP)
 	struct s_module *module = (cl->reader ? &cl->reader->ph : get_module(cl));
+#endif
 #ifdef MODULE_CCCAM
 	if(module->num == R_CCCAM && cl->cc)
 	{

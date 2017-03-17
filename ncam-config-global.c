@@ -151,6 +151,22 @@ void check_caidtab_fn(const char *token, char *value, void *setting, FILE *f)
 	}
 }
 
+void chk_ftab_fn(const char *token, char *value, void *setting, FILE *f)
+{
+	FTAB *ftab = setting;
+	if(value)
+	{
+		if(strlen(value))
+			chk_ftab(value, ftab);
+		else
+			ftab_clear(ftab);
+		return;
+	}
+	value = mk_t_ftab(ftab);
+	if(strlen(value) > 0 || cfg.http_full_cfg)
+		{ fprintf_conf(f, token, "%s\n", value); }
+	free_mk_t(value);
+}
 
 void caidvaluetab_fn(const char *token, char *value, void *setting, FILE *f)
 {
@@ -285,10 +301,12 @@ void global_fixups_fn(void *UNUSED(var))
 		SetPriorityClass(WinId, wprio);
 #endif
 	}
+	if(cfg.netprio <= 0 || cfg.netprio > 20) { cfg.netprio = 0; }
 	if(cfg.max_log_size != 0 && cfg.max_log_size <= 10) { cfg.max_log_size = 10; }
 #ifdef WITH_LB
 	if(cfg.lb_save > 0 && cfg.lb_save < 100) { cfg.lb_save = 100; }
 	if(cfg.lb_nbest_readers < 2) { cfg.lb_nbest_readers = DEFAULT_NBEST; }
+	if(cfg.lb_reopen_seconds_never_group != NULL) { cfg.lb_reopen_seconds_never = 0; }
 #endif
 }
 
@@ -316,6 +334,8 @@ static const struct config_list global_opts[] =
 	DEF_OPT_INT8("disablemail"              , OFS(disablemail),         1),
 	DEF_OPT_INT8("usrfileflag"              , OFS(usrfileflag),         0),
 	DEF_OPT_UINT32("clienttimeout"          , OFS(ctimeout),            CS_CLIENT_TIMEOUT),
+	DEF_OPT_UINT8("maxecmtime"              , OFS(maxecmtime),           1),
+	DEF_OPT_UINT8("maxecmtimenotfound"      , OFS(maxecmtimenotfound),   1),
 	DEF_OPT_UINT32("fallbacktimeout"        , OFS(ftimeout),            CS_CLIENT_TIMEOUT / 2),
 	DEF_OPT_FUNC("fallbacktimeout_percaid"  , OFS(ftimeouttab),         caidvaluetab_fn),
 	DEF_OPT_UINT32("clientmaxidle"          , OFS(cmaxidle),            CS_CLIENT_MAXIDLE),
@@ -326,8 +346,8 @@ static const struct config_list global_opts[] =
 	DEF_OPT_INT32("nice"                    , OFS(nice),                -1),
 	DEF_OPT_INT32("maxlogsize"              , OFS(max_log_size),        10),
 	DEF_OPT_INT8("waitforcards"             , OFS(waitforcards),        1),
-	DEF_OPT_INT32("waitforcards_extra_delay"    , OFS(waitforcards_extra_delay), 3000),
-	DEF_OPT_INT8("preferlocalcards"         , OFS(preferlocalcards),    1),
+	DEF_OPT_INT32("waitforcards_extra_delay"    , OFS(waitforcards_extra_delay), 500),
+	DEF_OPT_INT8("preferlocalcards"         , OFS(preferlocalcards),    0),
 	DEF_OPT_INT32("readerrestartseconds"    , OFS(reader_restart_seconds), 5),
 	DEF_OPT_INT8("dropdups"                 , OFS(dropdups),            1),
 	DEF_OPT_INT8("reload_useraccounts"      , OFS(reload_useraccounts), 1),
@@ -353,6 +373,8 @@ static const struct config_list global_opts[] =
 	DEF_OPT_INT32("lb_max_ecmcount"         , OFS(lb_max_ecmcount),     DEFAULT_MAX_ECM_COUNT),
 	DEF_OPT_INT32("lb_reopen_seconds"       , OFS(lb_reopen_seconds),   DEFAULT_REOPEN_SECONDS),
 	DEF_OPT_INT8("lb_reopen_invalid"        , OFS(lb_reopen_invalid),   1),
+	DEF_OPT_INT8("lb_reopen_seconds_never"  , OFS(lb_reopen_seconds_never),   0),
+	DEF_OPT_STR("lb_reopen_seconds_never_group"  , OFS(lb_reopen_seconds_never_group),         NULL),
 	DEF_OPT_INT8("lb_force_reopen_always"   , OFS(lb_force_reopen_always),   0),
 	DEF_OPT_INT32("lb_retrylimit"           , OFS(lb_retrylimit),       DEFAULT_RETRYLIMIT),
 	DEF_OPT_INT32("lb_stat_cleanup"         , OFS(lb_stat_cleanup),     DEFAULT_LB_STAT_CLEANUP),
@@ -376,14 +398,17 @@ static const struct config_list global_opts[] =
 	DEF_OPT_INT8("suppresscmd08"            , OFS(c35_suppresscmd08),   0),
 	DEF_OPT_INT8("getblockemmauprovid"      , OFS(getblockemmauprovid), 0),
 	DEF_OPT_INT8("double_check"             , OFS(double_check),        0),
+	DEF_OPT_INT8("disablecrccws"            , OFS(disablecrccws),            0),
+	DEF_OPT_FUNC("disablecrccws_only_for"   , OFS(disablecrccws_only_for),     chk_ftab_fn),
+	DEF_OPT_STR("forcereopenusernames"      , OFS(forcereopenusernames), NULL),
 	DEF_LAST_OPT
 };
 
 #ifdef CS_ANTICASC
 static void anticasc_fixups_fn(void *UNUSED(var))
 {
-	if(cfg.ac_users < 0) { cfg.ac_users = 0; }
-	if(cfg.ac_stime < 0) { cfg.ac_stime = 2; }
+	if(cfg.ac_users < 0) { cfg.ac_users = 1; }
+	if(cfg.ac_stime < 0) { cfg.ac_stime = 3; }
 	if(cfg.ac_samples < 2 || cfg.ac_samples > 10) { cfg.ac_samples = 10; }
 	if(cfg.ac_penalty < 0 || cfg.ac_penalty > 3) { cfg.ac_penalty = 0; }
 	if(cfg.ac_fakedelay < 100 || cfg.ac_fakedelay > 3000) { cfg.ac_fakedelay = 1000; }
@@ -405,9 +430,9 @@ static const struct config_list anticasc_opts[] =
 {
 	DEF_OPT_SAVE_FUNC(anticasc_should_save_fn),
 	DEF_OPT_FIXUP_FUNC(anticasc_fixups_fn),
-	DEF_OPT_INT8("enabled"					, OFS(ac_enabled),		1),
+	DEF_OPT_INT8("ac_enabled"				, OFS(ac_enabled),		0),
 	DEF_OPT_INT32("numusers"				, OFS(ac_users),		1),
-	DEF_OPT_INT32("sampletime"				, OFS(ac_stime),		2),
+	DEF_OPT_INT32("sampletime"				, OFS(ac_stime),		3),
 	DEF_OPT_INT32("samples"					, OFS(ac_samples),		10),
 	DEF_OPT_INT8("penalty"					, OFS(ac_penalty),		0),
 	DEF_OPT_STR("aclogfile"					, OFS(ac_logfile),		NULL),
@@ -562,12 +587,12 @@ static const struct config_list webif_opts[] =
 	DEF_OPT_INT32("httpemmgclean"            , OFS(http_emmg_clean),           -1),
 	DEF_OPT_FUNC("httputf8"                  , OFS(http_utf8),                 http_utf8_fn),
 #ifdef WEBIF_LIVELOG
- 	DEF_OPT_INT8("http_status_log"           , OFS(http_status_log),           0),
+ 	DEF_OPT_INT8("http_status_log"           , OFS(http_status_log),           1),
 #else
 	DEF_OPT_INT8("http_status_log"           , OFS(http_status_log),           1),
 #endif
 #ifndef WEBIF_JQUERY
-	DEF_OPT_STR("http_extern_jquery"         , OFS(http_extern_jquery),        "//code.jquery.com/jquery-1.11.0.min.js"),
+	DEF_OPT_STR("http_extern_jquery"         , OFS(http_extern_jquery),        "//code.jquery.com/jquery-3.2.0.min.js"),
 #endif
 	DEF_LAST_OPT
 };
@@ -671,10 +696,8 @@ static const struct config_list camd35_opts[] =
 static const struct config_list camd35_opts[] = { DEF_LAST_OPT };
 #endif
 
-#if defined(MODULE_CAMD35_TCP) || defined(MODULE_NEWCAMD)
-#define PORTTAB_CS378X  1
-#define PORTTAB_NEWCAMD 2
-static void porttab_fn(const char *token, char *value, void *setting, long type, FILE *f)
+#ifdef MODULE_NEWCAMD
+static void porttab_fn(const char *token, char *value, void *setting, FILE *f)
 {
 	PTAB *ptab = setting;
 	if(value)
@@ -689,11 +712,35 @@ static void porttab_fn(const char *token, char *value, void *setting, long type,
 		}
 		return;
 	}
-	value = (type == PORTTAB_CS378X) ? mk_t_camd35tcp_port() : mk_t_newcamd_port();
+	value = mk_t_newcamd_port();
 	fprintf_conf(f, token, "%s\n", value);
 	free_mk_t(value);
 }
+#endif
 
+#ifdef MODULE_CAMD35_TCP
+static void porttab_camd35_fn(const char *token, char *value, void *setting, FILE *f)
+{
+	PTAB *ptab = setting;
+	if(value)
+	{
+		if(strlen(value) == 0)
+		{
+			clear_ptab(ptab);
+		}
+		else
+		{
+			chk_port_camd35_tab(value, ptab);
+		}
+		return;
+	}
+	value = mk_t_camd35tcp_port();
+	fprintf_conf(f, token, "%s\n", value);
+	free_mk_t(value);
+}
+#endif
+
+#if defined(MODULE_NEWCAMD) || defined(MODULE_CAMD35_TCP)
 static void porttab_free_fn(void *setting)
 {
 	clear_ptab(setting);
@@ -709,9 +756,9 @@ static bool cs378x_should_save_fn(void *UNUSED(var))
 static const struct config_list cs378x_opts[] =
 {
 	DEF_OPT_SAVE_FUNC(cs378x_should_save_fn),
-	DEF_OPT_FUNC_X("port"			, OFS(c35_tcp_ptab),		porttab_fn, PORTTAB_CS378X, .free_value = porttab_free_fn),
-	DEF_OPT_FUNC("serverip"			, OFS(c35_tcp_srvip),		serverip_fn),
-	DEF_OPT_INT8("suppresscmd08"	, OFS(c35_tcp_suppresscmd08),	0),
+	DEF_OPT_FUNC("port"				, OFS(c35_tcp_ptab)			, porttab_camd35_fn	, .free_value = porttab_free_fn),
+	DEF_OPT_FUNC("serverip"			, OFS(c35_tcp_srvip)		, serverip_fn),
+	DEF_OPT_INT8("suppresscmd08"	, OFS(c35_tcp_suppresscmd08), 0),
 	DEF_LAST_OPT
 };
 #else
@@ -727,12 +774,12 @@ static bool newcamd_should_save_fn(void *UNUSED(var))
 static const struct config_list newcamd_opts[] =
 {
 	DEF_OPT_SAVE_FUNC(newcamd_should_save_fn),
-	DEF_OPT_FUNC_X("port"		, OFS(ncd_ptab),	porttab_fn, PORTTAB_NEWCAMD, .free_value = porttab_free_fn),
-	DEF_OPT_FUNC("serverip"		, OFS(ncd_srvip),	serverip_fn),
-	DEF_OPT_FUNC("allowed"		, OFS(ncd_allowed),	iprange_fn, .free_value = iprange_free_fn),
-	DEF_OPT_HEX("key"			, OFS(ncd_key),		SIZEOF(ncd_key)),
-	DEF_OPT_INT8("keepalive"	, OFS(ncd_keepalive),	DEFAULT_NCD_KEEPALIVE),
-	DEF_OPT_INT8("mgclient"		, OFS(ncd_mgclient),	1),
+	DEF_OPT_FUNC("port"			, OFS(ncd_ptab)		, porttab_fn, .free_value = porttab_free_fn),
+	DEF_OPT_FUNC("serverip"		, OFS(ncd_srvip)	, serverip_fn),
+	DEF_OPT_FUNC("allowed"		, OFS(ncd_allowed)	, iprange_fn, .free_value = iprange_free_fn),
+	DEF_OPT_HEX("key"			, OFS(ncd_key)		, SIZEOF(ncd_key)),
+	DEF_OPT_INT8("keepalive"	, OFS(ncd_keepalive), DEFAULT_NCD_KEEPALIVE),
+	DEF_OPT_INT8("mgclient"		, OFS(ncd_mgclient)	, 1),
 	DEF_LAST_OPT
 };
 #else
@@ -887,22 +934,82 @@ static const struct config_list serial_opts[] = { DEF_LAST_OPT };
 #endif
 
 #ifdef MODULE_GBOX
+
+static void gbox_block_ecm_fn(const char *token, char *value, void *UNUSED(setting), FILE *f)
+{
+	if (value)
+	{
+		char *ptr1, *saveptr1 = NULL;
+		memset(cfg.gbox_block_ecm, 0, sizeof(cfg.gbox_block_ecm));
+		int n = 0, i;
+		for (i = 0, ptr1 = strtok_r(value, ",", &saveptr1); (i < 4) && (ptr1); ptr1 = strtok_r(NULL, ",", &saveptr1))
+		{
+			if (n < GBOX_MAX_BLOCKED_ECM)
+			{ cfg.gbox_block_ecm[n++] = a2i(ptr1, 4); }
+		}
+		cfg.gbox_block_ecm_num = n;
+		return;
+	}
+	if (cfg.gbox_block_ecm_num > 0)
+	{
+		int i;
+		char *dot = "";
+		fprintf_conf(f, token, " ");
+		for (i = 0; i < cfg.gbox_block_ecm_num; i++)
+		{
+			fprintf(f, "%s%04X", dot, cfg.gbox_block_ecm[i]);
+			dot = ",";
+		}
+		fprintf(f, "\n");
+	}
+}
+
+static void gbox_ignored_peer_fn(const char *token, char *value, void *UNUSED(setting), FILE *f)
+{
+	if (value)
+	{
+		char *ptr1, *saveptr1 = NULL;
+		memset(cfg.gbox_ignored_peer, 0, sizeof(cfg.gbox_ignored_peer));
+		int n = 0, i;
+		for (i = 0, ptr1 = strtok_r(value, ",", &saveptr1); (i < 4) && (ptr1); ptr1 = strtok_r(NULL, ",", &saveptr1))
+		{
+			if (n < GBOX_MAX_IGNORED_PEERS)
+			{ cfg.gbox_ignored_peer[n++] = a2i(ptr1, 4); }
+		}
+		cfg.gbox_ignored_peer_num = n;
+		return;
+	}
+	if (cfg.gbox_ignored_peer_num > 0)
+	{
+		int i;
+		char *dot = "";
+		fprintf_conf(f, token, " ");
+		for (i = 0; i < cfg.gbox_ignored_peer_num; i++)
+		{
+			fprintf(f, "%s%04X", dot, cfg.gbox_ignored_peer[i]);
+			dot = ",";
+		}
+		fprintf(f, "\n");
+	}
+}
+
 static void gbox_proxy_card_fn(const char *token, char *value, void *UNUSED(setting), FILE *f)
 {
 	if (value)
 	{
 		char *ptr1, *saveptr1 = NULL;
-	 	memset(cfg.gbox_proxy_card, 0, sizeof(cfg.gbox_proxy_card));
+		memset(cfg.gbox_proxy_card, 0, sizeof(cfg.gbox_proxy_card));
 		int n = 0, i;
 		for (i = 0, ptr1 = strtok_r(value, ",", &saveptr1); (i < 8) && (ptr1); ptr1 = strtok_r(NULL, ",", &saveptr1))
 		{
-		    cfg.gbox_proxy_card[n++] = a2i(ptr1, 8);
+			if (n < GBOX_MAX_PROXY_CARDS)
+				{ cfg.gbox_proxy_card[n++] = a2i(ptr1, 8); }
 		}
 		cfg.gbox_proxy_cards_num = n;
 		return;
-	 }
+	}
 	if (cfg.gbox_proxy_cards_num > 0)
-	{ 
+	{
 		int i;
 		char *dot = "";
 		fprintf_conf(f, token, " ");
@@ -943,17 +1050,19 @@ static bool gbox_should_save_fn(void *UNUSED(var))
 static const struct config_list gbox_opts[] =
 {
 	DEF_OPT_SAVE_FUNC(gbox_should_save_fn),
-	DEF_OPT_FUNC("port"				, OFS(gbx_port),		gbox_port_fn),
-	DEF_OPT_STR("hostname"			, OFS(gbox_hostname),		NULL),
-	DEF_OPT_INT32("gbox_reconnect"	, OFS(gbox_reconnect),		DEFAULT_GBOX_RECONNECT),
-	DEF_OPT_FUNC("proxy_card"		, OFS(gbox_proxy_card),		gbox_proxy_card_fn ),
-	DEF_OPT_SSTR("my_password"		, OFS(gbox_my_password),	"", SIZEOF(gbox_my_password)),
-	DEF_OPT_SSTR("my_vers"			, OFS(gbox_my_vers),		"25", SIZEOF(gbox_my_vers)),
-	DEF_OPT_SSTR("my_cpu_api"		, OFS(gbox_my_cpu_api),		"40", SIZEOF(gbox_my_cpu_api)),
-	DEF_OPT_UINT8("gsms_disable"	, OFS(gsms_dis),		0),
-	DEF_OPT_UINT8("ccc_reshare"		, OFS(ccc_reshare),		0),
-	DEF_OPT_UINT8("log_hello"		, OFS(log_hello),		1),
-	DEF_OPT_STR("tmp_dir"			, OFS(gbox_tmp_dir),		NULL),
+	DEF_OPT_FUNC("port"				, OFS(gbx_port),				gbox_port_fn),
+	DEF_OPT_STR("hostname"			, OFS(gbox_hostname),			NULL),
+	DEF_OPT_INT32("gbox_reconnect"	, OFS(gbox_reconnect),			DEFAULT_GBOX_RECONNECT),
+	DEF_OPT_FUNC("proxy_card"		, OFS(gbox_proxy_card),			gbox_proxy_card_fn ),
+	DEF_OPT_SSTR("my_password"		, OFS(gbox_my_password),		"", SIZEOF(gbox_my_password)),
+	DEF_OPT_SSTR("my_vers"			, OFS(gbox_my_vers),			"25", SIZEOF(gbox_my_vers)),
+	DEF_OPT_SSTR("my_cpu_api"		, OFS(gbox_my_cpu_api),			"40", SIZEOF(gbox_my_cpu_api)),
+	DEF_OPT_UINT8("gsms_disable"	, OFS(gsms_dis),				0),
+	DEF_OPT_UINT8("ccc_reshare"		, OFS(ccc_reshare),				0),
+	DEF_OPT_UINT8("log_hello"		, OFS(log_hello),				1),
+	DEF_OPT_STR("tmp_dir"			, OFS(gbox_tmp_dir),			NULL),
+	DEF_OPT_FUNC("ignore_peer"		, OFS(gbox_ignored_peer),		gbox_ignored_peer_fn ),
+	DEF_OPT_FUNC("block_ecm"		, OFS(gbox_block_ecm),			gbox_block_ecm_fn ),
 	DEF_LAST_OPT
 };
 #else
@@ -1058,7 +1167,7 @@ static const struct config_list dvbapi_opts[] =
 	DEF_OPT_STR("user"				, OFS(dvbapi_usr),		NULL),
 	DEF_OPT_INT8("read_sdt"			, OFS(dvbapi_read_sdt),	0),
 	DEF_OPT_INT8("write_sdt_prov"	, OFS(dvbapi_write_sdt_prov),	0),
-	DEF_OPT_INT8("extended_cw_api"	, OFS(dvbapi_extended_cw_api),	2),
+	DEF_OPT_INT8("extended_cw_api"	, OFS(dvbapi_extended_cw_api),	1),
 	DEF_OPT_FUNC("boxtype"			, OFS(dvbapi_boxtype),		dvbapi_boxtype_fn),
 	DEF_OPT_FUNC("services"			, OFS(dvbapi_sidtabs.ok),	dvbapi_services_fn),
 	// OBSOLETE OPTIONS
@@ -1129,6 +1238,7 @@ void config_free(void)
 	config_sections_free(ncam_conf, &cfg);
 	caidvaluetab_clear(&cfg.ftimeouttab);
 	caidtab_clear(&cfg.double_check_caid);
+	ftab_clear(&cfg.disablecrccws_only_for);
 #ifdef WITH_LB
 	caidvaluetab_clear(&cfg.lb_retrylimittab);
 	caidvaluetab_clear(&cfg.lb_nbest_readers_tab);

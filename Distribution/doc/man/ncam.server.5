@@ -618,6 +618,11 @@ use this reader as local in loadbalancer's reader selection, default:none
 reader assignement to service group for channels which may never be blocked by the loadbalancer to the reader , default=none
 .RE
 .PP
+\fBlb_priority_services\fP = \fB<services>,<services>...\fP
+.RS 3n
+reader assignement to service group for channels which are always tried regardless of the load balacing status , default=none
+.RE
+.PP
 \fBlb_weight\fP = \fBweight\fP
 .RS 3n
 the higher the value the higher the probability for reader selection in load balacing mode, default:100

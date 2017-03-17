@@ -5,6 +5,9 @@
 #include "ncam-net.h"
 #include "ncam-string.h"
 
+const char *shortDay[8] = {"SUN","MON","TUE","WED","THU","FRI","SAT","ALL"};
+const char *weekdstr = "SUNMONTUEWEDTHUFRISATALL";
+
 /*
  * Creates a string ready to write as a token into config or WebIf for CAIDs. You must free the returned value through free_mk_t().
  */
@@ -139,9 +142,9 @@ char *mk_t_camd35tcp_port(void)
 	/* Precheck to determine how long the resulting string will maximally be (might be a little bit smaller but that shouldn't hurt) */
 	for(i = 0; i < cfg.c35_tcp_ptab.nports; ++i)
 	{
-		/* Port is maximally 5 chars long, plus the @caid, plus the ";" between ports */
+		/* Port is maximally 5 chars long, plus the @caid (5), plus the ";" between ports */
 		needed += 11;
-		if(cfg.c35_tcp_ptab.ports[i].ncd && cfg.c35_tcp_ptab.ports[i].ncd->ncd_ftab.filts[0].nprids > 1)
+		if(cfg.c35_tcp_ptab.ports[i].ncd && cfg.c35_tcp_ptab.ports[i].ncd->ncd_ftab.filts[0].nprids > 0)
 		{
 			needed += cfg.c35_tcp_ptab.ports[i].ncd->ncd_ftab.filts[0].nprids * 7;
 		}
@@ -159,12 +162,12 @@ char *mk_t_camd35tcp_port(void)
 							cfg.c35_tcp_ptab.ports[i].s_port,
 							cfg.c35_tcp_ptab.ports[i].ncd->ncd_ftab.filts[0].caid);
 
-			if(cfg.c35_tcp_ptab.ports[i].ncd->ncd_ftab.filts[0].nprids > 1)
+			if(cfg.c35_tcp_ptab.ports[i].ncd->ncd_ftab.filts[0].nprids > 0)
 			{
 				dot2 = ":";
 				for(j = 0; j < cfg.c35_tcp_ptab.ports[i].ncd->ncd_ftab.filts[0].nprids; ++j)
 				{
-					pos += snprintf(value + pos, needed - (value - saveptr), "%s%X", dot2, cfg.c35_tcp_ptab.ports[i].ncd->ncd_ftab.filts[0].prids[j]);
+					pos += snprintf(value + pos, needed - (value - saveptr), "%s%06X", dot2, cfg.c35_tcp_ptab.ports[i].ncd->ncd_ftab.filts[0].prids[j]);
 					dot2 = ",";
 				}
 			}
@@ -172,7 +175,8 @@ char *mk_t_camd35tcp_port(void)
 		}
 		else
 		{
-			pos += snprintf(value + pos, needed - (value - saveptr), "%d", cfg.c35_tcp_ptab.ports[i].s_port);
+			pos += snprintf(value + pos, needed - (value - saveptr), "%s%d", dot1, cfg.c35_tcp_ptab.ports[i].s_port);
+			dot1 = ";";
 		}
 	}
 	return value;
@@ -809,6 +813,74 @@ char *mk_t_allowedprotocols(struct s_auth *account)
 		tmp = tmp << 1;
 	}
 	return value;
+}
+
+/*
+ * return allowed time frame string from internal array content
+ *
+ */
+
+char *mk_t_allowedtimeframe(struct s_auth *account)
+{
+	char *result;
+	if(!cs_malloc(&result, MAXALLOWEDTF))
+		{ return ""; }
+
+	if(account->allowedtimeframe_set)
+	{
+		char 	mytime[6];
+		uint8_t day;
+		uint8_t value_in_day = 0;
+		uint8_t intime = 0;
+		uint16_t minutes =0;
+		uint16_t hours;
+		char	septime[2] = {'\0'};
+		char	sepday[2] = {'\0'};
+
+		for(day=0;day<SIZE_SHORTDAY;day++) {
+			for(hours=0;hours<24;hours++) {
+				for(minutes=0;minutes<60;minutes++) {
+					if(CHECK_BIT(account->allowedtimeframe[day][hours][minutes/30],(minutes % 30))) {
+							if(value_in_day == 0) {
+							strcat(result,&sepday[0]);
+							strcat(result,shortDay[day]);
+							strcat(result,"@");
+							value_in_day = 1;
+							intime=0;
+							sepday[0]=';';
+							septime[0]='\0';
+						}
+						if(!intime) {
+							strcat(result,&septime[0]);
+							snprintf(mytime,6,"%02d:%02d", hours, minutes);
+							strcat(result,mytime);
+							strcat(result,"-");
+							septime[0]=',';
+							intime=1;
+						}
+						// Special case 23H59 is enabled we close the day at 24H00
+						if(((hours*60)+minutes)==1439) {
+							strcat(result,"24:00");
+							intime=0;
+							septime[0]='\0';
+							value_in_day = 0;
+						}
+					}
+					else if(intime) {
+							snprintf(mytime,6,"%02d:%02d", hours, minutes);
+							strcat(result,mytime);
+							septime[0]=',';
+							intime=0;
+						}
+				}
+			}
+			value_in_day = 0;
+		}
+	}
+	else {
+		result="";
+	}
+	return result; 
 }
 
 /*

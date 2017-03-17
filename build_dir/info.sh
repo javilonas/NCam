@@ -18,13 +18,12 @@
 
 clear
 
-version=0.1
+version=0.2
 user=`id -g -n`
 
 echo 
 echo "============================================================"
 echo " Build System NCam Version $version by Javier Sayago (Javilonas). "
-echo " Github: https://github.com/javilonas/NCam"
 echo "============================================================"
 echo 
 echo "> ABOUT BUILD SYSTEM NCAM"

@@ -61,7 +61,9 @@ static void ssl_init(void)
 
 static void ssl_done(void)
 {
+#if OPENSSL_VERSION_NUMBER < 0x1010005fL
 	ERR_remove_state(0);
+#endif
 	ERR_free_strings();
 	EVP_cleanup();
 	CRYPTO_cleanup_all_ex_data();
@@ -1387,6 +1389,7 @@ static void *reader_check(void)
 				restart_cardreader(rdr, 1);
 			}
 		}
+
 		cs_readlock(__func__, &readerlist_lock);
 		for(rdr = first_active_reader; rdr; rdr = rdr->next)
 		{

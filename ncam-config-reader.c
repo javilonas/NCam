@@ -203,6 +203,17 @@ static void reader_lb_services_fn(const char *token, char *value, void *setting,
 	}
 }
 
+static void reader_lb_prio_services_fn(const char *token, char *value, void *setting, FILE *f)
+{
+	services_fn(token, value, setting, f);
+	if(value)
+	{
+		struct s_reader *rdr = container_of(setting, struct s_reader, lb_prio_sidtabs);
+			if(rdr)
+				{ rdr->changes_since_shareupdate = 1; }
+	}
+}
+
 static void reader_caid_fn(const char *token, char *value, void *setting, FILE *f)
 {
 	check_caidtab_fn(token, value, setting, f);
@@ -463,12 +474,13 @@ void ftab_fn(const char *token, char *value, void *setting, long ftab_type, FILE
 	if(ftab_type & FTAB_READER)
 	{
 		struct s_reader *rdr = NULL;
-		if(ftab_type & FTAB_PROVID)     { rdr = container_of(setting, struct s_reader, ftab); }
-		if(ftab_type & FTAB_CHID)       { rdr = container_of(setting, struct s_reader, fchid); }
-		if(ftab_type & FTAB_FBPCAID)    { rdr = container_of(setting, struct s_reader, fallback_percaid); }
-		if(ftab_type & FTAB_LOCALCARDS) { rdr = container_of(setting, struct s_reader, localcards); }
+		if(ftab_type & FTAB_PROVID)       { rdr = container_of(setting, struct s_reader, ftab); }
+		if(ftab_type & FTAB_CHID)         { rdr = container_of(setting, struct s_reader, fchid); }
+		if(ftab_type & FTAB_FBPCAID)      { rdr = container_of(setting, struct s_reader, fallback_percaid); }
+		if(ftab_type & FTAB_LOCALCARDS)   { rdr = container_of(setting, struct s_reader, localcards); }
+		if(ftab_type & FTAB_IGNCHKSMCAID) { rdr = container_of(setting, struct s_reader, disablecrccws_only_for); }
 #ifdef WITH_EMU
-		if(ftab_type & FTAB_EMUAU)      { rdr = container_of(setting, struct s_reader, emu_auproviders); }
+		if(ftab_type & FTAB_EMUAU)        { rdr = container_of(setting, struct s_reader, emu_auproviders); }
 #endif
 		if(rdr)
 			{ rdr->changes_since_shareupdate = 1; }
@@ -654,6 +666,29 @@ static void ratelimitecm_fn(const char *token, char *value, void *setting, FILE 
 		{ fprintf_conf(f, token, "%d\n", rdr->ratelimitecm); }
 }
 
+static void ecmunique_fn(const char *token, char *value, void *setting, FILE *f)
+{
+	struct s_reader *rdr = setting;
+	if(value)
+	{
+		if(strlen(value) == 0)
+		{
+			rdr->ecmunique = 0; // default
+		}
+		else
+		{
+			rdr->ecmunique = atoi(value);
+			if(rdr->ecmunique >= 1) 
+			{ rdr->ecmunique=1; }
+			else
+			{ rdr->ecmunique=0; }
+		}
+		return;
+	}
+	if((rdr->ratelimitecm && rdr->ecmunique!=0) || cfg.http_full_cfg)
+		{ fprintf_conf(f, token, "%d\n", rdr->ecmunique); }
+}
+
 static void ratelimittime_fn(const char *token, char *value, void *setting, FILE *f)
 {
 	struct s_reader *rdr = setting;
@@ -683,6 +718,7 @@ static void ratelimittime_fn(const char *token, char *value, void *setting, FILE
 	if(rdr->ratelimitecm || cfg.http_full_cfg)
 		{ fprintf_conf(f, token, "%d\n", rdr->ratelimittime); }
 }
+
 static void srvidholdtime_fn(const char *token, char *value, void *setting, FILE *f)
 {
 	struct s_reader *rdr = setting;
@@ -825,7 +861,8 @@ static const struct config_list reader_opts[] =
 #endif
 	DEF_OPT_STR("readnano"              , OFS(emmfile),                 NULL),
 	DEF_OPT_FUNC("services"             , OFS(sidtabs),                 reader_services_fn),
-	DEF_OPT_FUNC("lb_whitelist_services"    , OFS(lb_sidtabs),              reader_lb_services_fn),
+	DEF_OPT_FUNC("lb_whitelist_services"  , OFS(lb_sidtabs),            reader_lb_services_fn),
+	DEF_OPT_FUNC("lb_priority_services"   , OFS(lb_prio_sidtabs),       reader_lb_prio_services_fn),
 	DEF_OPT_INT32("inactivitytimeout"   , OFS(tcp_ito),                 DEFAULT_INACTIVITYTIMEOUT),
 	DEF_OPT_INT32("reconnecttimeout"    , OFS(tcp_rto),                 DEFAULT_TCP_RECONNECT_TIMEOUT),
 	DEF_OPT_INT32("reconnectdelay"      , OFS(tcp_reconnect_delay),     60000),
@@ -841,6 +878,7 @@ static const struct config_list reader_opts[] =
 	DEF_OPT_INT8("fallback"             , OFS(fallback),                1),
 	DEF_OPT_FUNC_X("fallback_percaid"   , OFS(fallback_percaid),        ftab_fn, FTAB_READER | FTAB_FBPCAID),
 	DEF_OPT_FUNC_X("localcards"         , OFS(localcards),              ftab_fn, FTAB_READER | FTAB_LOCALCARDS),
+	DEF_OPT_FUNC_X("disablecrccws_only_for", OFS(disablecrccws_only_for),     ftab_fn, FTAB_READER | FTAB_IGNCHKSMCAID),
 #ifdef CS_CACHEEX
 	DEF_OPT_INT8("cacheex"              , OFS(cacheex.mode),            0),
 	DEF_OPT_INT8("cacheex_maxhop"       , OFS(cacheex.maxhop),          0),
@@ -868,6 +906,7 @@ static const struct config_list reader_opts[] =
 	DEF_OPT_INT8("force_irdeto"         , OFS(force_irdeto),            0),
 	DEF_OPT_INT8("needsemmfirst"        , OFS(needsemmfirst),           0),
 	DEF_OPT_UINT32("ecmnotfoundlimit"   , OFS(ecmnotfoundlimit),        0),
+	DEF_OPT_UINT32("ecmtimeoutlimit"    , OFS(ecmtimeoutlimit),         0),
 	DEF_OPT_FUNC("ecmwhitelist"         , 0,                            ecmwhitelist_fn),
 	DEF_OPT_FUNC("ecmheaderwhitelist"   , 0,                            ecmheaderwhitelist_fn),
 	DEF_OPT_FUNC("detect"               , 0,                            detect_fn),
@@ -914,6 +953,7 @@ static const struct config_list reader_opts[] =
 	DEF_OPT_INT8("cccreshare"           , OFS(cc_reshare),              DEFAULT_CC_RESHARE),
 	DEF_OPT_INT32("cccreconnect"        , OFS(cc_reconnect),            DEFAULT_CC_RECONNECT),
 	DEF_OPT_INT8("ccchop"               , OFS(cc_hop),                  0),
+	DEF_OPT_INT8("ccckeepaliveping"     , OFS(cc_keepaliveping),        30),
 #endif
 #ifdef MODULE_GHTTP
 	DEF_OPT_UINT8("use_ssl"             , OFS(ghttp_use_ssl),           0),
@@ -937,8 +977,8 @@ static const struct config_list reader_opts[] =
 	DEF_OPT_FUNC("auprovid"             , 0,                            auprovid_fn),
 	DEF_OPT_INT8("ndsversion"           , OFS(ndsversion),              0),
 	DEF_OPT_FUNC("ratelimitecm"         , 0,                            ratelimitecm_fn),
+	DEF_OPT_FUNC("ecmunique"            , 0,                            ecmunique_fn),
 	DEF_OPT_FUNC("ratelimittime"        , 0,                            ratelimittime_fn),
-	DEF_OPT_INT8("ecmunique"            , OFS(ecmunique),               0),
 	DEF_OPT_FUNC("srvidholdtime"        , 0,                            srvidholdtime_fn),
 	DEF_OPT_FUNC("cooldown"             , 0,                            cooldown_fn),
 	DEF_OPT_FUNC("cooldowndelay"        , 0,                            cooldowndelay_fn),
@@ -1015,7 +1055,7 @@ static bool reader_check_setting(const struct config_list *UNUSED(clist), void *
 	static const char *cccam_settings[] =
 	{
 		"cccversion", "cccmaxhops", "cccmindown", "cccwantemu", "ccckeepalive",
-		"cccreconnect",
+		"cccreconnect", "ccckeepaliveping",
 		0
 	};
 	// Special settings for CCCAM
@@ -1112,6 +1152,22 @@ int32_t init_readerdb(void)
 	}
 	NULLFREE(token);
 	LL_ITER itr = ll_iter_create(configured_readers);
+	while((rdr = ll_iter_next(&itr)) && rdr->from_cccam_cfg)   //free duplicate reader
+	{
+		struct s_reader *rdr2;
+		LL_ITER iter = ll_iter_create(configured_readers);
+		while((rdr2 = ll_iter_next(&iter))){
+			if(rdr != rdr2 && !strcmp(rdr->device, rdr2->device)
+			   && rdr->r_port == rdr2->r_port && !strcmp(rdr->r_usr,rdr2->r_usr)
+			   && !strcmp(rdr->r_pwd, rdr2->r_pwd)){
+				rdr = ll_iter_remove(&itr);
+				free_reader(rdr);
+				break;
+			}
+		}
+	}
+
+	itr = ll_iter_create(configured_readers);
 	while((rdr = ll_iter_next(&itr)))   //build active readers list
 	{
 		reader_fixups_fn(rdr);
@@ -1133,11 +1189,11 @@ void free_reader(struct s_reader *rdr)
 	ftab_clear(&rdr->fchid);
 	ftab_clear(&rdr->ftab);
 
-    NULLFREE(rdr->cltab.aclass);
- 	NULLFREE(rdr->cltab.bclass);
+	NULLFREE(rdr->cltab.aclass);
+	NULLFREE(rdr->cltab.bclass);
 
 	caidtab_clear(&rdr->ctab);
-#ifdef CS_CACHEEX	
+#ifdef CS_CACHEEX
 	cecspvaluetab_clear(&rdr->cacheex.filter_caidtab);
 #endif
 	lb_destroy_stats(rdr);

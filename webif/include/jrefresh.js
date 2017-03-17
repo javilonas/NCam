@@ -63,4 +63,3 @@ function start()
 {
 	 setautorefresh(autorefresh);
 }
-

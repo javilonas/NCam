@@ -12,10 +12,10 @@
 #ifdef MODULE_GBOX
 
 #define NO_GBOX_ID			0
-#define GBOX_MAXHOPS			10
+#define GBOX_MAXHOPS			5
 #define DEFAULT_GBOX_MAX_DIST		2
 #define DEFAULT_GBOX_MAX_ECM_SEND	3
-#define DEFAULT_GBOX_RESHARE		5
+#define DEFAULT_GBOX_RESHARE		2
 #define DEFAULT_GBOX_RECONNECT		300
 #define CS_GBOX_MAX_LOCAL_CARDS		16
 #define GBOX_REBROADCAST_TIMEOUT	1250
@@ -63,6 +63,8 @@
 #define MSGID_COMEONLINE        3
 #define MSGID_GOODBYE           4
 #define MSGID_LOSTCONNECT       5
+#define	MSGID_ATTACK            6
+#define	MSGID_IPMISSMATCH       7
 
 #define GBOX_STAT_HELLOL        0
 #define GBOX_STAT_HELLOS        1

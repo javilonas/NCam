@@ -512,6 +512,7 @@ function updateUserpage(data) {
 
 		switch (item.user.classname) {
 		case 'online':
+		case 'forcereopenuseronline':
 			$(uid).attr('class', item.user.classname);
 
 			if (!is_nopoll('usercol1')) {
@@ -652,6 +653,7 @@ function updateUserpage(data) {
 			break;
 
 		case 'connected':
+		case 'forcereopenuserconnected':
 			$(uid).attr('class', item.user.classname);
 
 			if (!is_nopoll('usercol1')) {
@@ -737,7 +739,7 @@ function updateUserpage(data) {
 
 		default:
 			//check the last status
-			if ('online,connected'.indexOf($(uid).attr('class')) > (-1)) {
+			if ('online,connected,forcereopenuseronline,forcereopenuserconnected'.indexOf($(uid).attr('class')) > (-1)) {
 				// last status was online so cleanup offline
 				$(uid).attr('class', item.user.classname);
 				if (!is_nopoll('usercol1')) {

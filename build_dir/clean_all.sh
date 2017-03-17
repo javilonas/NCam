@@ -17,6 +17,7 @@
 #
 
 export ROOTFS_PATH=/home/*/NCam
+export PARCH_LOGS=$ROOTFS_PATH/build_dir/logs
 export SCRIPT=clean_all.sh
 echo ""
 rm -r $ROOTFS_PATH/build/* > /dev/null 2>&1
@@ -54,11 +55,32 @@ rm -f ncam.x86_64 > /dev/null 2>&1
 rm -f ncam.x86_64.debug > /dev/null 2>&1
 rm -f ncam-libusb-pcsc.x86_64 > /dev/null 2>&1
 rm -f ncam-libusb-pcsc.x86_64.debug > /dev/null 2>&1
+rm -f ncam.arm-raspbian > /dev/null 2>&1
+rm -f ncam.arm-raspbian.debug > /dev/null 2>&1
+rm -f ncam-libusb.arm-raspbian > /dev/null 2>&1
+rm -f ncam-libusb.arm-raspbian.debug > /dev/null 2>&1
 echo ""
 make clean > /dev/null 2>&1
 mkdir $ROOTFS_PATH/build > /dev/null 2>&1
 echo ""
 chmod 755 $ROOTFS_PATH/build_dir/$SCRIPT > /dev/null 2>&1
 sleep 0.8s
+echo ""
+echo ""
+echo " Remove Logs..."
+echo ""
+sleep 0.8s
+echo ""
+cd $PARCH_LOGS/
+rm -f .build*.log > /dev/null 2>&1
+cd ..
+sync
+echo ""
+echo " Deleted logs"
+echo ""
+sleep 0.8s
+echo ""
+echo ""
+sh clean_distri.sh > /dev/null 2>&1
 sync
 echo " Clean all!!"

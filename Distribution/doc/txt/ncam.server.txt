@@ -453,6 +453,10 @@ DESCRIPTIONS
 	  reader assignement to service group for channels which may never be  blocked	by  the  loadbalancer  to  the	reader	,
 	  default=none
 
+       lb_priority_services = <services>,<services>...
+	  reader assignement to service group for channels which are always tried regardless of the load balacing status  ,
+	  default=none
+
        lb_weight = weight
 	  the higher the value the higher the probability for reader selection in load balacing mode, default:100
 

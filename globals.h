@@ -358,12 +358,14 @@ typedef unsigned char uchar;
 #define SAFE_ATTR_SETSTACKSIZE_NOLOG(a,b)
 #endif
 
+#define CHECK_BIT(var,pos) (((var) & (1<<(pos)))? 1 : 0)
+
 /* ===========================
  *         constants
  * =========================== */
 #define CS_VERSION    "1.1"
-#define DATE_BUILD    "15-12-2016"
-#define CS_REVISION   "r1"
+#define DATE_BUILD    "18-03-2017"
+#define CS_REVISION   "r2"
 #ifndef CS_SVN_VERSION
 #   define CS_SVN_VERSION "stable"
 #endif
@@ -380,7 +382,7 @@ typedef unsigned char uchar;
 #define CS_MAXPROV    128
 #define CS_MAXPORTS   200  // max server ports
 #define CS_CLIENT_HASHBUCKETS 32
-#define CS_SERVICENAME_SIZE 32
+#define CS_SERVICENAME_SIZE 48
 
 #define CS_ECMSTORESIZE   16  // use MD5()
 #define CS_EMMSTORESIZE   16  // use MD5()
@@ -532,8 +534,8 @@ typedef unsigned char uchar;
 #define DEFAULT_LB_AUTO_BETATUNNEL_MODE 0
 #define DEFAULT_LB_AUTO_BETATUNNEL_PREFER_BETA 50
 
-#define DEFAULT_MAX_CACHE_TIME 13
-#define DEFAULT_MAX_HITCACHE_TIME 13
+#define DEFAULT_MAX_CACHE_TIME 16
+#define DEFAULT_MAX_HITCACHE_TIME 16
 
 #define DEFAULT_LB_AUTO_TIMEOUT 0
 #define DEFAULT_LB_AUTO_TIMEOUT_P 30
@@ -603,11 +605,16 @@ enum {E2_GLOBAL = 0, E2_GROUP, E2_CAID, E2_IDENT, E2_CLASS, E2_CHID, E2_QUEUE, E
 #define CW_ALGO_MODE_ECB 0
 #define CW_ALGO_MODE_CBC 1
 
+#define SIZE_SHORTDAY 8
+#define MAXALLOWEDTF 1001 // 10 allowed time frame slots for everyday + all [(3 + 1 + 10*(12) + 1)*8]
+extern const char *shortDay[SIZE_SHORTDAY];
+extern const char *weekdstr;
+
 /* ===========================
  *      Default Values
  * =========================== */
 #define DEFAULT_INACTIVITYTIMEOUT 15     // default 0
-#define DEFAULT_TCP_RECONNECT_TIMEOUT 10 // default 15
+#define DEFAULT_TCP_RECONNECT_TIMEOUT 8 // default 15
 #define DEFAULT_NCD_KEEPALIVE 1 // default 0
 
 #define DEFAULT_CC_MAXHOPS 3   // default 10
@@ -615,10 +622,12 @@ enum {E2_GLOBAL = 0, E2_GROUP, E2_CAID, E2_IDENT, E2_CLASS, E2_CHID, E2_QUEUE, E
 #define DEFAULT_CC_IGNRSHR 0   // Use global cfg // default -1
 #define DEFAULT_CC_STEALTH 1   // Use global cfg // default -1
 #define DEFAULT_CC_KEEPALIVE 1  // default 0
-#define DEFAULT_CC_RECONNECT 10000
+#define DEFAULT_CC_RECONNECT 8000
 #define DEFAULT_CC_RECV_TIMEOUT 2000
 
-#define CS_GBOX_MAX_PROXY_CARDS 32
+#define GBOX_MAX_PROXY_CARDS 32
+#define GBOX_MAX_IGNORED_PEERS  16
+#define GBOX_MAX_BLOCKED_ECM 16
 
 #define DEFAULT_AC_USERS   -1 // Use global cfg
 #define DEFAULT_AC_PENALTY -1 // Use global cfg
@@ -1087,6 +1096,9 @@ typedef struct ecm_request_t
 #endif
 	struct ecm_request_t    *parent;
 	struct ecm_request_t    *next;
+#ifdef HAVE_DVBAPI
+	uint8_t     adapter_index;
+#endif
 } ECM_REQUEST;
 
 
@@ -1184,7 +1196,8 @@ struct s_client
 	time_t          lastemm;
 	time_t          lastecm;
 	time_t          expirationdate;
-	int32_t         allowedtimeframe[2];
+	uint32_t        allowedtimeframe[SIZE_SHORTDAY][24][2]; //day[0-sun to 6-sat, 7-ALL],hours,minutes use as binary flags to reduce mem usage
+	uint8_t         allowedtimeframe_set; //flag for internal use to mention if allowed time frame is used
 	int8_t          c35_suppresscmd08;
 	uint8_t         c35_sleepsend;
 	int8_t          ncd_keepalive;
@@ -1484,6 +1497,7 @@ struct s_reader                                     // contains device info, rea
 	int8_t          fallback;
 	FTAB            fallback_percaid;
 	FTAB            localcards;
+	FTAB            disablecrccws_only_for;         // ignore checksum for selected caid provid
 #ifdef CS_CACHEEX
 	CECSP           cacheex; //CacheEx Settings
 #endif
@@ -1528,6 +1542,7 @@ struct s_reader                                     // contains device info, rea
 	int32_t         atrlen;
 	SIDTABS         sidtabs;
 	SIDTABS         lb_sidtabs;
+	SIDTABS         lb_prio_sidtabs;
 	uchar           hexserial[8];
 	int32_t         nprov;
 	uchar           prid[CS_MAXPROV][8];
@@ -1572,9 +1587,11 @@ struct s_reader                                     // contains device info, rea
 	int8_t          cc_want_emu;                    // Schlocke: Client want to have EMUs, 0 - NO; 1 - YES
 	uint32_t        cc_id;
 	int8_t          cc_keepalive;
+	int8_t          cc_keepaliveping;               // Keep Alive Ping - interval to send keepalives if idle.
 	int8_t          cc_hop;                         // For non-cccam reader: hop for virtual cards
 	int8_t          cc_reshare;
 	int32_t         cc_reconnect;                   //reconnect on ecm-request timeout
+	int8_t          from_cccam_cfg;                 //created from cccam.cfg
 #endif
 	int8_t          tcp_connected;
 	int32_t         tcp_ito;                        // inactivity timeout
@@ -1676,6 +1693,7 @@ struct s_reader                                     // contains device info, rea
 	uint32_t        ecmstout;
 	uint32_t        webif_ecmstout;
 	uint32_t        ecmnotfoundlimit;                   // config setting. restart reader if ecmsnok >= ecmnotfoundlimit
+	uint32_t        ecmtimeoutlimit;                    // config setting. restart reader if ecmstout >= ecmtimeoutlimit
 	uint32_t        autorestartseconds;                 // auto restart reader after login ,default 0  disable
 	uint8_t         restartforresetcycle;               // restart instead of reset for resetcycle.
 	int32_t         ecmsfilteredhead;                   // count filtered ECM's by ECM Headerwhitelist
@@ -1763,6 +1781,8 @@ struct s_auth
 #ifdef CS_CACHEEX
 	CECSP           cacheex; //CacheEx Settings
 	uint8_t         no_wait_time;
+	uint8_t			disablecrccacheex;
+	FTAB 			disablecrccacheex_only_for;
 #endif
 	int16_t         allowedprotocols;
 	LLIST           *aureader_list;
@@ -1804,7 +1824,8 @@ struct s_auth
 	char            *dyndns;
 	time_t          expirationdate;
 	time_t          firstlogin;
-	int32_t         allowedtimeframe[2];
+	uint32_t        allowedtimeframe[SIZE_SHORTDAY][24][2]; //day[0-sun to 6-sat, 7-ALL],hours,minutes use as binary flags to reduce mem usage
+	uint8_t         allowedtimeframe_set; //flag for internal use to mention if allowed time frame is used
 	int8_t          c35_suppresscmd08;
 	uint8_t         c35_sleepsend;
 	int8_t          ncd_keepalive;
@@ -1959,6 +1980,8 @@ struct s_config
 	int32_t         nice;
 	uint32_t        netprio;
 	uint32_t        ctimeout;
+	uint8_t         maxecmtime;
+	uint8_t         maxecmtimenotfound;
 	uint32_t        ftimeout;
 	CAIDVALUETAB    ftimeouttab;
 	uint32_t        cmaxidle;
@@ -1972,6 +1995,8 @@ struct s_config
 	char            *emmlogdir;
 	char            *logfile;
 	char            *mailfile;
+	int8_t          disablecrccws;                  // 1=disable cw checksum test. 0=enable checksum check
+	FTAB            disablecrccws_only_for;         // ignore checksum for selected caid provid
 	uint8_t         logtostdout;
 	uint8_t         logtosyslog;
 	int8_t          logduplicatelines;
@@ -2100,7 +2125,7 @@ struct s_config
 	char            *gbox_hostname;
 	int32_t         gbox_reconnect;
 	char            gbox_my_password[9];
-	unsigned long   gbox_proxy_card[CS_GBOX_MAX_PROXY_CARDS];
+	unsigned long   gbox_proxy_card[GBOX_MAX_PROXY_CARDS];
 	int8_t          gbox_proxy_cards_num;
 	char            gbox_my_vers[3];
 	char            gbox_my_cpu_api[3];
@@ -2108,6 +2133,10 @@ struct s_config
 	uint8_t         log_hello;
 	char            *gbox_tmp_dir;
 	uint8_t         ccc_reshare;
+	uint16_t        gbox_ignored_peer[GBOX_MAX_IGNORED_PEERS];
+	uint8_t         gbox_ignored_peer_num;
+	uint16_t        gbox_block_ecm[GBOX_MAX_BLOCKED_ECM];
+	uint8_t         gbox_block_ecm_num;
 #endif
 #ifdef MODULE_SERIAL
 	char            *ser_device;
@@ -2131,6 +2160,8 @@ struct s_config
 	int32_t         lb_min_ecmcount;                // minimal ecm count to evaluate lbvalues
 	int32_t         lb_max_ecmcount;                // maximum ecm count before reseting lbvalues
 	int32_t         lb_reopen_seconds;              // time between retrying failed readers/caids/prov/srv
+	int8_t          lb_reopen_seconds_never;        // permanently block this: time between retrying failed readers/caids/prov/srv
+	char            *lb_reopen_seconds_never_group; // permanently block this for defined group only: time between retrying failed readers/caids/prov/srv
 	int8_t          lb_reopen_invalid;              // default=1; if 0, rc=E_INVALID will be blocked until stats cleaned
 	int8_t          lb_force_reopen_always;         // force reopening immediately all failing readers if no matching reader found
 	int32_t         lb_retrylimit;                  // reopen only happens if reader response time > retrylimit
@@ -2279,6 +2310,7 @@ struct s_config
 #ifdef MODULE_SERIAL
 	struct s_twin *twin_list;
 #endif
+	char    *forcereopenusernames;
 };
 
 struct s_clientinit

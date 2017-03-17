@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 
-version=0.1
+version=0.2
 
 while :
 do
@@ -25,7 +25,6 @@ do
 
 echo "============================================================"
 echo " Build System NCam Version $version by Javier Sayago (Javilonas). "
-echo " Github: https://github.com/javilonas/NCam"
 echo "============================================================"
 echo 
 echo "> ADVANCED OPTIONS"
@@ -38,9 +37,11 @@ echo " 15 - Build sh4-libusb-pcsc (Golden Media, Galaxy Innovations, Amiko...)."
 echo " 16 - Build ppc-libusb (Power PC - DM600, 7000, 7020, 7020si...)."
 echo " 17 - Build arm-libusb (Cortex-A9 - Wetek Play and similar)."
 echo " 18 - Build mips-router-libusb (Routers MIPSEL DD-WRT)."
+echo " 19 - Build arm-libusb-raspbian (Rasp and similar)."
 echo
-echo " 19 - Remove logs."
-echo " 20 - Remove distribution."
+echo " 20 - Remove logs."
+echo " 21 - Remove distribution."
+echo " 22 - Remove all (log and distribution)."
 echo "  0 - Back to main menu."
 echo 
 echo "- Enter option:"
@@ -58,8 +59,10 @@ echo "- Enter option:"
       16) build_dir/build_ppc-libusb.sh;;
       17) build_dir/build_cortexa9hf-vfp-neon-libusb.sh;;
       18) build_dir/build_mips-libusb-pcsc.sh;;
-      19) build_dir/clean_logs.sh;;
-      20) build_dir/clean_distri.sh;;
+      19) build_dir/build_build_arm-raspbian-libusb.sh;;
+      20) build_dir/clean_logs.sh;;
+      21) build_dir/clean_distri.sh;;
+      22) build_dir/clean_all.sh;;
       0) exit 1;;
       *) echo "Invalid option"; continue;;
     esac

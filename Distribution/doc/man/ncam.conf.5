@@ -190,6 +190,16 @@ seconds beetween restarts, 0 = disable reader restart, default:5
 value (clienttimeout in seconds < 100, else milli-seconds) for client process to wait for key, default:5
 .RE
 .PP
+\fBmaxecmtime\fP = \fB0\fP|\fB1\fP
+.RS 3n
+1 = use client timeout as a max ecm time, default:0
+.RE
+.PP
+\fBmaxecmtimenotfound\fP = \fB0\fP|\fB1\fP
+.RS 3n
+1 = mark not_found imediately ecm with higher ecm time than maxecmtime, default:0
+.RE
+.PP
 \fBclientmaxidle\fP = \fBseconds\fP
 .RS 3n
 value for client process being idle before disconnect, 0 = idle disconnect disabled, default:120
@@ -227,9 +237,33 @@ bind service to specified IP address, default:none
 value to wait for bind request to complete, default:120
 .RE
 .PP
-\fBnetprio\fP = \fBpriority\fP
-.RS 3n
-network priority, default:system given
++\fBnetprio\fP = \fB0\fP|\fB1\fP|\fB2\fP|\fB3\fP|\fB4\fP|\fB5\fP|\fB6\fP|\fB7\fP|\fB8\fP|\fB9\fP|\fB10\fP|\fB11\fP|\fB12\fP|\fB13\fP|\fB14\fP|\fB15\fP|\fB16\fP|\fB17\fP|\fB18\fP|\fB19\fP|\fB20\fP
+ +.RS 3n
+ +value for network priority:
+ +IPP value will be applied to SO_PRIORITY (system internal prioritization)
+ +DSCP value will be applied to IP_TOS/IPV6_TCLASS (the TOS field in the IP packet header)
+
+   \fB0\fP = IPP=0; DSCP=CS0 (default)
+   \fB1\fP = IPP=1; DSCP=CS1
+   \fB2\fP = IPP=1; DSCP=AF11
+   \fB3\fP = IPP=1; DSCP=AF12
+   \fB4\fP = IPP=1; DSCP=AF13
+   \fB5\fP = IPP=2; DSCP=CS2
+   \fB6\fP = IPP=2; DSCP=AF21
+   \fB7\fP = IPP=2; DSCP=AF22
+   \fB8\fP = IPP=2; DSCP=AF23
+   \fB9\fP = IPP=3; DSCP=CS3
+  \fB10\fP = IPP=3; DSCP=AF31
+  \fB11\fP = IPP=3; DSCP=AF32
+  \fB12\fP = IPP=3; DSCP=AF33
+  \fB13\fP = IPP=4; DSCP=CS4
+  \fB14\fP = IPP=4; DSCP=AF41
+  \fB15\fP = IPP=4; DSCP=AF42
+  \fB16\fP = IPP=4; DSCP=AF43
+  \fB17\fP = IPP=5; DSCP=CS5
+  \fB18\fP = IPP=5; DSCP=EF
+  \fB19\fP = IPP=6; DSCP=CS6
+  \fB20\fP = IPP=7; DSCP=CS7
 .RE
 .PP
 \fBresolvegethostbyname\fP = \fB0\fP|\fB1\fP
@@ -332,6 +366,16 @@ maximum ECM count before resetting load balancing values, default:500
 \fBlb_reopen_seconds\fP = \fBseconds\fP
 .RS 3n
 time between retrying failed load balanced readers/CAIDs/providers/services, default:900
+.RE
+.PP
+\fBlb_reopen_seconds_never\fP = \fB0\fP|\fB1\fP
+.RS 3n
+1 = never retry failed load balanced readers/CAIDs/providers/services, default:0
+.RE
+.PP
+\fBlb_reopen_seconds_never_group\fP = \fB1\fP|\fB1,2\fP|\fB2,3,4\fP|\fB4,5...\fP
+.RS 3n
+never retry failed load balanced readers/CAIDs/providers/services for specific reader group, default:none
 .RE
 .PP
 \fBlb_reopen_invalid\fP = \fB0\fP|\fBfB1\fP

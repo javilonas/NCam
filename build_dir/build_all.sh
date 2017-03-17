@@ -358,6 +358,7 @@ echo ""
 echo " Build X86_64-LIBUSB-PCSC..."
 echo ""
 sh $BUILD_DIR/build_x86_64-libusb-pcsc.sh > /dev/null 2>&1
+sync
 echo ""
 echo ""
 echo ""
@@ -367,6 +368,48 @@ echo ""
 echo ""
 echo " PLEASE WAIT...."
 echo ""
+sync
+echo ""
+echo ""
+sleep 35
+sync
+echo ""
+echo " Build ARM-RASP..."
+echo ""
+sh $BUILD_DIR/build_arm-raspbian.sh > /dev/null 2>&1
+sync
+echo ""
+echo ""
+echo ""
+sleep 0.8s
+echo ""
+echo ""
+echo ""
+echo " PLEASE WAIT...."
+echo ""
+sync
+echo ""
+echo ""
+sleep 35
+sync
+echo ""
+echo " Build ARM-RASP-LIBUSB..."
+echo ""
+sh $BUILD_DIR/build_build_arm-raspbian-libusb.sh > /dev/null 2>&1
+sync
+echo ""
+echo ""
+echo ""
+sleep 0.8s
+echo ""
+echo ""
+echo ""
+echo " PLEASE WAIT...."
+echo ""
+sync
+echo ""
+echo ""
+sleep 35
 sync
 echo ""
 echo " We are finalizing ..."

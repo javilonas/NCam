@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 
-version=0.1
+version=0.2
 
 while :
 do
@@ -25,7 +25,6 @@ do
 
 echo "============================================================"
 echo " Build System NCam Version $version by Javier Sayago (Javilonas). "
-echo " Github: https://github.com/javilonas/NCam"
 echo "============================================================"
 echo 
 echo "> MAIN MENU"
@@ -40,6 +39,7 @@ echo "  7 - Build ppc (Power PC - DM600, 7000, 7020, 7020si...)."
 echo "  8 - Build ppc (Power PC OLD - DM500, 500S, DBox2...)."
 echo "  9 - Build arm (Cortex-A9 - Wetek Play and similar)."
 echo " 10 - Build mips-router (Routers MIPSEL DD-WRT)."
+echo " 11 - Build arm-raspbian (Rasp, Prismcube and similar)."
 echo
 echo "  a - Advanced Options."
 echo "  i - About Build System NCam."
@@ -62,6 +62,7 @@ echo "- Enter option:"
       8) build_dir/build_ppc-old.sh;;
       9) build_dir/build_cortexa9hf-vfp-neon.sh;;
       10) build_dir/build_mips-router.sh;;
+      11) build_dir/build_arm-raspbian.sh;;
       a) build_dir/advanced.sh $version; continue;;
       i) build_dir/info.sh $version; continue;;
       x) clear; echo; echo "Goodbye ;)"; echo; exit 1;;

@@ -38,16 +38,14 @@ endif
 CONF_DIR = /usr/local/etc
 
 LIB_PTHREAD = -lpthread
-LIB_DL = -ldl
+LIB_DL :=
 
 LIB_RT :=
 ifeq ($(uname_S),Linux)
+LIB_DL := -ldl
 ifeq "$(shell ./config.sh --enabled CLOCKFIX)" "Y"
 	LIB_RT := -lrt
 endif
-endif
-ifeq ($(uname_S),FreeBSD)
-LIB_DL :=
 endif
 
 override STD_LIBS := $(LIB_PTHREAD) $(LIB_DL) $(LIB_RT)
@@ -65,7 +63,7 @@ STRIP = $(CROSS_DIR)$(CROSS)strip
 
 LDFLAGS = -lpthread -ldl -lm -Wl,--gc-sections
 
-TARGETHELP := $(shell $(CC) --target-help)
+TARGETHELP := $(shell $(CC) --target-help 2>&1)
 ifneq (,$(findstring sse2,$(TARGETHELP)))
 override CFLAGS += -fexpensive-optimizations -mmmx -msse -msse2 -msse3
 else
@@ -295,7 +293,9 @@ SRC-$(CONFIG_CS_CACHEEX) += module-csp.c
 SRC-$(CONFIG_CW_CYCLE_CHECK) += module-cw-cycle-check.c
 SRC-$(CONFIG_WITH_AZBOX) += module-dvbapi-azbox.c
 SRC-$(CONFIG_WITH_MCA) += module-dvbapi-mca.c
-SRC-$(CONFIG_WITH_COOLAPI) += module-dvbapi-coolapi.c
+### SRC-$(CONFIG_WITH_COOLAPI) += module-dvbapi-coolapi.c 
+### experimental reversed API
+SRC-$(CONFIG_WITH_COOLAPI) += module-dvbapi-coolapi-legacy.c
 SRC-$(CONFIG_WITH_COOLAPI2) += module-dvbapi-coolapi.c
 SRC-$(CONFIG_WITH_SU980) += module-dvbapi-coolapi.c
 SRC-$(CONFIG_WITH_STAPI) += module-dvbapi-stapi.c

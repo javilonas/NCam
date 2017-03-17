@@ -687,7 +687,12 @@ int32_t coolapi_remove_filter(int32_t fd, int32_t num)
 	if (filter) {
 		result = cnxt_dmx_close_filter(filter);
 		coolapi_check_error("cnxt_dmx_close_filter", result);
- 	}
+	}
+
+	// COOLAPI2 - We don't want to close Channel on no ECM Filters (Makes AU / EMMs work)
+	if(dmx->type != TYPE_ECM)
+		{ return 0; }
+
 	if (channel) {
 		result = cnxt_dmx_channel_close(channel);
 		coolapi_check_error("cnxt_dmx_channel_close", result);

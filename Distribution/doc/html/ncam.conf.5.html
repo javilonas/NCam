@@ -255,6 +255,20 @@ value (clienttimeout in seconds &lt; 100, else milli-seconds) for client process
 
 <P>
 
+<B>maxecmtime</B> = <B>0</B>|<B>1</B>
+<DL COMPACT><DT><DD>
+1 = use client timeout as a max ecm time, default:0
+</DL>
+
+<P>
+
+<B>maxecmtimenotfound</B> = <B>0</B>|<B>1</B>
+<DL COMPACT><DT><DD>
+1 = mark not_found imediately ecm with higher ecm time than maxecmtime, default:0
+</DL>
+
+<P>
+
 <B>clientmaxidle</B> = <B>seconds</B>
 <DL COMPACT><DT><DD>
 value for client process being idle before disconnect, 0 = idle disconnect disabled, default:120
@@ -306,9 +320,33 @@ value to wait for bind request to complete, default:120
 
 <P>
 
-<B>netprio</B> = <B>priority</B>
+<B>netprio</B> = <B>0</B>|<B>1</B>|<B>2</B>|<B>3</B>|<B>4</B>|<B>5</B>|<B>6</B>|<B>7</B>|<B>8</B>|<B>9</B>|<B>10</B>|<B>11</B>|<B>12</B>|<B>13</B>|<B>14</B>|<B>15</B>|<B>16</B>|<B>17</B>|<B>18</B>|<B>19</B>|<B>20</B>
 <DL COMPACT><DT><DD>
-network priority, default:system given
+value for network priority:
+<BR>IPP value will be applied to SO_PRIORITY (system internal prioritization)
+<BR>DSCP value will be applied to IP_TOS/IPV6_TCLASS (the TOS field in the IP packet header)
+<P>
+<BR>&nbsp;<B>&nbsp;&nbsp;0</B>&nbsp;=&nbsp;IPP=0;&nbsp;DSCP=CS0&nbsp;(default)
+<BR>&nbsp;<B>&nbsp;&nbsp;1</B>&nbsp;=&nbsp;IPP=1;&nbsp;DSCP=CS1
+<BR>&nbsp;<B>&nbsp;&nbsp;2</B>&nbsp;=&nbsp;IPP=1;&nbsp;DSCP=AF11
+<BR>&nbsp;<B>&nbsp;&nbsp;3</B>&nbsp;=&nbsp;IPP=1;&nbsp;DSCP=AF12
+<BR>&nbsp;<B>&nbsp;&nbsp;4</B>&nbsp;=&nbsp;IPP=1;&nbsp;DSCP=AF13
+<BR>&nbsp;<B>&nbsp;&nbsp;5</B>&nbsp;=&nbsp;IPP=2;&nbsp;DSCP=CS2
+<BR>&nbsp;<B>&nbsp;&nbsp;6</B>&nbsp;=&nbsp;IPP=2;&nbsp;DSCP=AF21
+<BR>&nbsp;<B>&nbsp;&nbsp;7</B>&nbsp;=&nbsp;IPP=2;&nbsp;DSCP=AF22
+<BR>&nbsp;<B>&nbsp;&nbsp;8</B>&nbsp;=&nbsp;IPP=2;&nbsp;DSCP=AF23
+<BR>&nbsp;<B>&nbsp;&nbsp;9</B>&nbsp;=&nbsp;IPP=3;&nbsp;DSCP=CS3
+<BR>&nbsp;<B>10</B>&nbsp;=&nbsp;IPP=3;&nbsp;DSCP=AF31
+<BR>&nbsp;<B>11</B>&nbsp;=&nbsp;IPP=3;&nbsp;DSCP=AF32
+<BR>&nbsp;<B>12</B>&nbsp;=&nbsp;IPP=3;&nbsp;DSCP=AF33
+<BR>&nbsp;<B>13</B>&nbsp;=&nbsp;IPP=4;&nbsp;DSCP=CS4
+<BR>&nbsp;<B>14</B>&nbsp;=&nbsp;IPP=4;&nbsp;DSCP=AF41
+<BR>&nbsp;<B>15</B>&nbsp;=&nbsp;IPP=4;&nbsp;DSCP=AF42
+<BR>&nbsp;<B>16</B>&nbsp;=&nbsp;IPP=4;&nbsp;DSCP=AF43
+<BR>&nbsp;<B>17</B>&nbsp;=&nbsp;IPP=5;&nbsp;DSCP=CS5
+<BR>&nbsp;<B>18</B>&nbsp;=&nbsp;IPP=5;&nbsp;DSCP=EF
+<BR>&nbsp;<B>19</B>&nbsp;=&nbsp;IPP=6;&nbsp;DSCP=CS6
+<BR>&nbsp;<B>20</B>&nbsp;=&nbsp;IPP=7;&nbsp;DSCP=CS7
 </DL>
 
 <P>
@@ -442,6 +480,20 @@ maximum ECM count before resetting load balancing values, default:500
 <B>lb_reopen_seconds</B> = <B>seconds</B>
 <DL COMPACT><DT><DD>
 time between retrying failed load balanced readers/CAIDs/providers/services, default:900
+</DL>
+
+<P>
+
+<B>lb_reopen_seconds_never</B> = <B>0</B>|<B>fB1</B>
+<DL COMPACT><DT><DD>
+1 = never retry failed load balanced readers/CAIDs/providers/services, default:0
+</DL>
+
+<P>
+
+<B>lb_reopen_seconds_never_group</B> = <B>1</B>|<B>1,2</B>|<B>2,3,4</B>|<B>4,5</B> ...etc
+<DL COMPACT><DT><DD>
+never retry failed load balanced readers/CAIDs/providers/services for specific reader group, default:none
 </DL>
 
 <P>

@@ -136,6 +136,14 @@ DESCRIPTIONS
        clienttimeout = milli-seconds|seconds
 	  value (clienttimeout in seconds < 100, else milli-seconds) for client process to wait for key, default:5
 
+       maxecmtime = 0|1
+      0 = disabled
+      1 = use client timeout as a max ecm time
+
+       maxecmtimenotfound = 0|1
+      0 = disabled
+      1 = mark not_found imediately ecm with higher ecm time than maxecmtime
+
        clientmaxidle = seconds
 	  value for client process being idle before disconnect, 0 = idle disconnect disabled, default:120
 
@@ -158,8 +166,32 @@ DESCRIPTIONS
        bindwait = seconds
 	  value to wait for bind request to complete, default:120
 
-       netprio = priority
-	  network priority, default:system given
+       netprio = 0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20
+	  value for network priority:
+	  IPP value will be applied to SO_PRIORITY (system internal prioritization)
+	  DSCP value will be applied to IP_TOS/IPV6_TCLASS (the TOS field in the IP packet header)
+
+	    0 = IPP=0; DSCP=CS0 (default)
+	    1 = IPP=1; DSCP=CS1
+	    2 = IPP=1; DSCP=AF11
+	    3 = IPP=1; DSCP=AF12
+	    4 = IPP=1; DSCP=AF13
+	    5 = IPP=2; DSCP=CS2
+	    6 = IPP=2; DSCP=AF21
+	    7 = IPP=2; DSCP=AF22
+	    8 = IPP=2; DSCP=AF23
+	    9 = IPP=3; DSCP=CS3
+	   10 = IPP=3; DSCP=AF31
+	   11 = IPP=3; DSCP=AF32
+	   12 = IPP=3; DSCP=AF33
+	   13 = IPP=4; DSCP=CS4
+	   14 = IPP=4; DSCP=AF41
+	   15 = IPP=4; DSCP=AF42
+	   16 = IPP=4; DSCP=AF43
+	   17 = IPP=5; DSCP=CS5
+	   18 = IPP=5; DSCP=EF
+	   19 = IPP=6; DSCP=CS6
+	   20 = IPP=7; DSCP=CS7
 
        resolvegethostbyname = 0|1
 	  set mode for DNS resolving:
@@ -232,6 +264,12 @@ DESCRIPTIONS
 
        lb_reopen_seconds = seconds
 	  time between retrying failed load balanced readers/CAIDs/providers/services, default:900
+
+       lb_reopen_seconds_never = 0|1
+	  never retry failed load balanced readers/CAIDs/providers/services, default:0
+
+       lb_reopen_seconds_never_group = 1|1,2|2,3,4|4,5...etc
+	  never retry failed load balanced readers/CAIDs/providers/services for specific reader group, default:none
 
        lb_reopen_invalid = 0|fB1
 	  0 = E_INVALID will be blocked until statistics has been cleaned, default:1

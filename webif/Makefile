@@ -1,7 +1,7 @@
 HOSTCC ?= gcc
-HOSTCFLAGS ?= -O2 \
+HOSTCFLAGS ?= -Os \
  -W -Wall -Wextra -Wno-sign-compare \
- -Wshadow -Wformat-security -Wstrict-prototypes
+ -Wshadow -Wno-shadow -Wformat-security -Wstrict-prototypes
 
 # Setup quiet build
 Q =

@@ -203,30 +203,106 @@ static void account_expdate_fn(const char *token, char *value, void *setting, FI
 static void account_allowedtimeframe_fn(const char *token, char *value, void *setting, FILE *f)
 {
 	struct s_auth *account = setting;
+	int32_t i, j, t, startt, endt;
+	char *dest;
+	uint8_t day_idx;
+	int32_t allowed[4];
+	uint32_t tempo = 0;
+
+	char *ptr1, *ptr2, *ptr3, *saveptr1 = NULL, *saveptr2 = NULL;
+
 	if(value)
 	{
-		account->allowedtimeframe[0] = 0;
-		account->allowedtimeframe[1] = 0;
-		if(strlen(value))
-		{
-			int32_t allowed[4];
-			if(sscanf(value, "%2d:%2d-%2d:%2d", &allowed[0], &allowed[1], &allowed[2], &allowed[3]) == 4)
-			{
-				account->allowedtimeframe[0] = allowed[0] * 60 + allowed[1];
-				account->allowedtimeframe[1] = allowed[2] * 60 + allowed[3];
+		//First empty allowedtimeframe array very important otherwise new config won't be properly set
+		for(i=0;i<SIZE_SHORTDAY;i++) {
+			for(j=0;j<24;j++) {
+					account->allowedtimeframe[i][j][0]=0;
+					account->allowedtimeframe[i][j][1]=0;
 			}
-			else
+		}
+		account->allowedtimeframe_set=0;
+		strtoupper(value);
+
+		for(i = 0, ptr1 = strtok_r(value, ";", &saveptr1); (ptr1); ptr1 = strtok_r(NULL, ";", &saveptr1), i++)
+		{
+			if((ptr2 = strchr(trim(ptr1), '@')))
 			{
-				fprintf(stderr, "WARNING: Value '%s' is not valid for allowedtimeframe (hh:mm-hh:mm)\n", value);
+				*ptr2++ = '\0'; 	//clean up @ symbol
+				//ptr1 is the day
+				dest = strstr(weekdstr,ptr1);
+				day_idx = (dest - weekdstr)/3;
+
+				for(j = 0, ptr3 = strtok_r(ptr2, ",", &saveptr2); (ptr3); ptr3 = strtok_r(NULL, ",", &saveptr2), j++)
+				{
+					if((sscanf(ptr3, "%2d:%2d-%2d:%2d", &allowed[0], &allowed[1], &allowed[2], &allowed[3]) == 4) && (day_idx<SIZE_SHORTDAY))
+					{
+						startt = allowed[0] * 60 + allowed[1];
+						endt = allowed[2] * 60 + allowed[3];
+						if(startt == endt) { endt++; } //end time cannot be the same as the star time
+						if((startt <0) || (startt > 1439)) { startt = 0; } //could not start later than 23H59, avoid overflow
+						if((endt <0) || (endt > 1440)) { endt = 1440; } //could not be higher than 24H00, avoid overflow
+						account->allowedtimeframe_set=1;
+						if(startt > endt) {
+						    for(t=startt; t<1440 ;t++)
+							{
+								tempo = (1 << (t % 30));
+								account->allowedtimeframe[day_idx][t/60][(t/30)%2]=account->allowedtimeframe[day_idx][t/60][(t/30)%2]|tempo;
+							}
+							startt=0; 
+						}
+						for(t=startt; t<endt ;t++)
+						{
+							tempo = (1 << (t % 30));
+							account->allowedtimeframe[day_idx][t/60][((t/30)%2)]=account->allowedtimeframe[day_idx][t/60][(t/30)%2]|tempo;
+						}
+					}
+					else
+					{
+						fprintf(stderr, "WARNING: Value '%s' is not valid for allowedtimeframe (DAY@HH:MM-HH:MM)\n", value);
+					}
+				}
+			}
+			else //No day specified so whole week (ALL)
+			{
+				if(sscanf(ptr1, "%2d:%2d-%2d:%2d", &allowed[0], &allowed[1], &allowed[2], &allowed[3]) == 4)
+				{
+					startt = allowed[0] * 60 + allowed[1];
+					endt = allowed[2] * 60 + allowed[3];
+					if(startt == endt) { endt++; } //end time cannot be the same as the star time
+					if((startt <0) || (startt > 1439)) { startt = 0; } //could not start later than 23H59, avoid overflow
+					if((endt <0) || (endt > 1440)) { endt = 1440; } //could not be higher than 24H00, avoid overflow
+					account->allowedtimeframe_set=1;
+					dest = strstr(weekdstr,"ALL");
+					day_idx = (dest - weekdstr)/3;
+					if(startt > endt) 
+					{
+						for(t=startt; t<1440 ;t++)
+						{
+							tempo = (1 << (t % 30));
+							account->allowedtimeframe[day_idx][t/60][(t/30)%2]=account->allowedtimeframe[7][t/60][(t/30)%2]|tempo;
+						}
+						startt=0;
+					}
+					for(t=startt; t<endt ;t++)
+					{
+						tempo = (1 << (t % 30));
+						account->allowedtimeframe[day_idx][t/60][(t/30)%2]=account->allowedtimeframe[7][t/60][(t/30)%2]|tempo;
+					}
+				}
+				else
+				{
+					fprintf(stderr, "WARNING: Value '%s' is not valid for allowedtimeframe (hh:mm-hh:mm)\n", value);
+				}
+
 			}
 		}
 		return;
 	}
-	if(account->allowedtimeframe[0] && account->allowedtimeframe[1])
+	if(account->allowedtimeframe_set)
 	{
-		fprintf_conf(f, token, "%02d:%02d-%02d:%02d\n",
-					 account->allowedtimeframe[0] / 60, account->allowedtimeframe[0] % 60,
-					 account->allowedtimeframe[1] / 60, account->allowedtimeframe[1] % 60);
+		value = mk_t_allowedtimeframe(account);
+		fprintf_conf(f, token, "%s\n", value);
+		free_mk_t(value);
 	}
 	else if(cfg.http_full_cfg)
 	{
@@ -371,8 +447,10 @@ static const struct config_list account_opts[] =
 	DEF_OPT_UINT8("cacheex_drop_csp"    , OFS(cacheex.drop_csp),        0),
 	DEF_OPT_UINT8("cacheex_allow_request"   , OFS(cacheex.allow_request),   0),
 	DEF_OPT_UINT8("no_wait_time"        , OFS(no_wait_time),            0),
-	DEF_OPT_UINT8("cacheex_allow_filter", OFS(cacheex.allow_filter),    1),	
-	DEF_OPT_UINT8("cacheex_block_fakecws",OFS(cacheex.block_fakecws),   0),	
+	DEF_OPT_UINT8("cacheex_allow_filter", OFS(cacheex.allow_filter),    1),
+	DEF_OPT_UINT8("cacheex_block_fakecws",OFS(cacheex.block_fakecws),   0),
+	DEF_OPT_UINT8("disablecrccacheex"    ,OFS(disablecrccacheex),       0),
+	DEF_OPT_FUNC_X("disablecrccacheex_only_for", OFS(disablecrccacheex_only_for), ftab_fn, FTAB_ACCOUNT | FTAB_IGNCRCCEX4USERONLYFOR),
 #endif
 #ifdef MODULE_CCCAM
 	DEF_OPT_INT32("cccmaxhops"          , OFS(cccmaxhops),              DEFAULT_CC_MAXHOPS),

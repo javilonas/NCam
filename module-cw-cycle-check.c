@@ -35,7 +35,7 @@ struct s_cw_cycle_check
 	struct s_cwc_md5    ecm_md5[15]; // max 15 old ecm md5 /csp-hashs
 	int8_t          cwc_hist_entry;
 	uint8_t         old;
-	int8_t			stage4_repeat;
+	int8_t          stage4_repeat;
 	struct s_cw_cycle_check *prev;
 	struct s_cw_cycle_check *next;
 };
@@ -46,7 +46,7 @@ static struct s_cw_cycle_check *cw_cc_list;
 static int32_t cw_cc_list_size;
 static time_t last_cwcyclecleaning;
 
-/*
+ /*
  * Check for CW CYCLE
  */
 
@@ -114,8 +114,8 @@ static uint8_t countCWpart(ECM_REQUEST *er, struct s_cw_cycle_check *cwc)
 
 static uint8_t checkvalidCW(ECM_REQUEST *er)
 {
-	uint8_t ret = 1;	
-	if(chk_is_null_CW(er->cw)) 
+	uint8_t ret = 1;
+	if(chk_is_null_CW(er->cw) && er->caid !=0x2600) // 0x2600 used by biss and constant cw could be indeed zero 
 	{ er->rc = E_NOTFOUND; }
 
 	if(er->rc == E_NOTFOUND)
@@ -201,7 +201,7 @@ static int32_t checkcwcycle_int(ECM_REQUEST *er, char *er_ecmf , char *user, uch
 	}*/
 
 	if(!checkvalidCW(er))
-	{ return 3; } //cwc ign	
+	{ return 3; } //cwc ign
 
 	//read lock
 	cs_readlock(__func__, &cwcycle_lock);
@@ -264,11 +264,11 @@ static int32_t checkcwcycle_int(ECM_REQUEST *er, char *er_ecmf , char *user, uch
 							ret = cfg.cwcycle_dropold ? 2 : 4;
 						}
 						else
-						{				
+						{
 						ret = 4; // Return 4 same CW
 						}
 						upd_entry = 0;
-					}		
+					}
 					break;
 				}
 			}
@@ -290,7 +290,7 @@ static int32_t checkcwcycle_int(ECM_REQUEST *er, char *er_ecmf , char *user, uch
 							ret = cfg.cwcycle_dropold ? 2 : 4;
 						}
 						else
-						{				
+						{
 						ret = 4;  // Return 4 same CW
 						}
 						upd_entry = 0;
@@ -592,7 +592,8 @@ static int32_t checkcwcycle_int(ECM_REQUEST *er, char *er_ecmf , char *user, uch
 				new->cycletime = (cfg.cwcycle_usecwcfromce && cycletime_fr > 0 && next_cw_cycle_fr < 2) ? cycletime_fr : 99;
 				new->nextcyclecw = (cfg.cwcycle_usecwcfromce && cycletime_fr > 0 && next_cw_cycle_fr < 2) ? next_cw_cycle_fr : 2; //2=we dont know which next cw Cycle;  0= next cw Cycle CW0; 1= next cw Cycle CW1;
 				ret = (cycletime_fr > 0 && next_cw_cycle_fr < 2) ? 8 : 6;
-//		
+
+//
 				new->prev = new->next = NULL;
 				new->old = 0;
 				new->stage4_repeat = 0;

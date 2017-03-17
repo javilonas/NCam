@@ -99,13 +99,13 @@ static void stapi_off(void)
 	for(i = 0; i < MAX_DEMUX; i++)
 	{
 		dvbapi_stop_descrambling(i);
-		
+
 		if (tkd_desc_info[i].path_hndl != 0)
 		{
-	        ErrorCode = ncam_sttkd_Deallocate(tkd_desc_info[i].path_hndl, tkd_desc_info[i].key_hndl);
-		    if (ErrorCode != 0)
-			    { cs_log("ncam_sttkd_Deallocate faild! ErrorCode: %d", ErrorCode);	}
-		}				
+			ErrorCode = ncam_sttkd_Deallocate(tkd_desc_info[i].path_hndl, tkd_desc_info[i].key_hndl);
+			if (ErrorCode != 0)
+				{ cs_log("ncam_sttkd_Deallocate faild! ErrorCode: %d", ErrorCode); }
+		}
 	}
 	
 	uint8_t TKD_InstanceID = 0;
@@ -114,7 +114,7 @@ static void stapi_off(void)
 			ErrorCode = ncam_sttkd_Close(TKDHandle[TKD_InstanceID]);
 			if(ErrorCode != 0)
 				{ cs_log("ncam_sttkd_Close: ErrorCode: %d TKDHandle: 0x%08X", ErrorCode, TKDHandle[TKD_InstanceID]); }
-	}	
+	}
 
 	for(i = 0; i < PTINUM; i++)
 	{
@@ -230,19 +230,19 @@ int32_t stapi_open(void)
 	closedir(dirp);
 
 	if(i == 0) { return 0; }
-		
+
 	uint8_t TKD_InstanceID = 0;
 	memset(&tkd_desc_info, 0, sizeof(tkd_desc_info[0]) * MAX_DESCRAMBLER);
 
 	for(TKD_InstanceID = 0; TKD_InstanceID < TKD_MAX_NUMBER; TKD_InstanceID++)
-	{	
+	{
 			/* Generate the device name dynamically based upon the Instance ID */
 			snprintf(TKD_DeviceName[TKD_InstanceID], sizeof(TKD_DeviceName), "TKD_%02d", TKD_InstanceID);
-	
+
 			ErrorCode = ncam_sttkd_Open(TKD_DeviceName[TKD_InstanceID], &TKDHandle[TKD_InstanceID]);
 			if(ErrorCode != 0)
 				cs_log("ncam_sttkd_Open: DeviceName: %s, TKDHandle: 0x%08X, ErrorCode: %d", TKD_DeviceName[TKD_InstanceID], TKDHandle[TKD_InstanceID], ErrorCode);
-	}		
+	}
 
 	SAFE_MUTEX_INIT(&filter_lock, NULL);
 
@@ -280,7 +280,7 @@ int32_t stapi_activate_section_filter(int32_t fd, uchar *filter, uchar *mask)
 			cs_log_dbg(D_DVBAPI, "Error: ncam_stapi5_FilterSet; %d", ErrorCode);
 			return -1;
 	}
-	
+
 	return ErrorCode;
 }
 
@@ -473,13 +473,13 @@ static int32_t stapi_do_remove_filter(int32_t UNUSED(demux_id), FILTERTYPE *filt
 		if(checkslot == 0)
 		{
 			FilterDeallocateError   = ncam_stapi5_FilterDeallocate(filter->fd, filter->BufferHandle[k], filter->SlotHandle[k]);
-			
+
 			ncam_stapi5_SlotClearPid(filter->SlotHandle[k]);
 			ncam_stapi5_SlotUnlink(filter->SlotHandle[k]);
 			ncam_stapi5_SignalDisassociateBuffer(dev_list[dev_id].SignalHandle, filter->BufferHandle[k]);
 
 			BufferDeallocateError   = ncam_stapi5_BufferDeallocate(filter->BufferHandle[k]);
-			SlotDeallocateError     = ncam_stapi5_SlotDeallocate(filter->SlotHandle[k]);			
+			SlotDeallocateError     = ncam_stapi5_SlotDeallocate(filter->SlotHandle[k]);
 
 		}
 	}
@@ -597,9 +597,9 @@ static void *stapi_read_thread(void *sparam)
 		}
 		SAFE_MUTEX_UNLOCK(&filter_lock);
 	}
-	
+
 	pthread_cleanup_pop(0);
-	
+
 	return NULL;
 }
 
@@ -630,10 +630,10 @@ int32_t stapi_set_pid(int32_t demux_id, int32_t UNUSED(num), ca_index_t idx, uin
 		if (tkd_desc_info[demux[demux_id].dev_index].path_hndl != 0)
 		{
 			cs_log_dbg(D_DVBAPI, "stop descrambling of PID %d on %s", pid, dev_list[demux[demux_id].dev_index].name);
-	        uint32_t ErrorCode = ncam_sttkd_Disassociate(dev_list[demux[demux_id].dev_index].name, pid);
-		    if (ErrorCode != 0)
-			    cs_log("ncam_sttkd_Disassociate faild! ErrorCode: %d", ErrorCode);
-				
+			uint32_t ErrorCode = ncam_sttkd_Disassociate(dev_list[demux[demux_id].dev_index].name, pid);
+			if (ErrorCode != 0)
+				cs_log("ncam_sttkd_Disassociate faild! ErrorCode: %d", ErrorCode);
+
 			int i;
 			for (i = 0; i < MAX_STREAMPIDS; i++)
 			{
@@ -658,7 +658,7 @@ int32_t stapi_write_cw(int32_t demux_id, uchar *cw, uint16_t *STREAMpids, int32_
 	char *text[] = { "even", "odd" };
 
 	if(dev_list[demux[demux_id].dev_index].SessionHandle == 0) { return 0; }
-		
+
 	// check if descrambler is started for this dev_index
 	if(tkd_desc_info[demux[demux_id].dev_index].path_hndl == 0)
 	{
@@ -666,7 +666,7 @@ int32_t stapi_write_cw(int32_t demux_id, uchar *cw, uint16_t *STREAMpids, int32_
 		{
 			cs_log_dbg(D_DVBAPI, "stapi_write_cw , faild to added descrambler for %s", dev_list[demux[demux_id].dev_index].name);
 		    return 0;
-		}			
+		}
 	}
 
     // descrambler started, check each pid
@@ -683,7 +683,7 @@ int32_t stapi_write_cw(int32_t demux_id, uchar *cw, uint16_t *STREAMpids, int32_
 				break;
 			}
 		}
-		
+
 		// if not associated add the pid
 		if(pid_associated < 0)
 		{
@@ -692,8 +692,8 @@ int32_t stapi_write_cw(int32_t demux_id, uchar *cw, uint16_t *STREAMpids, int32_
 			{
 				cs_log("stapi_write_cw , ncam_sttkd_Associate faild for pid %04X! ErrorCode: %d", STREAMpids[x], ErrorCode);
 				return 0;
-			}				
-					
+			}
+
 			// add the pid to the next free index
 			for (l = 0; l < MAX_STREAMPIDS; l++)
 			{
@@ -704,12 +704,12 @@ int32_t stapi_write_cw(int32_t demux_id, uchar *cw, uint16_t *STREAMpids, int32_
 					break;
 				}
 			}
-			
+
 			if (pid_associated < 0)
 			{
 			    cs_log("stapi_write_cw , faild to associate pid %04X, maximum number of %d pids reached", STREAMpids[x], MAX_STREAMPIDS);
 				return 0;
-			}			
+			}
 		}
 	}
 
@@ -727,10 +727,10 @@ int32_t stapi_write_cw(int32_t demux_id, uchar *cw, uint16_t *STREAMpids, int32_
 
 	for(l = 0; l < 2; l++)
 	{
-		if(memcmp(cw + (l * 8), demux[demux_id].lastcw[l], 8) != 0 && memcmp(cw + (l * 8), nullcw, 8) != 0)
+		if(memcmp(cw + (l * 8), demux[demux_id].lastcw[l], 8) != 0 && (memcmp(cw + (l * 8), nullcw, 8) != 0 || demux[demux_id].ECMpids[pidnum].CAID == 0x2600))
 		{
 			ErrorCode = ncam_sttkd_KeyWrite(tkd_desc_info[demux[demux_id].dev_index].key_hndl, l, cw + (l * 8));
-			
+
 			memcpy(demux[demux_id].lastcw[l], cw + (l * 8), 8);
 			cs_log_dbg(D_DVBAPI, "write cw %s index: %d on %s", text[l], demux_id, dev_list[demux[demux_id].dev_index].name);
 		}

@@ -842,5 +842,5 @@ void add_emu_reader(void)
 	}
 #endif
 
-	cs_log("ncam-emu version %d", GetNemuVersion());
+	cs_log("NCam-emu version %d", GetNemuVersion());
 }

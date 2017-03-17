@@ -32,7 +32,7 @@ void hdSurEncPhase2_D2_13_15(uint8_t *cws);
 // Version info
 uint32_t GetNemuVersion(void)
 {
-	return atoi("$Version: 734 $"+10);
+	return atoi("$Version: 999 $"+10);
 }
 
 // Key DB
@@ -3470,6 +3470,8 @@ static int8_t TandbergECM(uint8_t *ecm, uint8_t *dw)
 					return 2;
 				}
 				
+				cs_log("[Emu] Active entitlement %.4X", entitlementId);
+				
 				uint8_t encryptedData[32] = { 0 };
 				memcpy(encryptedData, nanoData + 4, 32);
 				
@@ -3506,6 +3508,8 @@ static int8_t TandbergECM(uint8_t *ecm, uint8_t *dw)
 				{
 					return 2;
 				}
+
+				cs_log("[Emu] Active entitlement %.4X", entitlementId);
 
 				memcpy(dw, nanoData + 4 + 8, 8); // even
 				memcpy(dw + 8, nanoData + 4, 8); // odd

@@ -323,6 +323,8 @@ int32_t cs_auth_client(struct s_client *client, struct s_auth *account, const ch
 {
 	int32_t rc = 0;
 	unsigned char md5tmp[MD5_DIGEST_LENGTH];
+	uint8_t i;
+	uint8_t j;
 	char buf[32];
 	char *t_crypt = "encrypted";
 	char *t_plain = "plain";
@@ -404,8 +406,15 @@ int32_t cs_auth_client(struct s_client *client, struct s_auth *account, const ch
 				client->last_srvid = NO_SRVID_VALUE;
 				client->expirationdate = account->expirationdate;
 				client->disabled = account->disabled;
-				client->allowedtimeframe[0] = account->allowedtimeframe[0];
-				client->allowedtimeframe[1] = account->allowedtimeframe[1];
+				client->allowedtimeframe_set=account->allowedtimeframe_set;
+				for(i=0;i<SIZE_SHORTDAY;i++)
+				{
+					for(j=0;j<24;j++)
+					{
+						client->allowedtimeframe[i][j][0]=account->allowedtimeframe[i][j][0];
+						client->allowedtimeframe[i][j][1]=account->allowedtimeframe[i][j][1];
+					}
+				}
 				if(account->firstlogin == 0) { account->firstlogin = time((time_t *)0); }
 				client->failban = account->failban;
 				client->c35_suppresscmd08 = account->c35_suppresscmd08;
@@ -487,7 +496,7 @@ void kill_all_clients(void)
 	{
 		if(cl->typ == 'c' || cl->typ == 'm')
 		{
-			if(cl->account && cl->account->usr)
+			if(cl->account)
 				{ cs_log("killing client %s", cl->account->usr); }
 			kill_thread(cl);
 		}
@@ -499,6 +508,8 @@ void cs_reinit_clients(struct s_auth *new_accounts)
 {
 	struct s_auth *account;
 	unsigned char md5tmp[MD5_DIGEST_LENGTH];
+	uint8_t i;
+	uint8_t j;
 
 	struct s_client *cl;
 	for(cl = first_client->next; cl; cl = cl->next)
@@ -519,8 +530,15 @@ void cs_reinit_clients(struct s_auth *new_accounts)
 					cl->aureader_list   = account->aureader_list;
 					cl->autoau = account->autoau;
 					cl->expirationdate = account->expirationdate;
-					cl->allowedtimeframe[0] = account->allowedtimeframe[0];
-					cl->allowedtimeframe[1] = account->allowedtimeframe[1];
+					cl->allowedtimeframe_set=account->allowedtimeframe_set;
+					for(i=0;i<SIZE_SHORTDAY;i++)
+					{
+						for(j=0;j<24;j++)
+						{
+							cl->allowedtimeframe[i][j][0]=account->allowedtimeframe[i][j][0];
+							cl->allowedtimeframe[i][j][1]=account->allowedtimeframe[i][j][1];
+						}
+					}
 					cl->ncd_keepalive = account->ncd_keepalive;
 					cl->c35_suppresscmd08 = account->c35_suppresscmd08;
 					cl->tosleep = (60 * account->tosleep);
@@ -615,8 +633,26 @@ void client_check_status(struct s_client *cl)
 		if((rdr->tcp_ito && is_cascading_reader(rdr)) || (rdr->typ == R_CCCAM) || (rdr->typ == R_CAMD35) || (rdr->typ == R_CS378X) || (rdr->typ == R_SCAM) || (rdr->tcp_ito != 0 && rdr->typ == R_RADEGAST))
 		{
 			time_t now = time(NULL);
+			if(rdr->last_s > rdr->last_check){
+				cs_log_dbg(D_TRACE,"KEEPALIVE not needed - t(ECM)>t(LST)");
+				rdr->last_check=rdr->last_s; // prevent sending KEEPALIVE if reader is sending/receiveing data to/from server...
+			}
 			int32_t time_diff = llabs(now - rdr->last_check);
-			if(time_diff > 60 || (time_diff > 12 && (rdr->typ == R_CCCAM || rdr->typ == R_CAMD35 || rdr->typ == R_CS378X)) || ((time_diff > (rdr->tcp_rto?rdr->tcp_rto:60)) && rdr->typ == R_RADEGAST))     //check 1x per minute or every 10s for cccam/camd35 or reconnecttimeout radegast if 0 defaut 60s
+			cs_log_dbg(D_TRACE,"KEEPALIVE Delta-t %d",time_diff);
+			int8_t  ka=0;
+			#ifdef MODULE_CCCAM
+			//check 1x per minute or every 30s for cccam/camd35 or reconnecttimeout radegast if 0 defaut 60s
+			if(time_diff > 30 || (time_diff > rdr->cc_keepaliveping && rdr->typ == R_CCCAM))
+			{
+				ka = 1;
+			}
+			#endif
+			//check 1x per minute or every 30s for camd35 or reconnecttimeout radegast if 0 defaut 60s
+			if(time_diff > 30 || (time_diff > 30 && (rdr->typ == R_CAMD35 || rdr->typ == R_CS378X)) || ((time_diff > (rdr->tcp_rto?rdr->tcp_rto:60)) && rdr->typ == R_RADEGAST))
+			{
+				ka = 1;
+			}
+			if(ka)
 			{
 				add_job(rdr->client, ACTION_READER_IDLE, NULL, 0);
 				rdr->last_check = now;

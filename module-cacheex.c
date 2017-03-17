@@ -196,13 +196,13 @@ void cacheex_cleanup_hitcache(bool force)
 	{
 		i_next = i->next;
 		cachehit = get_data_from_node(i);
-		
+
 		if(!cachehit)
-		{ 
+		{
 			i = i_next;
 			continue;
 		}
-		
+
 		cs_ftime(&now);
 		gone = comp_timeb(&now, &cachehit->time);
 		gone_max_hitcache_time = comp_timeb(&now, &cachehit->max_hitcache_time);
@@ -627,7 +627,7 @@ static void log_cacheex_cw(ECM_REQUEST *er, char *reason)
 		{ memcpy(remotenodeid, data, 8); }
 	else
 		{ memset(remotenodeid, 0 , 8); }
-	
+
 	char buf_ecm[109];
 	format_ecm(er, buf_ecm, 109);
 	cs_log_dbg(D_CACHEEX,"got pushed ecm [%s]: %s - odd/even 0x%x - CSP cw: %s - pushed from %s, at hop %d, origin node-id %" PRIu64 "X",
@@ -655,28 +655,38 @@ static int32_t cacheex_add_to_cache_int(struct s_client *cl, ECM_REQUEST *er, in
 		cs_log_dbg(D_CACHEEX, "CACHEX received, but invalid client state %s", username(cl));
 		return 0;
 	}
-	
+
+	uint8_t selectedForIgnChecksum = chk_if_ignore_checksum(er, cfg.disablecrccws, &cfg.disablecrccws_only_for);
+			if (cl->typ == 'c') {
+				selectedForIgnChecksum += chk_if_ignore_checksum (er, cl->account->disablecrccacheex, &cl->account->disablecrccacheex_only_for);
+			}
+			if (cl->typ == 'p') {
+				selectedForIgnChecksum += chk_if_ignore_checksum (er, cl->reader->disablecrccws, &cl->reader->disablecrccws_only_for);
+			}
+
 	uint8_t i, c;
-	uint8_t null = 0;
-	for(i = 0; i < 16; i += 4)
+	if(cfg.disablecrccws == 0 || (cl->typ == 'c' && cl->account->disablecrccacheex == 0) || ( cl->typ == 'p' && cl->reader->disablecrccws == 0))
 	{
-		c = ((er->cw[i] + er->cw[i + 1] + er->cw[i + 2]) & 0xff);
-		null |= (er->cw[i] | er->cw[i + 1] | er->cw[i + 2]);
-		if(er->cw[i + 3] != c)
+		for(i = 0; i < 16; i += 4)
 		{
-			if(er->prid == 0x030B00 || er->prid == 0x032830) {
-				cs_log_dbg(D_TRACE, "notice: CW checksum check disabled for %d", er->prid);
+			c = ((er->cw[i] + er->cw[i + 1] + er->cw[i + 2]) & 0xff);
+
+			if((i!=12) && selectedForIgnChecksum && (er->cw[i + 3] != c)){
 				break;
 			}
-			cs_log_dump_dbg(D_CACHEEX, er->cw, 16, "push received cw with chksum error from %s", csp ? "csp" : username(cl));
-			cl->cwcacheexerr++;
-			if(cl->account)
-				{ cl->account->cwcacheexerr++; }
-			return 0;
+
+			if(er->cw[i + 3] != c)
+			{
+				cs_log_dump_dbg(D_CACHEEX, er->cw, 16, "push received cw with chksum error from %s", csp ? "csp" : username(cl));
+				cl->cwcacheexerr++;
+				if(cl->account)
+					{ cl->account->cwcacheexerr++; }
+				return 0;
+			}
 		}
 	}
 
-	if(null == 0 || chk_is_null_CW(er->cw))
+	if(chk_is_null_CW(er->cw) && er->caid !=0x2600) // 0x2600 used by biss and constant cw could be indeed zero
 	{
 		cs_log_dump_dbg(D_CACHEEX, er->cw, 16, "push received null cw from %s", csp ? "csp" : username(cl));
 		cl->cwcacheexerr++;

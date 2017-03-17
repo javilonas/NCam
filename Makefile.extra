@@ -80,8 +80,8 @@ cross-sh4-linux-stapi:
 
 cross-i386-pc-cygwin:
 	$(MAKE) --no-print-directory \
-		CROSS=i686-pc-cygwin- \
-		EXTRA_FLAGS="-static" \
+		CROSS=$(CROSS) \
+		EXTRA_FLAGS="-I. -static" \
 		$(MAKEFLAGS)
 
 cross-i386-pc-cygwin-pcsc:
@@ -249,6 +249,22 @@ cross-arm-tuxbox-linux:
 		CROSS=$(CROSS) \
 		CONF_DIR=/var/tuxbox/config \
 		EXTRA_FLAGS="-mtune=cortex-a9 -mcpu=cortex-a9 -mfpu=neon-vfpv4 -static-libgcc -I. -s" \
+		$(MAKEFLAGS)
+
+cross-arm-raspbian-linux-libusb:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		CONF_DIR=/var/tuxbox/config \
+		EXTRA_FLAGS="-static-libgcc -I. -s" \
+		USE_LIBUSB=1 \
+		LIBUSB_LIB=$(LIBUSB_LIB) \
+		$(MAKEFLAGS)
+
+cross-arm-raspbian-linux:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		CONF_DIR=/var/tuxbox/config \
+		EXTRA_FLAGS="-static-libgcc -I. -s" \
 		$(MAKEFLAGS)
 
 cross-sh4-tuxbox-linux-libusb-pcsc:

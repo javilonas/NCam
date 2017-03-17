@@ -232,7 +232,7 @@ static int32_t NegotiateSessionKey_Tiger(struct s_reader *reader)
 	Signature(sign1, idea_key, tmp, 104);
 	rdr_log_dbg(reader, D_READER, "sign1: %s", cs_hexdump(0, sign1, 8, tmp2, sizeof(tmp2)));
 	rdr_log_dbg(reader, D_READER, "sign2: %s", cs_hexdump(0, parte_fija + 111, 8, tmp2, sizeof(tmp2)));
-	if(!memcmp(parte_fija + 111, sign1, 8) == 0)
+	if((!memcmp(parte_fija + 111, sign1, 8)) == 0)
 	{
 		rdr_log_dbg(reader, D_READER, "signature check nok");
 		rdr_log_dbg(reader, D_READER, "------------------------------------------");

@@ -1078,7 +1078,7 @@ int32_t chk_is_null_CW(uchar cw[])
  **/
 int8_t is_halfCW_er(ECM_REQUEST *er)
 {
-	if( caid_is_videoguard(er->caid) && (er->caid == 0x09C4 || er->caid == 0x098C || er->caid == 0x0963 || er->caid == 0x09CD || er->caid == 0x0919 || er->caid == 0x093B || er->caid == 0x098E))
+	if( caid_is_videoguard(er->caid) && (er->caid == 0x09C4 || er->caid == 0x098C || er->caid == 0x0960 || er->caid == 0x0963 || er->caid == 0x09CD || er->caid == 0x0919 || er->caid == 0x093B || er->caid == 0x098E))
 		{ return 1; }
 	return 0;
 }
@@ -1101,17 +1101,17 @@ int8_t chk_halfCW(ECM_REQUEST *er, uchar *cw)
 
 		//check for correct cw position
 		if(
-			(get_odd_even(er) == 0x80 && part1 && !part2)   //xxxxxxxx00000000
-			||
-			(get_odd_even(er) == 0x81 && !part1 && part2)   //00000000xxxxxxxx
-			||
-			(get_odd_even(er) == 0x50 && part1 && part2)   //xxxxxxxxxxxxxxxx
+		(get_odd_even(er) == 0x80 && part1 && !part2)   //xxxxxxxx00000000
+		||
+		(get_odd_even(er) == 0x81 && !part1 && part2)   //00000000xxxxxxxx
+		||
+		(get_odd_even(er) == 0x50 && part1 && part2)   //xxxxxxxxxxxxxxxx
 		)
 		{ return 1; }
 		cw[15] = cw15;
 		return 0;  //not correct swapped cw
 	}else
-		return 1;
+	return 1;
 }
 
 /**

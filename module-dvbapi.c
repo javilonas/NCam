@@ -90,39 +90,39 @@ const char *get_streamtxt(uint8_t id)
 	}
 	else if(id == 0x24)
 	{
-		return 	"Videostream (H.265 Ultra HD video)";
+		return "Videostream (H.265 Ultra HD video)";
 	}
 	else if(id == 0x42)
 	{
-		return 	"Videostream (Chinese Video Standard)";
+		return "Videostream (Chinese Video Standard)";
 	}
 	else if(id >= 0x80 && id <= 0x87)
 	{
-		return 	streamtxt_80_to_87[id - 0x80];
+		return streamtxt_80_to_87[id - 0x80];
 	}
 	else if(id == 0x90)
 	{
-		return 	"Datastream (Blu-ray subtitling)";
+		return "Datastream (Blu-ray subtitling)";
 	}
 	else if(id == 0x95)
 	{
-		return 	"Datastream (DSM CC)";
+		return "Datastream (DSM CC)";
 	}
 	else if(id == 0xC0)
 	{
-		return 	"Datastream (DigiCipher II text)";
+		return "Datastream (DigiCipher II text)";
 	}
 	else if(id == 0xC2)
 	{
-		return 	"Datastream (DSM CC)";
+		return "Datastream (DSM CC)";
 	}
 	else if(id == 0xD1)
 	{
-		return 	"Videostream (BBC Dirac Ultra HD video)";
+		return "Videostream (BBC Dirac Ultra HD video)";
 	}
 	else if(id == 0xEA)
 	{
-		return 	"Videostream (WMV9 lower bit-rate)";
+		return "Videostream (WMV9 lower bit-rate)";
 	}
 	else
 	{
@@ -144,7 +144,7 @@ void flush_read_fd(int32_t demux_index, int32_t num, int fd)
 		FD_SET(fd,&rd);
 		while(select(fd+1,&rd,NULL,NULL,&t) > 0)
 		{
-			 if (read(fd,buff,100)){;}
+			if (read(fd,buff,100)){;}
 		}
 	}
 }
@@ -621,6 +621,21 @@ int32_t dvbapi_net_send(uint32_t request, int32_t socket_fd, int32_t demux_index
 			memcpy(&packet[size], data, sct_cadescr_size);
 
 			size += sct_cadescr_size;
+			break;
+		}
+		case DVBAPI_CA_SET_DESCR_AES:
+		{
+			int sct_cadescr_aes_size = sizeof(ca_descr_aes_t);
+
+			if (client_proto_version >= 1)
+			{
+				ca_descr_aes_t *cadescaes = (ca_descr_aes_t *) data;
+				cadescaes->index = htonl(cadescaes->index);
+				cadescaes->parity = htonl(cadescaes->parity);
+			}
+			memcpy(&packet[size], data, sct_cadescr_aes_size);
+
+			size += sct_cadescr_aes_size;
 			break;
 		}
 		case DVBAPI_CA_SET_DESCR_MODE:
@@ -1381,7 +1396,7 @@ void dvbapi_start_sdt_filter(int32_t demux_index)
 void dvbapi_start_pat_filter(int32_t demux_index)
 {
 	#if defined(WITH_COOLAPI) || defined(WITH_COOLAPI2)
-		// PAT-Filter breaks API and OSCAM for Coolstream. 
+		// PAT-Filter breaks API and NCAM for Coolstream. 
 		// Don't use it
 		return;
 	#endif
@@ -1392,7 +1407,7 @@ void dvbapi_start_pat_filter(int32_t demux_index)
 void dvbapi_start_pmt_filter(int32_t demux_index, int32_t pmt_pid)
 {
 	#if defined(WITH_COOLAPI) || defined(WITH_COOLAPI2)
-		// PMT-Filter breaks API and OSCAM for Coolstream. 
+		// PMT-Filter breaks API and NCAM for Coolstream. 
 		// Don't use it
 		return;
 	#endif
@@ -5932,45 +5947,59 @@ static void *dvbapi_main_local(void *cli)
 	return NULL;
 }
 
-void dvbapi_write_cw(int32_t demux_id, uchar *cw, int32_t pid, int32_t stream_id, enum ca_descr_algo algo, enum ca_descr_cipher_mode cipher_mode)
+void dvbapi_write_cw(int32_t demux_id, uchar *cw, int8_t cw_aes, int32_t pid, int32_t stream_id, enum ca_descr_algo algo, enum ca_descr_cipher_mode cipher_mode)
 {
 	int32_t n;
 	int8_t cwEmpty = 0;
-	unsigned char nullcw[8];
-	memset(nullcw, 0, 8);
+	unsigned char nullcw[16];
+	memset(nullcw, 0, 16);
 	ca_descr_t ca_descr;
+	ca_descr_aes_t ca_descr_aes;
 	ca_descr_mode_t ca_descr_mode;
 
 	memset(&ca_descr, 0, sizeof(ca_descr));
+	memset(&ca_descr_aes, 0, sizeof(ca_descr_aes));
 	memset(&ca_descr_mode, 0, sizeof(ca_descr_mode_t));
 
-	if(memcmp(demux[demux_id].lastcw[0], nullcw, 8) == 0
-			&& memcmp(demux[demux_id].lastcw[1], nullcw, 8) == 0)
+	 if(memcmp(demux[demux_id].lastcw[0], nullcw, cw_aes ? 16 : 8) == 0
+			&& memcmp(demux[demux_id].lastcw[1], nullcw, cw_aes ? 16 : 8) == 0)
 		{ cwEmpty = 1; } // to make sure that both cws get written on constantcw
 
 
 	for(n = 0; n < 2; n++)
 	{
-		char lastcw[9 * 3];
-		char newcw[9 * 3];
-		cs_hexdump(0, demux[demux_id].lastcw[n], 8, lastcw, sizeof(lastcw));
-		cs_hexdump(0, cw + (n * 8), 8, newcw, sizeof(newcw));
+		char lastcw[18 * 3];
+		char newcw[18 * 3];
+		cs_hexdump(0, demux[demux_id].lastcw[n], cw_aes ? 16 : 8, lastcw, sizeof(lastcw));
+		cs_hexdump(0, cw + (n * cw_aes ? 16 : 8), cw_aes ? 16 : 8, newcw, sizeof(newcw));
 
 		// check if already delivered and new cw part is valid but dont check for nullcw on Biss
-		if((memcmp(cw + (n * 8), demux[demux_id].lastcw[n], 8) != 0 || cwEmpty || stream_id >1)
-			&& (memcmp(cw + (n * 8), nullcw, 8) != 0 || demux[demux_id].ECMpids[pid].CAID == 0x2600))
+		if((memcmp(cw + (n * cw_aes ? 16 : 8), demux[demux_id].lastcw[n], cw_aes ? 16 : 8) != 0 || cwEmpty || stream_id >1)
+			&& (memcmp(cw + (n * cw_aes ? 16 : 8), nullcw, cw_aes ? 16 : 8) != 0 || demux[demux_id].ECMpids[pid].CAID == 0x2600))
 		{
 			ca_index_t idx = dvbapi_ca_setpid(demux_id, pid, stream_id, (algo == CA_ALGO_DES));  // prepare ca
 			if (idx == INDEX_INVALID) return; // return on no index!
 
 #if defined WITH_COOLAPI || defined WITH_COOLAPI2
 			ca_descr_mode.cipher_mode = cipher_mode;
-			ca_descr.index = idx;
-			ca_descr.parity = n;
-			memcpy(demux[demux_id].lastcw[n], cw + (n * 8), 8);
-			memcpy(ca_descr.cw, cw + (n * 8), 8);
-			cs_log_dbg(D_DVBAPI, "Demuxer %d write cw%d index: %d (ca_mask %d)", demux_id, n, ca_descr.index, demux[demux_id].ca_mask);
-			coolapi_write_cw(demux[demux_id].ca_mask, demux[demux_id].STREAMpids, demux[demux_id].STREAMpidcount, &ca_descr);
+			if(cw_aes)
+			{
+				ca_descr_aes.index = idx;
+				ca_descr_aes.parity = n;
+				memcpy(demux[demux_id].lastcw[n], cw + (n * 16), 16);
+				memcpy(ca_descr_aes.cw, cw + (n * 16), 16);
+				cs_log_dbg(D_DVBAPI, "Demuxer %d write cw%d index: %d (ca_mask %d)", demux_id, n, ca_descr_aes.index, demux[demux_id].ca_mask);
+				coolapi_write_cw(demux[demux_id].ca_mask, demux[demux_id].STREAMpids, demux[demux_id].STREAMpidcount, &ca_descr_aes);
+			}
+			else
+			{
+				ca_descr.index = idx;
+				ca_descr.parity = n;
+				memcpy(demux[demux_id].lastcw[n], cw + (n * 8), 8);
+				memcpy(ca_descr.cw, cw + (n * 8), 8);
+				cs_log_dbg(D_DVBAPI, "Demuxer %d write cw%d index: %d (ca_mask %d)", demux_id, n, ca_descr.index, demux[demux_id].ca_mask);
+				coolapi_write_cw(demux[demux_id].ca_mask, demux[demux_id].STREAMpids, demux[demux_id].STREAMpidcount, &ca_descr);
+			}
 #else
 			int32_t i, j, write_cw = 0;
 			ca_index_t usedidx, lastidx;
@@ -6011,15 +6040,29 @@ void dvbapi_write_cw(int32_t demux_id, uchar *cw, int32_t pid, int32_t stream_id
 					if(!write_cw) { continue; } // no need to write the cw since this ca isnt using it!
 
 					lastidx = usedidx;
-					ca_descr.index = usedidx;
-					ca_descr.parity = n;
-					memcpy(demux[demux_id].lastcw[n], cw + (n * 8), 8);
-					memcpy(ca_descr.cw, cw + (n * 8), 8);
-					cs_log_dbg(D_DVBAPI, "Demuxer %d writing %s part (%s) of controlword, replacing expired (%s)", demux_id, (n == 1 ? "even" : "odd"), newcw, lastcw);
-					cs_log_dbg(D_DVBAPI, "Demuxer %d write cw%d index: %d (ca%d)", demux_id, n, ca_descr.index, i);
-
+					if(cw_aes)
+					{
+						ca_descr_aes.index = usedidx;
+						ca_descr_aes.parity = n;
+						memcpy(demux[demux_id].lastcw[n], cw + (n * 16), 16);
+						memcpy(ca_descr_aes.cw, cw + (n * 16), 16);
+						cs_log_dbg(D_DVBAPI, "Demuxer %d writing %s part (%s) of controlword, replacing expired (%s)", demux_id, (n == 1 ? "even" : "odd"), newcw, lastcw);
+						cs_log_dbg(D_DVBAPI, "Demuxer %d write cw%d index: %d (ca%d)", demux_id, n, ca_descr_aes.index, i);
+					}
+					else
+					{
+						ca_descr.index = usedidx;
+						ca_descr.parity = n;
+						memcpy(demux[demux_id].lastcw[n], cw + (n * 8), 8);
+						memcpy(ca_descr.cw, cw + (n * 8), 8);
+						cs_log_dbg(D_DVBAPI, "Demuxer %d writing %s part (%s) of controlword, replacing expired (%s)", demux_id, (n == 1 ? "even" : "odd"), newcw, lastcw);
+						cs_log_dbg(D_DVBAPI, "Demuxer %d write cw%d index: %d (ca%d)", demux_id, n, ca_descr.index, i);
+					}
 					if(cfg.dvbapi_boxtype == BOXTYPE_PC || cfg.dvbapi_boxtype == BOXTYPE_PC_NODMX)
-						dvbapi_net_send(DVBAPI_CA_SET_DESCR, demux[demux_id].socket_fd, demux_id, -1 /*unused*/, (unsigned char *) &ca_descr, NULL, NULL, demux[demux_id].client_proto_version);
+						if(cw_aes)
+							dvbapi_net_send(DVBAPI_CA_SET_DESCR_AES, demux[demux_id].socket_fd, demux_id, -1 /*unused*/, (unsigned char *) &ca_descr_aes, NULL, NULL, demux[demux_id].client_proto_version);
+						else
+							dvbapi_net_send(DVBAPI_CA_SET_DESCR, demux[demux_id].socket_fd, demux_id, -1 /*unused*/, (unsigned char *) &ca_descr, NULL, NULL, demux[demux_id].client_proto_version);
 					else
 					{
 						if(ca_fd[i] <= 0)
@@ -6101,8 +6144,8 @@ void dvbapi_send_dcw(struct s_client *client, ECM_REQUEST *er)
 		}
 		if(j == demux[i].ECMpidcount) { continue; }  // ecm response srvid ok but no matching ecmpid, perhaps this for other demuxer
 
-		cs_log_dbg(D_DVBAPI, "Demuxer %d %scontrolword received for PID %d CAID %04X PROVID %06X ECMPID %04X CHID %04X VPID %04X", i,
-					  (er->rc >= E_NOTFOUND ? "no " : ""), j, er->caid, er->prid, er->pid, er->chid, er->vpid);
+		cs_log_dbg(D_DVBAPI, "Demuxer %d %scontrolword received for PID %d CAID %04X PROVID %06X ECMPID %04X CHID %04X VPID %04X AES %d", i,
+					  (er->rc >= E_NOTFOUND ? "no " : ""), j, er->caid, er->prid, er->pid, er->chid, er->vpid, er->cw_aes);
 
 		uint32_t status = dvbapi_check_ecm_delayed_delivery(i, er);
 
@@ -6131,11 +6174,11 @@ void dvbapi_send_dcw(struct s_client *client, ECM_REQUEST *er)
 		// Dont check for biss since it is using constant cw and cw can even be all zeros
 		if((status == 0 || status == 3 || status == 4) && er->rc < E_NOTFOUND && er->caid !=0x2600)
 		{
-			if(memcmp(er->cw, demux[i].lastcw[0], 8) == 0 && memcmp(er->cw + 8, demux[i].lastcw[1], 8) == 0)    // check for matching controlword
+			if(memcmp(er->cw, demux[i].lastcw[0], er->cw_aes ? 16 : 8) == 0 && memcmp(er->cw + (er->cw_aes ? 16 : 8), demux[i].lastcw[1], er->cw_aes ? 16 : 8) == 0)    // check for matching controlword
 			{
 				comparecw0 = 1;
 			}
-			else if(memcmp(er->cw, demux[i].lastcw[1], 8) == 0 && memcmp(er->cw + 8, demux[i].lastcw[0], 8) == 0)    // check for matching controlword
+			else if(memcmp(er->cw, demux[i].lastcw[1], er->cw_aes ? 16 : 8) == 0 && memcmp(er->cw + (er->cw_aes ? 16 : 8), demux[i].lastcw[0], er->cw_aes ? 16 : 8) == 0)    // check for matching controlword
 			{
 				comparecw1 = 1;
 			}
@@ -6214,8 +6257,8 @@ void dvbapi_send_dcw(struct s_client *client, ECM_REQUEST *er)
 					demux[i].ECMpids[j].checked = 4; // mark best pid last ;)
 				}
 
-				cs_log_dbg(D_DVBAPI, "Demuxer %d descrambling PID %d CAID %04X PROVID %06X ECMPID %04X CHID %02X VPID %04X",
-					i, demux[i].pidindex, er->caid, er->prid, er->pid, er->chid, er->vpid);
+				cs_log_dbg(D_DVBAPI, "Demuxer %d descrambling PID %d CAID %04X PROVID %06X ECMPID %04X CHID %02X VPID %04X AES %d",
+					i, demux[i].pidindex, er->caid, er->prid, er->pid, er->chid, er->vpid, er->cw_aes);
 			}
 			SAFE_MUTEX_UNLOCK(&demux[i].answerlock); // and release it!
 		}
@@ -6424,17 +6467,17 @@ void dvbapi_send_dcw(struct s_client *client, ECM_REQUEST *er)
 							cw = er->cw_ex.data;
 						}
 
-						dvbapi_write_cw(i, cw, j, k, er->cw_ex.algo, er->cw_ex.algo_mode);
+						dvbapi_write_cw(i, cw, er->cw_aes, j, k, er->cw_ex.algo, er->cw_ex.algo_mode);
 					}
 				}
 				else
 				{
 					demux[i].ECMpids[j].useMultipleIndices = 0;
-					dvbapi_write_cw(i, er->cw, j, 0, er->cw_ex.algo, er->cw_ex.algo_mode);
+					dvbapi_write_cw(i, er->cw, er->cw_aes, j, 0, er->cw_ex.algo, er->cw_ex.algo_mode);
 				}
 #else
 				cfg.dvbapi_extended_cw_api = 0; // in CSA mode extended_cw_api should be always 0 regardless what user selected!  
-				dvbapi_write_cw(i, er->cw, j, 0, CA_ALGO_DVBCSA, CA_MODE_ECB);
+				dvbapi_write_cw(i, er->cw, er->cw_aes, j, 0, CA_ALGO_DVBCSA, CA_MODE_ECB);
 #endif
 				break;
 			}
@@ -6910,8 +6953,8 @@ int32_t dvbapi_check_ecm_delayed_delivery(int32_t demux_index, ECM_REQUEST *er)
 {
 	int32_t ret = 0;
 	int32_t filternum = dvbapi_get_filternum(demux_index, er, TYPE_ECM);
-	char nullcw[CS_ECMSTORESIZE];
-	memset(nullcw, 0, CS_ECMSTORESIZE);
+	char nullcw[CS_ECMSTORESIZE *2];
+	memset(nullcw, 0, CS_ECMSTORESIZE * 2);
 
 	if(filternum < 0) { return 2; }  // if no matching filter act like ecm response is delayed
 	if(memcmp(demux[demux_index].demux_fd[filternum].lastecmd5, nullcw, CS_ECMSTORESIZE))
@@ -6926,7 +6969,7 @@ int32_t dvbapi_check_ecm_delayed_delivery(int32_t demux_index, ECM_REQUEST *er)
 	}
 
 	// 0x2600 used by biss and constant cw could be zero but every other caid received a null cw -> not usable!
-	if(memcmp(er->cw, nullcw, 8) == 0 && memcmp(er->cw+8, nullcw, 8) == 0 && er->caid !=0x2600) {return 5;}
+	if(memcmp(er->cw, nullcw, er->cw_aes ? 16 : 8) == 0 && memcmp(er->cw + (er->cw_aes ? 16 : 8), nullcw, er->cw_aes ? 16 : 8) == 0 && er->caid !=0x2600) {return 5;}
 	struct s_ecmpids *curpid = NULL;
 
 	int32_t pid = demux[demux_index].demux_fd[filternum].pidindex;

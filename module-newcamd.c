@@ -1103,7 +1103,7 @@ static void newcamd_send_dcw(struct s_client *client, ECM_REQUEST *er)
 {
 	int32_t len;
 	uint16_t cl_msgid;
-	uchar mbuf[19];
+	uchar mbuf[35];
 
 	if(!client->udp_fd)
 	{
@@ -1120,9 +1120,18 @@ static void newcamd_send_dcw(struct s_client *client, ECM_REQUEST *er)
 	}
 	else
 	{
-		len = 19;
-		mbuf[1] = mbuf[2] = 0x10;
-		memcpy(mbuf + 3, er->cw, 16);
+		if(er->cw_aes)
+		{
+			len = 35;
+			mbuf[1] = mbuf[2] = 0x10;
+			memcpy(mbuf + 3, er->cw, 32);
+		}
+		else
+		{
+			len = 19;
+			mbuf[1] = mbuf[2] = 0x10;
+			memcpy(mbuf + 3, er->cw, 16);
+		}
 	}
 
 	cs_log_dbg(D_CLIENT, "ncd_send_dcw: er->msgid=%d, cl_msgid=%d, %02X", er->msgid, cl_msgid, mbuf[0]);
@@ -1521,9 +1530,16 @@ static int32_t newcamd_recv_chk(struct s_client *client, uchar *dcw, int32_t *rc
 			cs_log_dbg(D_CLIENT, "invalid newcamd answer");
 			return (-1);
 		}
-
-		*rc = 1;
-		memcpy(dcw, buf + 5, 16);
+		if(n < 37)
+		{
+			*rc = 1; //des key
+			memcpy(dcw, buf + 5, 16);
+		}
+		else
+		{
+			*rc = 3; //aes key
+			memcpy(dcw, buf + 5, 32);
+		}
 		break;
 
 	case MSG_KEEPALIVE:

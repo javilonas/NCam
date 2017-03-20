@@ -82,6 +82,7 @@
 #define DVBAPI_CA_SET_PID         0x40086f87
 #define DVBAPI_CA_SET_DESCR       0x40106f86
 #define DVBAPI_CA_SET_DESCR_MODE  0x400c6f88
+#define DVBAPI_CA_SET_DESCR_AES   0x40106f87
 #define DVBAPI_DMX_SET_FILTER     0x403c6f2b
 #define DVBAPI_DMX_STOP           0x00006f2a
 
@@ -201,7 +202,7 @@ typedef struct demux_s
 	uint16_t tsid;
 	uint16_t pmtpid;
 	uint32_t enigma_namespace;
-	unsigned char lastcw[2][8];
+	unsigned char lastcw[2][16];
 	int8_t emm_filter;
 	int8_t sdt_filter;
 	uchar hexserial[8];
@@ -316,6 +317,13 @@ typedef struct ca_descr
 	unsigned char cw[8];
 } ca_descr_t;
 
+typedef struct ca_descr_aes
+{
+	uint32_t index;
+	uint32_t parity;    /* 0 == even, 1 == odd */
+	unsigned char cw[16];
+} ca_descr_aes_t;
+
 typedef struct ca_pid
 {
 	uint32_t pid;
@@ -358,7 +366,7 @@ struct s_dvbapi_priority *dvbapi_check_prio_match(int32_t demux_id, int32_t pidi
 //void dvbapi_adjust_prioritytab(int demux_index);
 //void dvbapi_write_prio(void);
 void dvbapi_send_dcw(struct s_client *client, ECM_REQUEST *er);
-void dvbapi_write_cw(int32_t demux_id, uchar *cw, int32_t pid, int32_t stream_id, enum ca_descr_algo algo, enum ca_descr_cipher_mode cipher_mode);
+void dvbapi_write_cw(int32_t demux_id, uchar *cw, int8_t cw_aes, int32_t pid, int32_t stream_id, enum ca_descr_algo algo, enum ca_descr_cipher_mode cipher_mode);
 int32_t dvbapi_parse_capmt(unsigned char *buffer, uint32_t length, int32_t connfd, char *pmtfile, int8_t is_real_pmt, uint16_t existing_demux_id, uint16_t client_proto_version);
 void request_cw(struct s_client *client, ECM_REQUEST *er, int32_t demux_id, uint8_t delayed_ecm_check);
 void dvbapi_try_next_caid(int32_t demux_id, int8_t checked);

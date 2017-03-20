@@ -90,39 +90,39 @@ const char *get_streamtxt(uint8_t id)
 	}
 	else if(id == 0x24)
 	{
-		return 	"Videostream (H.265 Ultra HD video)";
+		return "Videostream (H.265 Ultra HD video)";
 	}
 	else if(id == 0x42)
 	{
-		return 	"Videostream (Chinese Video Standard)";
+		return "Videostream (Chinese Video Standard)";
 	}
 	else if(id >= 0x80 && id <= 0x87)
 	{
-		return 	streamtxt_80_to_87[id - 0x80];
+		return streamtxt_80_to_87[id - 0x80];
 	}
 	else if(id == 0x90)
 	{
-		return 	"Datastream (Blu-ray subtitling)";
+		return "Datastream (Blu-ray subtitling)";
 	}
 	else if(id == 0x95)
 	{
-		return 	"Datastream (DSM CC)";
+		return "Datastream (DSM CC)";
 	}
 	else if(id == 0xC0)
 	{
-		return 	"Datastream (DigiCipher II text)";
+		return "Datastream (DigiCipher II text)";
 	}
 	else if(id == 0xC2)
 	{
-		return 	"Datastream (DSM CC)";
+		return "Datastream (DSM CC)";
 	}
 	else if(id == 0xD1)
 	{
-		return 	"Videostream (BBC Dirac Ultra HD video)";
+		return "Videostream (BBC Dirac Ultra HD video)";
 	}
 	else if(id == 0xEA)
 	{
-		return 	"Videostream (WMV9 lower bit-rate)";
+		return "Videostream (WMV9 lower bit-rate)";
 	}
 	else
 	{
@@ -144,7 +144,7 @@ void flush_read_fd(int32_t demux_index, int32_t num, int fd)
 		FD_SET(fd,&rd);
 		while(select(fd+1,&rd,NULL,NULL,&t) > 0)
 		{
-			 if (read(fd,buff,100)){;}
+			if (read(fd,buff,100)){;}
 		}
 	}
 }
@@ -1381,7 +1381,7 @@ void dvbapi_start_sdt_filter(int32_t demux_index)
 void dvbapi_start_pat_filter(int32_t demux_index)
 {
 	#if defined(WITH_COOLAPI) || defined(WITH_COOLAPI2)
-		// PAT-Filter breaks API and OSCAM for Coolstream. 
+		// PAT-Filter breaks API and NCAM for Coolstream.
 		// Don't use it
 		return;
 	#endif
@@ -1392,7 +1392,7 @@ void dvbapi_start_pat_filter(int32_t demux_index)
 void dvbapi_start_pmt_filter(int32_t demux_index, int32_t pmt_pid)
 {
 	#if defined(WITH_COOLAPI) || defined(WITH_COOLAPI2)
-		// PMT-Filter breaks API and OSCAM for Coolstream. 
+		// PMT-Filter breaks API and NCAM for Coolstream.
 		// Don't use it
 		return;
 	#endif

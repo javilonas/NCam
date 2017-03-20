@@ -363,9 +363,9 @@ typedef unsigned char uchar;
 /* ===========================
  *         constants
  * =========================== */
-#define CS_VERSION    "1.1"
-#define DATE_BUILD    "18-03-2017"
-#define CS_REVISION   "r2"
+#define CS_VERSION    "1.2"
+#define DATE_BUILD    "20-03-2017"
+#define CS_REVISION   "r3"
 #ifndef CS_SVN_VERSION
 #   define CS_SVN_VERSION "stable"
 #endif
@@ -622,7 +622,7 @@ extern const char *weekdstr;
 #define DEFAULT_CC_IGNRSHR 0   // Use global cfg // default -1
 #define DEFAULT_CC_STEALTH 1   // Use global cfg // default -1
 #define DEFAULT_CC_KEEPALIVE 1  // default 0
-#define DEFAULT_CC_RECONNECT 8000
+#define DEFAULT_CC_RECONNECT 7000
 #define DEFAULT_CC_RECV_TIMEOUT 2000
 
 #define GBOX_MAX_PROXY_CARDS 32

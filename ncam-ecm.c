@@ -690,7 +690,7 @@ int32_t send_dcw(struct s_client *client, ECM_REQUEST *er)
 		char cwstr[17 * 3];
 		format_ecm(er, buf, ECM_FMT_LEN);
 		cs_hexdump(0, er->ecmd5, 16, ecmd5, sizeof(ecmd5));
-		cs_hexdump(0, er->cw, 32, cwstr, sizeof(cwstr));
+		cs_hexdump(0, er->cw, 16, cwstr, sizeof(cwstr));
 #ifdef CS_CACHEEX
 		char csphash[5 * 3];
 		cs_hexdump(0, (void *)&er->csp_hash, 4, csphash, sizeof(csphash));
@@ -1092,7 +1092,7 @@ int32_t send_dcw(struct s_client *client, ECM_REQUEST *er)
 		}
 	}
 
-	cs_log_dump_dbg(D_ATR, er->cw, 32, "cw:");
+	cs_log_dump_dbg(D_ATR, er->cw, 16, "cw:");
 	led_status_cw_not_found(er);
 
 ESC:
@@ -1269,8 +1269,8 @@ void chk_dcw(struct s_ecm_answer *ea)
 		if(ea && ert->rc < E_NOTFOUND && ea->rc < E_NOTFOUND && memcmp(ea->cw, ert->cw, sizeof(ert->cw)) != 0)
 		{
 			char cw1[16 * 3 + 2], cw2[16 * 3 + 2];
-			cs_hexdump(0, ea->cw, 32, cw1, sizeof(cw1));
-			cs_hexdump(0, ert->cw, 32, cw2, sizeof(cw2));
+			cs_hexdump(0, ea->cw, 16, cw1, sizeof(cw1));
+			cs_hexdump(0, ert->cw, 16, cw2, sizeof(cw2));
 
 			char ip1[20] = "", ip2[20] = "";
 			if(ea->reader && check_client(ea->reader->client)) { cs_strncpy(ip1, cs_inet_ntoa(ea->reader->client->ip), sizeof(ip1)); }
@@ -1327,9 +1327,8 @@ void chk_dcw(struct s_ecm_answer *ea)
 	switch(ea->rc)
 	{
 	case E_FOUND:
-		memcpy(ert->cw, ea->cw, 32);
+		memcpy(ert->cw, ea->cw, 16);
 		ert->cw_ex = ea->cw_ex;
-		ert->cw_aes = ea->cw_aes;
 		ert->rcEx = 0;
 		ert->rc = ea->rc;
 		ert->grp |= eardr->grp;
@@ -1540,7 +1539,6 @@ int32_t write_ecm_answer(struct s_reader *reader, ECM_REQUEST *er, int8_t rc, ui
 
 	int32_t i;
 	uint8_t c;
-	uint8_t cw_aes = er->cw_aes;
 	struct timeb now;
 	cs_ftime(&now);
 
@@ -1576,12 +1574,12 @@ int32_t write_ecm_answer(struct s_reader *reader, ECM_REQUEST *er, int8_t rc, ui
 		cs_log_dbg(D_TRACE | D_LB, "WARNING: reader %s send fake cw, set rc=E_NOTFOUND!", reader ? reader->label : "-");
 	}
 
-	if(rc < E_NOTFOUND && cw && !chk_halfCW(er,cw) && !er->cw_aes){
+	if(rc < E_NOTFOUND && cw && !chk_halfCW(er,cw)){
 		rc = E_NOTFOUND;
 		cs_log_dbg(D_TRACE | D_LB, "WARNING: reader %s send wrong swapped NDS cw, set rc=E_NOTFOUND!", reader ? reader->label : "-");
 	}
 
-	if(reader && cw && rc < E_NOTFOUND && !er->cw_aes)
+	if(reader && cw && rc < E_NOTFOUND)
 	{
 		if(cfg.disablecrccws == 0 && reader->disablecrccws == 0 && ((er->caid >> 8) != 0x0E))
 		{
@@ -1664,8 +1662,7 @@ int32_t write_ecm_answer(struct s_reader *reader, ECM_REQUEST *er, int8_t rc, ui
 	ea->ecm_time = comp_timeb(&now, &ea->time_request_sent);
 	if(ea->ecm_time < 1) { ea->ecm_time = 1; }  //set ecm_time 1 if answer immediately
 	ea->rcEx = rcEx;
-	ea->cw_aes = cw_aes;
-	if(cw) { memcpy(ea->cw, cw, 32); }
+	if(cw) { memcpy(ea->cw, cw, 16); }
 	if(msglog) { memcpy(ea->msglog, msglog, MSGLOGSIZE); }
 	ea->tier = used_cardtier;
 	if(cw_ex)
@@ -1679,7 +1676,7 @@ int32_t write_ecm_answer(struct s_reader *reader, ECM_REQUEST *er, int8_t rc, ui
 	cs_ftime(&tpe);
 	int32_t ntime = comp_timeb(&tpe, &er->tps);
 	if(ntime < 1) { ntime = 1; }
-	cs_log_dbg(D_LB, "{client %s, caid %04X, prid %06X, srvid %04X aes %d} [write_ecm_answer] reader %s rc %d, ecm time %d ms (%d ms)", (check_client(er->client) ? er->client->account->usr : "-"), er->caid, er->prid, er->srvid, er->cw_aes, reader ? reader->label : "-", rc, ea->ecm_time, ntime);
+	cs_log_dbg(D_LB, "{client %s, caid %04X, prid %06X, srvid %04X} [write_ecm_answer] reader %s rc %d, ecm time %d ms (%d ms)", (check_client(er->client) ? er->client->account->usr : "-"), er->caid, er->prid, er->srvid, reader ? reader->label : "-", rc, ea->ecm_time, ntime);
 
 	//send ea for ecm request
 	int32_t res = 0;

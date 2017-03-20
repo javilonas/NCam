@@ -673,8 +673,6 @@ void casc_check_dcw(struct s_reader *reader, int32_t idx, int32_t rc, uchar *cw)
 			}
 			else if(rc)
 			{
-				rdr_log_dbg(reader, D_TRACE, "casc check dcw rc %d", rc);
-				if (rc == 3) ecm->cw_aes = 1; //aes key
 				write_ecm_answer(reader, ecm, E_FOUND, 0, cw, NULL, 0, NULL);
 			}
 			else

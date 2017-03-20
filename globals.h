@@ -363,9 +363,9 @@ typedef unsigned char uchar;
 /* ===========================
  *         constants
  * =========================== */
-#define CS_VERSION    "1.2"
-#define DATE_BUILD    "20-03-2017"
-#define CS_REVISION   "r1"
+#define CS_VERSION    "1.1"
+#define DATE_BUILD    "18-03-2017"
+#define CS_REVISION   "r2"
 #ifndef CS_SVN_VERSION
 #   define CS_SVN_VERSION "stable"
 #endif
@@ -622,7 +622,7 @@ extern const char *weekdstr;
 #define DEFAULT_CC_IGNRSHR 0   // Use global cfg // default -1
 #define DEFAULT_CC_STEALTH 1   // Use global cfg // default -1
 #define DEFAULT_CC_KEEPALIVE 1  // default 0
-#define DEFAULT_CC_RECONNECT 7000
+#define DEFAULT_CC_RECONNECT 8000
 #define DEFAULT_CC_RECV_TIMEOUT 2000
 
 #define GBOX_MAX_PROXY_CARDS 32
@@ -797,7 +797,7 @@ struct aes_keys
 struct s_ecm
 {
 	uchar           ecmd5[CS_ECMSTORESIZE];
-	uchar           cw[32];
+	uchar           cw[16];
 	uint16_t        caid;
 	uint64_t        grp;
 	struct s_reader *reader;
@@ -1016,9 +1016,8 @@ typedef struct cw_extendted_t
 typedef struct ecm_request_t
 {
 	uchar           ecm[MAX_ECM_SIZE];
-	uchar           cw[32];
+	uchar           cw[16];
 	EXTENDED_CW     cw_ex;
-	int8_t          cw_aes;
 	uchar           ecmd5[CS_ECMSTORESIZE];
 	int16_t         ecmlen;
 	uint16_t        caid;
@@ -1053,7 +1052,7 @@ typedef struct ecm_request_t
 	uint16_t            reader_count;               // count of selected not fb readers
 	int8_t          preferlocalcards;
 	int8_t          checked;                        // for doublecheck
-	uchar           cw_checked[32];                 // for doublecheck
+	uchar           cw_checked[16];                 // for doublecheck
 	int8_t          readers_timeout_check;          // set to 1 after ctimeout occurs and readers not answered are checked
 	struct s_reader     *origin_reader;
 
@@ -1110,9 +1109,8 @@ struct s_ecm_answer
 	ECM_REQUEST     *er;
 	int8_t          rc;
 	uint8_t         rcEx;
-	uchar           cw[32];
+	uchar           cw[16];
 	EXTENDED_CW     cw_ex;
-	int8_t          cw_aes;
 	char            msglog[MSGLOGSIZE];
 	struct timeb    time_request_sent;  //using for evaluate ecm_time
 	int32_t         ecm_time;
@@ -1895,7 +1893,7 @@ struct s_rlimit
 
 struct s_cw
 {
-	uint8_t cw[32];
+	uint8_t cw[16];
 };
 
 struct s_fakecws

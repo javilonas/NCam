@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (c) 2016 Javier Sayago <admin@lonasdigital.com>
+# Copyright (c) 2017 Javier Sayago <admin@lonasdigital.com>
 # Contact: javilonas@esp-desarrolladores.com
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,19 +29,23 @@ echo "============================================================"
 echo 
 echo "> ADVANCED OPTIONS"
 echo
-echo " 11 - Build x86-libusb-pcsc Linux PC (32 bit - i686)."
-echo " 12 - Build x86_64-libusb-pcsc Linux PC (64-bits)."
-echo " 13 - Build mips-libusb-pcsc (Gigablue, Dream, Vu+, Xtrend, Formuler...)."
-echo " 14 - Build mips-libusb-pcsc (Tiviar Plus and similar)."
-echo " 15 - Build sh4-libusb-pcsc (Golden Media, Galaxy Innovations, Amiko...)."
-echo " 16 - Build ppc-libusb (Power PC - DM600, 7000, 7020, 7020si...)."
-echo " 17 - Build arm-libusb (Cortex-A9 - Wetek Play and similar)."
-echo " 18 - Build mips-router-libusb (Routers MIPSEL DD-WRT)."
-echo " 19 - Build arm-libusb-raspbian (Rasp and similar)."
+echo " 17 - Build libusb-pcsc.x86 (Linux PC 32 bit - i686)."
+echo " 18 - Build libusb-pcsc.x86_64 (Linux PC 64-bits)."
+echo " 19 - Build libusb-pcsc.mips (Gigablue, Dream, Vu+, Xtrend, Formuler...)."
+echo " 20 - Build libusb-pcsc.mips-uclibc (Tiviar Plus and similar)."
+echo " 21 - Build libusb-pcsc.sh4 (Golden Media, Galaxy Innovations, Amiko...)."
+echo " 22 - Build libusb.ppc (Power PC - DM600, 7000, 7020, 7020si...)."
+echo " 23 - Build libusb.cortexa9hf-vfp-neon (Cortex-A9 - Wetek, Vu+4k and similar)."
+echo " 24 - Build router-openwrt-brcm47xx-libusb.mips (Routers openwrt brcm47xx)."
+echo " 25 - Build router-openwrt-ar71xx-libusb.mips (Routers openwrt ar71xx)."
+echo " 26 - Build router-openwrt-brcm63xx-libusb.mips (Routers openwrt brcm63xx)."
+echo " 27 - Build libusb.arm-raspbian (Rasp and similar)."
+echo " 28 - Build libusb.arm-marvell (Synology DS114, DS214 and similar)."
+echo " 29 - Build libusb.arm-android (For Android ARM)."
 echo
-echo " 20 - Remove logs."
-echo " 21 - Remove distribution."
-echo " 22 - Remove all (log and distribution)."
+echo " 30 - Remove logs."
+echo " 31 - Remove distribution."
+echo " 32 - Remove all (log and distribution)."
 echo "  0 - Back to main menu."
 echo 
 echo "- Enter option:"
@@ -51,18 +55,22 @@ echo "- Enter option:"
   if [ "$?" != "1" ]
   then
     case $opt in
-      11) build_dir/build_x86-libusb-pcsc.sh;;
-      12) build_dir/build_x86_64-libusb-pcsc.sh;;
-      13) build_dir/build_mips-libusb-pcsc.sh;;
-      14) build_dir/build_mips-uclibc-libusb-pcsc.sh;;
-      15) build_dir/build_sh4-libusb-pcsc.sh;;
-      16) build_dir/build_ppc-libusb.sh;;
-      17) build_dir/build_cortexa9hf-vfp-neon-libusb.sh;;
-      18) build_dir/build_mips-libusb-pcsc.sh;;
-      19) build_dir/build_build_arm-raspbian-libusb.sh;;
-      20) build_dir/clean_logs.sh;;
-      21) build_dir/clean_distri.sh;;
-      22) build_dir/clean_all.sh;;
+      17) build_dir/build_x86-libusb-pcsc.sh;;
+      18) build_dir/build_x86_64-libusb-pcsc.sh;;
+      19) build_dir/build_mips-libusb-pcsc.sh;;
+      20) build_dir/build_mips-uclibc-libusb-pcsc.sh;;
+      21) build_dir/build_sh4-libusb-pcsc.sh;;
+      22) build_dir/build_ppc-libusb.sh;;
+      23) build_dir/build_cortexa9hf-vfp-neon-libusb.sh;;
+      24) build_dir/build_mips-router-openwrt-brcm47xx-libusb.sh;;
+      25) build_dir/build_mips-router-openwrt-ar71xx-libusb.sh;;
+      26) build_dir/build_mips-router-openwrt-brcm63xx-libusb.sh;;
+      27) build_dir/build_arm-raspbian-libusb.sh;;
+      28) build_dir/build_arm-marvell-libusb.sh;;
+      29) build_dir/build_arm-android-libusb.sh;;
+      30) build_dir/clean_logs.sh;;
+      31) build_dir/clean_distri.sh;;
+      32) build_dir/clean_all.sh;;
       0) exit 1;;
       *) echo "Invalid option"; continue;;
     esac

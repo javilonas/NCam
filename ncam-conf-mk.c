@@ -142,8 +142,8 @@ char *mk_t_camd35tcp_port(void)
 	/* Precheck to determine how long the resulting string will maximally be (might be a little bit smaller but that shouldn't hurt) */
 	for(i = 0; i < cfg.c35_tcp_ptab.nports; ++i)
 	{
-		/* Port is maximally 5 chars long, plus the @caid (5), plus the ";" between ports */
-		needed += 11;
+		/* Port is maximally 5 chars long, plus comma, plus the @caid, plus the :provid plus the ";" between ports */
+		needed += 18;
 		if(cfg.c35_tcp_ptab.ports[i].ncd && cfg.c35_tcp_ptab.ports[i].ncd->ncd_ftab.filts[0].nprids > 0)
 		{
 			needed += cfg.c35_tcp_ptab.ports[i].ncd->ncd_ftab.filts[0].nprids * 7;

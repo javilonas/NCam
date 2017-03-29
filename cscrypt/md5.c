@@ -25,7 +25,7 @@
 
 #if !defined(WITH_SSL) && !defined(WITH_LIBCRYPTO)
 
-#if __BYTE_ORDER__==__ORDER_LITTLE_ENDIAN__
+#ifdef __i386__
 #define byteReverse(a, b)
 #else
 /*

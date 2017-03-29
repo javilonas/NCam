@@ -1,9 +1,10 @@
 	<input name="part" type="hidden" value="dvbapi">
+	<input name="dvbapi_enabled" type="hidden" value="0">
 	<input name="au" type="hidden" value="0">
 	<input name="write_sdt_prov" type="hidden" value="0">
 	<TABLE CLASS="config">
 		<TR><TH COLSPAN="2">Edit DVB Api Config</TH></TR>
-		<TR><TD><A>Enabled:</A></TD><TD><input name="enabled" type="checkbox" value="1" ##ENABLEDCHECKED##><label></label>
+		<TR><TD><A>Enabled:</A></TD><TD><input name="dvbapi_enabled" type="checkbox" value="1" ##ENABLEDCHECKED##><label></label>
 		<TR><TD><A>AU:</A></TD><TD><input name="au" type="checkbox" value="1" ##AUCHECKED##><label></label>
 		<TR><TD><A>Boxtype:</A></TD><TD><select name="boxtype">##BOXTYPE##</select></TD></TR>
 		<TR><TD><A data-p="user_2">User:</A></TD><TD><input name="user" class="longer" type="text" maxlength="63" value="##USERNAME##"></TD></TR>

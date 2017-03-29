@@ -10,6 +10,7 @@ $(function() {
 function startRefresh() {
   clearInterval(vTimeOut);
   vTimeOut= setTimeout(startRefresh, 3000);
+  document.title = 'NCAM Admin Control'
   $("#wrapper").load("status.html");
 }
 
@@ -23,13 +24,15 @@ function startRefresh() {
 	var stoppoll = 0;
 	var pollintervall = 0;
 	var polling = 0;
-	var pollrefresh = 0;
+	var pollrefresh = '##POLLREFRESHTIME##';
+	//var pollrefresh = 0;
 
 	</script>
 ##TPLBODY##
 ##TPLMENU##
 <br>
 ##TPLMESSAGE##
+<DIV>
 <TABLE CLASS="status">
 	<TR>
 		<TH COLSPAN="2" CLASS="statuscol0">Hide/Reset</TH>
@@ -58,6 +61,7 @@ function startRefresh() {
 ##TPLCACHEEXINFOBIT##
 ##TPLSYSTEMINFOBIT##
 </TABLE>
+</DIV>
 </DIV>
 <DIV id="picolor"></DIV>
 ##TPLFOOTER##

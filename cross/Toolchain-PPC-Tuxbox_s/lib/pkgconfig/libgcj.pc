@@ -1,0 +1,10 @@
+prefix=/7020/dm7020/build/tmp/cross
+exec_prefix=/7020/dm7020/build/tmp/cross
+libdir=/7020/dm7020/build/tmp/cross/lib
+includedir=/7020/dm7020/build/tmp/cross/include
+
+Name: libgcj
+Description: libgcj
+Version: 3.4.4
+Libs: -L${libdir} -lgcj
+Cflags: -I${includedir}

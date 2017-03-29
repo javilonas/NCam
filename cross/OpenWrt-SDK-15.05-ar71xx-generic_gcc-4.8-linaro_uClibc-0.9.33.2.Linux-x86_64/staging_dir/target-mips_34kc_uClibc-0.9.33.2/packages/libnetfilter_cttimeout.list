@@ -1,0 +1,13 @@
+./
+./host
+./usr
+./usr/lib
+./usr/lib/libnetfilter_cttimeout.so
+./usr/lib/libnetfilter_cttimeout.so.1
+./usr/lib/libnetfilter_cttimeout.a
+./usr/lib/pkgconfig
+./usr/lib/pkgconfig/libnetfilter_cttimeout.pc
+./usr/lib/libnetfilter_cttimeout.so.1.0.0
+./usr/include
+./usr/include/libnetfilter_cttimeout
+./usr/include/libnetfilter_cttimeout/libnetfilter_cttimeout.h

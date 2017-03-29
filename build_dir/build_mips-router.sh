@@ -25,9 +25,13 @@ export PARCH_LOGS=$ROOTFS_PATH/build_dir/logs
 export ARCH=mips
 export target=mips
 export NCAM_BIN=ncam-router.mips
-export CROSS=$ROOTFS_PATH/cross/4.1.0-uclibc-0.9.28/bin/mipsel-linux-uclibc-
+export CROSS=$ROOTFS_PATH/cross/ddwrt410/bin/mipsel-linux-uclibc-
 export DCMAKE=cross-mipsel-router-linux-uclibc
 export SCRIPT=build_mips-router.sh
+
+export LIB_PTHREAD="$ROOTFS_PATH/cross/ddwrt410/lib/libpthread.a -lrt"
+export PATH=$PATH:~$ROOTFS_PATH/cross/ddwrt410/bin
+export STAGING_DIR=~/openwrt/staging_dir
 
 # BEGIN THE LOG
 cd $PARCH_LOGS/

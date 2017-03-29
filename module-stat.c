@@ -50,6 +50,8 @@ void init_stat(void)
 		{ cfg.lb_max_ecmcount = DEFAULT_MAX_ECM_COUNT; }
 	if(cfg.lb_reopen_seconds < 10)
 		{ cfg.lb_reopen_seconds = DEFAULT_REOPEN_SECONDS; }
+	if(!cfg.lb_reopen_seconds_lbmin)
+		{ cfg.lb_reopen_seconds_lbmin = 0; }
 	if(cfg.lb_retrylimit < 0)
 		{ cfg.lb_retrylimit = DEFAULT_RETRYLIMIT; }
 	if(cfg.lb_stat_cleanup <= 0)
@@ -464,13 +466,38 @@ READER_STAT *readerinfofix_get_add_stat(struct s_reader *rdr, STAT_QUERY *q)
 
 static int32_t get_reopen_seconds(READER_STAT *s)
 {
-	int32_t max = (INT_MAX / cfg.lb_reopen_seconds);
+	int32_t max = 0;
+
+	if(s->ecm_count >= cfg.lb_min_ecmcount && cfg.lb_reopen_seconds_lbmin)
+	{
+		max = (INT_MAX / cfg.lb_reopen_seconds_lbmin);
+	}
+	else
+	{
+		max = (INT_MAX / cfg.lb_reopen_seconds);
+	}
 	if(max > 9999) { max = 9999; }
 	if(s->fail_factor > max)
 		{ s->fail_factor = max; }
 	if(!s->fail_factor)
-		{ return cfg.lb_reopen_seconds; }
-	return s->fail_factor * cfg.lb_reopen_seconds;
+	{
+		if(s->ecm_count >= cfg.lb_min_ecmcount && cfg.lb_reopen_seconds_lbmin)
+		{
+			return cfg.lb_reopen_seconds_lbmin;
+		}
+		else
+		{
+			return cfg.lb_reopen_seconds;
+		}
+	}
+	if(s->ecm_count >= cfg.lb_min_ecmcount && cfg.lb_reopen_seconds_lbmin)
+	{
+		return s->fail_factor * cfg.lb_reopen_seconds_lbmin;
+	}
+	else
+	{
+		return s->fail_factor * cfg.lb_reopen_seconds;
+	}
 }
 
 /**
@@ -587,7 +614,7 @@ static void add_stat(struct s_reader *rdr, ECM_REQUEST *er, int32_t ecm_time, in
 		{ return; }
 
 	if((uint32_t)ecm_time >= cfg.ctimeout)
-		{ rc = E_TIMEOUT;}
+		{ rc = E_TIMEOUT; }
 
 	STAT_QUERY q;
 	get_stat_query(er, &q);
@@ -985,15 +1012,27 @@ static void try_open_blocked_readers(ECM_REQUEST *er, STAT_QUERY *q, int32_t *ma
 			continue;
 		}
 
-		if (NULL != cfg.forcereopenusernames)
+		if (er->client->account->lb_force_reopen_user == 1)
 		{
-			if (strstr(cfg.forcereopenusernames, username(er->client)))
+			// reopen only readers reached lb_min_ecmcount or if account->lb_force_reopen_user_lb_min is disabled than reopen always
+			if (s->ecm_count >= cfg.lb_min_ecmcount || !er->client->account->lb_force_reopen_user_lb_min)
 			{
-				cs_log("loadbalancer for %s: force opening reader %s and reset fail_factor! --> ACTIVE", username(er->client), rdr->label);
+				if (er->client->account->lb_force_reopen_user_lb_min == 1)
+				{
+					cs_log_dbg(D_LB, "loadbalancer: %s: force opening reader %s and reset fail_factor (counts %d > lb_min_ecmcount)! --> ACTIVE", username(er->client), rdr->label, s->ecm_count);
+				}
+				else
+				{
+					cs_log_dbg(D_LB, "loadbalancer: %s: force opening reader %s and reset fail_factor! --> ACTIVE", username(er->client), rdr->label);
+				}
 				ea->status |= READER_ACTIVE;
 				s->fail_factor = 0;
-				continue;
 			}
+			else
+			{
+				cs_log_dbg(D_LB, "loadbalancer: %s: NOT force opening reader %s and reset fail_factor (counts %d < lb_min_ecmcount)! --> NOT ACTIVE", username(er->client), rdr->label, !s->ecm_count ? 0 : s->ecm_count);
+			}
+			continue;
 		}
 
 		//active readers reach get_reopen_seconds(s)

@@ -14,7 +14,7 @@
 #define CLOCKFIX 1
 #define IRDETO_GUESSING 1
 #define CS_ANTICASC 1
-#define WITH_DEBUG 1
+//#define WITH_DEBUG 1
 #define WITH_LB 1
 #define CS_CACHEEX 1
 #define CW_CYCLE_CHECK 1
@@ -51,6 +51,7 @@
 #define READER_DRE 1
 #define READER_TONGFANG 1
 #define READER_STREAMGUARD 1
+#define READER_JET 1
 #define READER_BULCRYPT 1
 #define READER_GRIFFIN 1
 #define READER_DGCRYPT 1
@@ -89,7 +90,7 @@
 #endif
 
 #ifdef WITH_STAPI5
-#define CARDREADER_STAPI5 1
+//#define CARDREADER_STAPI5 1
 #endif
 
 #ifdef READER_DRE

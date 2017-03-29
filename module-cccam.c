@@ -380,7 +380,7 @@ struct cc_srvid *is_good_sid(struct cc_card *card, struct cc_srvid *srvid_good)
 	return srvid;
 }
 
-#define BLOCKING_SECONDS 10
+#define BLOCKING_SECONDS 6
 
 void add_sid_block(struct cc_card *card, struct cc_srvid *srvid_blocked, bool temporary)
 {
@@ -1161,7 +1161,7 @@ void cc_UA_ncam2cccam(uint8_t *in, uint8_t *out, uint16_t caid)
 	//  //Place here your own adjustments!
 	//}
 
-	if(caid_is_bulcrypt(caid) || caid_is_streamguard(caid) || caid_is_tongfang(caid)){
+	if(caid_is_bulcrypt(caid) || caid_is_streamguard(caid) || caid_is_tongfang(caid) || caid_is_dvn(caid)){
 		out[4] = in[0];
 		out[5] = in[1];
 		out[6] = in[2];
@@ -1194,7 +1194,7 @@ void cc_UA_cccam2ncam(uint8_t *in, uint8_t *out, uint16_t caid)
 	//  //Place here your own adjustments!
 	//}
 
-	if(caid_is_bulcrypt(caid) || caid_is_streamguard(caid) || caid_is_tongfang(caid)){
+	if(caid_is_bulcrypt(caid) || caid_is_streamguard(caid) || caid_is_tongfang(caid) || caid_is_dvn(caid)){
 		out[0] = in[4];
 		out[1] = in[5];
 		out[2] = in[6];
@@ -2424,6 +2424,7 @@ int32_t cc_parse_msg(struct s_client *cl, uint8_t *buf, int32_t l)
 			//Trick: when discovered partner is an Ncam Client, then we send him our version string:
 			if(cc->is_ncam_cccam)
 			{
+				//cs_log("ncam detected: %s , version: v%s-%s, build: %s (%s) [EXT,SID,SLP]", getprefix(), CS_VERSION, CS_REVISION, CS_SVN_VERSION, DATE_BUILD, CS_TARGET);
 				uint8_t token[256];
 				snprintf((char *)token, sizeof(token),
 						 "PARTNER: NCAm v%s-%s, build: %s (%s) [EXT,SID,SLP]", CS_VERSION, CS_REVISION,

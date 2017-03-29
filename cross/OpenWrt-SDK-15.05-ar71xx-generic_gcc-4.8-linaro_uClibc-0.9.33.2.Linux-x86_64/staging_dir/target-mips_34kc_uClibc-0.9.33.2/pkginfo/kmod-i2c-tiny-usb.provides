@@ -1,0 +1,5 @@
+i2c-dev.ko
+i2c-tiny-usb.ko
+nls_base.ko
+usb-common.ko
+usbcore.ko

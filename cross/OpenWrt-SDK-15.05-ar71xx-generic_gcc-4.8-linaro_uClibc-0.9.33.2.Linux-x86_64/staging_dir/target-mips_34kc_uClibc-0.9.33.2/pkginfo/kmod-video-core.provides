@@ -1,0 +1,3 @@
+i2c-dev.ko
+v4l2-common.ko
+videodev.ko

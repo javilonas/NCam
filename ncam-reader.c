@@ -527,7 +527,7 @@ bool hexserialset(struct s_reader *rdr)
 
 void hexserial_to_newcamd(uchar *source, uchar *dest, uint16_t caid)
 {
-	if(caid_is_bulcrypt(caid) || caid_is_streamguard(caid) || caid_is_tongfang(caid))
+	if(caid_is_bulcrypt(caid) || caid_is_streamguard(caid) || caid_is_tongfang(caid) || caid_is_dvn(caid))
 	{
 		dest[0] = 0x00;
 		dest[1] = 0x00;
@@ -559,7 +559,7 @@ void hexserial_to_newcamd(uchar *source, uchar *dest, uint16_t caid)
 
 void newcamd_to_hexserial(uchar *source, uchar *dest, uint16_t caid)
 {
-	if(caid_is_bulcrypt(caid) || caid_is_streamguard(caid) || caid_is_tongfang(caid))
+	if(caid_is_bulcrypt(caid) || caid_is_streamguard(caid) || caid_is_tongfang(caid) || caid_is_dvn(caid))
 	{
 		memcpy(dest, source + 2, 4);
 		dest[4] = 0x00;
@@ -979,8 +979,11 @@ int32_t casc_process_ecm(struct s_reader *reader, ECM_REQUEST *er)
 
 		// ecm already pending
 		// ... this level at least
-		if((ecm->rc >= E_NOCARD) &&  er->caid == ecm->caid && (!memcmp(er->ecmd5, ecm->ecmd5, CS_ECMSTORESIZE)))
-			{ sflag = 0; }
+		if((ecm->rc >= E_NOCARD) && (er->caid == ecm->caid || er->caid == ecm->ocaid) && (er->srvid == ecm->srvid)){
+			if(!memcmp(er->ecmd5, ecm->ecmd5, CS_ECMSTORESIZE)){
+				sflag = 0;
+			}
+		}
 
 		if(ecm->rc >= E_NOCARD)
 			{ pending++; }
@@ -1062,7 +1065,9 @@ void reader_get_ecm(struct s_reader *reader, ECM_REQUEST *er)
 		if(!ecm->matching_rdr || ecm == er || ecm->rc == E_99) { continue; }
 
 		//match same ecm
-		if(er->caid == ecm->caid && !memcmp(er->ecmd5, ecm->ecmd5, CS_ECMSTORESIZE))
+		if(er->caid != ecm->caid && er->caid != ecm->ocaid) continue; // no match -> skip
+		if(er->srvid != ecm->srvid) continue; // no match -> skip 
+		if(!memcmp(er->ecmd5, ecm->ecmd5, CS_ECMSTORESIZE))
 		{
 			//check if ask this reader
 			ea = get_ecm_answer(reader, ecm);

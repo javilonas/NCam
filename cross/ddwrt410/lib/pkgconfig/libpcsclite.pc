@@ -1,0 +1,12 @@
+prefix=/usr/src/testing/ext_libs/ddwrt410
+exec_prefix=/usr/src/testing/ext_libs/ddwrt410
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include/PCSC
+usbdropdir=/usr/src/testing/ext_libs/ddwrt410/pcsc/drivers
+
+Name: PCSC Lite
+Description: PC/SC smart card interface
+Version: 1.5.5
+Libs: -L${libdir} -lpcsclite
+Libs.private: 
+Cflags: -I${includedir} -pthread

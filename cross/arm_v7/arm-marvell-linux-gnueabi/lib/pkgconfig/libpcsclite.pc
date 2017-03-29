@@ -1,0 +1,12 @@
+prefix=/opt/s2/ext_libs/arm_v7
+exec_prefix=/opt/s2/ext_libs/arm_v7
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include/PCSC
+usbdropdir=/opt/s2/ext_libs/arm_v7/lib/pcsc/drivers
+
+Name: PCSC Lite
+Description: PC/SC smart card interface
+Version: 1.7.4
+Libs: -L${libdir} -lpcsclite
+Libs.private: 
+Cflags: -I${includedir} -pthread

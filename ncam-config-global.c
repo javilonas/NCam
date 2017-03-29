@@ -306,6 +306,19 @@ void global_fixups_fn(void *UNUSED(var))
 #ifdef WITH_LB
 	if(cfg.lb_save > 0 && cfg.lb_save < 100) { cfg.lb_save = 100; }
 	if(cfg.lb_nbest_readers < 2) { cfg.lb_nbest_readers = DEFAULT_NBEST; }
+
+	bool is_user_lb_force_always = false;
+	struct s_auth *account;
+	for(account = cfg.account; account; account = account->next)
+	{
+		if(account->lb_force_reopen_user == 1)
+		{
+			is_user_lb_force_always = true;
+			break;
+		}
+	}
+	//now disable global lb_force_reopen_always if one of users have enabled user specific force reopen
+	if(is_user_lb_force_always) { cfg.lb_force_reopen_always = 0; }
 	if(cfg.lb_reopen_seconds_never_group != NULL) { cfg.lb_reopen_seconds_never = 0; }
 #endif
 }
@@ -372,6 +385,7 @@ static const struct config_list global_opts[] =
 	DEF_OPT_INT32("lb_min_ecmcount"         , OFS(lb_min_ecmcount),     DEFAULT_MIN_ECM_COUNT),
 	DEF_OPT_INT32("lb_max_ecmcount"         , OFS(lb_max_ecmcount),     DEFAULT_MAX_ECM_COUNT),
 	DEF_OPT_INT32("lb_reopen_seconds"       , OFS(lb_reopen_seconds),   DEFAULT_REOPEN_SECONDS),
+	DEF_OPT_INT32("lb_reopen_seconds_lbmin" , OFS(lb_reopen_seconds_lbmin),   0),
 	DEF_OPT_INT8("lb_reopen_invalid"        , OFS(lb_reopen_invalid),   1),
 	DEF_OPT_INT8("lb_reopen_seconds_never"  , OFS(lb_reopen_seconds_never),   0),
 	DEF_OPT_STR("lb_reopen_seconds_never_group"  , OFS(lb_reopen_seconds_never_group),         NULL),
@@ -400,7 +414,6 @@ static const struct config_list global_opts[] =
 	DEF_OPT_INT8("double_check"             , OFS(double_check),        0),
 	DEF_OPT_INT8("disablecrccws"            , OFS(disablecrccws),            0),
 	DEF_OPT_FUNC("disablecrccws_only_for"   , OFS(disablecrccws_only_for),     chk_ftab_fn),
-	DEF_OPT_STR("forcereopenusernames"      , OFS(forcereopenusernames), NULL),
 	DEF_LAST_OPT
 };
 
@@ -1157,7 +1170,7 @@ static bool dvbapi_should_save_fn(void *UNUSED(var))
 static const struct config_list dvbapi_opts[] =
 {
 	DEF_OPT_SAVE_FUNC(dvbapi_should_save_fn),
-	DEF_OPT_INT8("enabled"			, OFS(dvbapi_enabled),		1),
+	DEF_OPT_INT8("dvbapi_enabled"		, OFS(dvbapi_enabled),		0),
 	DEF_OPT_INT8("au"				, OFS(dvbapi_au),		0),
 	DEF_OPT_INT8("pmt_mode"			, OFS(dvbapi_pmtmode),		0),
 	DEF_OPT_INT8("request_mode"		, OFS(dvbapi_requestmode),	0),

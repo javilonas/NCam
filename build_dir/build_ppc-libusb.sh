@@ -29,6 +29,10 @@ export CROSS=$ROOTFS_PATH/cross/powerpc-tuxbox-linux-gnu/bin/powerpc-linux-
 export DCMAKE=cross-powerpc-tuxbox-linux-libusb
 export SCRIPT=build_ppc-libusb.sh
 
+export LIB_RT="$ROOTFS_PATH/cross/powerpc-tuxbox-linux-gnu/lib/librt.a -lrt"
+export LIB_PTHREAD="$ROOTFS_PATH/cross/powerpc-tuxbox-linux-gnu/lib/libpthread.a -lrt"
+export PATH=$PATH:~$ROOTFS_PATH/cross/powerpc-tuxbox-linux-gnu/bin
+
 export LIBUSB_LIB="$ROOTFS_PATH/cross/powerpc-tuxbox-linux-gnu/powerpc-linux/lib/libusb-1.0.a -lrt"
 export LIST_SMARGO=list_smargo-*-powerpc-linux-libusb
 

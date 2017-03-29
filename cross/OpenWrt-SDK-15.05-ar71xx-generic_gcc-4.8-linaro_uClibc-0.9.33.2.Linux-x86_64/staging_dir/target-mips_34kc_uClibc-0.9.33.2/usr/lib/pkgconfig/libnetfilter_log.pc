@@ -1,0 +1,16 @@
+# libnetfilter_log pkg-config file
+
+prefix=/usr
+exec_prefix=/usr
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libnetfilter_log
+Description: netfilter userspace packet logging library
+URL: http://netfilter.org/projects/libnetfilter_log/
+Version: 1.0.1
+Requires: libnfnetlink
+Conflicts:
+Libs: -L${libdir} -lnetfilter_log
+Libs.private: -L/home/buildbot/slave-local/ar71xx_generic/build/staging_dir/target-mips_34kc_uClibc-0.9.33.2/usr/lib -lnfnetlink 
+Cflags: -I${includedir}

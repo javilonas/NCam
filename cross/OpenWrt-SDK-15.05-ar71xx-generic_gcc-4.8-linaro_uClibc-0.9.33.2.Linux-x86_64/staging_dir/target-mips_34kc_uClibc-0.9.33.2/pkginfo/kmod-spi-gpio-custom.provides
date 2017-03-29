@@ -1,0 +1,3 @@
+spi-gpio-custom.ko
+spi-gpio.ko
+spidev.ko

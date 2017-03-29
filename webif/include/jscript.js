@@ -1571,9 +1571,7 @@ function updateStatuspage(data) {
  * Cacheexpage Functions: Update Page
  */
 function updateCacheexpage(data) {
-
 	updateCacheextotals(data);
-	
 }
 
 /*

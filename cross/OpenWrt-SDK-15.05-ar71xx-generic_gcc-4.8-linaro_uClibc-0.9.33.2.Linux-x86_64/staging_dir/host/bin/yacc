@@ -1,0 +1,2 @@
+#! /bin/sh
+exec '/home/buildbot/slave-local/ar71xx_generic/build/staging_dir/host/bin/bison' -y "$@"

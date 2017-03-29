@@ -59,6 +59,28 @@ rm -f ncam.arm-raspbian > /dev/null 2>&1
 rm -f ncam.arm-raspbian.debug > /dev/null 2>&1
 rm -f ncam-libusb.arm-raspbian > /dev/null 2>&1
 rm -f ncam-libusb.arm-raspbian.debug > /dev/null 2>&1
+rm -f ncam.arm-marvell > /dev/null 2>&1
+rm -f ncam.arm-marvell.debug > /dev/null 2>&1
+rm -f ncam-libusb.arm-marvell > /dev/null 2>&1
+rm -f ncam-libusb.arm-marvell.debug > /dev/null 2>&1
+rm -f ncam.arm-android > /dev/null 2>&1
+rm -f ncam.arm-android.debug > /dev/null 2>&1
+rm -f ncam-libusb.arm-android > /dev/null 2>&1
+rm -f ncam-libusb.arm-android.debug > /dev/null 2>&1
+rm -f ncam-router-OpenWrt-brcm47xx.mips > /dev/null 2>&1
+rm -f ncam-router-OpenWrt-brcm47xx.mips.debug > /dev/null 2>&1
+rm -f ncam-router-openwrt-brcm47xx-libusb.mips > /dev/null 2>&1
+rm -f ncam-router-openwrt-brcm47xx-libusb.mips.debug > /dev/null 2>&1
+rm -f ncam-router-OpenWrt-ar71xx.mips > /dev/null 2>&1
+rm -f ncam-router-OpenWrt-ar71xx.mips.debug > /dev/null 2>&1
+rm -f ncam-router-openwrt-ar71xx-libusb.mips > /dev/null 2>&1
+rm -f ncam-router-openwrt-ar71xx-libusb.mips.debug > /dev/null 2>&1
+rm -f ncam-router-OpenWrt-brcm63xx.mips > /dev/null 2>&1
+rm -f ncam-router-OpenWrt-brcm63xx.mips.debug > /dev/null 2>&1
+rm -f ncam-router-openwrt-brcm63xx-libusb.mips > /dev/null 2>&1
+rm -f ncam-router-openwrt-brcm63xx-libusb.mips.debug > /dev/null 2>&1
+rm -f ncam.arm-mca > /dev/null 2>&1
+rm -f ncam.arm-mca.debug > /dev/null 2>&1
 echo ""
 make clean > /dev/null 2>&1
 mkdir $ROOTFS_PATH/build > /dev/null 2>&1
@@ -84,3 +106,4 @@ echo ""
 sh clean_distri.sh > /dev/null 2>&1
 sync
 echo " Clean all!!"
+

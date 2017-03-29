@@ -1,0 +1,4 @@
+pcmcia.ko
+pcmcia_core.ko
+pcmcia_rsrc.ko
+yenta_socket.ko

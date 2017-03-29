@@ -1,0 +1,3 @@
+hwmon.ko
+i2c-dev.ko
+lm77.ko

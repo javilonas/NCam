@@ -1,0 +1,10 @@
+./
+./host
+./usr
+./usr/lib
+./usr/lib/libsetlbf.so
+./usr/sbin
+./usr/sbin/init
+./usr/sbin/procd
+./usr/sbin/askfirst
+./usr/sbin/udevtrigger

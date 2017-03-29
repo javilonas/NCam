@@ -1,0 +1,4 @@
+dht11.ko
+industrialio-triggered-buffer.ko
+industrialio.ko
+kfifo_buf.ko

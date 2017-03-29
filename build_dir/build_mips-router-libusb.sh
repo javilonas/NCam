@@ -25,11 +25,15 @@ export PARCH_LOGS=$ROOTFS_PATH/build_dir/logs
 export ARCH=mips
 export target=mips
 export NCAM_BIN=ncam-router-libusb.mips
-export CROSS=$ROOTFS_PATH/cross/4.1.0-uclibc-0.9.28/bin/mipsel-linux-uclibc-
+export CROSS=$ROOTFS_PATH/cross/ddwrt410/bin/mipsel-linux-uclibc-
 export DCMAKE=cross-mipsel-router-linux-uclibc-libusb
 export SCRIPT=build_mips-router-libusb.sh
 
-export LIBUSB_LIB="$ROOTFS_PATH/cross/4.1.0-uclibc-0.9.28/lib/libusb-1.0.a -lrt"
+export LIB_PTHREAD="$ROOTFS_PATH/cross/ddwrt410/lib/libpthread.a -lrt"
+export PATH=$PATH:~$ROOTFS_PATH/cross/ddwrt410/bin
+export STAGING_DIR=~/openwrt/staging_dir
+
+export LIBUSB_LIB="$ROOTFS_PATH/cross/ddwrt410/lib/libusb-1.0.a -lrt"
 export LIST_SMARGO=list_smargo-*-mipsel-linux-uclibc-libusb
 
 # BEGIN THE LOG

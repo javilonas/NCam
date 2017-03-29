@@ -1,0 +1,19 @@
+#
+# Author: Lasse Collin
+#
+# This file has been put into the public domain.
+# You can do whatever you want with this file.
+#
+
+prefix=/home/buildbot/slave-local/ar71xx_generic/build/staging_dir/host
+exec_prefix=/home/buildbot/slave-local/ar71xx_generic/build/staging_dir/host
+libdir=/home/buildbot/slave-local/ar71xx_generic/build/staging_dir/host/lib
+includedir=/home/buildbot/slave-local/ar71xx_generic/build/staging_dir/host/include
+
+Name: liblzma
+Description: General purpose data compression library
+URL: http://tukaani.org/xz/
+Version: 5.2.1
+Cflags: -I${includedir}
+Libs: -L${libdir} -llzma
+Libs.private: -pthread -lrt  

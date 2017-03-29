@@ -29,6 +29,10 @@ export CROSS=$ROOTFS_PATH/cross/powerpc-tuxbox-linux-gnu/bin/powerpc-linux-
 export DCMAKE=cross-powerpc-tuxbox-linux
 export SCRIPT=build_ppc.sh
 
+export LIB_RT="$ROOTFS_PATH/cross/powerpc-tuxbox-linux-gnu/lib/librt.a -lrt"
+export LIB_PTHREAD="$ROOTFS_PATH/cross/powerpc-tuxbox-linux-gnu/lib/libpthread.a -lrt"
+export PATH=$PATH:~$ROOTFS_PATH/cross/powerpc-tuxbox-linux-gnu/bin
+
 # BEGIN THE LOG
 cd $PARCH_LOGS/
 echo ">> LOG BUILD $NCAM_BIN >>" >> .build_$NCAM_BIN.$TIME_LOG.log 2>&1 || exit -1

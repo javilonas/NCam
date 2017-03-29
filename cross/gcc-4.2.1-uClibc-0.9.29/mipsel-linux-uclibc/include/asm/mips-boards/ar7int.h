@@ -1,0 +1,149 @@
+/*
+ * Carsten Langgaard, carstenl@mips.com
+ * Copyright (C) 2002 MIPS Technologies, Inc.  All rights reserved.
+ *
+ *  This program is free software; you can distribute it and/or modify it
+ *  under the terms of the GNU General Public License (Version 2) as
+ *  published by the Free Software Foundation.
+ *
+ *  This program is distributed in the hope it will be useful, but WITHOUT
+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ *  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ *  for more details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  59 Temple Place - Suite 330, Boston MA 02111-1307, USA.
+ *
+ * Defines for the AR7 interrupt controller.
+ */
+#ifndef _MIPS_AR7INT_H
+#define _MIPS_AR7INT_H
+
+/*------------------------------------------------------------------------------------------*\
+\*------------------------------------------------------------------------------------------*/
+#include <asm/mips-boards/ar7.h>
+
+/*------------------------------------------------------------------------------------------*\
+\*------------------------------------------------------------------------------------------*/
+enum _ar7_interrupt_type_trigger {
+    ar7_interrupt_type_level = 1,
+    ar7_interrupt_type_edge = 0
+};
+
+enum _ar7_interrupt_type_polarity {
+    ar7_interrupt_type_active_high = 0,
+    ar7_interrupt_type_active_low = 1
+};
+
+unsigned int ar7int_set_type(unsigned int irq, enum _ar7_interrupt_type_trigger, enum _ar7_interrupt_type_polarity);
+
+/*------------------------------------------------------------------------------------------*\
+ * Initialize the IRQ pacing administration                                                 *
+ *                                                                                          *
+ * Argument: prescale: Prescale-Value to define the intervals to count IRQs                 *
+\*------------------------------------------------------------------------------------------*/
+void ar7int_ctrl_irq_pacing_setup(unsigned int prescale);
+
+/*------------------------------------------------------------------------------------------*\
+ * Register the usage of pacing for an IRQ                                                  *
+ *                                                                                          *
+ * Argument: irq - The IRQ that should be paced                                             *
+ *                                                                                          *
+ * Return: >=0: Handle, with which to call the pacing related functions                     *
+ *         -1 : IRQ is already registered                                                   *
+ *         -2 : No more pacing registers available                                          *
+ *         -3 : Thengiven IRQ can not be set and is therefor rejected                       *
+\*------------------------------------------------------------------------------------------*/
+int ar7int_ctrl_irq_pacing_register(unsigned int irq);
+
+/*------------------------------------------------------------------------------------------*\
+ * Unregister the IRQ pacing for a given handle                                             *
+ *                                                                                          *
+ * Argument: handle - Handle returned at register time                                      *
+\*------------------------------------------------------------------------------------------*/
+void ar7int_ctrl_irq_pacing_unregister(int handle);
+
+/*------------------------------------------------------------------------------------------*\
+ * Set the needed IRQ pacing                                                                *
+ *                                                                                          *
+ * Arguments: handle - Handle returned at registration time                                 *
+ *            max    - Summarize at most 'max' interrupts per time slot                     *
+ *                                                                                          *
+ * Return: 0 on success, -1 on invalid handle                                               *
+\*------------------------------------------------------------------------------------------*/
+int ar7int_ctrl_irq_pacing_set(int handle, unsigned int max);
+
+/*------------------------------------------------------------------------------------------*\
+ * enable: max >= 2 (0 <= prescale < (1 << 12))
+ * illegal: max = 1
+ * disable: max = 0 (prescale must be 0)
+\*------------------------------------------------------------------------------------------*/
+unsigned int ar7int_ctrl_irq_pacing(unsigned int irq, unsigned int index, unsigned int prescale, unsigned int max);
+
+/*------------------------------------------------------------------------------------------*\
+\*------------------------------------------------------------------------------------------*/
+extern void ar7int_init(void);
+void ar7_timer_interrupt(void);
+extern unsigned long long ar7_nsec_timer(void);
+
+/*------------------------------------------------------------------------------------------*\
+\*------------------------------------------------------------------------------------------*/
+#define MIPS_EXCEPTION_OFFSET           8
+#define AR7_MAX_INT_PRIMARY            40
+#define AR7_MAX_INT_SECONDARY          40
+
+#define AR7_INT_END_PRIMARY            (AR7_MAX_INT_PRIMARY + MIPS_EXCEPTION_OFFSET)
+#define AR7_INT_START_SECONDARY        AR7_INT_END_PRIMARY            
+#define AR7_INT_END_SECONDARY          (AR7_MAX_INT_SECONDARY + AR7_INT_END_PRIMARY)
+
+#if defined(CONFIG_VLYNQ_SUPPORT)
+#define AR7_MAX_INT_VIRTUAL            (32 * MAX_VLYNQ_DEVICES)
+#define AR7_INT_START_VIRTUAL          AR7_INT_END_SECONDARY          
+#define AR7_INT_END_VIRTUAL            (AR7_MAX_INT_VIRTUAL + AR7_INT_END_SECONDARY)
+#endif /*--- #if defined(CONFIG_VLYNQ_SUPPORT) ---*/
+
+/*------------------------------------------------------------------------------------------*\
+ * Primary Interrupts
+\*------------------------------------------------------------------------------------------*/
+#define AR7INT_EXT_0                       (MIPS_EXCEPTION_OFFSET + 1)
+#define AR7INT_EXT_1                       (MIPS_EXCEPTION_OFFSET + 2)
+/* Line#  3 to 4 are reserved                            */
+#define AR7INT_TIMER_0                     (MIPS_EXCEPTION_OFFSET + 5)
+#define AR7INT_TIMER_1                     (MIPS_EXCEPTION_OFFSET + 6)
+#define AR7INT_UART0                       (MIPS_EXCEPTION_OFFSET + 7)
+#define AR7INT_UART1                       (MIPS_EXCEPTION_OFFSET + 8)
+#define AR7INT0_DMA                        (MIPS_EXCEPTION_OFFSET + 9)
+#define AR7INT1_DMA                        (MIPS_EXCEPTION_OFFSET + 10)
+/* Line# 11 to 14 are reserved                    */
+#define AR7INT_ATM_SAR                     (MIPS_EXCEPTION_OFFSET + 15)
+/* Line# 16 to 18 are reserved                    */
+#define AR7INT_CPMAC0                      (MIPS_EXCEPTION_OFFSET + 19)
+/* Line# 20 is reserved                           */
+#define AR7INT_VLYNQ0                      (MIPS_EXCEPTION_OFFSET + 21)
+#define AR7INT_CODEC_WAKEUP                (MIPS_EXCEPTION_OFFSET + 22)
+/* Line# 23 is reserved                           */
+#define AR7INT_USB_SLAVE                   (MIPS_EXCEPTION_OFFSET + 24)
+#define AR7INT_VLYNQ1                      (MIPS_EXCEPTION_OFFSET + 25)
+/* Line# 26 to 27 are reserved                    */
+#define AR7INT_UNIFIED_PHY                 (MIPS_EXCEPTION_OFFSET + 28)
+#define AR7INT_I2C                         (MIPS_EXCEPTION_OFFSET + 29)
+#define AR7INT2_DMA                        (MIPS_EXCEPTION_OFFSET + 30)
+#define AR7INT3_DMA                        (MIPS_EXCEPTION_OFFSET + 31)
+/* Line# 32 is reserved                           */
+#define AR7INT_CPMAC1                      (MIPS_EXCEPTION_OFFSET + 33)
+/* Line# 34 to 36 are reserved                    */
+#define AR7INT_VDMA_VT_RX                  (MIPS_EXCEPTION_OFFSET + 37)
+#define AR7INT_VDMA_VT_TX                  (MIPS_EXCEPTION_OFFSET + 38)
+#define AR7INT_ADSLSS                      (MIPS_EXCEPTION_OFFSET + 39) 
+
+/*------------------------------------------------------------------------------------------*\
+ * Secondary Interrupts
+\*------------------------------------------------------------------------------------------*/
+/*--- channel 0 to 6 are reserved ---*/
+#define AR7INT_EMIF                        (MIPS_EXCEPTION_OFFSET + 7)
+/*--- channel 8 to 31 are reserved ---*/
+
+/*------------------------------------------------------------------------------------------*\
+\*------------------------------------------------------------------------------------------*/
+#endif /* !(_MIPS_AR7INT_H) */

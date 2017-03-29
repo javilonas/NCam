@@ -363,9 +363,9 @@ typedef unsigned char uchar;
 /* ===========================
  *         constants
  * =========================== */
-#define CS_VERSION    "1.2"
-#define DATE_BUILD    "20-03-2017"
-#define CS_REVISION   "r3"
+#define CS_VERSION    "1.3"
+#define DATE_BUILD    "31-03-2017"
+#define CS_REVISION   "r6"
 #ifndef CS_SVN_VERSION
 #   define CS_SVN_VERSION "stable"
 #endif
@@ -395,11 +395,11 @@ typedef unsigned char uchar;
 // Support for multiple CWs per channel and other encryption algos
 #define WITH_EXTENDED_CW 1
 
-#define MAX_ECM_SIZE 1024
-#define MAX_EMM_SIZE 1024
-#define MAX_SCT_SIZE 1024   // smaller or equal to the minial one of MAX_ECM_SIZE and MAX_EMM_SIZE 
+#define MAX_ECM_SIZE 1240
+#define MAX_EMM_SIZE 1240
+#define MAX_SCT_SIZE 1240   // smaller or equal to the minial one of MAX_ECM_SIZE and MAX_EMM_SIZE 
 
-#define CS_EMMCACHESIZE 1024 //nr of EMMs that each reader will cache
+#define CS_EMMCACHESIZE 1240 //nr of EMMs that each reader will cache
 #define MSGLOGSIZE 64       // size of string buffer for a ecm to return messages
 
 #define D_TRACE     0x0001  // Generate very detailed error/trace messages per routine
@@ -521,7 +521,7 @@ typedef unsigned char uchar;
 #define READER_DEVICE_ERROR   5
 
 // moved from stats
-#define DEFAULT_REOPEN_SECONDS 30
+#define DEFAULT_REOPEN_SECONDS 18
 #define DEFAULT_MIN_ECM_COUNT 3
 #define DEFAULT_MAX_ECM_COUNT 1000
 #define DEFAULT_NBEST 1
@@ -613,8 +613,8 @@ extern const char *weekdstr;
 /* ===========================
  *      Default Values
  * =========================== */
-#define DEFAULT_INACTIVITYTIMEOUT 15     // default 0
-#define DEFAULT_TCP_RECONNECT_TIMEOUT 8 // default 15
+#define DEFAULT_INACTIVITYTIMEOUT 0     // default 0
+#define DEFAULT_TCP_RECONNECT_TIMEOUT 13 // default 15
 #define DEFAULT_NCD_KEEPALIVE 1 // default 0
 
 #define DEFAULT_CC_MAXHOPS 3   // default 10
@@ -622,8 +622,8 @@ extern const char *weekdstr;
 #define DEFAULT_CC_IGNRSHR 0   // Use global cfg // default -1
 #define DEFAULT_CC_STEALTH 1   // Use global cfg // default -1
 #define DEFAULT_CC_KEEPALIVE 1  // default 0
-#define DEFAULT_CC_RECONNECT 7000
-#define DEFAULT_CC_RECV_TIMEOUT 2000
+#define DEFAULT_CC_RECONNECT 8000
+#define DEFAULT_CC_RECV_TIMEOUT 1600
 
 #define GBOX_MAX_PROXY_CARDS 32
 #define GBOX_MAX_IGNORED_PEERS  16
@@ -1525,11 +1525,21 @@ struct s_reader                                     // contains device info, rea
 	uint32_t        tongfang3_calibsn;
 	uchar           tongfang3_commkey[8];
 #endif
+#ifdef READER_JET
+	uint8_t         jet_vendor_key[32];
+	uint8_t         jet_root_key[8];
+	uint8_t         jet_derive_key[56];
+	uint8_t         jet_auth_key[10];
+	uint8_t         jet_service_key[8];
+	uint8_t         jet_authorize_id[8];
+	uint8_t         jet_fix_ecm;                   // for dvn jet ,ecm head is 0x50, this option indicate if fix it to 0x80 or 0x81.
+	uint8_t         jet_resync_vendorkey;
+#endif
 	uint32_t        cas_version;
 	int8_t          nagra_read;                     // read nagra ncmed records: 0 Disabled (default), 1 read all records, 2 read valid records only
 	int8_t          detect_seca_nagra_tunneled_card;
 	int8_t          force_irdeto;
-	uint8_t         boxkey[16];                     // n3 boxkey 8 bytes, seca sessionkey 16 bytes, viaccess camid 4 bytes
+	uint8_t         boxkey[32];                     // n3 boxkey 8 bytes, seca sessionkey 16 bytes, viaccess camid 4 bytes
 	uint8_t         boxkey_length;
 	uint8_t         rsa_mod[120];                   // rsa modulus for nagra cards.
 	uint8_t         rsa_mod_length;
@@ -1781,8 +1791,8 @@ struct s_auth
 #ifdef CS_CACHEEX
 	CECSP           cacheex; //CacheEx Settings
 	uint8_t         no_wait_time;
-	uint8_t			disablecrccacheex;
-	FTAB 			disablecrccacheex_only_for;
+	uint8_t         disablecrccacheex;
+	FTAB            disablecrccacheex_only_for;
 #endif
 	int16_t         allowedprotocols;
 	LLIST           *aureader_list;
@@ -1819,6 +1829,8 @@ struct s_auth
 	int32_t         lb_nbest_readers;               // When this is -1, the global lb_nbest_readers is used
 	int32_t         lb_nfb_readers;                 // When this is -1, the global lb_nfb_readers is used
 	CAIDVALUETAB    lb_nbest_readers_tab;           // like nbest_readers, but for special caids
+	int8_t          lb_force_reopen_user;           // user always force reopening immediately all failing readers if no matching reader found
+	int8_t          lb_force_reopen_user_lb_min;    // user always force reopening immediately all failing readers if no matching reader found but only if ecm count reached lb_min_ecmcount
 #endif
 	IN_ADDR_T       dynip;
 	char            *dyndns;
@@ -2162,6 +2174,7 @@ struct s_config
 	int32_t         lb_reopen_seconds;              // time between retrying failed readers/caids/prov/srv
 	int8_t          lb_reopen_seconds_never;        // permanently block this: time between retrying failed readers/caids/prov/srv
 	char            *lb_reopen_seconds_never_group; // permanently block this for defined group only: time between retrying failed readers/caids/prov/srv
+	int32_t         lb_reopen_seconds_lbmin;        // time between retrying failed readers/caids/prov/srv which allready have FOUND count >= lb_min_ecmcount
 	int8_t          lb_reopen_invalid;              // default=1; if 0, rc=E_INVALID will be blocked until stats cleaned
 	int8_t          lb_force_reopen_always;         // force reopening immediately all failing readers if no matching reader found
 	int32_t         lb_retrylimit;                  // reopen only happens if reader response time > retrylimit
@@ -2310,7 +2323,6 @@ struct s_config
 #ifdef MODULE_SERIAL
 	struct s_twin *twin_list;
 #endif
-	char    *forcereopenusernames;
 };
 
 struct s_clientinit
@@ -2433,6 +2445,7 @@ static inline bool caid_is_nagra(uint16_t caid) { return caid >> 8 == 0x18; }
 static inline bool caid_is_bulcrypt(uint16_t caid) { return caid == 0x5581 || caid == 0x4AEE; }
 static inline bool caid_is_dre(uint16_t caid) { return caid == 0x4AE0 || caid == 0x4AE1 || caid == 0x2710; }
 static inline bool caid_is_streamguard(uint16_t caid) { return caid == 0x4AD2; }
+static inline bool caid_is_dvn(uint16_t caid) { return caid == 0x4A30; }
 static inline bool caid_is_tongfang(uint16_t caid) { return (caid == 0x4A02) || (caid >= 0x4B00 && caid <= 0x4BFF); }
 const char *get_cardsystem_desc_by_caid(uint16_t caid);
 

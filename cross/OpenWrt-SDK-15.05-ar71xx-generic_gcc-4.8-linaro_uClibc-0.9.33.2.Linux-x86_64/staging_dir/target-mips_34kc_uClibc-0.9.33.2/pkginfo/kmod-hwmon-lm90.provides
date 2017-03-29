@@ -1,0 +1,3 @@
+hwmon.ko
+i2c-dev.ko
+lm90.ko

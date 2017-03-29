@@ -395,7 +395,7 @@ sync
 echo ""
 echo " Build ARM-RASP-LIBUSB..."
 echo ""
-sh $BUILD_DIR/build_build_arm-raspbian-libusb.sh > /dev/null 2>&1
+sh $BUILD_DIR/build_arm-raspbian-libusb.sh > /dev/null 2>&1
 sync
 echo ""
 echo ""
@@ -410,6 +410,222 @@ sync
 echo ""
 echo ""
 sleep 35
+sync
+echo ""
+echo " Build ARM-MARVELL..."
+echo ""
+sh $BUILD_DIR/build_arm-marvell.sh > /dev/null 2>&1
+sync
+echo ""
+echo ""
+echo ""
+sleep 0.8s
+echo ""
+echo ""
+echo ""
+echo " PLEASE WAIT...."
+echo ""
+sync
+echo ""
+echo ""
+sleep 35
+sync
+echo ""
+echo " Build ARM-MARVELL-LIBUSB..."
+echo ""
+sh $BUILD_DIR/build_arm-marvell-libusb.sh > /dev/null 2>&1
+sync
+echo ""
+echo ""
+echo ""
+sleep 0.8s
+echo ""
+echo ""
+echo ""
+echo " PLEASE WAIT...."
+echo ""
+sync
+echo ""
+echo ""
+sleep 35
+sync
+echo ""
+echo " Build ARM-ANDROID..."
+echo ""
+sh $BUILD_DIR/build_arm-android.sh > /dev/null 2>&1
+sync
+echo ""
+echo ""
+echo ""
+sleep 0.8s
+echo ""
+echo ""
+echo ""
+echo " PLEASE WAIT...."
+echo ""
+sync
+echo ""
+echo ""
+sleep 35
+sync
+echo ""
+echo " Build ARM-ANDROID-LIBUSB..."
+echo ""
+sh $BUILD_DIR/build_arm-android-libusb.sh > /dev/null 2>&1
+sync
+echo ""
+echo ""
+echo ""
+sleep 0.8s
+echo ""
+echo ""
+echo ""
+echo " PLEASE WAIT...."
+echo ""
+echo ""
+sleep 35
+sync
+echo ""
+echo ""
+echo " PLEASE WAIT...."
+echo ""
+sync
+echo ""
+echo ""
+sleep 35
+sync
+echo ""
+echo " Build MIPS-ROUTER (DD-WRT-ar71xx)..."
+echo ""
+sh $BUILD_DIR/build_mips-router-openwrt-ar71xx.sh > /dev/null 2>&1
+sync
+echo ""
+echo ""
+echo ""
+sleep 0.8s
+echo ""
+echo ""
+echo ""
+echo " PLEASE WAIT...."
+echo ""
+sync
+echo ""
+echo ""
+sleep 35
+sync
+echo ""
+echo " Build MIPS-ROUTER-LIBUSB (DD-WRT-ar71xx)..."
+echo ""
+sh $BUILD_DIR/build_mips-router-openwrt-ar71xx-libusb.sh > /dev/null 2>&1
+sync
+echo ""
+echo ""
+echo ""
+sleep 0.8s
+echo ""
+echo ""
+echo ""
+sleep 35
+sync
+echo ""
+echo ""
+echo " PLEASE WAIT...."
+echo ""
+sync
+echo ""
+echo ""
+sleep 35
+sync
+echo ""
+echo " Build MIPS-ROUTER (DD-WRT-brcm47xx)..."
+echo ""
+sh $BUILD_DIR/build_mips-router-openwrt-brcm47xx.sh > /dev/null 2>&1
+sync
+echo ""
+echo ""
+echo ""
+sleep 0.8s
+echo ""
+echo ""
+echo ""
+echo " PLEASE WAIT...."
+echo ""
+sync
+echo ""
+echo ""
+sleep 35
+sync
+echo ""
+echo " Build MIPS-ROUTER-LIBUSB (DD-WRT-brcm47xx)..."
+echo ""
+sh $BUILD_DIR/build_mips-router-openwrt-brcm47xx-libusb.sh > /dev/null 2>&1
+sync
+echo ""
+echo ""
+echo ""
+sleep 0.8s
+echo ""
+echo ""
+echo ""
+echo " PLEASE WAIT...."
+echo ""
+sync
+echo ""
+echo ""
+sleep 35
+sync
+echo ""
+echo " Build MIPS-ROUTER (DD-WRT-brcm47xx)..."
+echo ""
+sh $BUILD_DIR/build_mips-router-openwrt-brcm63xx.sh > /dev/null 2>&1
+sync
+echo ""
+echo ""
+echo ""
+sleep 0.8s
+echo ""
+echo ""
+echo ""
+echo " PLEASE WAIT...."
+echo ""
+sync
+echo ""
+echo ""
+sleep 35
+sync
+echo ""
+echo " Build MIPS-ROUTER-LIBUSB (DD-WRT-brcm63xx)..."
+echo ""
+sh $BUILD_DIR/build_mips-router-openwrt-brcm63xx-libusb.sh > /dev/null 2>&1
+sync
+echo ""
+echo ""
+echo ""
+sleep 0.8s
+echo ""
+echo ""
+echo ""
+echo " PLEASE WAIT...."
+echo ""
+sync
+echo ""
+echo ""
+sleep 35
+sync
+echo ""
+echo " Build ARM-MCA (Matrix CAM Air)..."
+echo ""
+sh $BUILD_DIR/build_arm-mca.sh > /dev/null 2>&1
+sync
+echo ""
+echo ""
+echo ""
+sleep 0.8s
+echo ""
+echo ""
+echo ""
+echo " PLEASE WAIT...."
+echo ""
 sync
 echo ""
 echo " We are finalizing ..."

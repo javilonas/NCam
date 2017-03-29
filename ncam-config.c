@@ -1609,7 +1609,8 @@ void * read_cccamcfg(int32_t mode)
 			int32_t reshare=-1;
 			switch(line[0]){
 				case 'N':
-					proto = "newcamd", "newcamd524", "newcamd525", "mgcamd", "cccam";
+					//proto = "newcamd|newcamd524|newcamd525|mgcamd|cccam";
+					proto = "newcamd";
 					ret=sscanf(line,"%c:%s%d%s%s%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%d",&typ,host,&port,uname,upass,
 						&ncd_key[0], &ncd_key[1], &ncd_key[2], &ncd_key[3],&ncd_key[4],
 						&ncd_key[5], &ncd_key[6], &ncd_key[7], &ncd_key[8],&ncd_key[9],

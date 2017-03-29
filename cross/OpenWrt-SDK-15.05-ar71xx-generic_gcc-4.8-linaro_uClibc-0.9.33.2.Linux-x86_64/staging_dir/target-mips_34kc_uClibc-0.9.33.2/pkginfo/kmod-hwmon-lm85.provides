@@ -1,0 +1,4 @@
+hwmon-vid.ko
+hwmon.ko
+i2c-dev.ko
+lm85.ko

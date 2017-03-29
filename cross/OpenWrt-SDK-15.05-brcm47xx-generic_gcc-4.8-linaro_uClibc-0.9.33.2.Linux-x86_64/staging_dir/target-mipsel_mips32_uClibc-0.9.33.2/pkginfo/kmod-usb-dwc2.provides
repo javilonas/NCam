@@ -1,0 +1,5 @@
+dwc2.ko
+dwc2_platform.ko
+nls_base.ko
+usb-common.ko
+usbcore.ko

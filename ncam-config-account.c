@@ -389,10 +389,12 @@ void class_fn(const char *token, char *value, void *setting, FILE *f)
 	}
 }
 
-#ifdef CS_ANTICASC
 static void account_fixups_fn(void *var)
 {
+#if defined(CS_ANTICASC) || defined(WITH_LB)
 	struct s_auth *account = var;
+#endif
+#ifdef CS_ANTICASC
 	if(account->ac_users < -1) { account->ac_users = DEFAULT_AC_USERS; }
 	if(account->ac_penalty < -1) { account->ac_penalty = DEFAULT_AC_PENALTY; }
 	if(account->acosc_max_active_sids < -1) { account->acosc_max_active_sids = -1; }
@@ -400,15 +402,19 @@ static void account_fixups_fn(void *var)
 	if(account->acosc_penalty < -1) { account->acosc_penalty = -1; }
 	if(account->acosc_penalty_duration < -1) { account->acosc_penalty_duration = -1; }
 	if(account->acosc_delay < -1) { account->acosc_delay = -1; }
-}
 #endif
+#ifdef WITH_LB
+	if(account->lb_force_reopen_user == 1) { cfg.lb_force_reopen_always = 0; }
+	else{ account->lb_force_reopen_user_lb_min = 0; }
+#endif
+}
 
 #define OFS(X) offsetof(struct s_auth, X)
 #define SIZEOF(X) sizeof(((struct s_auth *)0)->X)
 
 static const struct config_list account_opts[] =
 {
-#ifdef CS_ANTICASC
+#if defined(CS_ANTICASC) || defined(WITH_LB)
 	DEF_OPT_FIXUP_FUNC(account_fixups_fn),
 #endif
 	DEF_OPT_INT8("disabled"             , OFS(disabled),                0),
@@ -472,6 +478,8 @@ static const struct config_list account_opts[] =
 	DEF_OPT_INT32("lb_nbest_readers"    , OFS(lb_nbest_readers),        -1),
 	DEF_OPT_INT32("lb_nfb_readers"      , OFS(lb_nfb_readers),          -1),
 	DEF_OPT_FUNC("lb_nbest_percaid"     , OFS(lb_nbest_readers_tab),    caidvaluetab_fn),
+	DEF_OPT_INT8("lb_force_reopen_user"     , OFS(lb_force_reopen_user),    0),
+	DEF_OPT_INT8("lb_force_reopen_user_lb_min"     , OFS(lb_force_reopen_user_lb_min),    0),
 #endif
 #ifdef CW_CYCLE_CHECK
 	DEF_OPT_INT8("cwc_disable"			, OFS(cwc_disable),			0),

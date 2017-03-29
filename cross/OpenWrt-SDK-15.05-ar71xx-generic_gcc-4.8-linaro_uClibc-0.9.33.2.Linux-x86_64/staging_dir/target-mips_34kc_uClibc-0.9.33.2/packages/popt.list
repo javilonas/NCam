@@ -1,0 +1,12 @@
+./
+./host
+./usr
+./usr/lib
+./usr/lib/libpopt.a
+./usr/lib/libpopt.so.0.0.0
+./usr/lib/libpopt.so
+./usr/lib/pkgconfig
+./usr/lib/pkgconfig/popt.pc
+./usr/lib/libpopt.so.0
+./usr/include
+./usr/include/popt.h

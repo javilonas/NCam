@@ -38,30 +38,38 @@ endif
 CONF_DIR = /usr/local/etc
 
 LIB_PTHREAD = -lpthread
-LIB_DL :=
+LIB_DL := -ldl
 
 LIB_RT :=
 ifeq ($(uname_S),Linux)
-LIB_DL := -ldl
+ifndef ANDROID_NDK
 ifeq "$(shell ./config.sh --enabled CLOCKFIX)" "Y"
 	LIB_RT := -lrt
 endif
+endif
+endif
+ifeq ($(uname_S),FreeBSD)
+LIB_DL :=
 endif
 
 override STD_LIBS := $(LIB_PTHREAD) $(LIB_DL) $(LIB_RT)
 override STD_DEFS := -D'CS_SVN_VERSION="$(SVN_REV)"'
 override STD_DEFS += -D'CS_CONFDIR="$(CONF_DIR)"'
 
+MODFLAGS_OPTS = -fPIC -fwrapv -fomit-frame-pointer
+
 # Compiler warnings
-CC_WARN = -W -Wall -Wshadow -Wno-shadow -Wredundant-decls -Wstrict-prototypes -Wold-style-definition
+CC_WARN = -W -Wall -Wextra -Wshadow -Wno-shadow -Wredundant-decls -Wstrict-prototypes -Wold-style-definition
 
 # Compiler optimizations
-CC_OPTS = -Os -ggdb -pipe -ffunction-sections -fdata-sections -fwrapv -fomit-frame-pointer
+CC_OPTS = -Os -ggdb -pipe -ffunction-sections -fdata-sections $(MODFLAGS_OPTS)
 
 CC = $(CROSS_DIR)$(CROSS)gcc
 STRIP = $(CROSS_DIR)$(CROSS)strip
 
-LDFLAGS = -lpthread -ldl -lm -Wl,--gc-sections
+MODLDFLAGS = -lm
+
+LDFLAGS = $(MODLDFLAGS) -Wl,--gc-sections
 
 TARGETHELP := $(shell $(CC) --target-help 2>&1)
 ifneq (,$(findstring sse2,$(TARGETHELP)))
@@ -234,7 +242,8 @@ SRC-$(CONFIG_LIB_BIGNUM) += cscrypt/bn_sqr.c
 SRC-$(CONFIG_LIB_BIGNUM) += cscrypt/bn_word.c
 SRC-$(CONFIG_LIB_BIGNUM) += cscrypt/mem.c
 SRC-$(CONFIG_LIB_DES) += cscrypt/des.c
-SRC-$(CONFIG_LIB_TWOFISH) += cscrypt/twofish.c
+SRC-$(CONFIG_LIB_TWOFISH) += cscrypt/jet_twofish.c
+SRC-$(CONFIG_READER_JET) += cscrypt/jet_dh.c
 SRC-$(CONFIG_LIB_IDEA) += cscrypt/i_cbc.c
 SRC-$(CONFIG_LIB_IDEA) += cscrypt/i_ecb.c
 SRC-$(CONFIG_LIB_IDEA) += cscrypt/i_skey.c
@@ -337,6 +346,7 @@ SRC-$(CONFIG_READER_NAGRA) += reader-nagra.c
 SRC-$(CONFIG_READER_SECA) += reader-seca.c
 SRC-$(CONFIG_READER_TONGFANG) += reader-tongfang.c
 SRC-$(CONFIG_READER_STREAMGUARD) += reader-streamguard.c
+SRC-$(CONFIG_READER_JET) += reader-jet.c
 SRC-$(CONFIG_READER_VIACCESS) += reader-viaccess.c
 SRC-$(CONFIG_READER_VIDEOGUARD) += reader-videoguard-common.c
 SRC-$(CONFIG_READER_VIDEOGUARD) += reader-videoguard1.c

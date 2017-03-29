@@ -1,0 +1,6388 @@
+config ALL
+	bool
+	default y
+
+config MODULES
+	bool
+	default y
+
+config HAVE_DOT_CONFIG
+	bool
+	default y
+
+config TARGET_ar71xx
+	bool
+	default y
+
+config TARGET_ar71xx_generic
+	bool
+	default y
+
+config TARGET_ar71xx_generic_Default
+	bool
+	default y
+
+config HAS_SUBTARGETS
+	bool
+	default y
+
+config TARGET_BOARD
+	string
+	default "ar71xx"
+
+config TARGET_ARCH_PACKAGES
+	string
+	default "ar71xx"
+
+config DEFAULT_TARGET_OPTIMIZATION
+	string
+	default "-Os -pipe -mno-branch-likely -mips32r2 -mtune=34kc"
+
+config CPU_TYPE
+	string
+	default "34kc"
+
+config LINUX_3_18
+	bool
+	default y
+
+config DEFAULT_base-files
+	bool
+	default y
+
+config DEFAULT_busybox
+	bool
+	default y
+
+config DEFAULT_dnsmasq
+	bool
+	default y
+
+config DEFAULT_dropbear
+	bool
+	default y
+
+config DEFAULT_firewall
+	bool
+	default y
+
+config DEFAULT_fstools
+	bool
+	default y
+
+config DEFAULT_ip6tables
+	bool
+	default y
+
+config DEFAULT_iptables
+	bool
+	default y
+
+config DEFAULT_iwinfo
+	bool
+	default y
+
+config DEFAULT_kmod-ath9k
+	bool
+	default y
+
+config DEFAULT_kmod-gpio-button-hotplug
+	bool
+	default y
+
+config DEFAULT_kmod-ledtrig-usbdev
+	bool
+	default y
+
+config DEFAULT_kmod-nf-nathelper
+	bool
+	default y
+
+config DEFAULT_kmod-usb-core
+	bool
+	default y
+
+config DEFAULT_kmod-usb-ohci
+	bool
+	default y
+
+config DEFAULT_kmod-usb2
+	bool
+	default y
+
+config DEFAULT_libc
+	bool
+	default y
+
+config DEFAULT_libgcc
+	bool
+	default y
+
+config DEFAULT_mtd
+	bool
+	default y
+
+config DEFAULT_netifd
+	bool
+	default y
+
+config DEFAULT_odhcp6c
+	bool
+	default y
+
+config DEFAULT_odhcpd
+	bool
+	default y
+
+config DEFAULT_opkg
+	bool
+	default y
+
+config DEFAULT_ppp
+	bool
+	default y
+
+config DEFAULT_ppp-mod-pppoe
+	bool
+	default y
+
+config DEFAULT_swconfig
+	bool
+	default y
+
+config DEFAULT_uboot-envtools
+	bool
+	default y
+
+config DEFAULT_uci
+	bool
+	default y
+
+config DEFAULT_wpad-mini
+	bool
+	default y
+
+config AUDIO_SUPPORT
+	bool
+	default y
+
+config GPIO_SUPPORT
+	bool
+	default y
+
+config PCI_SUPPORT
+	bool
+	default y
+
+config USB_SUPPORT
+	bool
+	default y
+
+config BIG_ENDIAN
+	bool
+	default y
+
+config USES_SQUASHFS
+	bool
+	default y
+
+config HAS_MIPS16
+	bool
+	default y
+
+config mips
+	bool
+	default y
+
+config ARCH
+	string
+	default "mips"
+
+config EXTERNAL_CPIO
+	string
+	default ""
+
+config TARGET_ROOTFS_SQUASHFS
+	bool
+	default y
+
+config TARGET_SQUASHFS_BLOCK_SIZE
+	int
+	default 256
+
+config TARGET_UBIFS_FREE_SPACE_FIXUP
+	bool
+	default y
+
+config TARGET_UBIFS_JOURNAL_SIZE
+	string
+	default ""
+
+config TARGET_ROOTFS_INCLUDE_UIMAGE
+	bool
+	default y
+
+config TARGET_ROOTFS_INCLUDE_ZIMAGE
+	bool
+	default y
+
+config TARGET_ROOTFS_INCLUDE_FIT
+	bool
+	default y
+
+config ALL_KMODS
+	bool
+	default y
+
+config BUILD_PATENTED
+	bool
+	default y
+
+config SHADOW_PASSWORDS
+	bool
+	default y
+
+config COLLECT_KERNEL_DEBUG
+	bool
+	default y
+
+config KERNEL_PRINTK
+	bool
+	default y
+
+config KERNEL_CRASHLOG
+	bool
+	default y
+
+config KERNEL_SWAP
+	bool
+	default y
+
+config KERNEL_DEBUG_FS
+	bool
+	default y
+
+config KERNEL_DEBUG_KERNEL
+	bool
+	default y
+
+config KERNEL_DEBUG_INFO
+	bool
+	default y
+
+config KERNEL_DIRECT_IO
+	bool
+	default y
+
+config KERNEL_MAGIC_SYSRQ
+	bool
+	default y
+
+config KERNEL_COREDUMP
+	bool
+	default y
+
+config KERNEL_ELF_CORE
+	bool
+	default y
+
+config KERNEL_PRINTK_TIME
+	bool
+	default y
+
+config KERNEL_RELAY
+	bool
+	default y
+
+config IPV6
+	bool
+	default y
+
+config PKG_BUILD_PARALLEL
+	bool
+	default y
+
+config PKG_BUILD_USE_JOBSERVER
+	bool
+	default y
+
+config USE_SSTRIP
+	bool
+	default y
+
+config USE_UCLIBCXX
+	bool
+	default y
+
+config PKG_CC_STACKPROTECTOR_NONE
+	bool
+	default y
+
+config KERNEL_CC_STACKPROTECTOR_NONE
+	bool
+	default y
+
+config PKG_FORTIFY_SOURCE_NONE
+	bool
+	default y
+
+config PKG_RELRO_NONE
+	bool
+	default y
+
+config DEVEL
+	bool
+	default y
+
+config BINARY_FOLDER
+	string
+	default ""
+
+config DOWNLOAD_FOLDER
+	string
+	default ""
+
+config LOCALMIRROR
+	string
+	default ""
+
+config AUTOREBUILD
+	bool
+	default y
+
+config BUILD_SUFFIX
+	string
+	default ""
+
+config TARGET_ROOTFS_DIR
+	string
+	default ""
+
+config CCACHE
+	bool
+	default y
+
+config EXTERNAL_KERNEL_TREE
+	string
+	default ""
+
+config KERNEL_GIT_CLONE_URI
+	string
+	default ""
+
+config EXTRA_OPTIMIZATION
+	string
+	default "-fno-caller-saves"
+
+config TARGET_OPTIMIZATION
+	string
+	default "-Os -pipe -mno-branch-likely -mips32r2 -mtune=34kc"
+
+config SOFT_FLOAT
+	bool
+	default y
+
+config USE_MIPS16
+	bool
+	default y
+
+config NEED_TOOLCHAIN
+	bool
+	default y
+
+config EXTRA_BINUTILS_CONFIG_OPTIONS
+	string
+	default ""
+
+config BINUTILS_VERSION
+	string
+	default "linaro"
+
+config EXTRA_GCC_CONFIG_OPTIONS
+	string
+	default ""
+
+config GDB
+	bool
+	default y
+
+config USE_UCLIBC
+	bool
+	default y
+
+config GCC_VERSION_4_8_LINARO
+	bool
+	default y
+
+config GCC_VERSION
+	string
+	default "4.8-linaro"
+
+config GCC_VERSION_4_8
+	bool
+	default y
+
+config UCLIBC_VERSION
+	string
+	default "0.9.33.2"
+
+config UCLIBC_VERSION_0_9_33
+	bool
+	default y
+
+config LIBC
+	string
+	default "uClibc"
+
+config LIBC_VERSION
+	string
+	default "0.9.33.2"
+
+config TARGET_SUFFIX
+	string
+	default "uclibc"
+
+config IB
+	bool
+	default y
+
+config SDK
+	bool
+	default y
+
+config IMAGEOPT
+	bool
+	default y
+
+config TARGET_PREINIT_SUPPRESS_STDERR
+	bool
+	default y
+
+config TARGET_PREINIT_TIMEOUT
+	int
+	default 2
+
+config TARGET_PREINIT_IFNAME
+	string
+	default ""
+
+config TARGET_PREINIT_IP
+	string
+	default "192.168.1.1"
+
+config TARGET_PREINIT_NETMASK
+	string
+	default "255.255.255.0"
+
+config TARGET_PREINIT_BROADCAST
+	string
+	default "192.168.1.255"
+
+config TARGET_INIT_PATH
+	string
+	default "/bin:/sbin:/usr/bin:/usr/sbin"
+
+config TARGET_INIT_ENV
+	string
+	default ""
+
+config TARGET_INIT_CMD
+	string
+	default "/sbin/init"
+
+config TARGET_INIT_SUPPRESS_STDERR
+	bool
+	default y
+
+config VERSIONOPT
+	bool
+	default y
+
+config VERSION_DIST
+	string
+	default "OpenWrt"
+
+config VERSION_NICK
+	string
+	default "Chaos Calmer"
+
+config VERSION_NUMBER
+	string
+	default "15.05"
+
+config VERSION_REPO
+	string
+	default "http://downloads.openwrt.org/%n/%v/%S/packages"
+
+config VERSION_MANUFACTURER
+	string
+	default ""
+
+config VERSION_PRODUCT
+	string
+	default ""
+
+config VERSION_HWREV
+	string
+	default ""
+
+config VERSION_FILENAMES
+	bool
+	default y
+
+config PER_FEED_REPO
+	bool
+	default y
+
+config PER_FEED_REPO_ADD_DISABLED
+	bool
+	default y
+
+config FEED_luci
+	bool
+	default y
+
+config OPKGSMIME_PASSPHRASE
+	bool
+	default y
+
+config PACKAGE_base-files
+	bool
+	default y
+
+config PACKAGE_block-mount
+	tristate
+	default m
+
+config PACKAGE_busybox
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_HAVE_DOT_CONFIG
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_INCLUDE_SUSv2
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_PLATFORM_LINUX
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_BUFFERS_GO_ON_STACK
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_SHOW_USAGE
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_VERBOSE_USAGE
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_COMPRESS_USAGE
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_SUBST_WCHAR
+	int
+	default 0
+
+config BUSYBOX_DEFAULT_LAST_SUPPORTED_WCHAR
+	int
+	default 0
+
+config BUSYBOX_DEFAULT_LONG_OPTS
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_DEVPTS
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_PIDFILE
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_PID_FILE_PATH
+	string
+	default "/var/run"
+
+config BUSYBOX_DEFAULT_FEATURE_SUID
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_PREFER_APPLETS
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_BUSYBOX_EXEC_PATH
+	string
+	default "/proc/self/exe"
+
+config BUSYBOX_DEFAULT_FEATURE_SYSLOG
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_LFS
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_CROSS_COMPILER_PREFIX
+	string
+	default ""
+
+config BUSYBOX_DEFAULT_SYSROOT
+	string
+	default ""
+
+config BUSYBOX_DEFAULT_EXTRA_CFLAGS
+	string
+	default ""
+
+config BUSYBOX_DEFAULT_EXTRA_LDFLAGS
+	string
+	default ""
+
+config BUSYBOX_DEFAULT_EXTRA_LDLIBS
+	string
+	default ""
+
+config BUSYBOX_DEFAULT_NO_DEBUG_LIB
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_INSTALL_APPLET_SYMLINKS
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_PREFIX
+	string
+	default "./_install"
+
+config BUSYBOX_DEFAULT_PASSWORD_MINLEN
+	int
+	default 6
+
+config BUSYBOX_DEFAULT_MD5_SMALL
+	int
+	default 1
+
+config BUSYBOX_DEFAULT_SHA3_SMALL
+	int
+	default 1
+
+config BUSYBOX_DEFAULT_FEATURE_FAST_TOP
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_EDITING
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_EDITING_MAX_LEN
+	int
+	default 512
+
+config BUSYBOX_DEFAULT_FEATURE_EDITING_HISTORY
+	int
+	default 256
+
+config BUSYBOX_DEFAULT_FEATURE_TAB_COMPLETION
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_EDITING_FANCY_PROMPT
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_NON_POSIX_CP
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_COPYBUF_KB
+	int
+	default 4
+
+config BUSYBOX_DEFAULT_IOCTL_HEX2STR_ERROR
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_SEAMLESS_GZ
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_GUNZIP
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_BUNZIP2
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_GZIP
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_GZIP_FAST
+	int
+	default 0
+
+config BUSYBOX_DEFAULT_TAR
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_TAR_CREATE
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_TAR_FROM
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_TAR_GNU_EXTENSIONS
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_BASENAME
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_CAT
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_DATE
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_DATE_ISOFMT
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_HOSTID
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_ID
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_TEST
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_TEST_64
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_TOUCH
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_TOUCH_SUSV3
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_TR
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_CHGRP
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_CHMOD
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_CHOWN
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_CHROOT
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_CP
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_CUT
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_DD
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_DD_SIGNAL_HANDLING
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_DD_IBS_OBS
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_DF
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_DIRNAME
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_DU
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_DU_DEFAULT_BLOCKSIZE_1K
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_ECHO
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_FANCY_ECHO
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_ENV
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_EXPR
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_EXPR_MATH_SUPPORT_64
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FALSE
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FSYNC
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_HEAD
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_FANCY_HEAD
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_LN
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_LS
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_LS_FILETYPES
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_LS_FOLLOWLINKS
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_LS_RECURSIVE
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_LS_SORTFILES
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_LS_TIMESTAMPS
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_LS_USERNAME
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_LS_COLOR
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_LS_COLOR_IS_DEFAULT
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_MD5SUM
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_MKDIR
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_MKFIFO
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_MKNOD
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_MV
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_NICE
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_PRINTF
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_PWD
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_READLINK
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_READLINK_FOLLOW
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_RM
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_RMDIR
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_SEQ
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_SLEEP
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_FANCY_SLEEP
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_SORT
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_SYNC
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_TAIL
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_FANCY_TAIL
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_TEE
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_TEE_USE_BLOCK_IO
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_TRUE
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_UNAME
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_UNIQ
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_WC
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_YES
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_PRESERVE_HARDLINKS
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_AUTOWIDTH
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_HUMAN_READABLE
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_MD5_SHA1_SUM_CHECK
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_CLEAR
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_RESET
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_DEFAULT_SETFONT_DIR
+	string
+	default ""
+
+config BUSYBOX_DEFAULT_MKTEMP
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_START_STOP_DAEMON
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_WHICH
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_AWK
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_AWK_LIBM
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_AWK_GNU_EXTENSIONS
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_CMP
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_SED
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_VI
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_VI_MAX_LEN
+	int
+	default 1024
+
+config BUSYBOX_DEFAULT_FEATURE_VI_COLON
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_VI_YANKMARK
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_VI_SEARCH
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_VI_USE_SIGNALS
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_VI_DOT_CMD
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_VI_READONLY
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_VI_SETOPTS
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_VI_SET
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_VI_WIN_RESIZE
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_VI_ASK_TERMINAL
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_VI_UNDO_QUEUE_MAX
+	int
+	default 0
+
+config BUSYBOX_DEFAULT_FEATURE_ALLOW_EXEC
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FIND
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_FIND_PRINT0
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_FIND_PERM
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_FIND_TYPE
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_FIND_XDEV
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_FIND_MAXDEPTH
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_FIND_EXEC
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_FIND_USER
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_FIND_GROUP
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_FIND_NOT
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_FIND_DEPTH
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_FIND_PAREN
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_FIND_SIZE
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_FIND_PRUNE
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_FIND_PATH
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_FIND_REGEX
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_GREP
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_GREP_EGREP_ALIAS
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_GREP_FGREP_ALIAS
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_GREP_CONTEXT
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_XARGS
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_XARGS_SUPPORT_CONFIRMATION
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_XARGS_SUPPORT_QUOTES
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_XARGS_SUPPORT_TERMOPT
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_XARGS_SUPPORT_ZERO_TERM
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_HALT
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_TELINIT_PATH
+	string
+	default ""
+
+config BUSYBOX_DEFAULT_FEATURE_KILL_DELAY
+	int
+	default 0
+
+config BUSYBOX_DEFAULT_INIT_TERMINAL_TYPE
+	string
+	default ""
+
+config BUSYBOX_DEFAULT_FEATURE_SHADOWPASSWDS
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_LAST_ID
+	int
+	default 0
+
+config BUSYBOX_DEFAULT_FIRST_SYSTEM_ID
+	int
+	default 0
+
+config BUSYBOX_DEFAULT_LAST_SYSTEM_ID
+	int
+	default 0
+
+config BUSYBOX_DEFAULT_PASSWD
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_PASSWD_WEAK_CHECK
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_DEFAULT_PASSWD_ALGO
+	string
+	default "md5"
+
+config BUSYBOX_DEFAULT_DEFAULT_MODULES_DIR
+	string
+	default ""
+
+config BUSYBOX_DEFAULT_DEFAULT_DEPMOD_FILE
+	string
+	default ""
+
+config BUSYBOX_DEFAULT_DMESG
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_DMESG_PRETTY
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_HEXDUMP
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_HWCLOCK
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_MKSWAP
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_MOUNT
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_MOUNT_HELPERS
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_MOUNT_CIFS
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_MOUNT_FLAGS
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_MOUNT_FSTAB
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_PIVOT_ROOT
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_SWITCH_ROOT
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_UMOUNT
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_UMOUNT_ALL
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_MOUNT_LOOP
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_CROND
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_CROND_DIR
+	string
+	default "/etc"
+
+config BUSYBOX_DEFAULT_LESS
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_LESS_MAXLINES
+	int
+	default 9999999
+
+config BUSYBOX_DEFAULT_FEATURE_BEEP_FREQ
+	int
+	default 0
+
+config BUSYBOX_DEFAULT_FEATURE_BEEP_LENGTH_MS
+	int
+	default 0
+
+config BUSYBOX_DEFAULT_CRONTAB
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_DEVMEM
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_LOCK
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_STRINGS
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_TIME
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_NC
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_PING
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_PING6
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_FANCY_PING
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_IPV6
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_PREFER_IPV4_ADDRESS
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_VERBOSE_RESOLUTION_ERRORS
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_ARPING
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_BRCTL
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_BRCTL_FANCY
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_BRCTL_SHOW
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_IFCONFIG
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_IFCONFIG_STATUS
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_IFCONFIG_HW
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_IFCONFIG_BROADCAST_PLUS
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_IFUPDOWN_IFSTATE_PATH
+	string
+	default ""
+
+config BUSYBOX_DEFAULT_NETMSG
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_NETSTAT
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_NETSTAT_WIDE
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_NETSTAT_PRG
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_NSLOOKUP
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_NTPD
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_NTPD_SERVER
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_ROUTE
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_TELNET
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_TELNET_TTYPE
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_TELNETD
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_TELNETD_STANDALONE
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_TRACEROUTE
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_TRACEROUTE_VERBOSE
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_DHCPD_LEASES_FILE
+	string
+	default ""
+
+config BUSYBOX_DEFAULT_UDHCPC
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_UDHCP_DEBUG
+	int
+	default 0
+
+config BUSYBOX_DEFAULT_FEATURE_UDHCP_RFC3397
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_UDHCPC_DEFAULT_SCRIPT
+	string
+	default "/usr/share/udhcpc/default.script"
+
+config BUSYBOX_DEFAULT_UDHCPC_SLACK_FOR_BUGGY_SERVERS
+	int
+	default 80
+
+config BUSYBOX_DEFAULT_IFUPDOWN_UDHCPC_CMD_OPTIONS
+	string
+	default ""
+
+config BUSYBOX_DEFAULT_VCONFIG
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_WGET
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_WGET_STATUSBAR
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_WGET_AUTHENTICATION
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_WGET_LONG_OPTIONS
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_MIME_CHARSET
+	string
+	default ""
+
+config BUSYBOX_DEFAULT_TOP
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_TOP_CPU_USAGE_PERCENTAGE
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_TOP_CPU_GLOBAL_PERCENTS
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_UPTIME
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FREE
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_KILL
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_KILLALL
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_PGREP
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_PIDOF
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_PS
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_PS_WIDE
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_BB_SYSCTL
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_SV_DEFAULT_SERVICE_DIR
+	string
+	default ""
+
+config BUSYBOX_DEFAULT_ASH
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_ASH_BASH_COMPAT
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_ASH_JOB_CONTROL
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_ASH_ALIAS
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_ASH_GETOPTS
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_ASH_BUILTIN_ECHO
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_ASH_BUILTIN_PRINTF
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_ASH_BUILTIN_TEST
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_ASH_CMDCMD
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_ASH_EXPAND_PRMT
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_SH_IS_ASH
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_BASH_IS_NONE
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_SH_MATH_SUPPORT
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_SH_MATH_SUPPORT_64
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_SH_NOFORK
+	bool
+	default y
+
+config BUSYBOX_DEFAULT_FEATURE_SYSLOGD_READ_BUFFER_SIZE
+	int
+	default 0
+
+config BUSYBOX_DEFAULT_FEATURE_IPC_SYSLOG_BUFFER_SIZE
+	int
+	default 0
+
+config BUSYBOX_DEFAULT_LOGGER
+	bool
+	default y
+
+config PACKAGE_ca-certificates
+	tristate
+	default m
+
+config PACKAGE_dnsmasq
+	bool
+	default y
+
+config PACKAGE_dnsmasq-dhcpv6
+	tristate
+	default m
+
+config PACKAGE_dnsmasq-full
+	tristate
+	default m
+
+config PACKAGE_dnsmasq_full_dhcpv6
+	bool
+	default y
+
+config PACKAGE_dnsmasq_full_dnssec
+	bool
+	default y
+
+config PACKAGE_dnsmasq_full_auth
+	bool
+	default y
+
+config PACKAGE_dnsmasq_full_ipset
+	bool
+	default y
+
+config PACKAGE_dropbear
+	bool
+	default y
+
+config PACKAGE_ead
+	tristate
+	default m
+
+config PACKAGE_firewall
+	bool
+	default y
+
+config PACKAGE_fstools
+	bool
+	default y
+
+config PACKAGE_jsonfilter
+	bool
+	default y
+
+config PACKAGE_libatomic
+	tristate
+	default m
+
+config PACKAGE_libc
+	bool
+	default y
+
+config PACKAGE_libgcc
+	bool
+	default y
+
+config PACKAGE_libpthread
+	tristate
+	default m
+
+config PACKAGE_librt
+	tristate
+	default m
+
+config PACKAGE_libstdcpp
+	tristate
+	default m
+
+config PACKAGE_libthread-db
+	tristate
+	default m
+
+config PACKAGE_mtd
+	bool
+	default y
+
+config PACKAGE_netifd
+	bool
+	default y
+
+config PACKAGE_nvram
+	tristate
+	default m
+
+config PACKAGE_om-watchdog
+	tristate
+	default m
+
+config PACKAGE_opkg
+	bool
+	default y
+
+config PACKAGE_opkg-smime
+	tristate
+	default m
+
+config PACKAGE_procd
+	bool
+	default y
+
+config PACKAGE_qos-scripts
+	tristate
+	default m
+
+config PACKAGE_resolveip
+	tristate
+	default m
+
+config PACKAGE_rpcd
+	bool
+	default y
+
+config PACKAGE_rpcd-mod-file
+	tristate
+	default m
+
+config PACKAGE_rpcd-mod-iwinfo
+	tristate
+	default m
+
+config PACKAGE_swconfig
+	bool
+	default y
+
+config PACKAGE_ubox
+	bool
+	default y
+
+config PACKAGE_ubus
+	bool
+	default y
+
+config PACKAGE_ubusd
+	bool
+	default y
+
+config PACKAGE_uci
+	bool
+	default y
+
+config PACKAGE_udev
+	tristate
+	default m
+
+config UDEV_EXTRA_accelerometer
+	bool
+	default y
+
+config UDEV_EXTRA_ata_id
+	bool
+	default y
+
+config UDEV_EXTRA_cdrom_id
+	bool
+	default y
+
+config UDEV_EXTRA_input_id
+	bool
+	default y
+
+config UDEV_EXTRA_mtd_probe
+	bool
+	default y
+
+config UDEV_EXTRA_path_id
+	bool
+	default y
+
+config UDEV_EXTRA_qemu
+	bool
+	default y
+
+config UDEV_EXTRA_rule_generator
+	bool
+	default y
+
+config UDEV_EXTRA_scsi_id
+	bool
+	default y
+
+config UDEV_EXTRA_usb_id
+	bool
+	default y
+
+config UDEV_EXTRA_v4l_id
+	bool
+	default y
+
+config PACKAGE_usign
+	bool
+	default y
+
+config PACKAGE_wireless-tools
+	tristate
+	default m
+
+config PACKAGE_zram-swap
+	tristate
+	default m
+
+config PACKAGE_uboot-ar71xx-nbg460n_550n_550nh
+	bool
+	default y
+
+config PACKAGE_ar
+	tristate
+	default m
+
+config PACKAGE_binutils
+	tristate
+	default m
+
+config PACKAGE_gdb
+	tristate
+	default m
+
+config PACKAGE_gdbserver
+	tristate
+	default m
+
+config PACKAGE_objdump
+	tristate
+	default m
+
+config PACKAGE_trace-cmd
+	tristate
+	default m
+
+config PACKAGE_trace-cmd-extra
+	tristate
+	default m
+
+config PACKAGE_valgrind
+	tristate
+	default m
+
+config PACKAGE_valgrind-cachegrind
+	tristate
+	default m
+
+config PACKAGE_valgrind-callgrind
+	tristate
+	default m
+
+config PACKAGE_valgrind-drd
+	tristate
+	default m
+
+config PACKAGE_valgrind-helgrind
+	tristate
+	default m
+
+config PACKAGE_valgrind-massif
+	tristate
+	default m
+
+config PACKAGE_valgrind-vgdb
+	tristate
+	default m
+
+config PACKAGE_r8169-firmware
+	tristate
+	default m
+
+config PACKAGE_r8188eu-firmware
+	tristate
+	default m
+
+config PACKAGE_kmod-aoe
+	tristate
+	default m
+
+config PACKAGE_kmod-ata-core
+	tristate
+	default m
+
+config PACKAGE_kmod-ata-ahci
+	tristate
+	default m
+
+config PACKAGE_kmod-ata-artop
+	tristate
+	default m
+
+config PACKAGE_kmod-ata-marvell-sata
+	tristate
+	default m
+
+config PACKAGE_kmod-ata-nvidia-sata
+	tristate
+	default m
+
+config PACKAGE_kmod-ata-pdc202xx-old
+	tristate
+	default m
+
+config PACKAGE_kmod-ata-piix
+	tristate
+	default m
+
+config PACKAGE_kmod-ata-sil
+	tristate
+	default m
+
+config PACKAGE_kmod-ata-sil24
+	tristate
+	default m
+
+config PACKAGE_kmod-ata-via-sata
+	tristate
+	default m
+
+config PACKAGE_kmod-block2mtd
+	tristate
+	default m
+
+config PACKAGE_kmod-dm
+	tristate
+	default m
+
+config PACKAGE_kmod-ide-core
+	tristate
+	default m
+
+config PACKAGE_kmod-ide-aec62xx
+	tristate
+	default m
+
+config PACKAGE_kmod-ide-generic
+	tristate
+	default m
+
+config PACKAGE_kmod-ide-generic-old
+	tristate
+	default m
+
+config PACKAGE_kmod-ide-it821x
+	tristate
+	default m
+
+config PACKAGE_kmod-ide-pdc202xx
+	tristate
+	default m
+
+config PACKAGE_kmod-loop
+	tristate
+	default m
+
+config PACKAGE_kmod-md-mod
+	tristate
+	default m
+
+config PACKAGE_kmod-md-linear
+	tristate
+	default m
+
+config PACKAGE_kmod-md-multipath
+	tristate
+	default m
+
+config PACKAGE_kmod-md-raid0
+	tristate
+	default m
+
+config PACKAGE_kmod-md-raid1
+	tristate
+	default m
+
+config PACKAGE_kmod-md-raid10
+	tristate
+	default m
+
+config PACKAGE_kmod-md-raid456
+	tristate
+	default m
+
+config PACKAGE_kmod-nbd
+	tristate
+	default m
+
+config PACKAGE_kmod-scsi-cdrom
+	tristate
+	default m
+
+config PACKAGE_kmod-scsi-core
+	tristate
+	default m
+
+config PACKAGE_kmod-scsi-generic
+	tristate
+	default m
+
+config PACKAGE_kmod-can
+	tristate
+	default m
+
+config PACKAGE_kmod-can-bcm
+	tristate
+	default m
+
+config PACKAGE_kmod-can-c-can
+	tristate
+	default m
+
+config PACKAGE_kmod-can-c-can-pci
+	tristate
+	default m
+
+config PACKAGE_kmod-can-c-can-platform
+	tristate
+	default m
+
+config PACKAGE_kmod-can-gw
+	tristate
+	default m
+
+config PACKAGE_kmod-can-raw
+	tristate
+	default m
+
+config PACKAGE_kmod-can-slcan
+	tristate
+	default m
+
+config PACKAGE_kmod-can-usb-8dev
+	tristate
+	default m
+
+config PACKAGE_kmod-can-usb-ems
+	tristate
+	default m
+
+config PACKAGE_kmod-can-usb-esd
+	tristate
+	default m
+
+config PACKAGE_kmod-can-usb-kvaser
+	tristate
+	default m
+
+config PACKAGE_kmod-can-usb-peak
+	tristate
+	default m
+
+config PACKAGE_kmod-can-vcan
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-aead
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-aes
+	bool
+	default y
+
+config PACKAGE_kmod-crypto-arc4
+	bool
+	default y
+
+config PACKAGE_kmod-crypto-authenc
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-cbc
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-ccm
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-core
+	bool
+	default y
+
+config PACKAGE_kmod-crypto-crc32c
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-ctr
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-deflate
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-des
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-ecb
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-fcrypt
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-gcm
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-gf128
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-ghash
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-hash
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-hmac
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-hw-geode
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-hw-hifn-795x
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-hw-padlock
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-hw-talitos
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-iv
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-manager
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-md4
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-md5
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-michael-mic
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-misc
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-null
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-ocf
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-ocf-hifn7751
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-ocf-hifnhipp
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-pcbc
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-pcompress
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-rng
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-seqiv
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-sha1
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-sha256
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-test
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-user
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-wq
+	tristate
+	default m
+
+config PACKAGE_kmod-crypto-xts
+	tristate
+	default m
+
+config PACKAGE_kmod-fs-afs
+	tristate
+	default m
+
+config PACKAGE_kmod-fs-autofs4
+	tristate
+	default m
+
+config PACKAGE_kmod-fs-btrfs
+	tristate
+	default m
+
+config PACKAGE_kmod-fs-cifs
+	tristate
+	default m
+
+config PACKAGE_kmod-fs-configfs
+	tristate
+	default m
+
+config PACKAGE_kmod-fs-cramfs
+	tristate
+	default m
+
+config PACKAGE_kmod-fs-exportfs
+	tristate
+	default m
+
+config PACKAGE_kmod-fs-ext4
+	tristate
+	default m
+
+config PACKAGE_kmod-fs-f2fs
+	tristate
+	default m
+
+config PACKAGE_kmod-fs-fscache
+	tristate
+	default m
+
+config PACKAGE_kmod-fs-hfs
+	tristate
+	default m
+
+config PACKAGE_kmod-fs-hfsplus
+	tristate
+	default m
+
+config PACKAGE_kmod-fs-isofs
+	tristate
+	default m
+
+config PACKAGE_kmod-fs-jfs
+	tristate
+	default m
+
+config PACKAGE_kmod-fs-minix
+	tristate
+	default m
+
+config PACKAGE_kmod-fs-msdos
+	tristate
+	default m
+
+config PACKAGE_kmod-fs-nfs
+	tristate
+	default m
+
+config PACKAGE_kmod-fs-nfs-common
+	tristate
+	default m
+
+config PACKAGE_kmod-fs-nfsd
+	tristate
+	default m
+
+config PACKAGE_kmod-fs-ntfs
+	tristate
+	default m
+
+config PACKAGE_kmod-fs-reiserfs
+	tristate
+	default m
+
+config PACKAGE_kmod-fs-udf
+	tristate
+	default m
+
+config PACKAGE_kmod-fs-vfat
+	tristate
+	default m
+
+config PACKAGE_kmod-fs-xfs
+	tristate
+	default m
+
+config PACKAGE_kmod-fuse
+	tristate
+	default m
+
+config PACKAGE_kmod-firewire
+	tristate
+	default m
+
+config PACKAGE_kmod-firewire-net
+	tristate
+	default m
+
+config PACKAGE_kmod-firewire-ohci
+	tristate
+	default m
+
+config PACKAGE_kmod-firewire-sbp2
+	tristate
+	default m
+
+config PACKAGE_kmod-hwmon-core
+	tristate
+	default m
+
+config PACKAGE_kmod-hwmon-adt7410
+	tristate
+	default m
+
+config PACKAGE_kmod-hwmon-adt7475
+	tristate
+	default m
+
+config PACKAGE_kmod-hwmon-gpiofan
+	tristate
+	default m
+
+config PACKAGE_kmod-hwmon-gsc
+	tristate
+	default m
+
+config PACKAGE_kmod-hwmon-ina2xx
+	tristate
+	default m
+
+config PACKAGE_kmod-hwmon-lm63
+	tristate
+	default m
+
+config PACKAGE_kmod-hwmon-lm75
+	tristate
+	default m
+
+config PACKAGE_kmod-hwmon-lm77
+	tristate
+	default m
+
+config PACKAGE_kmod-hwmon-lm85
+	tristate
+	default m
+
+config PACKAGE_kmod-hwmon-lm90
+	tristate
+	default m
+
+config PACKAGE_kmod-hwmon-lm92
+	tristate
+	default m
+
+config PACKAGE_kmod-hwmon-lm95241
+	tristate
+	default m
+
+config PACKAGE_kmod-hwmon-pwmfan
+	tristate
+	default m
+
+config PACKAGE_kmod-hwmon-sht21
+	tristate
+	default m
+
+config PACKAGE_kmod-hwmon-tmp421
+	tristate
+	default m
+
+config PACKAGE_kmod-hwmon-vid
+	tristate
+	default m
+
+config PACKAGE_kmod-i2c-core
+	tristate
+	default m
+
+config PACKAGE_kmod-i2c-algo-bit
+	tristate
+	default m
+
+config PACKAGE_kmod-i2c-algo-pca
+	tristate
+	default m
+
+config PACKAGE_kmod-i2c-algo-pcf
+	tristate
+	default m
+
+config PACKAGE_kmod-i2c-gpio
+	tristate
+	default m
+
+config PACKAGE_kmod-i2c-gpio-custom
+	tristate
+	default m
+
+config PACKAGE_kmod-i2c-mux
+	tristate
+	default m
+
+config PACKAGE_kmod-i2c-mux-gpio
+	tristate
+	default m
+
+config PACKAGE_kmod-i2c-mux-pca9541
+	tristate
+	default m
+
+config PACKAGE_kmod-i2c-mux-pca954x
+	tristate
+	default m
+
+config PACKAGE_kmod-i2c-tiny-usb
+	tristate
+	default m
+
+config PACKAGE_kmod-hid
+	tristate
+	default m
+
+config PACKAGE_kmod-hid-generic
+	tristate
+	default m
+
+config PACKAGE_kmod-input-core
+	tristate
+	default m
+
+config PACKAGE_kmod-input-evdev
+	tristate
+	default m
+
+config PACKAGE_kmod-input-gpio-encoder
+	tristate
+	default m
+
+config PACKAGE_kmod-input-gpio-keys
+	tristate
+	default m
+
+config PACKAGE_kmod-input-gpio-keys-polled
+	tristate
+	default m
+
+config PACKAGE_kmod-input-joydev
+	tristate
+	default m
+
+config PACKAGE_kmod-input-matrixkmap
+	tristate
+	default m
+
+config PACKAGE_kmod-input-polldev
+	tristate
+	default m
+
+config PACKAGE_kmod-input-uinput
+	tristate
+	default m
+
+config PACKAGE_kmod-leds-gpio
+	tristate
+	default m
+
+config PACKAGE_kmod-leds-pca963x
+	tristate
+	default m
+
+config PACKAGE_kmod-leds-rb750
+	tristate
+	default m
+
+config PACKAGE_kmod-leds-wndr3700-usb
+	tristate
+	default m
+
+config PACKAGE_kmod-ledtrig-default-on
+	tristate
+	default m
+
+config PACKAGE_kmod-ledtrig-gpio
+	tristate
+	default m
+
+config PACKAGE_kmod-ledtrig-heartbeat
+	tristate
+	default m
+
+config PACKAGE_kmod-ledtrig-morse
+	tristate
+	default m
+
+config PACKAGE_kmod-ledtrig-netdev
+	tristate
+	default m
+
+config PACKAGE_kmod-ledtrig-netfilter
+	tristate
+	default m
+
+config PACKAGE_kmod-ledtrig-oneshot
+	tristate
+	default m
+
+config PACKAGE_kmod-ledtrig-timer
+	tristate
+	default m
+
+config PACKAGE_kmod-ledtrig-transient
+	tristate
+	default m
+
+config PACKAGE_kmod-ledtrig-usbdev
+	bool
+	default y
+
+config PACKAGE_kmod-lib-cordic
+	tristate
+	default m
+
+config PACKAGE_kmod-lib-crc-ccitt
+	bool
+	default y
+
+config PACKAGE_kmod-lib-crc-itu-t
+	tristate
+	default m
+
+config PACKAGE_kmod-lib-crc16
+	tristate
+	default m
+
+config PACKAGE_kmod-lib-crc32c
+	tristate
+	default m
+
+config PACKAGE_kmod-lib-crc7
+	tristate
+	default m
+
+config PACKAGE_kmod-lib-crc8
+	tristate
+	default m
+
+config PACKAGE_kmod-lib-lz4
+	tristate
+	default m
+
+config PACKAGE_kmod-lib-lzo
+	tristate
+	default m
+
+config PACKAGE_kmod-lib-raid6
+	tristate
+	default m
+
+config PACKAGE_kmod-lib-textsearch
+	tristate
+	default m
+
+config PACKAGE_kmod-lib-xor
+	tristate
+	default m
+
+config PACKAGE_kmod-lib-zlib
+	tristate
+	default m
+
+config PACKAGE_kmod-nls-base
+	bool
+	default y
+
+config PACKAGE_kmod-nls-cp1250
+	tristate
+	default m
+
+config PACKAGE_kmod-nls-cp1251
+	tristate
+	default m
+
+config PACKAGE_kmod-nls-cp437
+	tristate
+	default m
+
+config PACKAGE_kmod-nls-cp775
+	tristate
+	default m
+
+config PACKAGE_kmod-nls-cp850
+	tristate
+	default m
+
+config PACKAGE_kmod-nls-cp852
+	tristate
+	default m
+
+config PACKAGE_kmod-nls-cp862
+	tristate
+	default m
+
+config PACKAGE_kmod-nls-cp864
+	tristate
+	default m
+
+config PACKAGE_kmod-nls-cp866
+	tristate
+	default m
+
+config PACKAGE_kmod-nls-cp932
+	tristate
+	default m
+
+config PACKAGE_kmod-nls-iso8859-1
+	tristate
+	default m
+
+config PACKAGE_kmod-nls-iso8859-13
+	tristate
+	default m
+
+config PACKAGE_kmod-nls-iso8859-15
+	tristate
+	default m
+
+config PACKAGE_kmod-nls-iso8859-2
+	tristate
+	default m
+
+config PACKAGE_kmod-nls-iso8859-6
+	tristate
+	default m
+
+config PACKAGE_kmod-nls-iso8859-8
+	tristate
+	default m
+
+config PACKAGE_kmod-nls-koi8r
+	tristate
+	default m
+
+config PACKAGE_kmod-nls-utf8
+	tristate
+	default m
+
+config PACKAGE_kmod-arptables
+	tristate
+	default m
+
+config PACKAGE_kmod-ebtables
+	tristate
+	default m
+
+config PACKAGE_kmod-ebtables-ipv4
+	tristate
+	default m
+
+config PACKAGE_kmod-ebtables-ipv6
+	tristate
+	default m
+
+config PACKAGE_kmod-ebtables-watchers
+	tristate
+	default m
+
+config PACKAGE_kmod-ip6tables
+	bool
+	default y
+
+config PACKAGE_kmod-ip6tables-extra
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-account
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-chaos
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-cluster
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-clusterip
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-compat-xtables
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-condition
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-conntrack
+	bool
+	default y
+
+config PACKAGE_kmod-ipt-conntrack-extra
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-core
+	bool
+	default y
+
+config PACKAGE_kmod-ipt-delude
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-dhcpmac
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-dnetmap
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-extra
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-filter
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-fuzzy
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-geoip
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-hashlimit
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-iface
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-ipmark
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-ipopt
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-ipp2p
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-iprange
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-ipsec
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-ipset
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-ipv4options
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-led
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-length2
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-logmark
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-lscan
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-lua
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-nat
+	bool
+	default y
+
+config PACKAGE_kmod-ipt-nat-extra
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-nat6
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-nathelper-rtsp
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-nflog
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-nfqueue
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-psd
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-quota2
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-sysrq
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-tarpit
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-tee
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-tproxy
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-u32
+	tristate
+	default m
+
+config PACKAGE_kmod-ipt-ulog
+	tristate
+	default m
+
+config PACKAGE_kmod-nf-conntrack
+	bool
+	default y
+
+config PACKAGE_kmod-nf-conntrack-netlink
+	tristate
+	default m
+
+config PACKAGE_kmod-nf-conntrack6
+	bool
+	default y
+
+config PACKAGE_kmod-nf-ipt
+	bool
+	default y
+
+config PACKAGE_kmod-nf-ipt6
+	bool
+	default y
+
+config PACKAGE_kmod-nf-nat
+	bool
+	default y
+
+config PACKAGE_kmod-nf-nat6
+	tristate
+	default m
+
+config PACKAGE_kmod-nf-nathelper
+	bool
+	default y
+
+config PACKAGE_kmod-nf-nathelper-extra
+	tristate
+	default m
+
+config PACKAGE_kmod-nfnetlink
+	tristate
+	default m
+
+config PACKAGE_kmod-nfnetlink-log
+	tristate
+	default m
+
+config PACKAGE_kmod-nfnetlink-queue
+	tristate
+	default m
+
+config PACKAGE_kmod-nft-core
+	tristate
+	default m
+
+config PACKAGE_kmod-nft-nat
+	tristate
+	default m
+
+config PACKAGE_kmod-nft-nat6
+	tristate
+	default m
+
+config PACKAGE_kmod-3c59x
+	tristate
+	default m
+
+config PACKAGE_kmod-8139cp
+	tristate
+	default m
+
+config PACKAGE_kmod-8139too
+	tristate
+	default m
+
+config PACKAGE_kmod-atl1
+	tristate
+	default m
+
+config PACKAGE_kmod-atl1c
+	tristate
+	default m
+
+config PACKAGE_kmod-atl1e
+	tristate
+	default m
+
+config PACKAGE_kmod-atl2
+	tristate
+	default m
+
+config PACKAGE_kmod-b44
+	tristate
+	default m
+
+config PACKAGE_kmod-dm9000
+	tristate
+	default m
+
+config PACKAGE_kmod-dummy
+	tristate
+	default m
+
+config PACKAGE_kmod-e100
+	tristate
+	default m
+
+config PACKAGE_kmod-e1000
+	tristate
+	default m
+
+config PACKAGE_kmod-et131x
+	tristate
+	default m
+
+config PACKAGE_kmod-forcedeth
+	tristate
+	default m
+
+config PACKAGE_kmod-gigaset
+	tristate
+	default m
+
+config PACKAGE_kmod-hfcmulti
+	tristate
+	default m
+
+config PACKAGE_kmod-hfcpci
+	tristate
+	default m
+
+config PACKAGE_kmod-ifb
+	tristate
+	default m
+
+config PACKAGE_kmod-igb
+	tristate
+	default m
+
+config PACKAGE_kmod-libphy
+	tristate
+	default m
+
+config PACKAGE_kmod-macvlan
+	tristate
+	default m
+
+config PACKAGE_kmod-mii
+	tristate
+	default m
+
+config PACKAGE_kmod-natsemi
+	tristate
+	default m
+
+config PACKAGE_kmod-ne2k-pci
+	tristate
+	default m
+
+config PACKAGE_kmod-of-mdio
+	tristate
+	default m
+
+config PACKAGE_kmod-pcnet32
+	tristate
+	default m
+
+config PACKAGE_kmod-phy-broadcom
+	tristate
+	default m
+
+config PACKAGE_kmod-r6040
+	tristate
+	default m
+
+config PACKAGE_kmod-r8169
+	tristate
+	default m
+
+config PACKAGE_kmod-sis190
+	tristate
+	default m
+
+config PACKAGE_kmod-sis900
+	tristate
+	default m
+
+config PACKAGE_kmod-skge
+	tristate
+	default m
+
+config PACKAGE_kmod-sky2
+	tristate
+	default m
+
+config PACKAGE_kmod-solos-pci
+	tristate
+	default m
+
+config PACKAGE_kmod-spi-ks8995
+	tristate
+	default m
+
+config PACKAGE_kmod-swconfig
+	tristate
+	default m
+
+config PACKAGE_kmod-switch-ip17xx
+	tristate
+	default m
+
+config PACKAGE_kmod-switch-rtl8366-smi
+	tristate
+	default m
+
+config PACKAGE_kmod-switch-rtl8366rb
+	tristate
+	default m
+
+config PACKAGE_kmod-switch-rtl8366s
+	tristate
+	default m
+
+config PACKAGE_kmod-tg3
+	tristate
+	default m
+
+config PACKAGE_kmod-tulip
+	tristate
+	default m
+
+config PACKAGE_kmod-via-rhine
+	tristate
+	default m
+
+config PACKAGE_kmod-via-velocity
+	tristate
+	default m
+
+config PACKAGE_kmod-vmxnet3
+	tristate
+	default m
+
+config PACKAGE_kmod-8021q
+	tristate
+	default m
+
+config PACKAGE_kmod-appletalk
+	tristate
+	default m
+
+config PACKAGE_kmod-atm
+	tristate
+	default m
+
+config PACKAGE_kmod-atmtcp
+	tristate
+	default m
+
+config PACKAGE_kmod-ax25
+	tristate
+	default m
+
+config PACKAGE_kmod-bonding
+	tristate
+	default m
+
+config PACKAGE_kmod-bridge
+	tristate
+	default m
+
+config PACKAGE_kmod-capi
+	tristate
+	default m
+
+config PACKAGE_kmod-dnsresolver
+	tristate
+	default m
+
+config PACKAGE_kmod-gre
+	tristate
+	default m
+
+config PACKAGE_kmod-gre6
+	tristate
+	default m
+
+config PACKAGE_kmod-ip6-tunnel
+	tristate
+	default m
+
+config PACKAGE_kmod-ipip
+	tristate
+	default m
+
+config PACKAGE_kmod-ipoa
+	tristate
+	default m
+
+config PACKAGE_kmod-ipsec
+	tristate
+	default m
+
+config PACKAGE_kmod-ipsec4
+	tristate
+	default m
+
+config PACKAGE_kmod-ipsec6
+	tristate
+	default m
+
+config PACKAGE_kmod-iptunnel
+	tristate
+	default m
+
+config PACKAGE_kmod-iptunnel4
+	tristate
+	default m
+
+config PACKAGE_kmod-iptunnel6
+	tristate
+	default m
+
+config PACKAGE_kmod-ipv6
+	bool
+	default y
+
+config PACKAGE_kmod-ipvti
+	tristate
+	default m
+
+config PACKAGE_kmod-isdn4linux
+	tristate
+	default m
+
+config PACKAGE_kmod-l2tp
+	tristate
+	default m
+
+config PACKAGE_kmod-l2tp-eth
+	tristate
+	default m
+
+config PACKAGE_kmod-l2tp-ip
+	tristate
+	default m
+
+config PACKAGE_kmod-llc
+	tristate
+	default m
+
+config PACKAGE_kmod-misdn
+	tristate
+	default m
+
+config PACKAGE_kmod-netem
+	tristate
+	default m
+
+config PACKAGE_kmod-pktgen
+	tristate
+	default m
+
+config PACKAGE_kmod-ppp
+	bool
+	default y
+
+config PACKAGE_kmod-mppe
+	tristate
+	default m
+
+config PACKAGE_kmod-ppp-synctty
+	tristate
+	default m
+
+config PACKAGE_kmod-pppoa
+	tristate
+	default m
+
+config PACKAGE_kmod-pppoe
+	bool
+	default y
+
+config PACKAGE_kmod-pppol2tp
+	tristate
+	default m
+
+config PACKAGE_kmod-pppox
+	bool
+	default y
+
+config PACKAGE_kmod-pptp
+	tristate
+	default m
+
+config PACKAGE_kmod-rxrpc
+	tristate
+	default m
+
+config PACKAGE_kmod-sched
+	tristate
+	default m
+
+config PACKAGE_kmod-sched-connmark
+	tristate
+	default m
+
+config PACKAGE_kmod-sched-core
+	tristate
+	default m
+
+config PACKAGE_kmod-sched-esfq
+	tristate
+	default m
+
+config PACKAGE_kmod-sctp
+	tristate
+	default m
+
+config PACKAGE_kmod-sit
+	tristate
+	default m
+
+config PACKAGE_kmod-slhc
+	bool
+	default y
+
+config PACKAGE_kmod-slip
+	tristate
+	default m
+
+config PACKAGE_kmod-stp
+	tristate
+	default m
+
+config PACKAGE_kmod-trelay
+	tristate
+	default m
+
+config PACKAGE_kmod-tun
+	tristate
+	default m
+
+config PACKAGE_kmod-udptunnel4
+	tristate
+	default m
+
+config PACKAGE_kmod-udptunnel6
+	tristate
+	default m
+
+config PACKAGE_kmod-veth
+	tristate
+	default m
+
+config PACKAGE_kmod-vxlan
+	tristate
+	default m
+
+config PACKAGE_kmod-6lowpan
+	tristate
+	default m
+
+config PACKAGE_kmod-bcma
+	tristate
+	default m
+
+config PACKAGE_kmod-bluetooth
+	tristate
+	default m
+
+config PACKAGE_kmod-bluetooth_6lowpan
+	tristate
+	default m
+
+config PACKAGE_kmod-button-hotplug
+	tristate
+	default m
+
+config PACKAGE_kmod-echo
+	tristate
+	default m
+
+config PACKAGE_kmod-eeprom-93cx6
+	tristate
+	default m
+
+config PACKAGE_kmod-eeprom-at24
+	tristate
+	default m
+
+config PACKAGE_kmod-eeprom-at25
+	tristate
+	default m
+
+config PACKAGE_kmod-gpio-beeper
+	tristate
+	default m
+
+config PACKAGE_kmod-gpio-button-hotplug
+	bool
+	default y
+
+config PACKAGE_kmod-gpio-dev
+	tristate
+	default m
+
+config PACKAGE_kmod-gpio-mcp23s08
+	tristate
+	default m
+
+config PACKAGE_kmod-gpio-nxp-74hc164
+	tristate
+	default m
+
+config PACKAGE_kmod-gpio-pca953x
+	tristate
+	default m
+
+config PACKAGE_kmod-gpio-pcf857x
+	tristate
+	default m
+
+config PACKAGE_kmod-iio-core
+	tristate
+	default m
+
+config PACKAGE_kmod-iio-ad799x
+	tristate
+	default m
+
+config PACKAGE_kmod-ikconfig
+	tristate
+	default m
+
+config PACKAGE_kmod-mmc
+	tristate
+	default m
+
+config PACKAGE_kmod-mmc-over-gpio
+	tristate
+	default m
+
+config KMOD_MMC_OVER_GPIO_DI_PIN
+	int
+	default 1
+
+config KMOD_MMC_OVER_GPIO_DO_PIN
+	int
+	default 3
+
+config KMOD_MMC_OVER_GPIO_CLK_PIN
+	int
+	default 4
+
+config KMOD_MMC_OVER_GPIO_CS_PIN
+	int
+	default 7
+
+config PACKAGE_kmod-mtdtests
+	tristate
+	default m
+
+config PACKAGE_kmod-pps
+	tristate
+	default m
+
+config PACKAGE_kmod-pps-gpio
+	tristate
+	default m
+
+config PACKAGE_kmod-ptp
+	tristate
+	default m
+
+config PACKAGE_kmod-random-core
+	tristate
+	default m
+
+config PACKAGE_kmod-regmap
+	tristate
+	default m
+
+config PACKAGE_kmod-rotary-gpio-custom
+	tristate
+	default m
+
+config PACKAGE_kmod-sdhci
+	tristate
+	default m
+
+config PACKAGE_kmod-serial-8250
+	tristate
+	default m
+
+config PACKAGE_kmod-softdog
+	tristate
+	default m
+
+config PACKAGE_kmod-ssb
+	tristate
+	default m
+
+config PACKAGE_kmod-zram
+	tristate
+	default m
+
+config PACKAGE_kmod-mmc-spi
+	tristate
+	default m
+
+config PACKAGE_kmod-spi-bitbang
+	tristate
+	default m
+
+config PACKAGE_kmod-spi-dev
+	tristate
+	default m
+
+config PACKAGE_kmod-spi-gpio
+	tristate
+	default m
+
+config PACKAGE_kmod-spi-gpio-custom
+	tristate
+	default m
+
+config PACKAGE_kmod-spi-gpio-old
+	tristate
+	default m
+
+config PACKAGE_kmod-spi-vsc7385
+	tristate
+	default m
+
+config PACKAGE_kmod-sound-core
+	tristate
+	default m
+
+config PACKAGE_kmod-ac97
+	tristate
+	default m
+
+config PACKAGE_kmod-sound-i8x0
+	tristate
+	default m
+
+config PACKAGE_kmod-sound-seq
+	tristate
+	default m
+
+config PACKAGE_kmod-sound-soc-ac97
+	tristate
+	default m
+
+config PACKAGE_kmod-sound-soc-core
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-audio
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-acm
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-atm
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-atm-cxacru
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-atm-speedtouch
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-atm-ueagle
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-cm109
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-core
+	bool
+	default y
+
+config PACKAGE_kmod-usb-dwc2
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-dwc3
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-hid
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-net
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-net-asix
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-net-asix-ax88179
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-net-cdc-eem
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-net-cdc-ether
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-net-cdc-mbim
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-net-cdc-ncm
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-net-cdc-subset
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-net-dm9601-ether
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-net-hso
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-net-huawei-cdc-ncm
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-net-ipheth
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-net-kalmia
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-net-kaweth
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-net-mcs7830
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-net-pegasus
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-net-qmi-wwan
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-net-rndis
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-net-sierrawireless
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-net-smsc95xx
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-ohci
+	bool
+	default y
+
+config PACKAGE_kmod-usb-ohci-pci
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-printer
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-serial
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-serial-ark3116
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-serial-belkin
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-serial-ch341
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-serial-cp210x
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-serial-cypress-m8
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-serial-ftdi
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-serial-garmin
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-serial-ipw
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-serial-keyspan
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-serial-mct
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-serial-mos7720
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-serial-option
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-serial-oti6858
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-serial-pl2303
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-serial-qualcomm
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-serial-sierrawireless
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-serial-simple
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-serial-ti-usb
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-serial-visor
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-serial-wwan
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-storage
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-storage-extras
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-test
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-uhci
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-wdm
+	tristate
+	default m
+
+config PACKAGE_kmod-usb-yealink
+	tristate
+	default m
+
+config PACKAGE_kmod-usb2
+	bool
+	default y
+
+config PACKAGE_kmod-usb2-pci
+	tristate
+	default m
+
+config PACKAGE_kmod-usb3
+	tristate
+	default m
+
+config PACKAGE_kmod-usbip
+	tristate
+	default m
+
+config PACKAGE_kmod-usbip-client
+	tristate
+	default m
+
+config PACKAGE_kmod-usbip-server
+	tristate
+	default m
+
+config PACKAGE_kmod-usbmon
+	tristate
+	default m
+
+config PACKAGE_kmod-video-core
+	tristate
+	default m
+
+config PACKAGE_kmod-video-cpia2
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-core
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-conex
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-etoms
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-finepix
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-gl860
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-jeilinj
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-konica
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-m5602
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-mars
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-mr97310a
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-ov519
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-ov534
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-ov534-9
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-pac207
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-pac7311
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-se401
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-sn9c20x
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-sonixb
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-sonixj
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-spca500
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-spca501
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-spca505
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-spca506
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-spca508
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-spca561
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-sq905
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-sq905c
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-stk014
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-stv06xx
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-sunplus
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-t613
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-tv8532
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-vc032x
+	tristate
+	default m
+
+config PACKAGE_kmod-video-gspca-zc3xx
+	tristate
+	default m
+
+config PACKAGE_kmod-video-pwc
+	tristate
+	default m
+
+config PACKAGE_kmod-video-uvc
+	tristate
+	default m
+
+config PACKAGE_kmod-video-videobuf2
+	tristate
+	default m
+
+config PACKAGE_kmod-w1
+	tristate
+	default m
+
+config PACKAGE_kmod-w1-gpio-custom
+	tristate
+	default m
+
+config PACKAGE_kmod-w1-master-ds2482
+	tristate
+	default m
+
+config PACKAGE_kmod-w1-master-ds2490
+	tristate
+	default m
+
+config PACKAGE_kmod-w1-master-gpio
+	tristate
+	default m
+
+config PACKAGE_kmod-w1-slave-ds2413
+	tristate
+	default m
+
+config PACKAGE_kmod-w1-slave-ds2431
+	tristate
+	default m
+
+config PACKAGE_kmod-w1-slave-ds2433
+	tristate
+	default m
+
+config PACKAGE_kmod-w1-slave-ds2760
+	tristate
+	default m
+
+config PACKAGE_kmod-w1-slave-smem
+	tristate
+	default m
+
+config PACKAGE_kmod-w1-slave-therm
+	tristate
+	default m
+
+config PACKAGE_kmod-adm8211
+	tristate
+	default m
+
+config PACKAGE_kmod-ath
+	bool
+	default y
+
+config PACKAGE_ATH_DFS
+	bool
+	default y
+
+config PACKAGE_kmod-ath10k
+	tristate
+	default m
+
+config PACKAGE_kmod-ath5k
+	tristate
+	default m
+
+config PACKAGE_kmod-ath9k
+	bool
+	default y
+
+config PACKAGE_kmod-ath9k-common
+	bool
+	default y
+
+config PACKAGE_kmod-ath9k-htc
+	tristate
+	default m
+
+config PACKAGE_kmod-b43
+	tristate
+	default m
+
+config PACKAGE_B43_USE_SSB
+	tristate
+	default m
+
+config PACKAGE_B43_USE_BCMA
+	tristate
+	default m
+
+config B43_FW_5_100_138
+	bool
+	default y
+
+config B43_FW_SQUASH
+	bool
+	default y
+
+config B43_FW_SQUASH_COREREVS
+	string
+	default "5,6,7,8,9,10,11,13,15,16,28,29,30"
+
+config B43_FW_SQUASH_PHYTYPES
+	string
+	default "G,N,LP,HT"
+
+config PACKAGE_B43_BUSES_BCMA_AND_SSB
+	bool
+	default y
+
+config PACKAGE_B43_PHY_G
+	bool
+	default y
+
+config PACKAGE_B43_PHY_N
+	bool
+	default y
+
+config PACKAGE_B43_PHY_LP
+	bool
+	default y
+
+config PACKAGE_B43_PHY_HT
+	bool
+	default y
+
+config PACKAGE_kmod-b43legacy
+	tristate
+	default m
+
+config B43LEGACY_FW_SQUASH
+	bool
+	default y
+
+config B43LEGACY_FW_SQUASH_COREREVS
+	string
+	default "1,2,3,4"
+
+config PACKAGE_kmod-brcmfmac
+	tristate
+	default m
+
+config BRCMFMAC_USB
+	bool
+	default y
+
+config BRCMFMAC_PCIE
+	bool
+	default y
+
+config PACKAGE_kmod-brcmsmac
+	tristate
+	default m
+
+config BRCMSMAC_USE_FW_FROM_WL
+	bool
+	default y
+
+config PACKAGE_kmod-brcmutil
+	tristate
+	default m
+
+config PACKAGE_kmod-carl9170
+	tristate
+	default m
+
+config PACKAGE_kmod-cfg80211
+	bool
+	default y
+
+config PACKAGE_kmod-hostap
+	tristate
+	default m
+
+config PACKAGE_kmod-hostap-pci
+	tristate
+	default m
+
+config PACKAGE_kmod-hostap-plx
+	tristate
+	default m
+
+config PACKAGE_kmod-iwl-legacy
+	tristate
+	default m
+
+config PACKAGE_kmod-iwl3945
+	tristate
+	default m
+
+config PACKAGE_kmod-iwl4965
+	tristate
+	default m
+
+config PACKAGE_kmod-iwlagn
+	tristate
+	default m
+
+config IWL5000_FW
+	bool
+	default y
+
+config IWL5150_FW
+	bool
+	default y
+
+config IWL1000_FW
+	bool
+	default y
+
+config IWL6000_FW
+	bool
+	default y
+
+config IWL6050_FW
+	bool
+	default y
+
+config IWL6005_FW
+	bool
+	default y
+
+config IWL6030_FW
+	bool
+	default y
+
+config IWL7260_FW
+	bool
+	default y
+
+config IWL7265_FW
+	bool
+	default y
+
+config IWL100_FW
+	bool
+	default y
+
+config IWL2000_FW
+	bool
+	default y
+
+config IWL2030_FW
+	bool
+	default y
+
+config IWL105_FW
+	bool
+	default y
+
+config IWL135_FW
+	bool
+	default y
+
+config IWL3160_FW
+	bool
+	default y
+
+config PACKAGE_kmod-lib80211
+	tristate
+	default m
+
+config PACKAGE_kmod-libertas-sdio
+	tristate
+	default m
+
+config PACKAGE_kmod-libertas-usb
+	tristate
+	default m
+
+config PACKAGE_kmod-mac80211
+	bool
+	default y
+
+config PACKAGE_MAC80211_DEBUGFS
+	bool
+	default y
+
+config PACKAGE_MAC80211_MESH
+	bool
+	default y
+
+config PACKAGE_kmod-mac80211-hwsim
+	tristate
+	default m
+
+config PACKAGE_kmod-mt76
+	tristate
+	default m
+
+config PACKAGE_kmod-mwifiex-pcie
+	tristate
+	default m
+
+config PACKAGE_kmod-mwl8k
+	tristate
+	default m
+
+config PACKAGE_kmod-net-airo
+	tristate
+	default m
+
+config PACKAGE_kmod-net-hermes
+	tristate
+	default m
+
+config PACKAGE_kmod-net-hermes-pci
+	tristate
+	default m
+
+config PACKAGE_kmod-net-hermes-plx
+	tristate
+	default m
+
+config PACKAGE_kmod-net-prism54
+	tristate
+	default m
+
+config PACKAGE_kmod-net-rtl8188eu
+	tristate
+	default m
+
+config PACKAGE_kmod-net-rtl8192su
+	tristate
+	default m
+
+config PACKAGE_kmod-p54-common
+	tristate
+	default m
+
+config PACKAGE_kmod-p54-pci
+	tristate
+	default m
+
+config PACKAGE_kmod-p54-usb
+	tristate
+	default m
+
+config PACKAGE_kmod-rt2400-pci
+	tristate
+	default m
+
+config PACKAGE_kmod-rt2500-pci
+	tristate
+	default m
+
+config PACKAGE_kmod-rt2500-usb
+	tristate
+	default m
+
+config PACKAGE_kmod-rt2800-lib
+	tristate
+	default m
+
+config PACKAGE_kmod-rt2800-mmio
+	tristate
+	default m
+
+config PACKAGE_kmod-rt2800-pci
+	tristate
+	default m
+
+config PACKAGE_kmod-rt2800-usb
+	tristate
+	default m
+
+config PACKAGE_kmod-rt2x00-lib
+	tristate
+	default m
+
+config PACKAGE_kmod-rt2x00-mmio
+	tristate
+	default m
+
+config PACKAGE_kmod-rt2x00-pci
+	tristate
+	default m
+
+config PACKAGE_kmod-rt2x00-usb
+	tristate
+	default m
+
+config PACKAGE_kmod-rt61-pci
+	tristate
+	default m
+
+config PACKAGE_kmod-rt73-usb
+	tristate
+	default m
+
+config PACKAGE_kmod-rtl8180
+	tristate
+	default m
+
+config PACKAGE_kmod-rtl8187
+	tristate
+	default m
+
+config PACKAGE_kmod-rtl8192c-common
+	tristate
+	default m
+
+config PACKAGE_kmod-rtl8192ce
+	tristate
+	default m
+
+config PACKAGE_kmod-rtl8192cu
+	tristate
+	default m
+
+config PACKAGE_kmod-rtl8192de
+	tristate
+	default m
+
+config PACKAGE_kmod-rtl8192se
+	tristate
+	default m
+
+config PACKAGE_kmod-rtlwifi
+	tristate
+	default m
+
+config PACKAGE_kmod-rtlwifi-pci
+	tristate
+	default m
+
+config PACKAGE_kmod-rtlwifi-usb
+	tristate
+	default m
+
+config PACKAGE_kmod-zd1211rw
+	tristate
+	default m
+
+config PACKAGE_libiwinfo-lua
+	bool
+	default y
+
+config PACKAGE_lua
+	bool
+	default y
+
+config PACKAGE_lua-examples
+	tristate
+	default m
+
+config PACKAGE_luac
+	tristate
+	default m
+
+config PACKAGE_libbz2
+	tristate
+	default m
+
+config PACKAGE_libext2fs
+	tristate
+	default m
+
+config PACKAGE_libfuse
+	tristate
+	default m
+
+config PACKAGE_libsysfs
+	tristate
+	default m
+
+config PACKAGE_libip4tc
+	bool
+	default y
+
+config PACKAGE_libip6tc
+	bool
+	default y
+
+config PACKAGE_libiptc
+	tristate
+	default m
+
+config PACKAGE_libxtables
+	bool
+	default y
+
+config PACKAGE_libcyassl
+	tristate
+	default m
+
+config PACKAGE_libopenssl
+	tristate
+	default m
+
+config OPENSSL_WITH_EC
+	bool
+	default y
+
+config OPENSSL_ENGINE_CRYPTO
+	bool
+	default y
+
+config PACKAGE_libpolarssl
+	tristate
+	default m
+
+config PACKAGE_argp-standalone
+	tristate
+	default m
+
+config PACKAGE_libbfd
+	tristate
+	default m
+
+config PACKAGE_libblkid
+	tristate
+	default m
+
+config PACKAGE_libblobmsg-json
+	bool
+	default y
+
+config PACKAGE_libcharset
+	tristate
+	default m
+
+config PACKAGE_libconfig
+	tristate
+	default m
+
+config PACKAGE_libcurl
+	tristate
+	default m
+
+config LIBCURL_POLARSSL
+	bool
+	default y
+
+config LIBCURL_FILE
+	bool
+	default y
+
+config LIBCURL_FTP
+	bool
+	default y
+
+config LIBCURL_HTTP
+	bool
+	default y
+
+config LIBCURL_COOKIES
+	bool
+	default y
+
+config LIBCURL_NO_SMB
+	string
+	default "!"
+
+config LIBCURL_PROXY
+	bool
+	default y
+
+config PACKAGE_libelf1
+	tristate
+	default m
+
+config PACKAGE_libasm
+	tristate
+	default m
+
+config PACKAGE_libdw
+	tristate
+	default m
+
+config PACKAGE_libevent2
+	tristate
+	default m
+
+config PACKAGE_libevent2-core
+	tristate
+	default m
+
+config PACKAGE_libevent2-extra
+	tristate
+	default m
+
+config PACKAGE_libevent2-openssl
+	tristate
+	default m
+
+config PACKAGE_libevent2-pthreads
+	tristate
+	default m
+
+config PACKAGE_libgmp
+	tristate
+	default m
+
+config PACKAGE_libiconv
+	tristate
+	default m
+
+config PACKAGE_libiconv-full
+	tristate
+	default m
+
+config PACKAGE_libintl
+	tristate
+	default m
+
+config PACKAGE_libintl-full
+	tristate
+	default m
+
+config PACKAGE_libiw
+	tristate
+	default m
+
+config PACKAGE_libiwinfo
+	bool
+	default y
+
+config PACKAGE_libjson-c
+	bool
+	default y
+
+config PACKAGE_libltdl
+	tristate
+	default m
+
+config PACKAGE_liblua
+	bool
+	default y
+
+config PACKAGE_liblzo
+	tristate
+	default m
+
+config PACKAGE_libmnl
+	tristate
+	default m
+
+config PACKAGE_libmount
+	tristate
+	default m
+
+config PACKAGE_libncurses
+	tristate
+	default m
+
+config PACKAGE_libncursesw
+	tristate
+	default m
+
+config PACKAGE_libnetfilter-conntrack
+	tristate
+	default m
+
+config PACKAGE_libnetfilter-cthelper
+	tristate
+	default m
+
+config PACKAGE_libnetfilter-cttimeout
+	tristate
+	default m
+
+config PACKAGE_libnetfilter-log
+	tristate
+	default m
+
+config PACKAGE_libnetfilter-queue
+	tristate
+	default m
+
+config PACKAGE_libnettle
+	tristate
+	default m
+
+config PACKAGE_libnfnetlink
+	tristate
+	default m
+
+config PACKAGE_libnftnl
+	tristate
+	default m
+
+config PACKAGE_libnl
+	tristate
+	default m
+
+config PACKAGE_libnl-tiny
+	bool
+	default y
+
+config PACKAGE_libopcodes
+	tristate
+	default m
+
+config PACKAGE_libpcap
+	tristate
+	default m
+
+config PACKAGE_libpopt
+	tristate
+	default m
+
+config PACKAGE_libreadline
+	tristate
+	default m
+
+config PACKAGE_libroxml
+	tristate
+	default m
+
+config PACKAGE_librpc
+	tristate
+	default m
+
+config PACKAGE_libsmartcols
+	tristate
+	default m
+
+config PACKAGE_libsocks
+	tristate
+	default m
+
+config PACKAGE_libubox
+	bool
+	default y
+
+config PACKAGE_libubox-lua
+	tristate
+	default m
+
+config PACKAGE_libubus
+	bool
+	default y
+
+config PACKAGE_libubus-lua
+	bool
+	default y
+
+config PACKAGE_libuci
+	bool
+	default y
+
+config PACKAGE_libuci-lua
+	bool
+	default y
+
+config PACKAGE_libuclient
+	tristate
+	default m
+
+config PACKAGE_libusb-1.0
+	tristate
+	default m
+
+config PACKAGE_libusb-compat
+	tristate
+	default m
+
+config PACKAGE_libustream-cyassl
+	tristate
+	default m
+
+config PACKAGE_libustream-openssl
+	tristate
+	default m
+
+config PACKAGE_libustream-polarssl
+	tristate
+	default m
+
+config PACKAGE_libuuid
+	tristate
+	default m
+
+config PACKAGE_linux-atm
+	tristate
+	default m
+
+config PACKAGE_terminfo
+	tristate
+	default m
+
+config PACKAGE_uclibcxx
+	tristate
+	default m
+
+config PACKAGE_zlib
+	tristate
+	default m
+
+config PACKAGE_luci
+	bool
+	default y
+
+config PACKAGE_luci-base
+	bool
+	default y
+
+config PACKAGE_luci-mod-admin-full
+	bool
+	default y
+
+config PACKAGE_luci-app-firewall
+	bool
+	default y
+
+config PACKAGE_luci-theme-bootstrap
+	bool
+	default y
+
+config PACKAGE_luci-proto-ipv6
+	bool
+	default y
+
+config PACKAGE_luci-proto-ppp
+	bool
+	default y
+
+config PACKAGE_luci-lib-ip
+	bool
+	default y
+
+config PACKAGE_luci-lib-nixio
+	bool
+	default y
+
+config PACKAGE_luci-i18n-base-ca
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-base-cs
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-base-de
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-base-el
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-base-en
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-base-es
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-base-fr
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-base-he
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-base-hu
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-base-it
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-base-ja
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-base-ms
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-base-no
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-base-pl
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-base-pt
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-base-pt-br
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-base-ro
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-base-ru
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-base-sk
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-base-sv
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-base-tr
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-base-uk
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-base-vi
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-base-zh-cn
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-base-zh-tw
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-firewall-ca
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-firewall-cs
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-firewall-de
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-firewall-el
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-firewall-en
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-firewall-es
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-firewall-fr
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-firewall-he
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-firewall-hu
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-firewall-it
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-firewall-ja
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-firewall-ms
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-firewall-no
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-firewall-pl
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-firewall-pt
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-firewall-pt-br
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-firewall-ro
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-firewall-ru
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-firewall-sk
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-firewall-sv
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-firewall-tr
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-firewall-uk
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-firewall-vi
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-firewall-zh-cn
+	tristate
+	default m
+
+config PACKAGE_luci-i18n-firewall-zh-tw
+	tristate
+	default m
+
+config PACKAGE_curl
+	tristate
+	default m
+
+config PACKAGE_arptables
+	tristate
+	default m
+
+config PACKAGE_conntrack-tools
+	tristate
+	default m
+
+config PACKAGE_ebtables
+	tristate
+	default m
+
+config PACKAGE_ebtables-utils
+	tristate
+	default m
+
+config PACKAGE_ip6tables
+	bool
+	default y
+
+config PACKAGE_ip6tables-extra
+	tristate
+	default m
+
+config PACKAGE_ip6tables-mod-nat
+	tristate
+	default m
+
+config PACKAGE_iptables
+	bool
+	default y
+
+config PACKAGE_iptables-mod-account
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-chaos
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-cluster
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-clusterip
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-condition
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-conntrack-extra
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-delude
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-dhcpmac
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-dnetmap
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-extra
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-filter
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-fuzzy
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-geoip
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-hashlimit
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-iface
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-ipmark
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-ipopt
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-ipp2p
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-iprange
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-ipsec
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-ipv4options
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-led
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-length2
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-logmark
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-lscan
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-lua
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-nat-extra
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-nflog
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-nfqueue
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-psd
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-quota2
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-sysrq
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-tarpit
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-tee
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-tproxy
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-u32
+	tristate
+	default m
+
+config PACKAGE_iptables-mod-ulog
+	tristate
+	default m
+
+config PACKAGE_iptaccount
+	tristate
+	default m
+
+config PACKAGE_nftables
+	tristate
+	default m
+
+config PACKAGE_atm-aread
+	tristate
+	default m
+
+config PACKAGE_atm-atmaddr
+	tristate
+	default m
+
+config PACKAGE_atm-atmdiag
+	tristate
+	default m
+
+config PACKAGE_atm-atmdump
+	tristate
+	default m
+
+config PACKAGE_atm-atmloop
+	tristate
+	default m
+
+config PACKAGE_atm-atmsigd
+	tristate
+	default m
+
+config PACKAGE_atm-atmswitch
+	tristate
+	default m
+
+config PACKAGE_atm-atmtcp
+	tristate
+	default m
+
+config PACKAGE_atm-awrite
+	tristate
+	default m
+
+config PACKAGE_atm-bus
+	tristate
+	default m
+
+config PACKAGE_atm-debug-tools
+	tristate
+	default m
+
+config PACKAGE_atm-diagnostics
+	tristate
+	default m
+
+config PACKAGE_atm-esi
+	tristate
+	default m
+
+config PACKAGE_atm-ilmid
+	tristate
+	default m
+
+config PACKAGE_atm-ilmidiag
+	tristate
+	default m
+
+config PACKAGE_atm-lecs
+	tristate
+	default m
+
+config PACKAGE_atm-les
+	tristate
+	default m
+
+config PACKAGE_atm-mpcd
+	tristate
+	default m
+
+config PACKAGE_atm-saaldump
+	tristate
+	default m
+
+config PACKAGE_atm-sonetdiag
+	tristate
+	default m
+
+config PACKAGE_atm-svc_recv
+	tristate
+	default m
+
+config PACKAGE_atm-svc_send
+	tristate
+	default m
+
+config PACKAGE_atm-tools
+	tristate
+	default m
+
+config PACKAGE_atm-ttcp_atm
+	tristate
+	default m
+
+config PACKAGE_atm-zeppelin
+	tristate
+	default m
+
+config PACKAGE_br2684ctl
+	tristate
+	default m
+
+config PACKAGE_genl
+	tristate
+	default m
+
+config PACKAGE_igmpproxy
+	tristate
+	default m
+
+config PACKAGE_ip
+	tristate
+	default m
+
+config PACKAGE_ip-bridge
+	tristate
+	default m
+
+config PACKAGE_ip-full
+	tristate
+	default m
+
+config PACKAGE_lldpd
+	tristate
+	default m
+
+config LLDPD_WITH_PRIVSEP
+	bool
+	default y
+
+config LLDPD_WITH_CDP
+	bool
+	default y
+
+config LLDPD_WITH_FDP
+	bool
+	default y
+
+config LLDPD_WITH_EDP
+	bool
+	default y
+
+config LLDPD_WITH_SONMP
+	bool
+	default y
+
+config LLDPD_WITH_LLDPMED
+	bool
+	default y
+
+config LLDPD_WITH_DOT1
+	bool
+	default y
+
+config LLDPD_WITH_DOT3
+	bool
+	default y
+
+config LLDPD_WITH_CUSTOM
+	bool
+	default y
+
+config PACKAGE_relayd
+	tristate
+	default m
+
+config PACKAGE_ss
+	tristate
+	default m
+
+config PACKAGE_tc
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-address6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-alive6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-covert-send6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-covert-send6d
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-denial6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-detect-new-ip6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-detect-sniffer6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-dnsdict6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-dnsrevenum6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-dos-new-ip6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-dump-router6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-exploit6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-fake-advertise6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-fake-dhcps6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-fake-dns6d
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-fake-dnsupdate6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-fake-mipv6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-fake-mld26
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-fake-mld6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-fake-mldrouter6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-fake-router26
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-fake-router6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-fake-solicitate6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-flood-advertise6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-flood-dhcpc6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-flood-mld26
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-flood-mld6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-flood-mldrouter6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-flood-router26
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-flood-router6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-flood-solicitate6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-fragmentation6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-fuzz-dhcpc6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-fuzz-dhcps6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-fuzz-ip6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-implementation6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-implementation6d
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-inverse-lookup6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-kill-router6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-ndpexhaust6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-node-query6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-parasite6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-passive-discovery6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-randicmp6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-redir6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-rsmurf6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-sendpees6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-sendpeesmp6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-smurf6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-thcping6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-toobig6
+	tristate
+	default m
+
+config PACKAGE_thc-ipv6-trace6
+	tristate
+	default m
+
+config PACKAGE_openvpn-easy-rsa
+	tristate
+	default m
+
+config PACKAGE_openvpn-nossl
+	tristate
+	default m
+
+config OPENVPN_nossl_ENABLE_LZO
+	bool
+	default y
+
+config OPENVPN_nossl_ENABLE_SERVER
+	bool
+	default y
+
+config OPENVPN_nossl_ENABLE_HTTP
+	bool
+	default y
+
+config OPENVPN_nossl_ENABLE_SOCKS
+	bool
+	default y
+
+config OPENVPN_nossl_ENABLE_FRAGMENT
+	bool
+	default y
+
+config OPENVPN_nossl_ENABLE_MULTIHOME
+	bool
+	default y
+
+config OPENVPN_nossl_ENABLE_PORT_SHARE
+	bool
+	default y
+
+config OPENVPN_nossl_ENABLE_DEF_AUTH
+	bool
+	default y
+
+config OPENVPN_nossl_ENABLE_PF
+	bool
+	default y
+
+config OPENVPN_nossl_ENABLE_SMALL
+	bool
+	default y
+
+config PACKAGE_openvpn-openssl
+	tristate
+	default m
+
+config OPENVPN_openssl_ENABLE_LZO
+	bool
+	default y
+
+config OPENVPN_openssl_ENABLE_SERVER
+	bool
+	default y
+
+config OPENVPN_openssl_ENABLE_HTTP
+	bool
+	default y
+
+config OPENVPN_openssl_ENABLE_SOCKS
+	bool
+	default y
+
+config OPENVPN_openssl_ENABLE_FRAGMENT
+	bool
+	default y
+
+config OPENVPN_openssl_ENABLE_MULTIHOME
+	bool
+	default y
+
+config OPENVPN_openssl_ENABLE_PORT_SHARE
+	bool
+	default y
+
+config OPENVPN_openssl_ENABLE_DEF_AUTH
+	bool
+	default y
+
+config OPENVPN_openssl_ENABLE_PF
+	bool
+	default y
+
+config OPENVPN_openssl_ENABLE_SMALL
+	bool
+	default y
+
+config PACKAGE_openvpn-polarssl
+	tristate
+	default m
+
+config OPENVPN_polarssl_ENABLE_LZO
+	bool
+	default y
+
+config OPENVPN_polarssl_ENABLE_SERVER
+	bool
+	default y
+
+config OPENVPN_polarssl_ENABLE_HTTP
+	bool
+	default y
+
+config OPENVPN_polarssl_ENABLE_SOCKS
+	bool
+	default y
+
+config OPENVPN_polarssl_ENABLE_FRAGMENT
+	bool
+	default y
+
+config OPENVPN_polarssl_ENABLE_MULTIHOME
+	bool
+	default y
+
+config OPENVPN_polarssl_ENABLE_PORT_SHARE
+	bool
+	default y
+
+config OPENVPN_polarssl_ENABLE_DEF_AUTH
+	bool
+	default y
+
+config OPENVPN_polarssl_ENABLE_PF
+	bool
+	default y
+
+config OPENVPN_polarssl_ENABLE_SMALL
+	bool
+	default y
+
+config PACKAGE_sockd
+	tristate
+	default m
+
+config PACKAGE_socksify
+	tristate
+	default m
+
+config PACKAGE_uhttpd
+	bool
+	default y
+
+config PACKAGE_uhttpd-mod-lua
+	tristate
+	default m
+
+config PACKAGE_uhttpd-mod-tls
+	tristate
+	default m
+
+config PACKAGE_uhttpd-mod-tls_polarssl
+	bool
+	default y
+
+config PACKAGE_uhttpd-mod-ubus
+	bool
+	default y
+
+config PACKAGE_6in4
+	tristate
+	default m
+
+config PACKAGE_6rd
+	tristate
+	default m
+
+config PACKAGE_6to4
+	tristate
+	default m
+
+config PACKAGE_authsae
+	tristate
+	default m
+
+config PACKAGE_chat
+	tristate
+	default m
+
+config PACKAGE_ds-lite
+	tristate
+	default m
+
+config PACKAGE_eapol-test
+	tristate
+	default m
+
+config PACKAGE_gre
+	tristate
+	default m
+
+config PACKAGE_grev4
+	tristate
+	default m
+
+config PACKAGE_grev6
+	tristate
+	default m
+
+config PACKAGE_hostap-utils
+	tristate
+	default m
+
+config PACKAGE_hostapd
+	tristate
+	default m
+
+config PACKAGE_hostapd-common
+	bool
+	default y
+
+config PACKAGE_hostapd-common-old
+	tristate
+	default m
+
+config PACKAGE_hostapd-mini
+	tristate
+	default m
+
+config PACKAGE_hostapd-utils
+	tristate
+	default m
+
+config PACKAGE_iftop
+	tristate
+	default m
+
+config PACKAGE_iperf
+	tristate
+	default m
+
+config PACKAGE_iperf-mt
+	tristate
+	default m
+
+config PACKAGE_iperf3
+	tristate
+	default m
+
+config PACKAGE_ipip
+	tristate
+	default m
+
+config PACKAGE_ipset
+	tristate
+	default m
+
+config PACKAGE_ipset-dns
+	tristate
+	default m
+
+config PACKAGE_iputils-arping
+	tristate
+	default m
+
+config PACKAGE_iputils-clockdiff
+	tristate
+	default m
+
+config PACKAGE_iputils-ping
+	tristate
+	default m
+
+config PACKAGE_iputils-ping6
+	tristate
+	default m
+
+config PACKAGE_iputils-tftpd
+	tristate
+	default m
+
+config PACKAGE_iputils-tracepath
+	tristate
+	default m
+
+config PACKAGE_iputils-tracepath6
+	tristate
+	default m
+
+config PACKAGE_iputils-traceroute6
+	tristate
+	default m
+
+config PACKAGE_iw
+	bool
+	default y
+
+config PACKAGE_map
+	tristate
+	default m
+
+config PACKAGE_mdns
+	tristate
+	default m
+
+config PACKAGE_odhcp6c
+	bool
+	default y
+
+config PACKAGE_odhcp6c_ext_cer_id
+	int
+	default 0
+
+config PACKAGE_odhcpd
+	bool
+	default y
+
+config PACKAGE_odhcpd_ext_cer_id
+	int
+	default 0
+
+config PACKAGE_ppp
+	bool
+	default y
+
+config PACKAGE_ppp-mod-pppoa
+	tristate
+	default m
+
+config PACKAGE_ppp-mod-pppoe
+	bool
+	default y
+
+config PACKAGE_ppp-mod-pppol2tp
+	tristate
+	default m
+
+config PACKAGE_ppp-mod-pptp
+	tristate
+	default m
+
+config PACKAGE_ppp-mod-radius
+	tristate
+	default m
+
+config PACKAGE_ppp-multilink
+	tristate
+	default m
+
+config PACKAGE_pppdump
+	tristate
+	default m
+
+config PACKAGE_pppstats
+	tristate
+	default m
+
+config PACKAGE_rssileds
+	tristate
+	default m
+
+config PACKAGE_samba36-client
+	tristate
+	default m
+
+config PACKAGE_samba36-server
+	tristate
+	default m
+
+config PACKAGE_soloscli
+	tristate
+	default m
+
+config PACKAGE_tcpdump
+	tristate
+	default m
+
+config PACKAGE_tcpdump-mini
+	tristate
+	default m
+
+config PACKAGE_uclient-fetch
+	tristate
+	default m
+
+config PACKAGE_umbim
+	tristate
+	default m
+
+config PACKAGE_uqmi
+	tristate
+	default m
+
+config PACKAGE_wpa-cli
+	tristate
+	default m
+
+config PACKAGE_wpa-supplicant
+	tristate
+	default m
+
+config WPA_SUPPLICANT_INTERNAL
+	bool
+	default y
+
+config WPA_MSG_MIN_PRIORITY
+	int
+	default 3
+
+config DRIVER_WEXT_SUPPORT
+	bool
+	default y
+
+config DRIVER_11N_SUPPORT
+	bool
+	default y
+
+config PACKAGE_wpa-supplicant-mesh
+	tristate
+	default m
+
+config PACKAGE_wpa-supplicant-mini
+	tristate
+	default m
+
+config PACKAGE_wpa-supplicant-p2p
+	tristate
+	default m
+
+config PACKAGE_wpad
+	tristate
+	default m
+
+config PACKAGE_wpad-mesh
+	tristate
+	default m
+
+config PACKAGE_wpad-mini
+	bool
+	default y
+
+config PACKAGE_wpan-tools
+	tristate
+	default m
+
+config PACKAGE_wwan
+	tristate
+	default m
+
+config PACKAGE_bzip2
+	tristate
+	default m
+
+config PACKAGE_badblocks
+	tristate
+	default m
+
+config PACKAGE_debugfs
+	tristate
+	default m
+
+config PACKAGE_dumpe2fs
+	tristate
+	default m
+
+config PACKAGE_e2freefrag
+	tristate
+	default m
+
+config PACKAGE_e2fsprogs
+	tristate
+	default m
+
+config PACKAGE_filefrag
+	tristate
+	default m
+
+config PACKAGE_fuse-utils
+	tristate
+	default m
+
+config PACKAGE_resize2fs
+	tristate
+	default m
+
+config PACKAGE_sysfsutils
+	tristate
+	default m
+
+config PACKAGE_tune2fs
+	tristate
+	default m
+
+config PACKAGE_xfs-fsck
+	tristate
+	default m
+
+config PACKAGE_xfs-growfs
+	tristate
+	default m
+
+config PACKAGE_xfs-mkfs
+	tristate
+	default m
+
+config PACKAGE_agetty
+	tristate
+	default m
+
+config PACKAGE_script-utils
+	tristate
+	default m
+
+config PACKAGE_setterm
+	tristate
+	default m
+
+config PACKAGE_wall
+	tristate
+	default m
+
+config PACKAGE_blkid
+	tristate
+	default m
+
+config PACKAGE_cfdisk
+	tristate
+	default m
+
+config PACKAGE_fdisk
+	tristate
+	default m
+
+config PACKAGE_findfs
+	tristate
+	default m
+
+config PACKAGE_lsblk
+	tristate
+	default m
+
+config PACKAGE_partx-utils
+	tristate
+	default m
+
+config PACKAGE_sfdisk
+	tristate
+	default m
+
+config PACKAGE_swap-utils
+	tristate
+	default m
+
+config PACKAGE_wipefs
+	tristate
+	default m
+
+config PACKAGE_cal
+	tristate
+	default m
+
+config PACKAGE_comgt
+	tristate
+	default m
+
+config PACKAGE_comgt-directip
+	tristate
+	default m
+
+config PACKAGE_comgt-ncm
+	tristate
+	default m
+
+config PACKAGE_dmesg
+	tristate
+	default m
+
+config PACKAGE_dropbearconvert
+	tristate
+	default m
+
+config PACKAGE_fconfig
+	tristate
+	default m
+
+config PACKAGE_flock
+	tristate
+	default m
+
+config PACKAGE_getopt
+	tristate
+	default m
+
+config PACKAGE_hwclock
+	tristate
+	default m
+
+config PACKAGE_iconv
+	tristate
+	default m
+
+config PACKAGE_iwcap
+	tristate
+	default m
+
+config PACKAGE_iwinfo
+	bool
+	default y
+
+config PACKAGE_jshn
+	bool
+	default y
+
+config PACKAGE_ldconfig
+	tristate
+	default m
+
+config PACKAGE_ldd
+	tristate
+	default m
+
+config PACKAGE_libjson-script
+	bool
+	default y
+
+config PACKAGE_logger
+	tristate
+	default m
+
+config PACKAGE_look
+	tristate
+	default m
+
+config PACKAGE_losetup
+	tristate
+	default m
+
+config PACKAGE_maccalc
+	tristate
+	default m
+
+config PACKAGE_mcookie
+	tristate
+	default m
+
+config PACKAGE_mdadm
+	tristate
+	default m
+
+config PACKAGE_mount-utils
+	tristate
+	default m
+
+config PACKAGE_mountd
+	tristate
+	default m
+
+config PACKAGE_namei
+	tristate
+	default m
+
+config PACKAGE_ocf-crypto-headers
+	tristate
+	default m
+
+config PACKAGE_openssl-util
+	tristate
+	default m
+
+config PACKAGE_owipcalc
+	tristate
+	default m
+
+config PACKAGE_px5g
+	tristate
+	default m
+
+config PACKAGE_px5g-standalone
+	tristate
+	default m
+
+config PACKAGE_rbcfg
+	tristate
+	default m
+
+config PACKAGE_rename
+	tristate
+	default m
+
+config PACKAGE_robocfg
+	tristate
+	default m
+
+config PACKAGE_spidev-test
+	tristate
+	default m
+
+config PACKAGE_strace
+	tristate
+	default m
+
+config PACKAGE_uboot-envtools
+	bool
+	default y
+
+config PACKAGE_ugps
+	tristate
+	default m
+
+config PACKAGE_usb-modeswitch
+	tristate
+	default m
+
+config PACKAGE_usbreset
+	tristate
+	default m
+
+config PACKAGE_usbutils
+	tristate
+	default m
+
+config PACKAGE_uuidd
+	tristate
+	default m
+
+config PACKAGE_uuidgen
+	tristate
+	default m
+
+config PACKAGE_whereis
+	tristate
+	default m
+

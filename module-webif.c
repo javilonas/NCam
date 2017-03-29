@@ -801,6 +801,7 @@ static char *send_ncam_config_loadbalancer(struct templatevars *vars, struct uri
 	free_mk_t(value);
 
 	tpl_printf(vars, TPLADD, "LBREOPENSECONDS", "%d", cfg.lb_reopen_seconds);
+	tpl_printf(vars, TPLADD, "LBREOPENSECONDSLBMIN", "%d", cfg.lb_reopen_seconds_lbmin);
 	tpl_printf(vars, TPLADD, "LBCLEANUP", "%d", cfg.lb_stat_cleanup);
 
 	tpl_addVar(vars, TPLADD, "LBREOPENSECONDS_NEVER", (cfg.lb_reopen_seconds_never == 1) ? "checked" : "");
@@ -812,6 +813,20 @@ static char *send_ncam_config_loadbalancer(struct templatevars *vars, struct uri
 
 	tpl_addVar(vars, TPLADD, "LBREOPENINVALID", (cfg.lb_reopen_invalid == 1) ? "checked" : "");
 	tpl_addVar(vars, TPLADD, "LBFORCEALWAYS", (cfg.lb_force_reopen_always == 1) ? "checked" : "");
+
+	struct s_auth *account;
+	int8_t i = 0;
+	for(account = cfg.account; (account); account = account->next)
+	{
+		tpl_addVar(vars, TPLADD, "LBFORCEALWAYSUSER", (account->lb_force_reopen_user == 1) ? "yes" : "-");
+		tpl_addVar(vars, TPLADD, "LBFORCEALWAYSUSER_LB_MIN", (account->lb_force_reopen_user_lb_min == 1) ? "yes" : "-");
+		tpl_addVar(vars, TPLADD, "USERNAME", xml_encode(vars, account->usr));
+		tpl_addVar(vars, TPLAPPEND, "CONFIGFORCEREOPENUSERSUSERINS", tpl_getTpl(vars, "CONFIGFORCEREOPENUSERSUSER"));
+		i += 1;
+	}
+	if(i){
+		tpl_addVar(vars, TPLADD, "CONFIGFORCEREOPENUSERSINS", tpl_getTpl(vars, "CONFIGFORCEREOPENUSERS"));
+	}
 
 	value = mk_t_caidtab(&cfg.lb_noproviderforcaid);
 	tpl_addVar(vars, TPLADD, "LBNOPROVIDERFORCAID", value);
@@ -833,11 +848,6 @@ static char *send_ncam_config_loadbalancer(struct templatevars *vars, struct uri
 	tpl_printf(vars, TPLADD, "LBAUTOTIMEOUTT", "%d", cfg.lb_auto_timeout_t);
 
 	tpl_addVar(vars, TPLADDONCE, "CONFIG_CONTROL", tpl_getTpl(vars, "CONFIGLOADBALANCERCTRL"));
-
-	if (cfg.forcereopenusernames != NULL)
-	{
-		tpl_addVar(vars, TPLADD, "FORCEREOPENUSERNAMES", cfg.forcereopenusernames);
-	}
 
 	return tpl_getTpl(vars, "CONFIGLOADBALANCER");
 }
@@ -2586,6 +2596,15 @@ static char *send_ncam_reader_config(struct templatevars *vars, struct uriparams
 		{ tpl_printf(vars, TPLADD, "TONGFANGCALIBSN", "%08X", rdr->tongfang3_calibsn); }
 
 #endif
+#ifdef READER_JET
+	for(i = 0; (size_t)i < sizeof(rdr->jet_authorize_id) && rdr->jet_authorize_id[i] == 0; i++);
+	if((size_t)i <  sizeof(rdr->jet_authorize_id))
+	{
+		for(i = 0; (size_t)i <  sizeof(rdr->jet_authorize_id) ; i++)
+			{ tpl_printf(vars, TPLAPPEND, "JETAUTHORIZEID", "%02X", rdr->jet_authorize_id[i]); }
+	}
+	tpl_addVar(vars, TPLADD, "JETFIXECM", (rdr->jet_fix_ecm == 1) ? "checked" : "");
+#endif
 
 #ifdef MODULE_CCCAM
 	tpl_printf(vars, TPLADD, "CCCMAXHOPS",   "%d", rdr->cc_maxhops);
@@ -3289,7 +3308,6 @@ static char *send_ncam_user_config_edit(struct templatevars *vars, struct uripar
 	{
 		tpl_printf(vars, TPLADD, "TMP", "CACHEEXSELECTED%d", account->cacheex.mode);
 		tpl_addVar(vars, TPLADD, tpl_getVar(vars, "TMP"), "selected");
-
 	}
 	else
 	{
@@ -3395,6 +3413,13 @@ static char *send_ncam_user_config_edit(struct templatevars *vars, struct uripar
 	tpl_printf(vars, TPLADD, "CFG_ACOSC_PENALTY_DURATION", "%d", cfg.acosc_penalty_duration);
 	tpl_printf(vars, TPLADD, "ACOSC_DELAY", "%d", account->acosc_delay);
 	tpl_printf(vars, TPLADD, "CFG_ACOSC_DELAY", "%d", cfg.acosc_delay);
+#endif
+#ifdef WITH_LB
+	if (account->lb_force_reopen_user == 1)
+	{
+		tpl_addVar(vars, TPLADD, "LBFORCEALWAYSUSER", (account->lb_force_reopen_user == 1) ? "checked" : "");
+		tpl_addVar(vars, TPLADD, "LBFORCEALWAYSUSER_LB_MIN", (account->lb_force_reopen_user_lb_min == 1) ? "checked" : "");
+	}
 #endif
 
 #ifdef MODULE_CCCAM
@@ -3854,13 +3879,12 @@ static char *send_ncam_user_config(struct templatevars *vars, struct uriparams *
 			else
 			{
 				classname = "connected";conn = 1;
-				if (cfg.forcereopenusernames != NULL)
+#ifdef WITH_LB
+				if (account->lb_force_reopen_user == 1)
 				{
-					if (strstr(cfg.forcereopenusernames, account->usr))
-					{
-						classname = "forcereopenuserconnected";
-					}
+					classname = "forcereopenuserconnected";
 				}
+#endif
 			}
 
 			proto = client_get_proto(latestclient);
@@ -3956,13 +3980,12 @@ static char *send_ncam_user_config(struct templatevars *vars, struct uriparams *
 					else
 					{
 						classname = "online";
-						if (cfg.forcereopenusernames != NULL)
+#ifdef WITH_LB
+						if (account->lb_force_reopen_user == 1)
 						{
-							if (strstr(cfg.forcereopenusernames, account->usr))
-							{
-								classname = "forcereopenuseronline";
-							}
+							classname = "forcereopenuseronline";
 						}
+#endif
 					}
 					if(latestclient->cwfound + latestclient->cwnot + latestclient->cwcache > 0)
 					{
@@ -5197,7 +5220,7 @@ static char *send_ncam_status(struct templatevars * vars, struct uriparams * par
 						{
 							char channame[CS_SERVICENAME_SIZE];
 							const char *lastprovidername;
-							
+
 							get_servicename_or_null(cl, cl->last_srvid, cl->last_provid, cl->last_caid, channame, sizeof(channame));
 							if(channame[0] == '\0')
 							{
@@ -5205,7 +5228,7 @@ static char *send_ncam_status(struct templatevars * vars, struct uriparams * par
 							}
 
 							lastprovidername = get_cl_lastprovidername(cl);
-							
+
 							tpl_printf(vars, TPLADD, "CLIENTCAID", "%04X", cl->last_caid);
 							tpl_printf(vars, TPLADD, "CLIENTPROVID", "%06X", cl->last_provid);
 							tpl_printf(vars, TPLADD, "CLIENTSRVID", "%04X", cl->last_srvid);
@@ -8342,6 +8365,7 @@ static int32_t process_request(FILE * f, IN_ADDR_T in)
 			case 29:
 				result = send_ncam_logpoll(vars, &params);
 				break;
+			//case 30: jquery.js
 #endif
 			default:
 				result = send_ncam_status(vars, &params, 0);

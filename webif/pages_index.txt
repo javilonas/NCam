@@ -65,6 +65,8 @@ UNLOCKPARENTAL                config/global_unlockparental.html                 
 CONFIGLCD                     config/lcd.html                                             LCDSUPPORT
 CONFIGLOADBALANCER            config/loadbalancer.html                                    WITH_LB
 CONFIGLOADBALANCERCTRL        config/loadbalancer_control.html                            WITH_LB
+CONFIGFORCEREOPENUSERS        config/loadbalancer_forcereopen_users.html                  WITH_LB
+CONFIGFORCEREOPENUSERSUSER    config/loadbalancer_forcereopen_users_user.html             WITH_LB
 CONFIGMENU                    config/menu.html
 CONFIGMENUANTICASC            config/menu_anticasc.html                                   CS_ANTICASC
 CONFIGMENUCAMD33              config/menu_camd33.html                                     MODULE_CAMD33
@@ -203,6 +205,7 @@ READERCONFIGVIACCESS          readerconfig/readerconfig_hwreader_viaccess.html  
 READERCONFIGDRE               readerconfig/readerconfig_hwreader_dre.html                 READER_DRE
 READERCONFIGVIDEOGUARD        readerconfig/readerconfig_hwreader_videoguard.html          READER_VIDEOGUARD
 READERCONFIGTONGFANG          readerconfig/readerconfig_hwreader_tongfang.html            READER_TONGFANG
+READERCONFIGJET               readerconfig/readerconfig_hwreader_jet.html                 READER_JET
 READERCONFIGLBWEIGHT          readerconfig/readerconfig_lbweight.html                     WITH_LB
 READERCONFIGNCD525BIT         readerconfig/readerconfig_ncd525bit.html                    MODULE_NEWCAMD
 READERCONFIGNCD524BIT         readerconfig/readerconfig_ncd524bit.html                    MODULE_NEWCAMD
@@ -292,6 +295,7 @@ USEREDIT                      user_edit/user_edit.html
 USEREDITANTICASC              user_edit/user_edit_anticasc.html                           CS_ANTICASC
 USEREDITCACHEEXBIT            user_edit/user_edit_cacheexbit.html                         CS_CACHEEX
 USEREDITCWCYCLE               user_edit/user_edit_cwcycle.html                            CW_CYCLE_CHECK
+USEREDITLOADBALANCER          user_edit/user_edit_loadbalancer.html                       WITH_LB
 USEREDITCCCAM                 user_edit/user_edit_cccam.html                              MODULE_CCCAM
 USEREDITMONLEVEL              user_edit/user_edit_monlevel.html                           MODULE_MONITOR
 USEREDITSID                   user_edit/user_edit_sid.html

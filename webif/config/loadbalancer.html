@@ -26,9 +26,10 @@
 				<label>&nbsp;never reopen &nbsp;</label><input name="lb_reopen_seconds_never" type="hidden" value="0"><input name="lb_reopen_seconds_never" type="checkbox" value="1" ##LBREOPENSECONDS_NEVER##>
 				<label>&nbsp;never reopen specific group: &nbsp;</label><input name="lb_reopen_seconds_never_group" class="withunit short" type="text" maxlength="5" value="##LBREOPENSECONDS_NEVER_GROUP##">
 			</TD></TR>
+			<TR><TD>Time to reopen lb_min_ecmcount:</TD><TD><input name="lb_reopen_seconds_lbmin" class="withunit short" type="text" maxlength="5" value="##LBREOPENSECONDSLBMIN##"> s</TD></TR>
 			<TR><TD><A>Hours to cleanup older than:</A></TD><TD><input name="lb_stat_cleanup" class="withunit short" type="text" maxlength="5" value="##LBCLEANUP##"> h</TD></TR>
 			<TR><TD><A>Reopen Invalid:</A></TD><TD><input name="lb_reopen_invalid" value="0" type="hidden"><input name="lb_reopen_invalid" value="1" type="checkbox" ##LBREOPENINVALID##><label></label></TD></TR>
-			<TR><TD><A>Force always reopen:</A></TD><TD><input name="lb_force_reopen_always" value="0" type="hidden"><input name="lb_force_reopen_always" value="1" type="checkbox" ##LBFORCEALWAYS##><label></label></TD></TR>
+			<TR><TD><A>Force always reopen:</A></TD><TD><input name="lb_force_reopen_always" value="0" type="hidden"><input name="lb_force_reopen_always" value="1" type="checkbox" ##LBFORCEALWAYS##><label>(working only if no "user specific settings for loadbalancer" enabled)</label></TD></TR>
 			<TR><TD>Force always reopen usernames:</TD><TD><input name="forcereopenusernames" type="text" maxlength="500" value="##FORCEREOPENUSERNAMES##"></TD></TR>
 			<TR><TD><A>Ignore provider for:</A></TD><TD><input name="lb_noproviderforcaid" type="text" maxlength="160" value="##LBNOPROVIDERFORCAID##"></TD></TR>
 			<TR><TD><A>Auto Betatunnel:</A></TD><TD><input name="lb_auto_betatunnel" value="0" type="hidden"><input name="lb_auto_betatunnel" value="1" type="checkbox" ##LBAUTOBETATUNNEL##><label></label></TD></TR>
@@ -37,3 +38,4 @@
 			<TR><TD><A>Auto timeout:</A></TD><TD><input name="lb_auto_timeout" value="0" type="hidden"><input name="lb_auto_timeout" value="1" type="checkbox" ##LBAUTOTIMEOUT##><label></label></TD></TR>
 			<TR><TD><A>Auto timeout percent:</A></TD><TD><input name="lb_auto_timeout_p" class="withunit short" type="text" maxlength="5" value="##LBAUTOTIMEOUTP##"> %</TD></TR>
 			<TR><TD><A>Auto timeout time:</A></TD><TD><input name="lb_auto_timeout_t" class="withunit short" type="text" maxlength="5" value="##LBAUTOTIMEOUTT##"> ms</TD></TR>
+##CONFIGFORCEREOPENUSERSINS##

@@ -1778,7 +1778,11 @@ void dvbapi_parse_cat(int32_t demux_id, uchar *buf, int32_t len)
 	return;
 }
 
+#if defined cross-powerpc-tuxbox-linux || cross-powerpc-tuxbox-linux-libusb || cross-ppc-tuxbox-linux
+//static pthread_mutex_t lockindex = PTHREAD_MUTEX_INITIALIZER;
+#else
 static pthread_mutex_t lockindex = PTHREAD_MUTEX_INITIALIZER;
+#endif
 
 ca_index_t dvbapi_get_descindex(int32_t demux_index, int32_t pid, int32_t stream_id)
 {
@@ -1786,6 +1790,17 @@ ca_index_t dvbapi_get_descindex(int32_t demux_index, int32_t pid, int32_t stream
 	ca_index_t idx = 0;
 	uint32_t tmp_idx;
 
+#if defined cross-powerpc-tuxbox-linux || cross-powerpc-tuxbox-linux-libusb || cross-ppc-tuxbox-linux
+	static pthread_mutex_t lockindex;
+	static int8_t init_mutex = 0;
+
+	if(init_mutex == 0)
+	{
+		SAFE_MUTEX_INIT(&lockindex, NULL);
+		init_mutex = 1;
+	}
+
+#endif
 	if(cfg.dvbapi_boxtype == BOXTYPE_NEUMO)
 	{
 		tmp_idx = 0;
@@ -1973,7 +1988,6 @@ void dvbapi_stop_all_emm_sdt_filtering(void)
 	}
 }
 
-
 void dvbapi_stop_descrambling(int32_t demux_id)
 {
 	int32_t i, j, z;
@@ -2134,8 +2148,14 @@ int32_t dvbapi_start_descrambling(int32_t demux_id, int32_t pid, int8_t checked)
 
 			demux[demux_id].curindex = pid; // set current pid to the fresh started one
 
+			uint32_t table = 0x80;
+			uint32_t mask = 0xF0;
+			if(caid_is_dvn(demux[demux_id].ECMpids[pid].CAID)){
+				table = 0x50;
+				mask = 0xFF;
+			}
 			dvbapi_start_filter(demux_id, pid, demux[demux_id].ECMpids[pid].ECM_PID, demux[demux_id].ECMpids[pid].CAID,
-								demux[demux_id].ECMpids[pid].PROVID, 0x80, 0xF0, 3000, TYPE_ECM);
+								demux[demux_id].ECMpids[pid].PROVID, table, mask, 3000, TYPE_ECM);
 			started = 1;
 
 			request_cw(dvbapi_client, er, demux_id, 0); // do not register ecm since this try!
@@ -4212,7 +4232,12 @@ int32_t dvbapi_net_init_listenfd(void)
 	return listenfd;
 }
 
+#if defined cross-powerpc-tuxbox-linux || cross-powerpc-tuxbox-linux-libusb  || cross-ppc-tuxbox-linux
+static pthread_mutex_t event_handler_lock;
+static int8_t init_mutex = 0;
+#else
 static pthread_mutex_t event_handler_lock = PTHREAD_MUTEX_INITIALIZER;
+#endif
 
 void event_handler(int32_t UNUSED(signal))
 {
@@ -4224,6 +4249,14 @@ void event_handler(int32_t UNUSED(signal))
 	uchar mbuf[2048]; // dirty fix: larger buffer needed for CA PMT mode 6 with many parallel channels to decode
 	if(dvbapi_client != cur_client()) { return; }
 
+#if defined cross-powerpc-tuxbox-linux || cross-powerpc-tuxbox-linux-libusb  || cross-ppc-tuxbox-linux
+	if(init_mutex == 0)
+	{
+		SAFE_MUTEX_INIT(&event_handler_lock, NULL);
+		init_mutex = 1;
+	}
+
+#endif
 	SAFE_MUTEX_LOCK(&event_handler_lock);
 
 	if(cfg.dvbapi_boxtype == BOXTYPE_PC || cfg.dvbapi_boxtype == BOXTYPE_PC_NODMX || cfg.dvbapi_boxtype == BOXTYPE_SAMYGO)
@@ -4516,7 +4549,7 @@ void dvbapi_process_input(int32_t demux_id, int32_t filter_num, uchar *buffer, i
 				return;
 			}
 
-			if(!(buffer[0] == 0x80 || buffer[0] == 0x81))
+			if(!(buffer[0] == 0x80 || buffer[0] == 0x81 || (caid_is_dvn(curpid->CAID) && buffer[0] == 0x50)))
 			{
 				cs_log_dbg(D_DVBAPI, "Received an ECM with invalid ecmtable ID %02X -> ignoring!", buffer[0]);
 				if(curpid)
@@ -4541,7 +4574,7 @@ void dvbapi_process_input(int32_t demux_id, int32_t filter_num, uchar *buffer, i
 				}
 			}
 
-			if((curpid->table == buffer[0] && !caid_is_irdeto(curpid->CAID)) || pvu_skip)  // wait for odd / even ecm change (only not for irdeto!)
+			if((curpid->table == buffer[0] && !caid_is_irdeto(curpid->CAID) && !caid_is_dvn(curpid->CAID)) || pvu_skip)  // wait for odd / even ecm change (only not for irdeto and dvn!)
 			{
 
 				if(!(er = get_ecmtask()))
@@ -4668,6 +4701,7 @@ void dvbapi_process_input(int32_t demux_id, int32_t filter_num, uchar *buffer, i
 		// check for matching chid (unique ecm part in case of non-irdeto cas) + added fix for seca2 monthly changing fakechid 
 		if((curpid->CHID < 0x10000) && !( (chid == curpid->CHID)
 						 || ((curpid->CAID >> 8 == 0x01) && (chid&0xF0FF) == (curpid->CHID&0xF0FF))
+						 || caid_is_dvn(curpid->CAID)
 						 || caid_is_streamguard(curpid->CAID) ) )
 		{
 			if(caid_is_irdeto(curpid->CAID))
@@ -6018,21 +6052,6 @@ void dvbapi_write_cw(int32_t demux_id, uchar *cw, int32_t pid, int32_t stream_id
 					cs_log_dbg(D_DVBAPI, "Demuxer %d writing %s part (%s) of controlword, replacing expired (%s)", demux_id, (n == 1 ? "even" : "odd"), newcw, lastcw);
 					cs_log_dbg(D_DVBAPI, "Demuxer %d write cw%d index: %d (ca%d)", demux_id, n, ca_descr.index, i);
 
-					if(cfg.dvbapi_boxtype == BOXTYPE_PC || cfg.dvbapi_boxtype == BOXTYPE_PC_NODMX)
-						dvbapi_net_send(DVBAPI_CA_SET_DESCR, demux[demux_id].socket_fd, demux_id, -1 /*unused*/, (unsigned char *) &ca_descr, NULL, NULL, demux[demux_id].client_proto_version);
-					else
-					{
-						if(ca_fd[i] <= 0)
-						{
-							ca_fd[i] = dvbapi_open_device(1, i, demux[demux_id].adapter_index);
-							if(ca_fd[i] <= 0) { continue; }
-						}
-						if (dvbapi_ioctl(ca_fd[i], CA_SET_DESCR, &ca_descr) < 0)
-						{
-							cs_log("ERROR: ioctl(CA_SET_DESCR): %s", strerror(errno));
-						}
-					}
-
 					if(cfg.dvbapi_extended_cw_api == 1)
 					{
 						ca_descr_mode.index = usedidx;
@@ -6052,6 +6071,21 @@ void dvbapi_write_cw(int32_t demux_id, uchar *cw, int32_t pid, int32_t stream_id
 							{
 								cs_log("ERROR: ioctl(CA_SET_DESCR_MODE): %s", strerror(errno));
 							}
+						}
+					}
+
+					if(cfg.dvbapi_boxtype == BOXTYPE_PC || cfg.dvbapi_boxtype == BOXTYPE_PC_NODMX)
+						dvbapi_net_send(DVBAPI_CA_SET_DESCR, demux[demux_id].socket_fd, demux_id, -1 /*unused*/, (unsigned char *) &ca_descr, NULL, NULL, demux[demux_id].client_proto_version);
+					else
+					{
+						if(ca_fd[i] <= 0)
+						{
+							ca_fd[i] = dvbapi_open_device(1, i, demux[demux_id].adapter_index);
+							if(ca_fd[i] <= 0) { continue; }
+						}
+						if (dvbapi_ioctl(ca_fd[i], CA_SET_DESCR, &ca_descr) < 0)
+						{
+							cs_log("ERROR: ioctl(CA_SET_DESCR): %s", strerror(errno));
 						}
 					}
 				}
@@ -6169,6 +6203,13 @@ void dvbapi_send_dcw(struct s_client *client, ECM_REQUEST *er)
 
 		if(er->rc < E_NOTFOUND && cfg.dvbapi_requestmode == 1 && er->caid != 0) // FOUND
 		{
+#if defined cross-powerpc-tuxbox-linux || cross-powerpc-tuxbox-linux-libusb  || cross-ppc-tuxbox-linux
+			if(demux[i].init_mutex == 0)
+			{
+				SAFE_MUTEX_INIT(&demux[i].answerlock, NULL);
+				demux[i].init_mutex = 1;
+			}
+#endif
 			SAFE_MUTEX_LOCK(&demux[i].answerlock); // only process one ecm answer
 
 			if(demux[i].ECMpids[j].checked != 4)
@@ -6727,12 +6768,19 @@ int32_t dvbapi_set_section_filter(int32_t demux_index, ECM_REQUEST *er, int32_t 
 	if(er->ecm[0] == 0x80) { ecmfilter = 0x81; }  // current processed ecm is even, next will be filtered for odd
 	else { ecmfilter = 0x80; } // current processed ecm is odd, next will be filtered for even
 
-	if(curpid->table != 0)   // cycle ecmtype from odd to even or even to odd
+	if(caid_is_dvn(er->caid))
+	{
+		filter[0] = 0x50; // set filter to wait for any ecms
+		mask[0] = 0xFF;
+		cs_log_dbg(D_DVBAPI, "Demuxer %d Filter %d set ecmtable to %s (CAID %04X PROVID %06X FD %d)", demux_index, n + 1,
+				   "EVEN+ODD", curpid->CAID, curpid->PROVID, fd);
+	}
+	else if(curpid->table != 0)   // cycle ecmtype from odd to even or even to odd
 	{
 		filter[0] = ecmfilter; // only accept new ecms (if previous odd, filter for even and visaversa)
 		mask[0] = 0xFF;
 		cs_log_dbg(D_DVBAPI, "Demuxer %d Filter %d set ecmtable to %s (CAID %04X PROVID %06X FD %d)", demux_index, n + 1,
-					  (ecmfilter == 0x80 ? "EVEN" : "ODD"), curpid->CAID, curpid->PROVID, fd);
+					  ((ecmfilter == 0x80) ? "EVEN" : "ODD"), curpid->CAID, curpid->PROVID, fd);
 	}
 	else  // not decoding right now so we are interessted in all ecmtypes!
 	{

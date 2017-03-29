@@ -1,0 +1,4 @@
+bcm63xx_pcmcia.ko
+pcmcia.ko
+pcmcia_core.ko
+pcmcia_rsrc.ko

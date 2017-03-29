@@ -25,9 +25,13 @@ export PARCH_LOGS=$ROOTFS_PATH/build_dir/logs
 export ARCH=ppc
 export target=ppc
 export NCAM_BIN=ncam.ppc-old
-export CROSS=$ROOTFS_PATH/cross/powerpc-old-tuxbox-linux/dm500/cdk/bin/powerpc-tuxbox-linux-gnu-
+export CROSS=$ROOTFS_PATH/cross/Toolchain-PPC-Tuxbox_s/bin/powerpc-linux-
 export DCMAKE=cross-ppc-tuxbox-linux
 export SCRIPT=build_ppc-old.sh
+
+export LIB_RT="$ROOTFS_PATH/cross/Toolchain-PPC-Tuxbox_s/lib/librt.a -lrt"
+export LIB_PTHREAD="$ROOTFS_PATH/cross/Toolchain-PPC-Tuxbox_s/lib/libpthread.a -lrt"
+export PATH=$PATH:~$ROOTFS_PATH/cross/Toolchain-PPC-Tuxbox_s/bin
 
 # BEGIN THE LOG
 cd $PARCH_LOGS/

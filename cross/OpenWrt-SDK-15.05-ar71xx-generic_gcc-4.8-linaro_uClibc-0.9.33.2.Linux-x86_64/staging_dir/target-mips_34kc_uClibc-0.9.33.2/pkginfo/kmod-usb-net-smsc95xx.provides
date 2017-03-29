@@ -1,0 +1,7 @@
+crc16.ko
+mii.ko
+nls_base.ko
+smsc95xx.ko
+usb-common.ko
+usbcore.ko
+usbnet.ko

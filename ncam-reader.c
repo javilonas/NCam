@@ -492,7 +492,7 @@ struct s_reader *get_reader_by_label(char *lbl)
 	return rdr;
 }
 
-const char *reader_get_type_desc(struct s_reader *rdr, int32_t extended)
+const char *reader_get_type_desc(struct s_reader *rdr)
 {
 	const char *desc = "unknown";
 	if(rdr->crdr && rdr->crdr->desc)
@@ -504,10 +504,20 @@ const char *reader_get_type_desc(struct s_reader *rdr, int32_t extended)
 	}
 	if(rdr->typ == R_NEWCAMD && rdr->ncd_proto == NCD_524)
 		{ desc = "newcamd524"; }
-	else if(rdr->typ == R_CCCAM && cccam_client_multics_mode(rdr->client) && cccam_client_newbox_mode(rdr->client))
+	else if (rdr->typ == R_CCCAM)
+	//else if(rdr->typ == R_CCCAM && cccam_client_multics_mode(rdr->client) && cccam_client_newbox_mode(rdr->client))
 	{
-		desc = "cccam";
-		if(extended && cccam_client_extended_mode(rdr->client)) desc = "cccam_ext";
+//		desc = "cccam";
+//		if(extended && cccam_client_extended_mode(rdr->client)) desc = "cccam_ext";
+		if (cccam_client_multics_mode(rdr->client) && cccam_client_newbox_mode(rdr->client))
+			desc = "cccam";
+		else
+		{
+			if (cccam_client_extended_mode(rdr->client))
+				desc = "cccam_ext";
+			else
+				desc = "cccam";
+		}
 	}
 	return desc;
 }

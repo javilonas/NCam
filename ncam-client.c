@@ -83,7 +83,7 @@ const char *client_get_proto(struct s_client *cl)
 		break;
 	case 'p':
 	case 'r':
-		ctyp = reader_get_type_desc(cl->reader, 1);
+		ctyp = reader_get_type_desc(cl->reader);
 		break;
 #ifdef CS_ANTICASC
 	case 'a':
@@ -91,7 +91,12 @@ const char *client_get_proto(struct s_client *cl)
 		break;
 #endif
 	case 'c':
-		if(cccam_client_extended_mode(cl))
+		if(cccam_client_multics_mode(cl) && cccam_client_newbox_mode(cl))
+		{
+			ctyp = "cccam";
+			break;
+		}
+		else if(cccam_client_extended_mode(cl))
 		{
 			ctyp = "cccam_ext";
 			break;

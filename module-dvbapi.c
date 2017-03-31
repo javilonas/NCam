@@ -565,7 +565,7 @@ int32_t dvbapi_net_send(uint32_t request, int32_t socket_fd, int32_t demux_index
 							dvbapi_net_add_str(packet, &size, er->selected_reader->device);          //from
 						else
 							dvbapi_net_add_str(packet, &size, "local");                              //from
-						dvbapi_net_add_str(packet, &size, reader_get_type_desc(er->selected_reader, 1)); //protocol
+						dvbapi_net_add_str(packet, &size, reader_get_type_desc(er->selected_reader)); //protocol
 						hops = er->selected_reader->currenthops;
 					}
 					break;
@@ -6590,7 +6590,7 @@ void dvbapi_write_ecminfo_file(struct s_client *client, ECM_REQUEST *er, uint8_t
 				else
 					{ from_name = "local"; }
 				from_port = er->selected_reader->r_port;
-				proto_name = reader_get_type_desc(er->selected_reader, 1);
+				proto_name = reader_get_type_desc(er->selected_reader);
 				hops = er->selected_reader->currenthops;
 			}
 			else

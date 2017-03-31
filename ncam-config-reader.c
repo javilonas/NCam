@@ -144,7 +144,7 @@ static void protocol_fn(const char *token, char *value, void *setting, FILE *f)
 			}
 		return;
 	}
-	fprintf_conf(f, token, "%s\n", reader_get_type_desc(rdr, 0));
+	fprintf_conf(f, token, "%s\n", reader_get_type_desc(rdr));
 }
 
 static void device_fn(const char *token, char *value, void *setting, FILE *f)
@@ -176,7 +176,7 @@ static void device_fn(const char *token, char *value, void *setting, FILE *f)
 	fprintf_conf(f, token, "%s", rdr->device); // it should not have \n at the end
 	if((rdr->r_port || cfg.http_full_cfg) && !isphysical)
 		{ fprintf(f, ",%d", rdr->r_port); }
-	if((rdr->l_port || cfg.http_full_cfg) && !isphysical && strncmp(reader_get_type_desc(rdr, 0), "cccam", 5))
+	if((rdr->l_port || cfg.http_full_cfg) && !isphysical && strncmp(reader_get_type_desc(rdr), "cccam", 5))
 		{ fprintf(f, ",%d", rdr->l_port); }
 	fprintf(f, "\n");
 }

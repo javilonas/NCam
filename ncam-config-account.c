@@ -397,11 +397,25 @@ static void account_fixups_fn(void *var)
 #ifdef CS_ANTICASC
 	if(account->ac_users < -1) { account->ac_users = DEFAULT_AC_USERS; }
 	if(account->ac_penalty < -1) { account->ac_penalty = DEFAULT_AC_PENALTY; }
+	if(account->acosc_max_ecms_per_minute < -1) { account->acosc_max_ecms_per_minute = -1; }
 	if(account->acosc_max_active_sids < -1) { account->acosc_max_active_sids = -1; }
 	if(account->acosc_zap_limit < -1) { account->acosc_zap_limit = -1; }
 	if(account->acosc_penalty < -1) { account->acosc_penalty = -1; }
 	if(account->acosc_penalty_duration < -1) { account->acosc_penalty_duration = -1; }
 	if(account->acosc_delay < -1) { account->acosc_delay = -1; }
+	if(account->acosc_penalty == 4 || (cfg.acosc_penalty == 4 && account->acosc_penalty == -1))
+	{
+		account->acosc_max_active_sids = -1; //use global value
+		account->acosc_zap_limit = -1; //use global value
+		account->acosc_penalty_duration = -1; //use global value
+
+		if(account->acosc_max_ecms_per_minute != -1 && account->acosc_max_ecms_per_minute != 0)
+		{
+			if(account->acosc_max_ecms_per_minute < 6) { account->acosc_max_ecms_per_minute = 6; }
+			if(account->acosc_max_ecms_per_minute > 20) { account->acosc_max_ecms_per_minute = 20; }
+			account->acosc_penalty_duration = (60 / account->acosc_max_ecms_per_minute);
+		}
+	}
 #endif
 #ifdef WITH_LB
 	if(account->lb_force_reopen_user == 1) { cfg.lb_force_reopen_always = 0; }
@@ -468,6 +482,7 @@ static const struct config_list account_opts[] =
 	DEF_OPT_INT32("fakedelay"           , OFS(ac_fakedelay),            -1),
 	DEF_OPT_INT32("numusers"            , OFS(ac_users),                DEFAULT_AC_USERS),
 	DEF_OPT_INT8("penalty"              , OFS(ac_penalty),              DEFAULT_AC_PENALTY),
+	DEF_OPT_INT8("acosc_max_ecms_per_minute"	, OFS(acosc_max_ecms_per_minute),	-1 ),
 	DEF_OPT_INT8("acosc_max_active_sids"	, OFS(acosc_max_active_sids),	-1 ),
 	DEF_OPT_INT8("acosc_zap_limit"		, OFS(acosc_zap_limit),			-1 ),
 	DEF_OPT_INT8("acosc_penalty"		, OFS(acosc_penalty),			-1 ),

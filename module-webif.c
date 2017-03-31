@@ -1643,7 +1643,7 @@ static char *send_ncam_reader(struct templatevars *vars, struct uriparams *param
 		}
 	}
 
-	tpl_addVar(vars, TPLADD, "READERACTIONCOLS", config_enabled(WITH_LB) ? "6" : "5");
+	tpl_addVar(vars, TPLADD, "READERACTIONCOLS", config_enabled(WITH_LB) ? "7" : "5");
 
 	if(strcmp(getParam(params, "action"), "resetuserstats") == 0)
 	{
@@ -1786,7 +1786,14 @@ static char *send_ncam_reader(struct templatevars *vars, struct uriparams *param
 			if(rdr->enable) { active_readers += 1; }
 			else { disabled_readers += 1; }
 
-			if(rdr->tcp_connected) { connected_readers += 1; }
+			if(rdr->tcp_connected) {
+				connected_readers += 1;
+				tpl_addVar(vars, TPLADD, "READERIP", cs_inet_ntoa(rdr->client->ip));
+			}
+			else
+			{
+				tpl_addVar(vars, TPLADD, "READERIP", "offline");
+			}
 
 			if(rdr->description)
 				tpl_printf(vars, TPLADD, "DESCRIPTION","%s(%s)",!apicall?"&#13;":"",xml_encode(vars, rdr->description));

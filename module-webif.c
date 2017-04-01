@@ -1643,7 +1643,7 @@ static char *send_ncam_reader(struct templatevars *vars, struct uriparams *param
 		}
 	}
 
-	tpl_addVar(vars, TPLADD, "READERACTIONCOLS", config_enabled(WITH_LB) ? "7" : "5");
+	tpl_addVar(vars, TPLADD, "READERACTIONCOLS", config_enabled(WITH_LB) ? "6" : "5");
 
 	if(strcmp(getParam(params, "action"), "resetuserstats") == 0)
 	{
@@ -3822,6 +3822,7 @@ static char *send_ncam_user_config(struct templatevars *vars, struct uriparams *
 		tpl_addVar(vars, TPLADD, "CWLASTRESPONSET", "");
 		tpl_addVar(vars, TPLADD, "CWLASTRESPONSETMS", "");
 		tpl_addVar(vars, TPLADD, "CLIENTIP", "");
+		tpl_addVar(vars, TPLADD, "CLIENTPORT", "");
 		tpl_addVar(vars, TPLADD, "LASTCHANNELTITLE", "");
 		tpl_addVar(vars, TPLADD, "LASTCHANNELSORT", "");
 		tpl_addVar(vars, TPLADD, "CLIENTTIMEONCHANNELAPI", "");
@@ -3981,7 +3982,20 @@ static char *send_ncam_user_config(struct templatevars *vars, struct uriparams *
 			}
 
 			lastresponsetm = latestclient->cwlastresptime;
-			tpl_addVar(vars, TPLADD, "CLIENTIP", cs_inet_ntoa(latestclient->ip));
+			if(latestclient->ip) {
+				connected_users += 1;
+				tpl_addVar(vars, TPLADD, "CLIENTIP", cs_inet_ntoa(latestclient->ip));
+				if(isactive > 0 || conn > 0)
+				{
+					tpl_printf(vars, TPLADD, "CLIENTPORT", "%d", latestclient->port);
+				}
+				//tpl_addVar(vars, TPLADD, "CLIENTPORT", cs_inet_ntoa(latestclient->port));
+			}
+			else
+			{
+				tpl_addVar(vars, TPLADD, "CLIENTIP", "0.0.0.0");
+				tpl_addVar(vars, TPLADD, "CLIENTPORT", "0");
+			}
 			connected_users++;
 			casc_users = ll_count(latestclient->cascadeusers);
 			LL_ITER it = ll_iter_create(latestclient->cascadeusers);
@@ -5247,7 +5261,7 @@ static char *send_ncam_status(struct templatevars * vars, struct uriparams * par
 							get_servicename_or_null(cl, cl->last_srvid, cl->last_provid, cl->last_caid, channame, sizeof(channame));
 							if(channame[0] == '\0')
 							{
-								cs_strncpy(channame, "unknown", sizeof(channame));	
+								cs_strncpy(channame, "unknown", sizeof(channame));
 							}
 
 							lastprovidername = get_cl_lastprovidername(cl);

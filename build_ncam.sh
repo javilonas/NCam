@@ -72,7 +72,7 @@ echo "- Enter option:"
       13) build_dir/build_arm-raspbian.sh;;
       14) build_dir/build_arm-marvell.sh;;
       15) build_dir/build_arm-android.sh;;
-      16) build_dir/build_arm-android.sh;;
+      16) build_dir/build_arm-mca.sh;;
       a) build_dir/advanced.sh $version; continue;;
       i) build_dir/info.sh $version; continue;;
       x) clear; echo; echo "Goodbye ;)"; echo; exit 1;;

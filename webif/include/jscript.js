@@ -12,6 +12,19 @@ function cdpause() {
 	clearTimeout(oReloadTimer);
 };
 
+function randomstring(L){
+    // Hexadecimal key
+    var chars = "0123456789ABCDEF";
+    var string_length = 16;
+    var randomstring = '';
+    for (var i=0; i < string_length; i++) {
+        var rnum = Math.floor(Math.random() * chars.length);
+        randomstring += chars.substring(rnum,rnum+1);
+    }
+    document.getElementById("randomfield").value = randomstring;
+    return randomstring;
+};
+
 function runReloadCounter() {
 	var oReloadContent = document.getElementById("ReloadContent");
 	if (oReloadContent) {

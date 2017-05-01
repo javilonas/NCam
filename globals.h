@@ -363,9 +363,9 @@ typedef unsigned char uchar;
 /* ===========================
  *         constants
  * =========================== */
-#define CS_VERSION    "1.3"
-#define DATE_BUILD    "01-04-2017"
-#define CS_REVISION   "r7"
+#define CS_VERSION    "1.6"
+#define DATE_BUILD    "01-05-2017"
+#define CS_REVISION   "r0"
 #ifndef CS_SVN_VERSION
 #   define CS_SVN_VERSION "stable"
 #endif
@@ -554,7 +554,7 @@ enum {E2_GLOBAL = 0, E2_GROUP, E2_CAID, E2_IDENT, E2_CLASS, E2_CHID, E2_QUEUE, E
 
 #define CTA_RES_LEN 512
 
-#define MAX_ATR_LEN     33          // max. ATR length
+#define MAX_ATR_LEN     64          // max. ATR length
 #define MAX_HIST        15          // max. number of historical characters
 
 #define MAX_SIDBITS     (64+64)     // max services
@@ -575,8 +575,8 @@ enum {E2_GLOBAL = 0, E2_GROUP, E2_CAID, E2_IDENT, E2_CLASS, E2_CHID, E2_QUEUE, E
 #define AVAIL_CHECK_CONNECTED   0
 #define AVAIL_CHECK_LOADBALANCE 1
 
-#define ECM_FMT_LEN 109 //64
-#define CXM_FMT_LEN 209 // 160
+#define ECM_FMT_LEN 173 //64
+#define CXM_FMT_LEN 273 // 160
 
 #define LB_MAX_STAT_TIME        10
 
@@ -2175,9 +2175,9 @@ struct s_config
 	int32_t         lb_min_ecmcount;                // minimal ecm count to evaluate lbvalues
 	int32_t         lb_max_ecmcount;                // maximum ecm count before reseting lbvalues
 	int32_t         lb_reopen_seconds;              // time between retrying failed readers/caids/prov/srv
+	int32_t         lb_reopen_seconds_lbmin;        // time between retrying failed readers/caids/prov/srv which allready have FOUND count >= lb_min_ecmcount
 	int8_t          lb_reopen_seconds_never;        // permanently block this: time between retrying failed readers/caids/prov/srv
 	char            *lb_reopen_seconds_never_group; // permanently block this for defined group only: time between retrying failed readers/caids/prov/srv
-	int32_t         lb_reopen_seconds_lbmin;        // time between retrying failed readers/caids/prov/srv which allready have FOUND count >= lb_min_ecmcount
 	int8_t          lb_reopen_invalid;              // default=1; if 0, rc=E_INVALID will be blocked until stats cleaned
 	int8_t          lb_force_reopen_always;         // force reopening immediately all failing readers if no matching reader found
 	int32_t         lb_retrylimit;                  // reopen only happens if reader response time > retrylimit

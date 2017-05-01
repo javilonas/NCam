@@ -56,10 +56,10 @@ override STD_LIBS := $(LIB_PTHREAD) $(LIB_DL) $(LIB_RT)
 override STD_DEFS := -D'CS_SVN_VERSION="$(SVN_REV)"'
 override STD_DEFS += -D'CS_CONFDIR="$(CONF_DIR)"'
 
-MODFLAGS_OPTS = -fPIC -fwrapv -fomit-frame-pointer
+MODFLAGS_OPTS = -fwrapv -fomit-frame-pointer
 
 # Compiler warnings
-CC_WARN = -W -Wall -Wextra -Wshadow -Wno-shadow -Wredundant-decls -Wstrict-prototypes -Wold-style-definition
+CC_WARN = -W -Wall -Wshadow -Wno-shadow -Wredundant-decls -Wstrict-prototypes -Wold-style-definition
 
 # Compiler optimizations
 CC_OPTS = -Os -ggdb -pipe -ffunction-sections -fdata-sections $(MODFLAGS_OPTS)
@@ -67,9 +67,13 @@ CC_OPTS = -Os -ggdb -pipe -ffunction-sections -fdata-sections $(MODFLAGS_OPTS)
 CC = $(CROSS_DIR)$(CROSS)gcc
 STRIP = $(CROSS_DIR)$(CROSS)strip
 
+ifndef MCA
+#MODLDFLAGS = -lm
+else
 MODLDFLAGS = -lm
+endif
 
-LDFLAGS = $(MODLDFLAGS) -Wl,--gc-sections
+LDFLAGS = -Wl,--gc-sections
 
 TARGETHELP := $(shell $(CC) --target-help 2>&1)
 ifneq (,$(findstring sse2,$(TARGETHELP)))
@@ -819,3 +823,4 @@ debug: all
 
 -include Makefile.extra
 -include Makefile.local
+

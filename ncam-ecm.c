@@ -2088,6 +2088,14 @@ void get_cw(struct s_client *client, ECM_REQUEST *er)
 	if(er->caid == 0x500 && er->prid == 0xD20200)
 		{ er->prid = 0x030600; }
 
+	// Quickfix for 0500:030B00
+	if(er->caid == 0x500 && er->prid == 0x030B00)
+		{ er->prid = 0x030600; }
+
+	// Quickfix for 0500:032830
+	if(er->caid == 0x500 && er->prid == 0x032830)
+		{ er->prid = 0x030600; }
+
 	//betacrypt ecm with nagra header
 	if(chk_is_betatunnel_caid(er->caid) == 1 && (er->ecmlen == 0x89 || er->ecmlen == 0x4A) && er->ecm[3] == 0x07 && (er->ecm[4] == 0x84 || er->ecm[4] == 0x45))
 	{

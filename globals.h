@@ -364,10 +364,10 @@ typedef unsigned char uchar;
  *         constants
  * =========================== */
 #define CS_VERSION    "1.6"
-#define DATE_BUILD    "01-05-2017"
-#define CS_REVISION   "r0"
+#define DATE_BUILD    "04-05-2017"
+#define CS_REVISION   "r1"
 #ifndef CS_SVN_VERSION
-#   define CS_SVN_VERSION "stable"
+#   define CS_SVN_VERSION "test"
 #endif
 #ifndef CS_TARGET
 #   define CS_TARGET "unknown"

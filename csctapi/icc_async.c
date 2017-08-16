@@ -325,10 +325,10 @@ int32_t ICC_Async_Close(struct s_reader *reader)
 	rdr_log_dbg(reader, D_IFD, "Closing device %s", reader->device);
 	call(crdr_ops->close(reader));
 	if(reader->typ != R_SC8in1)
-        { 
-           NULLFREE(reader->crdr_data);
-           NULLFREE(reader->csystem_data);
-        }
+		{
+			NULLFREE(reader->crdr_data);
+			NULLFREE(reader->csystem_data);
+		}
 	rdr_log_dbg(reader, D_IFD, "Device %s succesfully closed", reader->device);
 	return OK;
 }
@@ -351,7 +351,7 @@ int32_t ICC_Async_Reset(struct s_reader *reader, struct s_ATR *atr,
 
 /*static uint32_t ICC_Async_GetClockRate_NewSmart(int32_t cardmhz)
 {
- 	return (cardmhz * 10000L);
+	return (cardmhz * 10000L);
 
 }*/
 
@@ -650,7 +650,6 @@ static uint32_t PPS_GetLength(unsigned char *block)
 
 static uint32_t ETU_to_us(struct s_reader *reader, uint32_t ETU)
 {
-	
 	return (uint32_t)((double) ETU * reader->worketu);  // in us
 }
 
@@ -730,15 +729,17 @@ static int32_t InitCard(struct s_reader *reader, ATR *atr, unsigned char FI, uin
 
 			if(reader->protocol_type != ATR_PROTOCOL_TYPE_T14)    //dont switch for T14
 			{
-					uint32_t baud_temp = (double)D * ICC_Async_GetClockRate(reader->cardmhz) / (double)Fi; // just a test
-					rdr_log(reader, "Setting baudrate to %d bps", baud_temp);
-					call(crdr_ops->set_baudrate(reader, baud_temp));
-					reader->current_baudrate = baud_temp;				
+				uint32_t baud_temp = (double)D * ICC_Async_GetClockRate(reader->cardmhz) / (double)Fi;
+				uint32_t baud_temp2 = (double)D * ICC_Async_GetClockRate(reader->mhz) / (double)Fi;
+				rdr_log(reader, "Setting baudrate to %d bps", baud_temp2);
+				// set_baudrate() increases/decreases baud_temp to baud_temp2 in case of over/underclocking
+				call(crdr_ops->set_baudrate(reader, baud_temp));
+				reader->current_baudrate = baud_temp2;
 			}
 		}
 	}
 	if(reader->cardmhz > 2000 && reader->typ == R_INTERNAL) { F = reader->mhz; }  // for PLL based internal readers
-	else { 
+	else {
 	if (reader->typ == R_SMART || is_smargo_reader(reader))
 	{
 		if (reader->autospeed == 1) {
@@ -760,7 +761,7 @@ static int32_t InitCard(struct s_reader *reader, ATR *atr, unsigned char FI, uin
 		else
 		{ reader->mhz =  320; }
 		}
-	}	
+	}
 	F = reader->mhz; } // all other readers
 	reader->worketu = (double)((double)(1 / (double)D) * ((double)Fi / (double)((double)F / 100)));
 	rdr_log(reader, "Calculated work ETU is %.2f us reader mhz = %u", reader->worketu, reader->mhz);
@@ -791,7 +792,6 @@ static int32_t InitCard(struct s_reader *reader, ATR *atr, unsigned char FI, uin
 		tmpatr[4] = 0x42;
 		tmpatr[5] = 0x30;
 		tmpatr[6] = 0x30;
-		
 
 	//	WWT = (uint32_t) 960 * D * wi; //in work ETU
 		if (!memcmp(reader->card_atr, tmpatr, sizeof(tmpatr))){ // check for conax pairingecmrotation card atr.
@@ -807,7 +807,6 @@ static int32_t InitCard(struct s_reader *reader, ATR *atr, unsigned char FI, uin
 		reader->CWT = 0; // T0 protocol doesnt have char waiting time (used to detect errors within 1 single block of data)
 		reader->BWT = 0; // T0 protocol doesnt have block waiting time (used to detect unresponsive card, this is max time for starting a block answer)
 
-		
 		rdr_log_dbg(reader, D_ATR, "Protocol: T=%i, WWT=%u, Clockrate=%u", reader->protocol_type, WWT, F * 10000);
 
 		reader->read_timeout = WWT; // Work waiting time used in T0 (max time to signal unresponsive card!)
@@ -945,7 +944,7 @@ static int32_t InitCard(struct s_reader *reader, ATR *atr, unsigned char FI, uin
 			rdr_log(reader, "ATR Fsmax is %i MHz, clocking card to ATR Fsmax for smartreader cardspeed of %.2f MHz (specified in reader->mhz)",
 				atr_fs_table[FI] / 1000000, (float) reader->mhz / 100);
 		else 
-			rdr_log(reader, "ATR Fsmax is %i MHz, clocking card to wanted user cardspeed off %.2f MHz (specified in reader->mhz)",
+			rdr_log(reader, "ATR Fsmax is %i MHz, clocking card to wanted user cardclock of %.2f MHz (specified in reader->mhz)",
 				atr_fs_table[FI] / 1000000, (float) reader->mhz / 100); 
 	}
 

@@ -367,7 +367,7 @@ typedef unsigned char uchar;
 #define DATE_BUILD    "16-08-2017"
 #define CS_REVISION   "r1"
 #ifndef CS_SVN_VERSION
-#   define CS_SVN_VERSION "test"
+#   define CS_SVN_VERSION "stable"
 #endif
 #ifndef CS_TARGET
 #   define CS_TARGET "unknown"

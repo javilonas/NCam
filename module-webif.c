@@ -1190,6 +1190,10 @@ static char *send_ncam_config_cccam(struct templatevars *vars, struct uriparams 
 	{
 		tpl_addVar(vars, TPLADD, "VERSIONSELECTED8", "selected");
 	}
+	else if(!strcmp((char *)cfg.cc_version, "2.3.1"))
+	{
+		tpl_addVar(vars, TPLADD, "VERSIONSELECTED9", "selected");
+	}
 
 	tpl_printf(vars, TPLADD, "UPDATEINTERVAL", "%d", cfg.cc_update_interval);
 	tpl_printf(vars, TPLADD, "RECV_TIMEOUT", "%u", cfg.cc_recv_timeout);
@@ -2584,6 +2588,10 @@ static char *send_ncam_reader_config(struct templatevars *vars, struct uriparams
 	else if(!strcmp(rdr->cc_version, "2.3.0"))
 	{
 		tpl_addVar(vars, TPLADD, "CCCVERSIONSELECTED8", "selected");
+	}
+	else if(!strcmp(rdr->cc_version, "2.3.1"))
+	{
+		tpl_addVar(vars, TPLADD, "CCCVERSIONSELECTED9", "selected");
 	}
 #endif
 

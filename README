@@ -6,7 +6,7 @@ License
 =======
 
 NCam: Open Source CAM
-Copyright (C) 2012-2017 developed by Javilonas.
+Copyright (C) 2012-2018 developed by Javilonas.
 
 NCam is based on the Oscam 1.20: http://www.streamboard.tv/svn/oscam/trunk/
 

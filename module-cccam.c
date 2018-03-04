@@ -143,7 +143,7 @@ void cc_xor(uint8_t *buf)
 void cc_cw_crypt(struct s_client *cl, uint8_t *cws, uint32_t cardid)
 {
 	struct cc_data *cc = cl->cc;
-	int64_t node_id;
+	uint64_t node_id;
 	uint8_t tmp;
 	int32_t i;
 
@@ -781,10 +781,10 @@ int32_t cc_cmd_send(struct s_client *cl, uint8_t *buf, int32_t len, cc_msg_type_
 }
 
 #define CC_DEFAULT_VERSION 1
-#define CC_VERSIONS 9
-static char *version[CC_VERSIONS]  = { "2.0.9", "2.0.11", "2.1.1", "2.1.2", "2.1.3", "2.1.4", "2.2.0", "2.2.1", "2.3.0"};
-static char *build[CC_VERSIONS]    = { "2816",   "2892",   "2971",  "3094",  "3165",  "3191",  "3290",  "3316",  "3367"};
-static char extcompat[CC_VERSIONS] = { 0,        0,        0,       0,       0,       0,       1,       1,       1}; //Supporting new card format starting with 2.2.0
+#define CC_VERSIONS 10
+static char *version[CC_VERSIONS]  = { "2.0.9", "2.0.11", "2.1.1", "2.1.2", "2.1.3", "2.1.4", "2.2.0", "2.2.1", "2.3.0", "2.3.1"};
+static char *build[CC_VERSIONS]    = { "2816",   "2892",   "2971",  "3094",  "3165",  "3191",  "3290",  "3316",  "3367",  "9d508a"};
+static char extcompat[CC_VERSIONS] = { 0,        0,        0,       0,       0,       0,       1,       1,       1,       1}; //Supporting new card format starting with 2.2.0
 
 /**
  * reader+server

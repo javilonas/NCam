@@ -22,7 +22,7 @@ void    free_reader(struct s_reader *rdr);
 int32_t free_readerdb(void);
 int32_t write_server(void);
 void    reload_readerdb(void);
-void reader_fixups_fn(void *var);
+void    reader_fixups_fn(void *var);
 
 void    chk_sidtab(char *token, char *value, struct s_sidtab *sidtab);
 int32_t init_sidtab(void);

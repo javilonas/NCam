@@ -363,8 +363,8 @@ typedef unsigned char uchar;
 /* ===========================
  *         constants
  * =========================== */
-#define CS_VERSION    "1.6"
-#define DATE_BUILD    "16-08-2017"
+#define CS_VERSION    "1.7"
+#define DATE_BUILD    "04-03-2018"
 #define CS_REVISION   "r1"
 #ifndef CS_SVN_VERSION
 #   define CS_SVN_VERSION "stable"
@@ -1019,6 +1019,7 @@ typedef struct ecm_request_t
 	uchar           cw[16];
 	EXTENDED_CW     cw_ex;
 	uchar           ecmd5[CS_ECMSTORESIZE];
+	int8_t          demux_index;
 	int16_t         ecmlen;
 	uint16_t        caid;
 	uint16_t        ocaid;              //original caid, used for betatunneling
@@ -1493,6 +1494,7 @@ struct s_reader                                     // contains device info, rea
 	LLIST           *ll_entitlements;               // entitlements
 	int8_t          enable;
 	int8_t          active;
+	int8_t          for_demux;                      // set demux number for which use this reader
 	int8_t          dropbadcws;                     // Schlocke: 1=drops cw if checksum is wrong. 0=fix checksum (default)
 	int8_t          disablecrccws;                  // 1=disable cw checksum test. 0=enable checksum check
 	uint64_t        grp;
@@ -1758,11 +1760,10 @@ struct s_reader                                     // contains device info, rea
 	uint8_t         ghttp_use_ssl;
 #endif
 #ifdef WITH_EMU
-	FTAB            emu_auproviders;
-	char            *extee36;
-	char            *extee56;
-	opkeys_t        *ee36;
-	opkeys_t        *ee56;
+	FTAB            emu_auproviders;                // AU providers for Emu reader
+	int8_t          emu_datecodedenabled;           // date-coded keys for BISS
+	char            *extee36;                       // path to "ee36.bin" - Set by the user via the webif
+	char            *extee56;                       // path to "ee56.bin" - Set by the user via the webif
 	uint8_t         dre36_force_group;
 	uint8_t         dre56_force_group;
 #endif
@@ -2210,6 +2211,7 @@ struct s_config
 	int8_t      dvbapi_read_sdt;
 	int8_t      dvbapi_write_sdt_prov;
 	int8_t      dvbapi_extended_cw_api;
+	int8_t      dvbapi_extended_cw_pids;            // pid limiter
 #endif
 
 #ifdef CS_ANTICASC

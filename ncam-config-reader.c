@@ -880,6 +880,7 @@ static const struct config_list reader_opts[] =
 	DEF_OPT_STR("description"           , OFS(description),             NULL),
 #endif
 	DEF_OPT_INT8("enable"               , OFS(enable),                  1),
+	DEF_OPT_INT8("use_for_demux"        , OFS(for_demux),               -1),
 	DEF_OPT_FUNC("protocol"             , 0,                            protocol_fn),
 	DEF_OPT_FUNC("device"               , 0,                            device_fn),
 	DEF_OPT_HEX("key"                   , OFS(ncd_key),                 SIZEOF(ncd_key)),
@@ -1005,6 +1006,7 @@ static const struct config_list reader_opts[] =
 #endif
 #ifdef WITH_EMU
 	DEF_OPT_FUNC_X("emu_auproviders"    , OFS(emu_auproviders),         ftab_fn, FTAB_READER | FTAB_EMUAU),
+	DEF_OPT_INT8("emu_datecodedenabled" , OFS(emu_datecodedenabled),    0),
 	DEF_OPT_STR("extee36"               , OFS(extee36),                 NULL),
 	DEF_OPT_STR("extee56"               , OFS(extee56),                 NULL),
 	DEF_OPT_HEX("dre36_force_group"     , OFS(dre36_force_group),       1),

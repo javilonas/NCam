@@ -11,7 +11,7 @@
 #define HAVE_DVBAPI 1
 #endif
 #define READ_SDT_CHARSETS 1
-#define CLOCKFIX 1
+//#define CLOCKFIX 1
 #define IRDETO_GUESSING 1
 #define CS_ANTICASC 1
 //#define WITH_DEBUG 1

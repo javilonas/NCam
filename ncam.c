@@ -154,7 +154,7 @@ static void show_usage(void)
 		printf("%s).\n", info.machine);
 	}
 	printf("\n");
-	printf("Copyright (C) 2012-2017 developed by Javilonas.\n");
+	printf("Copyright (C) 2012-2018 developed by Javilonas.\n");
 	printf("Visit https://www.lonasdigital.com/ for more details.\n\n");
 
 	printf(" ConfigDir  : %s\n", CS_CONFDIR);

@@ -2005,7 +2005,7 @@ function decodeVideoguardEMM(text, target, addHideButton) {
 
 			case AddTextType.keyIndex:
 
-				if (!isV13V14) {
+				if (!isV13V14V15) {
 					text += ' - <b>' + ret + '</b>';
 				}
 
@@ -2015,6 +2015,9 @@ function decodeVideoguardEMM(text, target, addHideButton) {
 						break;
 					case '02':
 						text += ' - <b>V14</b>';
+						break;
+					case '03':
+						text += ' - <b>V15</b>';
 						break;
 					default:
 						text += ' - <b>unknown</b>';

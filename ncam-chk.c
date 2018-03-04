@@ -748,6 +748,10 @@ int32_t matching_reader(ECM_REQUEST *er, struct s_reader *rdr)
 	if(!cl || !rdr->enable)
 		{ return (0); }
 
+	//Checking demux number for which use this reader if it is specified in config:
+	if((rdr->for_demux >= 0) && (er->demux_index != rdr->for_demux)) 
+		{ return (0); }
+
 	// if physical reader a card needs to be inserted
 	if(!is_network_reader(rdr) && rdr->card_status != CARD_INSERTED)
 		{ return (0); }
@@ -1078,7 +1082,7 @@ int32_t chk_is_null_CW(uchar cw[])
  **/
 int8_t is_halfCW_er(ECM_REQUEST *er)
 {
-	if( caid_is_videoguard(er->caid) && (er->caid == 0x09C4 || er->caid == 0x098C || er->caid == 0x0963 || er->caid == 0x09CD || er->caid == 0x0919 || er->caid == 0x093B || er->caid == 0x098E))
+	if( caid_is_videoguard(er->caid) && (er->caid == 0x09C4 || er->caid == 0x098C || er->caid == 0x098D || er->caid == 0x0963 || er->caid == 0x09CD || er->caid == 0x0919 || er->caid == 0x093B || er->caid == 0x098E))
 		{ return 1; }
 	return 0;
 }

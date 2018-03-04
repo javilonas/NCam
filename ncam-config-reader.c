@@ -880,6 +880,7 @@ static const struct config_list reader_opts[] =
 	DEF_OPT_STR("description"           , OFS(description),             NULL),
 #endif
 	DEF_OPT_INT8("enable"               , OFS(enable),                  1),
+	DEF_OPT_INT8("use_for_demux"        , OFS(for_demux),               -1),
 	DEF_OPT_FUNC("protocol"             , 0,                            protocol_fn),
 	DEF_OPT_FUNC("device"               , 0,                            device_fn),
 	DEF_OPT_HEX("key"                   , OFS(ncd_key),                 SIZEOF(ncd_key)),

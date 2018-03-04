@@ -748,6 +748,10 @@ int32_t matching_reader(ECM_REQUEST *er, struct s_reader *rdr)
 	if(!cl || !rdr->enable)
 		{ return (0); }
 
+	//Checking demux number for which use this reader if it is specified in config:
+	if((rdr->for_demux >= 0) && (er->demux_index != rdr->for_demux)) 
+		{ return (0); }
+
 	// if physical reader a card needs to be inserted
 	if(!is_network_reader(rdr) && rdr->card_status != CARD_INSERTED)
 		{ return (0); }

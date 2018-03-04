@@ -2100,6 +2100,7 @@ int32_t dvbapi_start_descrambling(int32_t demux_id, int32_t pid, int8_t checked,
 			}
 		}
 	}
+	er->demux_index = demux_id;
 	er->srvid = demux[demux_id].program_number;
 	er->caid  = demux[demux_id].ECMpids[pid].CAID;
 	er->pid   = demux[demux_id].ECMpids[pid].ECM_PID;
@@ -2730,6 +2731,7 @@ void dvbapi_resort_ecmpids(int32_t demux_index)
 		for(n = 0; n < demux[demux_index].ECMpidcount; n++)
 		{
 			if(demux[demux_index].ECMpids[n].status == -1) continue; // skip ignores!
+			er->demux_index = demux_index;
 			er->caid = er->ocaid = demux[demux_index].ECMpids[n].CAID;
 			er->prid = demux[demux_index].ECMpids[n].PROVID;
 			er->pid = demux[demux_index].ECMpids[n].ECM_PID;
@@ -2799,6 +2801,7 @@ void dvbapi_resort_ecmpids(int32_t demux_index)
 
 		int32_t nr;
 		SIDTAB *sidtab;
+		er->demux_index = demux_index;
 		er->caid = er->ocaid = demux[demux_index].ECMpids[n].CAID;
 		er->prid = demux[demux_index].ECMpids[n].PROVID;
 		er->pid = demux[demux_index].ECMpids[n].ECM_PID;
@@ -2865,6 +2868,7 @@ void dvbapi_resort_ecmpids(int32_t demux_index)
 
 		if(demux[demux_index].ECMpids[n].status == -1) continue; // skip ignores!
 
+		er->demux_index = demux_index;
 		er->caid = er->ocaid = demux[demux_index].ECMpids[n].CAID;
 		er->prid = demux[demux_index].ECMpids[n].PROVID;
 		er->pid = demux[demux_index].ECMpids[n].ECM_PID;
@@ -2922,6 +2926,7 @@ void dvbapi_resort_ecmpids(int32_t demux_index)
 				cacheexprio = max_local_matching_reader+p_order+1;
 			}
 
+			er->demux_index = demux_index;
 			er->caid = er->ocaid = demux[demux_index].ECMpids[n].CAID;
 			er->prid = demux[demux_index].ECMpids[n].PROVID;
 			er->pid = demux[demux_index].ECMpids[n].ECM_PID;
@@ -4597,6 +4602,7 @@ void dvbapi_process_input(int32_t demux_id, int32_t filter_num, uchar *buffer, i
 					return;
 				}
 
+				er->demux_index = demux_id;
 				er->srvid = demux[demux_id].program_number;
 
 #ifdef WITH_STAPI5
@@ -4640,6 +4646,7 @@ void dvbapi_process_input(int32_t demux_id, int32_t filter_num, uchar *buffer, i
 			return;
 		}
 
+		er->demux_index = demux_id;
 		er->srvid = demux[demux_id].program_number;
 
 #ifdef WITH_STAPI5

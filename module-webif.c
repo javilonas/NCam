@@ -1479,6 +1479,10 @@ static char *send_ncam_config_dvbapi(struct templatevars *vars, struct uriparams
 	tpl_printf(vars, TPLADD, "TMP", "EXTENDEDCWAPISELECTED%d", cfg.dvbapi_extended_cw_api);
 	tpl_addVar(vars, TPLADD, tpl_getVar(vars, "TMP"), "selected");
 
+	//extended_cw_pids (pid limiter)
+	tpl_printf(vars, TPLADD, "TMP", "EXTENDEDCWPIDSSELECTED%d", cfg.dvbapi_extended_cw_pids);
+	tpl_addVar(vars, TPLADD, tpl_getVar(vars, "TMP"), "selected");
+
 	//write_sdt_prov
 	if(cfg.dvbapi_write_sdt_prov > 0)
 		{ tpl_addVar(vars, TPLADD, "WRITESDTPROVCHECKED", "checked"); } 
@@ -2654,6 +2658,16 @@ static char *send_ncam_reader_config(struct templatevars *vars, struct uriparams
 	value = mk_t_ftab(&rdr->emu_auproviders);
 	tpl_addVar(vars, TPLADD, "EMUAUPROVIDERS", value);
 	free_mk_t(value);
+
+	// Date-coded BISS keys
+	if(!apicall)
+	{
+		tpl_addVar(vars, TPLADD, "EMUDATECODEDENABLED", (rdr->emu_datecodedenabled == 1) ? "checked" : "");
+	}
+	else
+	{
+		tpl_addVar(vars, TPLADD, "EMUDATECODEDENABLED", (rdr->emu_datecodedenabled == 1) ? "1" : "0");
+	}
 
 	//extee
 	tpl_addVar(vars, TPLADD, "EXTEE36", rdr->extee36);

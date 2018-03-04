@@ -2107,6 +2107,8 @@ int32_t dvbapi_start_descrambling(int32_t demux_id, int32_t pid, int8_t checked,
 	er->prid  = demux[demux_id].ECMpids[pid].PROVID;
 	er->vpid  = demux[demux_id].ECMpids[pid].VPID;
 	er->onid = demux[demux_id].onid;
+	er->tsid = demux[demux_id].tsid;
+	er->ens  = demux[demux_id].enigma_namespace;
 	er->msgid = msgid;
 
 #ifdef WITH_STAPI5
@@ -2144,18 +2146,29 @@ int32_t dvbapi_start_descrambling(int32_t demux_id, int32_t pid, int8_t checked,
 		if(caid_is_fake(demux[demux_id].ECMpids[pid].CAID) || caid_is_biss(demux[demux_id].ECMpids[pid].CAID))
 		{
 			int32_t j, n;
-			er->ecmlen = 5;
+			er->ecmlen = 7;
 			er->ecm[0] = 0x80; // to pass the cache check it must be 0x80 or 0x81
 			er->ecm[1] = 0x00;
-			er->ecm[2] = 0x02;
+			er->ecm[2] = 0x04;
 			i2b_buf(2, er->srvid, er->ecm + 3);
+			i2b_buf(2, er->pmtpid, er->ecm + 5);
 
-			for(j = 0, n = 5; j < demux[demux_id].STREAMpidcount; j++, n += 2)
+			for(j = 0, n = 7; j < demux[demux_id].STREAMpidcount; j++, n += 2)
 			{
 				i2b_buf(2, demux[demux_id].STREAMpids[j], er->ecm + n);
 				er->ecm[2] += 2;
 				er->ecmlen += 2;
 			}
+
+			er->ens &= 0x0FFFFFFF; // clear top 4 bits (in case of DVB-T/C or garbage), prepare for flagging
+			er->ens |= 0xA0000000; // flag to emu: this is the namespace, not a pid
+
+			i2b_buf(2, er->tsid, er->ecm + 3 + er->ecm[2]);     // place tsid after the last stream pid
+			i2b_buf(2, er->onid, er->ecm + 3 + er->ecm[2] + 2); // place onid right after tsid
+			i2b_buf(4, er->ens, er->ecm + 3 + er->ecm[2] + 4);  // place namespace at the end of the ecm
+
+			er->ecm[2] += 8;
+			er->ecmlen += 8;
 
 			cs_log("Demuxer %d trying to descramble PID %d CAID %04X PROVID %06X ECMPID %04X ANY CHID PMTPID %04X VPID %04X", demux_id, pid,
 				   demux[demux_id].ECMpids[pid].CAID, demux[demux_id].ECMpids[pid].PROVID, demux[demux_id].ECMpids[pid].ECM_PID,
@@ -3357,6 +3370,7 @@ int32_t dvbapi_parse_capmt(unsigned char *buffer, uint32_t length, int32_t connf
 {
 	uint32_t i = 0, start_descrambling = 0;
 	int32_t j = 0;
+	int32_t max_pids = 64;
 	int32_t demux_id = -1;
 	uint16_t demux_index, adapter_index, pmtpid;
 	uint32_t ca_mask;
@@ -3518,6 +3532,12 @@ int32_t dvbapi_parse_capmt(unsigned char *buffer, uint32_t length, int32_t connf
 	uint32_t es_info_length = 0, vpid = 0;
 	struct s_dvbapi_priority *addentry;
 
+	// pid limiter for PowerVu
+	if(demux[demux_id].ECMpids[0].CAID >> 8 == 0x0E)
+	{
+		max_pids = cfg.dvbapi_extended_cw_pids;
+	}
+
 	for(i = program_info_length + program_info_start; i + 4 < length; i += es_info_length + 5)
 	{
 		uint8_t stream_type = buffer[i];
@@ -3525,7 +3545,7 @@ int32_t dvbapi_parse_capmt(unsigned char *buffer, uint32_t length, int32_t connf
 		uint8_t is_audio = 0;
 		es_info_length = b2i(2, buffer + i +3)&0x0FFF;
 
-		if(demux[demux_id].STREAMpidcount < ECM_PIDS)
+		if(demux[demux_id].STREAMpidcount < max_pids) // was "ECM_PIDS" (pid limiter)
 		{
 
 			demux[demux_id].STREAMpids[demux[demux_id].STREAMpidcount] = elementary_pid;
@@ -4582,19 +4602,19 @@ void dvbapi_process_input(int32_t demux_id, int32_t filter_num, uchar *buffer, i
 			if(curpid->CAID>>8 == 0x0E)
 			{
 				pvu_skip = 1;
-
-				if(sctlen > 0xb)
+				
+				if(sctlen - 11 > buffer[9])
 				{
-					if(buffer[0xb] > curpid->pvu_counter || (curpid->pvu_counter == 255 && buffer[0xb] == 0)
-							|| ((curpid->pvu_counter - buffer[0xb]) > 5))
+					if(buffer[11 + buffer[9]] > curpid->pvu_counter || (curpid->pvu_counter == 255 && buffer[11 + buffer[9]] == 0)
+							|| ((curpid->pvu_counter - buffer[11 + buffer[9]]) > 5))
 					{
-						curpid->pvu_counter = buffer[0xb];
+						curpid->pvu_counter = buffer[11 + buffer[9]];
 						pvu_skip = 0;
 					}
 				}
 			}
-
-			if((curpid->table == buffer[0] && !caid_is_irdeto(curpid->CAID) && !caid_is_dvn(curpid->CAID)) || pvu_skip)  // wait for odd / even ecm change (only not for irdeto and dvn!)
+			
+			if((curpid->table == buffer[0] && !caid_is_irdeto(curpid->CAID)) || pvu_skip)  // wait for odd / even ecm change (only not for irdeto!)
 			{
 
 				if(!(er = get_ecmtask()))

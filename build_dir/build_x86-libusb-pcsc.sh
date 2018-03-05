@@ -28,6 +28,7 @@ export NCAM_BIN=ncam-libusb-pcsc.x86
 export CROSS=$ROOTFS_PATH/cross/i686-unknown-linux-gnu/bin/i686-unknown-linux-gnu-
 export DCMAKE=cross-x86-tuxbox-linux-libusb-pcsc
 export SCRIPT=build_x86-libusb-pcsc.sh
+export LDFLAGS=-lrt
 
 export PCSC_LIB="$ROOTFS_PATH/cross/i686-unknown-linux-gnu/i686-unknown-linux-gnu/sys-root/usr/lib/libpcsclite.a -lrt"
 export LIBUSB_LIB="$ROOTFS_PATH/cross/i686-unknown-linux-gnu/i686-unknown-linux-gnu/sys-root/usr/lib/libusb-1.0.a -lrt"
@@ -83,7 +84,7 @@ echo ""
 sleep 0.8s
 sync
 echo "+-------------------------------------------------------------------------------"
-nice -n 10 make NCAM_BIN=$NCAM_BIN ARCH=$ARCH target=$target -j`grep 'processor' /proc/cpuinfo | wc -l` $DCMAKE || exit 1
+nice -n 10 make NCAM_BIN=$NCAM_BIN ARCH=$ARCH LDFLAGS=$LDFLAGS target=$target -j`grep 'processor' /proc/cpuinfo | wc -l` $DCMAKE || exit 1
 sleep 0.8s
 sync
 echo ""

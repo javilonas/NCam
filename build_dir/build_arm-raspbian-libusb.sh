@@ -28,6 +28,7 @@ export NCAM_BIN=ncam-libusb.arm-raspbian
 export CROSS=$ROOTFS_PATH/cross/raspbian-toolchain-gcc-4.7.2-linux64/bin/arm-linux-gnueabihf-
 export DCMAKE=cross-arm-raspbian-linux-libusb
 export SCRIPT=build_arm-raspbian-libusb.sh
+export LDFLAGS=-lrt
 
 export LIBUSB_LIB="$ROOTFS_PATH/cross/raspbian-toolchain-gcc-4.7.2-linux64/arm-raspbian-linux-gnueabi/sysroot/usr/lib/libusb-1.0.a -lrt"
 export LIST_SMARGO=list_smargo-*-arm-raspbian-linux-gnueabi-libusb
@@ -82,7 +83,7 @@ echo ""
 sleep 0.8s
 sync
 echo "+-------------------------------------------------------------------------------"
-nice -n 10 make NCAM_BIN=$NCAM_BIN ARCH=$ARCH target=$target -j`grep 'processor' /proc/cpuinfo | wc -l` $DCMAKE || exit 1
+nice -n 10 make NCAM_BIN=$NCAM_BIN ARCH=$ARCH LDFLAGS=$LDFLAGS target=$target -j`grep 'processor' /proc/cpuinfo | wc -l` $DCMAKE || exit 1
 sleep 0.8s
 sync
 echo ""

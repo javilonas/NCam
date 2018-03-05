@@ -28,6 +28,7 @@ export NCAM_BIN=ncam-libusb.ppc
 export CROSS=$ROOTFS_PATH/cross/powerpc-tuxbox-linux-gnu/bin/powerpc-linux-
 export DCMAKE=cross-powerpc-tuxbox-linux-libusb
 export SCRIPT=build_ppc-libusb.sh
+export LDFLAGS=-lrt
 
 export LIB_RT="$ROOTFS_PATH/cross/powerpc-tuxbox-linux-gnu/lib/librt.a -lrt"
 export LIB_PTHREAD="$ROOTFS_PATH/cross/powerpc-tuxbox-linux-gnu/lib/libpthread.a -lrt"
@@ -86,7 +87,7 @@ echo ""
 sleep 0.8s
 sync
 echo "+-------------------------------------------------------------------------------"
-nice -n 10 make NCAM_BIN=$NCAM_BIN ARCH=$ARCH target=$target -j`grep 'processor' /proc/cpuinfo | wc -l` $DCMAKE || exit 1
+nice -n 10 make NCAM_BIN=$NCAM_BIN ARCH=$ARCH LDFLAGS=$LDFLAGS target=$target -j`grep 'processor' /proc/cpuinfo | wc -l` $DCMAKE || exit 1
 sleep 0.8s
 sync
 echo ""

@@ -28,7 +28,7 @@ export NCAM_BIN=ncam-libusb.arm-marvell
 export CROSS=$ROOTFS_PATH/cross/arm_v7/bin/arm-marvell-linux-gnueabi-
 export DCMAKE=cross-arm-marvell-linux-libusb
 export SCRIPT=build_build_arm-marvell-libusb.sh
-
+export LDFLAGS=-lrt
 export LIBUSB_LIB="$ROOTFS_PATH/cross/arm_v7/arm-marvell-linux-gnueabi/lib/libusb-1.0.a -lrt"
 export LIST_SMARGO=list_smargo-*-arm-marvell-linux-gnueabi-libusb
 
@@ -82,7 +82,7 @@ echo ""
 sleep 0.8s
 sync
 echo "+-------------------------------------------------------------------------------"
-nice -n 10 make NCAM_BIN=$NCAM_BIN ARCH=$ARCH target=$target -j`grep 'processor' /proc/cpuinfo | wc -l` $DCMAKE || exit 1
+nice -n 10 make NCAM_BIN=$NCAM_BIN ARCH=$ARCH LDFLAGS=$LDFLAGS target=$target -j`grep 'processor' /proc/cpuinfo | wc -l` $DCMAKE || exit 1
 sleep 0.8s
 sync
 echo ""

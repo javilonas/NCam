@@ -260,6 +260,25 @@ echo ""
 sleep 35
 sync
 echo ""
+echo " Build PPC-OLD-LIBUSB..."
+echo ""
+sh $BUILD_DIR/build_ppc-old-libusb.sh > /dev/null 2>&1
+sync
+echo ""
+echo ""
+echo ""
+sleep 0.8s
+echo ""
+echo ""
+echo ""
+echo " PLEASE WAIT...."
+echo ""
+sync
+echo ""
+echo ""
+sleep 35
+sync
+echo ""
 echo " Build SH4..."
 echo ""
 sh $BUILD_DIR/build_sh4.sh > /dev/null 2>&1

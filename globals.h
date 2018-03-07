@@ -364,8 +364,8 @@ typedef unsigned char uchar;
  *         constants
  * =========================== */
 #define CS_VERSION    "1.7"
-#define DATE_BUILD    "05-03-2018"
-#define CS_REVISION   "r2"
+#define DATE_BUILD    "06-03-2018"
+#define CS_REVISION   "r4"
 #ifndef CS_SVN_VERSION
 #   define CS_SVN_VERSION "stable"
 #endif
@@ -395,11 +395,11 @@ typedef unsigned char uchar;
 // Support for multiple CWs per channel and other encryption algos
 #define WITH_EXTENDED_CW 1
 
-#define MAX_ECM_SIZE 1536
-#define MAX_EMM_SIZE 1536
-#define MAX_SCT_SIZE 1536   // smaller or equal to the minial one of MAX_ECM_SIZE and MAX_EMM_SIZE 
+#define MAX_ECM_SIZE 2048
+#define MAX_EMM_SIZE 2048
+#define MAX_SCT_SIZE 2048   // smaller or equal to the minial one of MAX_ECM_SIZE and MAX_EMM_SIZE 
 
-#define CS_EMMCACHESIZE 1536 //nr of EMMs that each reader will cache
+#define CS_EMMCACHESIZE 2048 //nr of EMMs that each reader will cache
 #define MSGLOGSIZE 64       // size of string buffer for a ecm to return messages
 
 #define D_TRACE     0x0001  // Generate very detailed error/trace messages per routine

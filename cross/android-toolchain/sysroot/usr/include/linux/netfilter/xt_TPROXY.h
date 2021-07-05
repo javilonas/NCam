@@ -19,20 +19,17 @@
 #ifndef _XT_TPROXY_H
 #define _XT_TPROXY_H
 #include <linux/types.h>
+#include <linux/netfilter.h>
 struct xt_tproxy_target_info {
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
- __u32 mark_mask;
- __u32 mark_value;
- __be32 laddr;
- __be16 lport;
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
+  __u32 mark_mask;
+  __u32 mark_value;
+  __be32 laddr;
+  __be16 lport;
 };
 struct xt_tproxy_target_info_v1 {
- __u32 mark_mask;
- __u32 mark_value;
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
- union nf_inet_addr laddr;
- __be16 lport;
+  __u32 mark_mask;
+  __u32 mark_value;
+  union nf_inet_addr laddr;
+  __be16 lport;
 };
 #endif
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */

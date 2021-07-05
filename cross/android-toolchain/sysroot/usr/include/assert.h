@@ -1,6 +1,3 @@
-/*	$OpenBSD: assert.h,v 1.12 2006/01/31 10:53:51 hshoexer Exp $	*/
-/*	$NetBSD: assert.h,v 1.6 1994/10/26 00:55:44 cgd Exp $	*/
-
 /*-
  * Copyright (c) 1992, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -33,33 +30,57 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- *
- *	@(#)assert.h	8.2 (Berkeley) 1/21/94
  */
 
-/*
- * Unlike other ANSI header files, <assert.h> may usefully be included
- * multiple times, with and without NDEBUG defined.
+/**
+ * @file assert.h
+ * @brief Assertions.
+ *
+ * There's no include guard in this file because <assert.h> may usefully be
+ * included multiple times, with and without NDEBUG defined.
  */
 
 #include <sys/cdefs.h>
 
 #undef assert
-#undef _assert
+#undef __assert_no_op
+
+/** Internal implementation detail. Do not use. */
+#define __assert_no_op __BIONIC_CAST(static_cast, void, 0)
 
 #ifdef NDEBUG
-# define	assert(e)	((void)0)
-# define	_assert(e)	((void)0)
+# define assert(e) __assert_no_op
 #else
-# define	_assert(e)	assert(e)
-# if __ISO_C_VISIBLE >= 1999
-#  define	assert(e)	((e) ? (void)0 : __assert2(__FILE__, __LINE__, __func__, #e))
+# if defined(__cplusplus) || __STDC_VERSION__ >= 199901L
+#  define assert(e) ((e) ? __assert_no_op : __assert2(__FILE__, __LINE__, __PRETTY_FUNCTION__, #e))
 # else
-#  define	assert(e)	((e) ? (void)0 : __assert(__FILE__, __LINE__, #e))
+/**
+ * assert() aborts the program after logging an error message, if the
+ * expression evaluates to false.
+ *
+ * On Android, the error goes to both stderr and logcat.
+ */
+#  define assert(e) ((e) ? __assert_no_op : __assert(__FILE__, __LINE__, #e))
 # endif
 #endif
 
+#if !defined(__cplusplus) && __STDC_VERSION__ >= 201112L
+# undef static_assert
+# define static_assert _Static_assert
+#endif
+
 __BEGIN_DECLS
-__dead void __assert(const char *, int, const char *) __noreturn;
-__dead void __assert2(const char *, int, const char *, const char *) __noreturn;
+
+/**
+ * __assert() is called by assert() on failure. Most users want assert()
+ * instead, but this can be useful for reporting other failures.
+ */
+void __assert(const char* __file, int __line, const char* __msg) __noreturn;
+
+/**
+ * __assert2() is called by assert() on failure. Most users want assert()
+ * instead, but this can be useful for reporting other failures.
+ */
+void __assert2(const char* __file, int __line, const char* __function, const char* __msg) __noreturn;
+
 __END_DECLS

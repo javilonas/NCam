@@ -1,0 +1,95 @@
+-------------------------------------------------------------------------
+0. Android gingerbread mmp2, Marvell GCC-4.4.5(armv5-marvell-eabi-soft) 
+-------------------------------------------------------------------------    
+    (1) . Build the kernel and modules: 
+    	
+        cd <android_working_dir>
+        cd kernel
+        make all 
+    
+    (2). Build U-Boot 
+    	
+        cd <android_working_dir>/boot 
+    	make all
+    
+    (3). Build android: 
+    
+        cd <android_working_dir> 
+    	. build/envsetup.sh 
+    	chooseproduct brownstone 
+    	export TARGET_TOOLS_PREFIX=prebuilt/linux-x86/toolchain/armv5-marvell-eabi-soft/bin/arm-marvell-eabi-
+    	make
+
+     (4). Trouble Shooting :
+     	
+	[1].ASSERTION FAILURE external/elfcopy/elfcopy.c:2459: [!(shdr_info[sym->st_shndx].shdr.sh_flags & SHF_ALLOC)] 
+	
+	external/elfcopy/elfcopy.c:2459
+	--ASSERT(!(shdr_info[sym->st_shndx].shdr.sh_flags & SHF_ALLOC));
+	++//ASSERT(!(shdr_info[sym->st_shndx].shdr.sh_flags & SHF_ALLOC));
+
+------------------------------------------------------------------------------------
+1. Android Honeycomb MMP3, Marvell GCC-4.4.5(armv7-marvell-linux-androideabi-soft)
+------------------------------------------------------------------------------------
+
+	(1). Build the kernel and modules: 
+	
+	    cd <android_working_dir>
+	    cd kernel
+	    make all 
+	    uImage is located at kernel/out, modules is located at kernel/out/modules 
+	(2). Build U-Boot 
+	
+	    cd <android_working_dir>/boot 
+	    make all
+	    
+	(3). Build android: 
+	
+	    cd <android_working_dir> 
+	    . build/envsetup.sh 
+            chooseproduct abilene 
+	    export ANDROID_PREBUILT_MODULES=kernel/out/modules 
+	    export TARGET_TOOLS_PREFIX=prebuilt/linux-x86/toolchain/armv7-marvell-linux-androideabi-soft/bin/arm-marvell-linux-androideabi-
+	    make
+
+------------------------------------------------------------------------------------
+2. Android Honeycomb BG2, Marvell GCC-4.4.5(armv7-marvell-linux-gnueabi-softfp) 
+------------------------------------------------------------------------------------
+
+        (1). Build android:
+        
+	    . build/envsetup
+	    chooseproduct berlin
+	    export TARGET_TOOLS_PREFIX=prebuilt/linux-x86/toolchain/armv7-marvell-linux-gnueabi-softfp/bin/arm-marvell-linux-gnueabi-
+	    make
+							  
+	
+
+	 (2). Trouble Shooting:
+
+	    [1]. cc1plus: warnings being treated as errors
+		
+	        build/code/binary.mk:148
+
+		-LOCAL_CFLAGS += -Werror
+		-LOCAL_CPPFLAGS += -Werror
+		+#LOCAL_CFLAGS += -Werror
+		+#LOCAL_CPPFLAGS += -Werror
+							  
+	    [2]. system/core/init/init.c:34:26: error: mtd/mtd-user.h: No such file or directory
+		cp -r prebuilt/common/toolchain/arm-unknown-linux-gnueabi-4.5.3-glibc/target-arm-unknown-linux-gnueabi/usr/include/mtd/ prebuilt/linux-x86/toolchain/armv7-marvell-linux-gnueabi-softfp/arm-marvell-linux-gnueabi/libc/usr/include/
+							  
+	    [3]. No rule to make target `/home/kkoala/Honeycomb/prebuilt/linux-x86/toolchain/armv7-marvell-linux-gnueabi-softfp/bin/../arm-marvell-linux-gnueabi/libc/lib/ld-2.12.2.so', needed by `out/target/product/berlin/root/lib/ld-2.12.2.so'.
+							  
+		cp -i prebuilt/common/toolchain/arm-unknown-linux-gnueabi-4.5.3-glibc/target-arm-unknown-linux-gnueabi/lib/* prebuilt/linux-x86/toolchain/armv7-marvell-linux-gnueabi-softfp/arm-marvell-linux-gnueabi/libc/lib/ 
+							
+	    [4]. error: Player.h: No such file or directory
+		cp vendor/marvell-confidential/berlin/prebuilt/marvell-sdk/include/Player.h vendor/marvell-confidential/berlin/apps/BDPBinder/libBDPBinder/
+	
+	    [5]. error: 'MS_DIRSYNC' was not declared in this scope
+		cp prebuilt/common/toolchain/arm-unknown-linux-gnueabi-4.5.3-glibc/target-arm-unknown-linux-gnueabi/usr/include/sys/mount.h prebuilt/linux-x86/toolchain/armv7-marvell-linux-gnueabi-softfp/arm-marvell-linux-gnueabi/libc/usr/include/sys/
+
+
+
+
+

@@ -37,73 +37,137 @@
  *	@(#)ctype.h	5.3 (Berkeley) 4/3/91
  */
 
-#ifndef _CTYPE_H_
-#define _CTYPE_H_
+#pragma once
+
+/**
+ * @file ctype.h
+ * @brief ASCII character classification.
+ */
 
 #include <sys/cdefs.h>
 #include <xlocale.h>
 
-#define	_CTYPE_U	0x01
-#define	_CTYPE_L	0x02
-#define	_CTYPE_D	0x04
-#define	_CTYPE_S	0x08
-#define	_CTYPE_P	0x10
-#define	_CTYPE_C	0x20
-#define	_CTYPE_X	0x40
-#define	_CTYPE_B	0x80
-#define	_CTYPE_R	(_CTYPE_P|_CTYPE_U|_CTYPE_L|_CTYPE_D|_CTYPE_B)
-#define	_CTYPE_A	(_CTYPE_L|_CTYPE_U)
-
-#define _CTYPE_N    _CTYPE_D
+/** Internal implementation detail. Do not use. */
+#define _CTYPE_U 0x01
+/** Internal implementation detail. Do not use. */
+#define _CTYPE_L 0x02
+/** Internal implementation detail. Do not use. */
+#define _CTYPE_D 0x04
+/** Internal implementation detail. Do not use. */
+#define _CTYPE_S 0x08
+/** Internal implementation detail. Do not use. */
+#define _CTYPE_P 0x10
+/** Internal implementation detail. Do not use. */
+#define _CTYPE_C 0x20
+/** Internal implementation detail. Do not use. */
+#define _CTYPE_X 0x40
+/** Internal implementation detail. Do not use. */
+#define _CTYPE_B 0x80
+/** Internal implementation detail. Do not use. */
+#define _CTYPE_R (_CTYPE_P|_CTYPE_U|_CTYPE_L|_CTYPE_D|_CTYPE_B)
+/** Internal implementation detail. Do not use. */
+#define _CTYPE_A (_CTYPE_L|_CTYPE_U)
+/** Internal implementation detail. Do not use. */
+#define _CTYPE_N _CTYPE_D
 
 __BEGIN_DECLS
 
-extern const char	*_ctype_;
+/** Internal implementation detail. Do not use. */
+extern const char* _ctype_;
 
-#if defined(__GNUC__) || defined(_ANSI_LIBRARY) || defined(lint)
-int	isalnum(int);
-int	isalpha(int);
-int	iscntrl(int);
-int	isdigit(int);
-int	isgraph(int);
-int	islower(int);
-int	isprint(int);
-int	ispunct(int);
-int	isspace(int);
-int	isupper(int);
-int	isxdigit(int);
-int	tolower(int);
-int	toupper(int);
+/** Returns true if `ch` is in `[A-Za-z0-9]`. */
+int isalnum(int __ch);
+/** Returns true if `ch` is in `[A-Za-z]`. */
+int isalpha(int __ch);
+/** Returns true if `ch` is a space or tab. */
+int isblank(int __ch);
+/** Returns true if `ch` is a control character (any character before space, plus DEL). */
+int iscntrl(int __ch);
+/** Returns true if `ch` is in `[0-9]`. */
+int isdigit(int __ch);
+/** Returns true if `ch` is `[A-Za-z0-9]` or punctuation. */
+int isgraph(int __ch);
+/** Returns true if `ch` is in `[a-z]`. */
+int islower(int __ch);
+/** Returns true if `ch` is `[A-Za-z0-9]` or punctuation or space. */
+int isprint(int __ch);
+/** Returns true if `ch` is punctuation. */
+int ispunct(int __ch);
+/** Returns true if `ch` is in `[ \f\n\r\t\v]`. */
+int isspace(int __ch);
+/** Returns true if `ch` is in `[A-Z]`. */
+int isupper(int __ch);
+/** Returns true if `ch` is in `[0-9a-f]`. */
+int isxdigit(int __ch);
 
-int isalnum_l(int, locale_t);
-int isalpha_l(int, locale_t);
-int isblank_l(int, locale_t);
-int iscntrl_l(int, locale_t);
-int isdigit_l(int, locale_t);
-int isgraph_l(int, locale_t);
-int islower_l(int, locale_t);
-int isprint_l(int, locale_t);
-int ispunct_l(int, locale_t);
-int isspace_l(int, locale_t);
-int isupper_l(int, locale_t);
-int isxdigit_l(int, locale_t);
-int tolower_l(int, locale_t);
-int toupper_l(int, locale_t);
+/** Returns the corresponding lower-case character if `ch` is upper-case, or `ch` otherwise. */
+int tolower(int __ch);
 
-#if __BSD_VISIBLE || __ISO_C_VISIBLE >= 1999 || __POSIX_VISIBLE > 200112 \
-    || __XPG_VISIBLE > 600
-int	isblank(int);
+/**
+ * Returns the corresponding lower-case character if `ch` is upper-case, or undefined otherwise.
+ *
+ * Available since API level 21.
+ *
+ * Prefer tolower() instead.
+ */
+
+#if __ANDROID_API__ >= 21
+int _tolower(int __ch) __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
+
+
+/** Returns the corresponding upper-case character if `ch` is lower-case, or `ch` otherwise. */
+int toupper(int __ch);
+
+/**
+ * Returns the corresponding upper-case character if `ch` is lower-case, or undefined otherwise.
+ *
+ * Available since API level 21.
+ *
+ * Prefer toupper() instead.
+ */
+
+#if __ANDROID_API__ >= 21
+int _toupper(int __ch) __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
+
+
+#if __ANDROID_API__ >= __ANDROID_API_L__
+/** Like isalnum but with an ignored `locale_t`. */
+int isalnum_l(int __ch, locale_t __l) __INTRODUCED_IN(21);
+/** Like isalpha but with an ignored `locale_t`. */
+int isalpha_l(int __ch, locale_t __l) __INTRODUCED_IN(21);
+/** Like isblank but with an ignored `locale_t`. */
+int isblank_l(int __ch, locale_t __l) __INTRODUCED_IN(21);
+/** Like iscntrl but with an ignored `locale_t`. */
+int iscntrl_l(int __ch, locale_t __l) __INTRODUCED_IN(21);
+/** Like isdigit but with an ignored `locale_t`. */
+int isdigit_l(int __ch, locale_t __l) __INTRODUCED_IN(21);
+/** Like isgraph but with an ignored `locale_t`. */
+int isgraph_l(int __ch, locale_t __l) __INTRODUCED_IN(21);
+/** Like islower but with an ignored `locale_t`. */
+int islower_l(int __ch, locale_t __l) __INTRODUCED_IN(21);
+/** Like isprint but with an ignored `locale_t`. */
+int isprint_l(int __ch, locale_t __l) __INTRODUCED_IN(21);
+/** Like ispunct but with an ignored `locale_t`. */
+int ispunct_l(int __ch, locale_t __l) __INTRODUCED_IN(21);
+/** Like isspace but with an ignored `locale_t`. */
+int isspace_l(int __ch, locale_t __l) __INTRODUCED_IN(21);
+/** Like isupper but with an ignored `locale_t`. */
+int isupper_l(int __ch, locale_t __l) __INTRODUCED_IN(21);
+/** Like isxdigit but with an ignored `locale_t`. */
+int isxdigit_l(int __ch, locale_t __l) __INTRODUCED_IN(21);
+/** Like tolower but with an ignored `locale_t`. */
+int tolower_l(int __ch, locale_t __l) __INTRODUCED_IN(21);
+/** Like toupper but with an ignored `locale_t`. */
+int toupper_l(int __ch, locale_t __l) __INTRODUCED_IN(21);
+#else
+// Implemented as static inlines before 21.
 #endif
 
-#if __BSD_VISIBLE || __XPG_VISIBLE
-int	isascii(int);
-int	toascii(int);
-int	_tolower(int);
-int	_toupper(int);
-#endif /* __BSD_VISIBLE || __XPG_VISIBLE */
-
-#endif /* __GNUC__ || _ANSI_LIBRARY || lint */
+/** Returns true if `ch` is less than 0x80. */
+int isascii(int __ch);
+/** Returns `ch & 0x7f`. */
+int toascii(int __ch);
 
 __END_DECLS
-
-#endif /* !_CTYPE_H_ */

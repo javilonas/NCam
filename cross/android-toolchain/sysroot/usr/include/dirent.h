@@ -31,6 +31,7 @@
 
 #include <stdint.h>
 #include <sys/cdefs.h>
+#include <sys/types.h>
 
 __BEGIN_DECLS
 
@@ -46,36 +47,76 @@ __BEGIN_DECLS
 #define DT_WHT 14
 #endif
 
+#if defined(__LP64__)
+#define __DIRENT64_INO_T ino_t
+#else
+#define __DIRENT64_INO_T uint64_t /* Historical accident. */
+#endif
+
 #define __DIRENT64_BODY \
-    uint64_t         d_ino; \
-    int64_t          d_off; \
-    unsigned short   d_reclen; \
-    unsigned char    d_type; \
-    char             d_name[256]; \
+    __DIRENT64_INO_T d_ino; \
+    off64_t d_off; \
+    unsigned short d_reclen; \
+    unsigned char d_type; \
+    char d_name[256]; \
 
 struct dirent { __DIRENT64_BODY };
 struct dirent64 { __DIRENT64_BODY };
 
 #undef __DIRENT64_BODY
+#undef __DIRENT64_INO_T
+
+/* glibc compatibility. */
+#undef _DIRENT_HAVE_D_NAMLEN /* Linux doesn't have a d_namlen field. */
+#define _DIRENT_HAVE_D_RECLEN
+#define _DIRENT_HAVE_D_OFF
+#define _DIRENT_HAVE_D_TYPE
 
 #define d_fileno d_ino
 
 typedef struct DIR DIR;
 
-extern DIR* opendir(const char*);
-extern DIR* fdopendir(int);
-extern struct dirent* readdir(DIR*);
-extern struct dirent64* readdir64(DIR*);
-extern int readdir_r(DIR*, struct dirent*, struct dirent**);
-extern int readdir64_r(DIR*, struct dirent64*, struct dirent64**);
-extern int closedir(DIR*);
-extern void rewinddir(DIR*);
-extern int dirfd(DIR*);
-extern int alphasort(const struct dirent**, const struct dirent**);
-extern int alphasort64(const struct dirent64**, const struct dirent64**);
-extern int scandir(const char*, struct dirent***, int (*)(const struct dirent*), int (*)(const struct dirent**, const struct dirent**));
-extern int scandir64(const char*, struct dirent64***, int (*)(const struct dirent64*), int (*)(const struct dirent64**, const struct dirent64**));
+DIR* opendir(const char* __path);
+DIR* fdopendir(int __dir_fd);
+struct dirent* readdir(DIR* __dir);
+
+#if __ANDROID_API__ >= 21
+struct dirent64* readdir64(DIR* __dir) __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
+
+int readdir_r(DIR* __dir, struct dirent* __entry, struct dirent** __buffer) __attribute__((__deprecated__("readdir_r is deprecated; use readdir instead")));
+
+#if __ANDROID_API__ >= 21
+int readdir64_r(DIR* __dir, struct dirent64* __entry, struct dirent64** __buffer) __INTRODUCED_IN(21) __attribute__((__deprecated__("readdir64_r is deprecated; use readdir64 instead")));
+#endif /* __ANDROID_API__ >= 21 */
+
+int closedir(DIR* __dir);
+void rewinddir(DIR* __dir);
+
+#if __ANDROID_API__ >= 23
+void seekdir(DIR* __dir, long __location) __INTRODUCED_IN(23);
+long telldir(DIR* __dir) __INTRODUCED_IN(23);
+#endif /* __ANDROID_API__ >= 23 */
+
+int dirfd(DIR* __dir);
+int alphasort(const struct dirent** __lhs, const struct dirent** __rhs);
+
+#if __ANDROID_API__ >= 21
+int alphasort64(const struct dirent64** __lhs, const struct dirent64** __rhs) __INTRODUCED_IN(21);
+int scandir64(const char* __path, struct dirent64*** __name_list, int (*__filter)(const struct dirent64*), int (*__comparator)(const struct dirent64**, const struct dirent64**)) __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
+
+int scandir(const char* __path, struct dirent*** __name_list, int (*__filter)(const struct dirent*), int (*__comparator)(const struct dirent**, const struct dirent**));
+
+#if defined(__USE_GNU)
+
+#if __ANDROID_API__ >= 24
+int scandirat64(int __dir_fd, const char* __path, struct dirent64*** __name_list, int (*__filter)(const struct dirent64*), int (*__comparator)(const struct dirent64**, const struct dirent64**)) __INTRODUCED_IN(24);
+int scandirat(int __dir_fd, const char* __path, struct dirent*** __name_list, int (*__filter)(const struct dirent*), int (*__comparator)(const struct dirent**, const struct dirent**)) __INTRODUCED_IN(24);
+#endif /* __ANDROID_API__ >= 24 */
+
+#endif
 
 __END_DECLS
 
-#endif /* _DIRENT_H_ */
+#endif

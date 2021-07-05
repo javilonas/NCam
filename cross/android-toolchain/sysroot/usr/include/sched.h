@@ -25,13 +25,13 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+
 #ifndef _SCHED_H_
 #define _SCHED_H_
 
-#include <sys/cdefs.h>
-#include <sys/time.h>
-
+#include <bits/timespec.h>
 #include <linux/sched.h>
+#include <sys/cdefs.h>
 
 __BEGIN_DECLS
 
@@ -39,25 +39,37 @@ __BEGIN_DECLS
 #define SCHED_OTHER SCHED_NORMAL
 
 struct sched_param {
-  int __sched_priority;
+  int sched_priority;
 };
-#define sched_priority __sched_priority
 
-extern int sched_setscheduler(pid_t, int, const struct sched_param*);
-extern int sched_getscheduler(pid_t);
-extern int sched_yield(void);
-extern int sched_get_priority_max(int);
-extern int sched_get_priority_min(int);
-extern int sched_setparam(pid_t, const struct sched_param*);
-extern int sched_getparam(pid_t, struct sched_param*);
-extern int sched_rr_get_interval(pid_t, struct timespec*);
+int sched_setscheduler(pid_t __pid, int __policy, const struct sched_param* __param);
+int sched_getscheduler(pid_t __pid);
+int sched_yield(void);
+int sched_get_priority_max(int __policy);
+int sched_get_priority_min(int __policy);
+int sched_setparam(pid_t __pid, const struct sched_param* __param);
+int sched_getparam(pid_t __pid, struct sched_param* __param);
+int sched_rr_get_interval(pid_t __pid, struct timespec* __quantum);
 
-#ifdef _GNU_SOURCE
+#if defined(__USE_GNU)
 
-extern int clone(int (*)(void*), void*, int, void*, ...);
-extern int unshare(int);
-extern int sched_getcpu(void);
-extern int setns(int, int);
+
+#if (defined(__LP64__)) || (defined(__mips__)) || (defined(__arm__)) || (defined(__i386__) && __ANDROID_API__ >= 17)
+int clone(int (*__fn)(void*), void* __child_stack, int __flags, void* __arg, ...)
+    __INTRODUCED_IN_ARM(9) __INTRODUCED_IN_MIPS(12) __INTRODUCED_IN_X86(17);
+#endif /* (defined(__LP64__)) || (defined(__mips__)) || (defined(__arm__)) || (defined(__i386__) && __ANDROID_API__ >= 17) */
+
+
+#if __ANDROID_API__ >= 17
+int unshare(int __flags) __INTRODUCED_IN(17);
+#endif /* __ANDROID_API__ >= 17 */
+
+int sched_getcpu(void) __INTRODUCED_IN(12);
+
+#if __ANDROID_API__ >= 21
+int setns(int __fd, int __ns_type) __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
+
 
 #ifdef __LP64__
 #define CPU_SETSIZE 1024
@@ -74,9 +86,8 @@ typedef struct {
   __CPU_BITTYPE  __bits[ CPU_SETSIZE / __CPU_BITS ];
 } cpu_set_t;
 
-extern int sched_setaffinity(pid_t pid, size_t setsize, const cpu_set_t* set);
-
-extern int sched_getaffinity(pid_t pid, size_t setsize, cpu_set_t* set);
+int sched_setaffinity(pid_t __pid, size_t __set_size, const cpu_set_t* __set) __INTRODUCED_IN(12);
+int sched_getaffinity(pid_t __pid, size_t __set_size, cpu_set_t* __set) __INTRODUCED_IN(12);
 
 #define CPU_ZERO(set)          CPU_ZERO_S(sizeof(cpu_set_t), set)
 #define CPU_SET(cpu, set)      CPU_SET_S(cpu, sizeof(cpu_set_t), set)
@@ -99,8 +110,8 @@ extern int sched_getaffinity(pid_t pid, size_t setsize, cpu_set_t* set);
 #define CPU_ALLOC(count)  __sched_cpualloc((count))
 #define CPU_FREE(set)     __sched_cpufree((set))
 
-extern cpu_set_t* __sched_cpualloc(size_t count);
-extern void       __sched_cpufree(cpu_set_t* set);
+cpu_set_t* __sched_cpualloc(size_t __count) __INTRODUCED_IN(12);
+void __sched_cpufree(cpu_set_t* __set) __INTRODUCED_IN(12);
 
 #define CPU_ZERO_S(setsize, set)  __builtin_memset(set, 0, setsize)
 
@@ -144,9 +155,9 @@ extern void       __sched_cpufree(cpu_set_t* set);
 
 #define CPU_COUNT_S(setsize, set)  __sched_cpucount((setsize), (set))
 
-extern int __sched_cpucount(size_t setsize, cpu_set_t* set);
+int __sched_cpucount(size_t __set_size, const cpu_set_t* __set) __INTRODUCED_IN(12);
 
-#endif /* _GNU_SOURCE */
+#endif /* __USE_GNU */
 
 __END_DECLS
 

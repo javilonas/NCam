@@ -25,32 +25,39 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+
 #ifndef _SYS_XATTR_H_
 #define _SYS_XATTR_H_
 
+#include <linux/xattr.h>
+#include <sys/cdefs.h>
 #include <sys/types.h>
 
 __BEGIN_DECLS
 
-#define XATTR_CREATE 1
-#define XATTR_REPLACE 2
 
-extern int fsetxattr(int fd, const char *name, const void *value, size_t size, int flags);
-extern int setxattr(const char *path, const char *name, const void *value, size_t size, int flags);
-extern int lsetxattr(const char *path, const char *name, const void *value, size_t size, int flags);
+#if __ANDROID_API__ >= 16
+int fsetxattr(int __fd, const char* __name, const void* __value, size_t __size, int __flags)
+  __INTRODUCED_IN(16);
+int setxattr(const char* __path, const char* __name, const void* __value, size_t __size, int __flags)
+  __INTRODUCED_IN(16);
+int lsetxattr(const char* __path, const char* __name, const void* __value, size_t __size, int __flags)
+  __INTRODUCED_IN(16);
 
-extern ssize_t fgetxattr(int fd, const char *name, void *value, size_t size);
-extern ssize_t getxattr(const char *path, const char *name, void *value, size_t size);
-extern ssize_t lgetxattr(const char *path, const char *name, void *value, size_t size);
+ssize_t fgetxattr(int __fd, const char* __name, void* __value, size_t __size) __INTRODUCED_IN(16);
+ssize_t getxattr(const char* __path, const char* __name, void* __value, size_t __size) __INTRODUCED_IN(16);
+ssize_t lgetxattr(const char* __path, const char* __name, void* __value, size_t __size) __INTRODUCED_IN(16);
 
-extern ssize_t listxattr(const char *path, char *list, size_t size);
-extern ssize_t llistxattr(const char *path, char *list, size_t size);
-extern ssize_t flistxattr(int fd, char *list, size_t size);
+ssize_t listxattr(const char* __path, char* __list, size_t __size) __INTRODUCED_IN(16);
+ssize_t llistxattr(const char* __path, char* __list, size_t __size) __INTRODUCED_IN(16);
+ssize_t flistxattr(int __fd, char* __list, size_t __size) __INTRODUCED_IN(16);
 
-extern int removexattr(const char *path, const char *name);
-extern int lremovexattr(const char *path, const char *name);
-extern int fremovexattr(int fd, const char *name);
+int removexattr(const char* __path, const char* __name) __INTRODUCED_IN(16);
+int lremovexattr(const char* __path, const char* __name) __INTRODUCED_IN(16);
+int fremovexattr(int __fd, const char* __name) __INTRODUCED_IN(16);
+#endif /* __ANDROID_API__ >= 16 */
+
 
 __END_DECLS
 
-#endif /* _SYS_XATTR_H_ */
+#endif

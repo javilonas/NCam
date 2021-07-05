@@ -1,5 +1,5 @@
-prefix=/home/lonas/toolchains/i686-unknown-linux-gnu
-exec_prefix=/home/lonas/toolchains/i686-unknown-linux-gnu
+prefix=/home/lonas/NCam/cross/i686-unknown-linux-gnu
+exec_prefix=/home/lonas/NCam/cross/i686-unknown-linux-gnu
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
 

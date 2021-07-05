@@ -25,270 +25,254 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#ifndef _STRING_H_
-#define _STRING_H_
+
+#ifndef _STRING_H
+#define _STRING_H
 
 #include <sys/cdefs.h>
 #include <stddef.h>
-#include <malloc.h>
 #include <xlocale.h>
+
+#include <bits/strcasecmp.h>
 
 __BEGIN_DECLS
 
-extern void*  memccpy(void* __restrict, const void* __restrict, int, size_t);
-extern void*  memchr(const void *, int, size_t) __purefunc;
-extern void*  memrchr(const void *, int, size_t) __purefunc;
-extern int    memcmp(const void *, const void *, size_t) __purefunc;
-extern void*  memcpy(void* __restrict, const void* __restrict, size_t);
-extern void*  memmove(void *, const void *, size_t);
-extern void*  memset(void *, int, size_t);
-extern void*  memmem(const void *, size_t, const void *, size_t) __purefunc;
+#if defined(__USE_BSD)
+#include <strings.h>
+#endif
 
-extern char*  strchr(const char *, int) __purefunc;
-extern char* __strchr_chk(const char *, int, size_t);
+void* memccpy(void* __dst, const void* __src, int __stop_char, size_t __n);
+void* memchr(const void* __s, int __ch, size_t __n) __attribute_pure__;
+#if defined(__cplusplus)
+extern "C++" void* memrchr(void* __s, int __ch, size_t __n) __RENAME(memrchr) __attribute_pure__;
+extern "C++" const void* memrchr(const void* __s, int __ch, size_t __n) __RENAME(memrchr) __attribute_pure__;
+#else
+void* memrchr(const void* __s, int __ch, size_t __n) __attribute_pure__;
+#endif
+int memcmp(const void* __lhs, const void* __rhs, size_t __n) __attribute_pure__;
+void* memcpy(void*, const void*, size_t);
+#if defined(__USE_GNU)
 
-extern char*  strrchr(const char *, int) __purefunc;
-extern char* __strrchr_chk(const char *, int, size_t);
+#if __ANDROID_API__ >= 23
+void* mempcpy(void* __dst, const void* __src, size_t __n) __INTRODUCED_IN(23);
+#endif /* __ANDROID_API__ >= 23 */
 
-extern size_t strlen(const char *) __purefunc;
-extern size_t __strlen_chk(const char *, size_t);
-extern int    strcmp(const char *, const char *) __purefunc;
-extern char*  stpcpy(char* __restrict, const char* __restrict);
-extern char*  strcpy(char* __restrict, const char* __restrict);
-extern char*  strcat(char* __restrict, const char* __restrict);
+#endif
+void* memmove(void* __dst, const void* __src, size_t __n);
+void* memset(void* __dst, int __ch, size_t __n);
+void* memmem(const void* __haystack, size_t __haystack_size, const void* __needle, size_t __needle_size) __attribute_pure__;
 
-extern int    strcasecmp(const char *, const char *) __purefunc;
-extern int    strncasecmp(const char *, const char *, size_t) __purefunc;
-extern char*  strdup(const char *);
+char* strchr(const char* __s, int __ch) __attribute_pure__;
 
-extern char*  strstr(const char *, const char *) __purefunc;
-extern char*  strcasestr(const char *haystack, const char *needle) __purefunc;
-extern char*  strtok(char* __restrict, const char* __restrict);
-extern char*  strtok_r(char* __restrict, const char* __restrict, char** __restrict);
+#if __ANDROID_API__ >= 18
+char* __strchr_chk(const char* __s, int __ch, size_t __n) __INTRODUCED_IN(18);
+#endif /* __ANDROID_API__ >= 18 */
 
-extern char*  strerror(int);
-extern int    strerror_r(int errnum, char *buf, size_t n);
+#if defined(__USE_GNU)
+#if defined(__cplusplus)
 
-extern size_t strnlen(const char *, size_t) __purefunc;
-extern char*  strncat(char* __restrict, const char* __restrict, size_t);
-extern char*  strndup(const char *, size_t);
-extern int    strncmp(const char *, const char *, size_t) __purefunc;
-extern char*  stpncpy(char* __restrict, const char* __restrict, size_t);
-extern char*  strncpy(char* __restrict, const char* __restrict, size_t);
+#if __ANDROID_API__ >= 24
+extern "C++" char* strchrnul(char* __s, int __ch) __RENAME(strchrnul) __attribute_pure__ __INTRODUCED_IN(24);
+extern "C++" const char* strchrnul(const char* __s, int __ch) __RENAME(strchrnul) __attribute_pure__ __INTRODUCED_IN(24);
+#endif /* __ANDROID_API__ >= 24 */
 
-extern size_t strlcat(char* __restrict, const char* __restrict, size_t);
-extern size_t strlcpy(char* __restrict, const char* __restrict, size_t);
+#else
 
-extern size_t strcspn(const char *, const char *) __purefunc;
-extern char*  strpbrk(const char *, const char *) __purefunc;
-extern char*  strsep(char** __restrict, const char* __restrict);
-extern size_t strspn(const char *, const char *);
+#if __ANDROID_API__ >= 24
+char* strchrnul(const char* __s, int __ch) __attribute_pure__ __INTRODUCED_IN(24);
+#endif /* __ANDROID_API__ >= 24 */
 
-extern char*  strsignal(int  sig);
+#endif
+#endif
 
-extern int    strcoll(const char *, const char *) __purefunc;
-extern size_t strxfrm(char* __restrict, const char* __restrict, size_t);
+char* strrchr(const char* __s, int __ch) __attribute_pure__;
 
-extern int    strcoll_l(const char *, const char *, locale_t) __purefunc;
-extern size_t strxfrm_l(char* __restrict, const char* __restrict, size_t, locale_t);
+#if __ANDROID_API__ >= 18
+char* __strrchr_chk(const char* __s, int __ch, size_t __n) __INTRODUCED_IN(18);
+#endif /* __ANDROID_API__ >= 18 */
 
-#if defined(__BIONIC_FORTIFY)
 
-__BIONIC_FORTIFY_INLINE
-void* memcpy(void* __restrict dest, const void* __restrict src, size_t copy_amount) {
-    char *d = (char *) dest;
-    const char *s = (const char *) src;
-    size_t s_len = __bos0(s);
-    size_t d_len = __bos0(d);
+size_t strlen(const char* __s) __attribute_pure__;
 
-    return __builtin___memcpy_chk(dest, src, copy_amount, d_len);
+#if __ANDROID_API__ >= 17
+size_t __strlen_chk(const char* __s, size_t __n) __INTRODUCED_IN(17);
+#endif /* __ANDROID_API__ >= 17 */
+
+
+int strcmp(const char* __lhs, const char* __rhs) __attribute_pure__;
+
+#if __ANDROID_API__ >= 21
+char* stpcpy(char* __dst, const char* __src) __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
+
+char* strcpy(char* __dst, const char* __src);
+char* strcat(char* __dst, const char* __src);
+char* strdup(const char* __s);
+
+char* strstr(const char* __haystack, const char* __needle) __attribute_pure__;
+#if defined(__cplusplus)
+extern "C++" char* strcasestr(char*, const char*) __RENAME(strcasestr) __attribute_pure__;
+extern "C++" const char* strcasestr(const char*, const char*) __RENAME(strcasestr) __attribute_pure__;
+#else
+char* strcasestr(const char* __haystack, const char* __needle) __attribute_pure__;
+#endif
+char* strtok(char* __s, const char* __delimiter);
+char* strtok_r(char* __s, const char* __delimiter, char** __pos_ptr);
+
+char* strerror(int __errno_value);
+
+#if __ANDROID_API__ >= 23
+char* strerror_l(int __errno_value, locale_t __l) __INTRODUCED_IN(23);
+#endif /* __ANDROID_API__ >= 23 */
+
+#if defined(__USE_GNU) && __ANDROID_API__ >= 23
+char* strerror_r(int __errno_value, char* __buf, size_t __n) __RENAME(__gnu_strerror_r) __INTRODUCED_IN(23);
+#else /* POSIX */
+int strerror_r(int __errno_value, char* __buf, size_t __n);
+#endif
+
+size_t strnlen(const char* __s, size_t __n) __attribute_pure__;
+char* strncat(char* __dst, const char* __src, size_t __n);
+char* strndup(const char* __s, size_t __n);
+int strncmp(const char* __lhs, const char* __rhs, size_t __n) __attribute_pure__;
+
+#if __ANDROID_API__ >= 21
+char* stpncpy(char* __dst, const char* __src, size_t __n) __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
+
+char* strncpy(char* __dst, const char* __src, size_t __n);
+
+size_t strlcat(char* __dst, const char* __src, size_t __n);
+size_t strlcpy(char* __dst, const char* __src, size_t __n);
+
+size_t strcspn(const char* __s, const char* __reject) __attribute_pure__;
+char* strpbrk(const char* __s, const char* __accept) __attribute_pure__;
+char* strsep(char** __s_ptr, const char* __delimiter);
+size_t strspn(const char* __s, const char* __accept);
+
+char* strsignal(int __signal);
+
+int strcoll(const char* __lhs, const char* __rhs) __attribute_pure__;
+size_t strxfrm(char* __dst, const char* __src, size_t __n);
+
+#if __ANDROID_API__ >= __ANDROID_API_L__
+int strcoll_l(const char* __lhs, const char* __rhs, locale_t __l) __attribute_pure__ __INTRODUCED_IN(21);
+size_t strxfrm_l(char* __dst, const char* __src, size_t __n, locale_t __l) __INTRODUCED_IN(21);
+#else
+// Implemented as static inlines before 21.
+#endif
+
+#if defined(__USE_GNU) && !defined(basename)
+/*
+ * glibc has a basename in <string.h> that's different to the POSIX one in <libgen.h>.
+ * It doesn't modify its argument, and in C++ it's const-correct.
+ */
+#if defined(__cplusplus)
+
+#if __ANDROID_API__ >= 23
+extern "C++" char* basename(char* __path) __RENAME(__gnu_basename) __INTRODUCED_IN(23);
+extern "C++" const char* basename(const char* __path) __RENAME(__gnu_basename) __INTRODUCED_IN(23);
+#endif /* __ANDROID_API__ >= 23 */
+
+#else
+
+#if __ANDROID_API__ >= 23
+char* basename(const char* __path) __RENAME(__gnu_basename) __INTRODUCED_IN(23);
+#endif /* __ANDROID_API__ >= 23 */
+
+#endif
+#endif
+
+#if defined(__BIONIC_INCLUDE_FORTIFY_HEADERS)
+#include <bits/fortify/string.h>
+#endif
+
+/* Const-correct overloads. Placed after FORTIFY so we call those functions, if possible. */
+#if defined(__cplusplus)
+/*
+ * Use two enable_ifs so these overloads don't conflict with + are preferred over libcxx's. This can
+ * be reduced to 1 after libcxx recognizes that we have const-correct overloads.
+ */
+#define __prefer_this_overload __enable_if(true, "preferred overload") __enable_if(true, "")
+extern "C++" {
+inline __always_inline
+void* __bionic_memchr(const void* const s __pass_object_size, int c, size_t n) {
+    return memchr(s, c, n);
 }
 
-__BIONIC_FORTIFY_INLINE
-void* memmove(void *dest, const void *src, size_t len) {
-    return __builtin___memmove_chk(dest, src, len, __bos0(dest));
+inline __always_inline
+const void* memchr(const void* const s __pass_object_size, int c, size_t n)
+        __prefer_this_overload {
+    return __bionic_memchr(s, c, n);
 }
 
-__BIONIC_FORTIFY_INLINE
-char* stpcpy(char* __restrict dest, const char* __restrict src) {
-    return __builtin___stpcpy_chk(dest, src, __bos(dest));
+inline __always_inline
+void* memchr(void* const s __pass_object_size, int c, size_t n) __prefer_this_overload {
+    return __bionic_memchr(s, c, n);
 }
 
-__BIONIC_FORTIFY_INLINE
-char* strcpy(char* __restrict dest, const char* __restrict src) {
-    return __builtin___strcpy_chk(dest, src, __bos(dest));
+inline __always_inline
+char* __bionic_strchr(const char* const s __pass_object_size, int c) {
+    return strchr(s, c);
 }
 
-extern char* __stpncpy_chk2(char* __restrict, const char* __restrict, size_t, size_t, size_t);
-
-__BIONIC_FORTIFY_INLINE
-char* stpncpy(char* __restrict dest, const char* __restrict src, size_t n) {
-    size_t bos_dest = __bos(dest);
-    size_t bos_src = __bos(src);
-
-    if (bos_src == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
-        return __builtin___stpncpy_chk(dest, src, n, bos_dest);
-    }
-
-    if (__builtin_constant_p(n) && (n <= bos_src)) {
-        return __builtin___stpncpy_chk(dest, src, n, bos_dest);
-    }
-
-    size_t slen = __builtin_strlen(src);
-    if (__builtin_constant_p(slen)) {
-        return __builtin___stpncpy_chk(dest, src, n, bos_dest);
-    }
-
-    return __stpncpy_chk2(dest, src, n, bos_dest, bos_src);
+inline __always_inline
+const char* strchr(const char* const s __pass_object_size, int c)
+        __prefer_this_overload {
+    return __bionic_strchr(s, c);
 }
 
-extern char* __strncpy_chk2(char* __restrict, const char* __restrict, size_t, size_t, size_t);
-
-__BIONIC_FORTIFY_INLINE
-char* strncpy(char* __restrict dest, const char* __restrict src, size_t n) {
-    size_t bos_dest = __bos(dest);
-    size_t bos_src = __bos(src);
-
-    if (bos_src == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
-        return __builtin___strncpy_chk(dest, src, n, bos_dest);
-    }
-
-    if (__builtin_constant_p(n) && (n <= bos_src)) {
-        return __builtin___strncpy_chk(dest, src, n, bos_dest);
-    }
-
-    size_t slen = __builtin_strlen(src);
-    if (__builtin_constant_p(slen)) {
-        return __builtin___strncpy_chk(dest, src, n, bos_dest);
-    }
-
-    return __strncpy_chk2(dest, src, n, bos_dest, bos_src);
+inline __always_inline
+char* strchr(char* const s __pass_object_size, int c)
+        __prefer_this_overload {
+    return __bionic_strchr(s, c);
 }
 
-__BIONIC_FORTIFY_INLINE
-char* strcat(char* __restrict dest, const char* __restrict src) {
-    return __builtin___strcat_chk(dest, src, __bos(dest));
+inline __always_inline
+char* __bionic_strrchr(const char* const s __pass_object_size, int c) {
+    return strrchr(s, c);
 }
 
-__BIONIC_FORTIFY_INLINE
-char *strncat(char* __restrict dest, const char* __restrict src, size_t n) {
-    return __builtin___strncat_chk(dest, src, n, __bos(dest));
+inline __always_inline
+const char* strrchr(const char* const s __pass_object_size, int c) __prefer_this_overload {
+    return __bionic_strrchr(s, c);
 }
 
-__BIONIC_FORTIFY_INLINE
-void* memset(void *s, int c, size_t n) {
-    return __builtin___memset_chk(s, c, n, __bos0(s));
+inline __always_inline
+char* strrchr(char* const s __pass_object_size, int c) __prefer_this_overload {
+    return __bionic_strrchr(s, c);
 }
 
-extern size_t __strlcpy_real(char* __restrict, const char* __restrict, size_t)
-    __asm__(__USER_LABEL_PREFIX__ "strlcpy");
-extern size_t __strlcpy_chk(char *, const char *, size_t, size_t);
+/* Functions with no FORTIFY counterpart. */
+inline __always_inline
+char* __bionic_strstr(const char* h, const char* n) { return strstr(h, n); }
 
-__BIONIC_FORTIFY_INLINE
-size_t strlcpy(char* __restrict dest, const char* __restrict src, size_t size) {
-    size_t bos = __bos(dest);
-
-#if !defined(__clang__)
-    // Compiler does not know destination size. Do not call __strlcpy_chk
-    if (bos == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
-        return __strlcpy_real(dest, src, size);
-    }
-
-    // Compiler can prove, at compile time, that the passed in size
-    // is always <= the actual object size. Do not call __strlcpy_chk
-    if (__builtin_constant_p(size) && (size <= bos)) {
-        return __strlcpy_real(dest, src, size);
-    }
-#endif /* !defined(__clang__) */
-
-    return __strlcpy_chk(dest, src, size, bos);
+inline __always_inline
+const char* strstr(const char* h, const char* n) __prefer_this_overload {
+    return __bionic_strstr(h, n);
 }
 
-extern size_t __strlcat_real(char* __restrict, const char* __restrict, size_t)
-    __asm__(__USER_LABEL_PREFIX__ "strlcat");
-extern size_t __strlcat_chk(char* __restrict, const char* __restrict, size_t, size_t);
-
-
-__BIONIC_FORTIFY_INLINE
-size_t strlcat(char* __restrict dest, const char* __restrict src, size_t size) {
-    size_t bos = __bos(dest);
-
-#if !defined(__clang__)
-    // Compiler does not know destination size. Do not call __strlcat_chk
-    if (bos == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
-        return __strlcat_real(dest, src, size);
-    }
-
-    // Compiler can prove, at compile time, that the passed in size
-    // is always <= the actual object size. Do not call __strlcat_chk
-    if (__builtin_constant_p(size) && (size <= bos)) {
-        return __strlcat_real(dest, src, size);
-    }
-#endif /* !defined(__clang__) */
-
-    return __strlcat_chk(dest, src, size, bos);
+inline __always_inline
+char* strstr(char* h, const char* n) __prefer_this_overload {
+    return __bionic_strstr(h, n);
 }
 
-__BIONIC_FORTIFY_INLINE
-size_t strlen(const char *s) {
-    size_t bos = __bos(s);
+inline __always_inline
+char* __bionic_strpbrk(const char* h, const char* n) { return strpbrk(h, n); }
 
-#if !defined(__clang__)
-    // Compiler does not know destination size. Do not call __strlen_chk
-    if (bos == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
-        return __builtin_strlen(s);
-    }
-
-    size_t slen = __builtin_strlen(s);
-    if (__builtin_constant_p(slen)) {
-        return slen;
-    }
-#endif /* !defined(__clang__) */
-
-    return __strlen_chk(s, bos);
+inline __always_inline
+char* strpbrk(char* h, const char* n) __prefer_this_overload {
+    return __bionic_strpbrk(h, n);
 }
 
-__BIONIC_FORTIFY_INLINE
-char* strchr(const char *s, int c) {
-    size_t bos = __bos(s);
-
-#if !defined(__clang__)
-    // Compiler does not know destination size. Do not call __strchr_chk
-    if (bos == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
-        return __builtin_strchr(s, c);
-    }
-
-    size_t slen = __builtin_strlen(s);
-    if (__builtin_constant_p(slen) && (slen < bos)) {
-        return __builtin_strchr(s, c);
-    }
-#endif /* !defined(__clang__) */
-
-    return __strchr_chk(s, c, bos);
+inline __always_inline
+const char* strpbrk(const char* h, const char* n) __prefer_this_overload {
+    return __bionic_strpbrk(h, n);
 }
-
-__BIONIC_FORTIFY_INLINE
-char* strrchr(const char *s, int c) {
-    size_t bos = __bos(s);
-
-#if !defined(__clang__)
-    // Compiler does not know destination size. Do not call __strrchr_chk
-    if (bos == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
-        return __builtin_strrchr(s, c);
-    }
-
-    size_t slen = __builtin_strlen(s);
-    if (__builtin_constant_p(slen) && (slen < bos)) {
-        return __builtin_strrchr(s, c);
-    }
-#endif /* !defined(__clang__) */
-
-    return __strrchr_chk(s, c, bos);
 }
-
-
-#endif /* defined(__BIONIC_FORTIFY) */
+#undef __prefer_this_overload
+#endif
 
 __END_DECLS
 
-#endif /* _STRING_H_ */
+#endif

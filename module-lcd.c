@@ -80,6 +80,7 @@ static void refresh_lcd_file(void)
 			}
 
 			fprintf(fpsave, "Version: %s\n", CS_VERSION);
+			fprintf(fpsave, "Revision: %s\n", CS_SVN_VERSION);
 			if(days == 0)
 				{ fprintf(fpsave, "up: %02d:%02d:%02d\n", hours, mins, secs); }
 			else
@@ -149,7 +150,7 @@ static void refresh_lcd_file(void)
 						}
 					}
 
-					int16_t written = 0, skipped = 0, blocked = 0, error = 0;
+					uint16_t written = 0, skipped = 0, blocked = 0, error = 0;
 
 					char emmtext[16] = "               ";
 					if(cl->typ == 'r' || !iscccam)
@@ -214,12 +215,12 @@ static void refresh_lcd_file(void)
 				seconds = now - cl->lastecm;
 
 				if(cl->typ == 'c' && seconds < 15)
-				{		
+				{
 					type = "U";
 					idx = count_u;
 					label = cl->account->usr;
 					count_u++;
-							
+
 					get_servicename(cl, cl->last_srvid, cl->last_provid, cl->last_caid, channame, sizeof(channame));
 					fprintf(fpsave, "%s%d | %-10.10s | %-10.10s:%-17.17s| % 4d\n",
 							type,

@@ -372,6 +372,8 @@ tr.expired td {background-color:#FBA}
 tr.forcereopenuseronline td {background-color:#C7D6FF}
 tr.forcereopenuserconnected td {background-color:#D2EDFF}
 tr.connected td {background-color:#FFA}
+tr.r_undefined td {background-color:#FFA}
+tr.r_connected td {background-color:#BCFFAD}
 /* color of button for readers and user row in readers.html and userconfig.html*/
 tr.disabled td {}
 tr.disabled td:first-child img.icon,
@@ -886,6 +888,10 @@ path.graph_curve {stroke-opacity:0.8;stroke-width:0.7px;fill:none}
 }
 .sorting-asc, .sorting-desc {background-color:#AAA}
 .readers .td-sorting,
+.readers tr.r_undefined .td-sorting {background-color: #EAEA95}
+.readers tr.r_connected .td-sorting {background-color: #A6EA95}
+.readers tr.enabledreader .td-sorting {background-color: #D9D9D9}
+.readers tr.disabledreader .td-sorting {background-color: #D9D9D9}
 .users tr.offline .td-sorting,
 .users tr.disabled .td-sorting,
 .statsbalance .td-sorting {background-color: #D9D9D9}
@@ -1039,8 +1045,10 @@ input.pintervall {
 	position:absolute;
 	width: 150px;
 	height: 90px;
-	border: 1px dotted #F00;
-	background-color: #EAEAEA;
+	border: 1px dotted #050840;
+	background-color: #000000bf;
+	color: #2fd62c;
+	box-shadow: 0 0 2px 1px black;
 	padding:5px;
 	z-index:1000
 }

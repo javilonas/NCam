@@ -25,17 +25,33 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#ifndef _SYS_IPC_H
-#define _SYS_IPC_H
+
+#pragma once
+
+/**
+ * @file sys/ipc.h
+ * @brief System V IPC.
+ */
 
 #include <sys/cdefs.h>
 #include <sys/types.h>
 #include <linux/ipc.h>
 
+#if defined(__USE_GNU)
+#define __key key
+#define __seq seq
+#endif
+
+#define ipc_perm ipc64_perm
+
 __BEGIN_DECLS
 
-extern key_t  ftok(const char*  path, int  id);
+/**
+ * [ftok(3)](http://man7.org/linux/man-pages/man3/ftok.3.html) converts a path and id to a
+ * System V IPC key.
+ *
+ * Returns a key on success, and returns -1 and sets `errno` on failure.
+ */
+key_t ftok(const char* __path, int __id);
 
 __END_DECLS
-
-#endif /* _SYS_IPC_H */

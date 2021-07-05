@@ -1,12 +1,12 @@
 .TH ncam 1
 .SH NAME
-\fBNCAm\fR - SC server
+\fBNCam\fR - SC server
 .SH DESCRIPTIONS
-The NCAm software is an \fIopen source\fR multi-protocol/multi-platform SC server.
+The NCam software is an \fIopen source\fR multi-protocol/multi-platform SC server.
 
 \fIPlease check the compile options for included features in the binary.\fR
 
-NCAm supports the following protocols:
+NCam supports the following protocols:
 .TP 3n
 \(bu
 newcamd with cascading/remote server ECM support
@@ -35,7 +35,7 @@ serial (HSIC, SSSP, BOMBA, DSR 9500)
 \(bu
 radegast
 .TP 3n
-NCAm works on the following platforms:
+NCam works on the following platforms:
 .TP 3n
 \(bu
 Linux (Tuxbox, ARM, MIPS, MIPSel, SH-4, PowerPC, ...)
@@ -49,7 +49,7 @@ Mac OS X
 .PP
 \fB-a\fP|\fB--crash-dump\fP
 .RS 3n
-write ncam.crash on segfault (needs installed GDB and NCAm compiled with debug infos -ggdb)
+write ncam.crash on segfault (needs installed GDB and NCam compiled with debug infos -ggdb)
 .RE
 .PP
 \fB-b\fP|\fB--daemon\fP
@@ -65,7 +65,7 @@ set PID file, overrides pidfile of \fBncam.conf\fR, default:none
 \fB-c\fP|\fB--config-dir\fP <directory>
 .RS 3n
 read configuration from <directory>, default:see CS_CONFDIR in \fBglobals.h\fR,
-while starting NCAm prints warnings on invalid keywords, comment lines start with \fB#\fP character.
+while starting NCam prints warnings on invalid keywords, comment lines start with \fB#\fP character.
 
 Autodiscover of the following directories will be done:
 
@@ -173,7 +173,7 @@ enable output of web interface in UTF-8 charset
 .PP
 \fB-V\fP|\fB--build-info\fP
 .RS 3n
-show NCAm version info
+show NCam version info
 .RE
 .PP
 \fB-w\fP|\fB--wait\fP <seconds>

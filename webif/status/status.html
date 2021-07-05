@@ -1,21 +1,5 @@
 ##TPLHEADERSHORT##
-<script type="text/javascript">
-//<![CDATA[
-var vTimeOut;
-
-$(function() {
-  vTimeOut= setTimeout(startRefresh, 3000)
-});
-
-function startRefresh() {
-  clearInterval(vTimeOut);
-  vTimeOut= setTimeout(startRefresh, 3000);
-  document.title = 'NCAM Admin Control'
-  $("#wrapper").load("status.html");
-}
-
-//]]>
-</script>
+##REFRESH##
 	<script type="text/javascript">
 
 	var page = 'status';
@@ -25,12 +9,17 @@ function startRefresh() {
 	var pollintervall = 0;
 	var polling = 0;
 	var pollrefresh = '##POLLREFRESHTIME##';
-	//var pollrefresh = 0;
 
 	</script>
 ##TPLBODY##
 ##TPLMENU##
+<div id = "chart">
+	<div id = "charthead" ></div>
+	<div id = "graph" ></div>
+</div>
+<DIV ID="subnav">
 <br>
+</DIV>
 ##TPLMESSAGE##
 <DIV>
 <TABLE CLASS="status">

@@ -25,11 +25,20 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#ifndef _SYS_UN_H_
-#define _SYS_UN_H_
 
-typedef unsigned short sa_family_t;
+#pragma once
 
+/**
+ * @file sys/un.h
+ * @brief Unix domain sockets.
+ */
+
+#include <bits/sa_family_t.h>
 #include <linux/un.h>
+#include <sys/cdefs.h>
 
-#endif /* _SYS_UN_H_ */
+#if defined(__USE_BSD) || defined(__USE_GNU)
+#include <string.h>
+/** Returns the actual length of the given `sockaddr_un`. */
+#define SUN_LEN(__ptr) (offsetof(struct sockaddr_un, sun_path) + strlen((__ptr)->sun_path))
+#endif

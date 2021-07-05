@@ -36,13 +36,15 @@
 #ifndef _NDK_CAMERA_MANAGER_H
 #define _NDK_CAMERA_MANAGER_H
 
+#include <sys/cdefs.h>
+
 #include "NdkCameraError.h"
 #include "NdkCameraMetadata.h"
 #include "NdkCameraDevice.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+__BEGIN_DECLS
+
+#if __ANDROID_API__ >= 24
 
 /**
  * ACameraManager is opaque type that provides access to camera service.
@@ -63,20 +65,14 @@ typedef struct ACameraManager ACameraManager;
  * @return a {@link ACameraManager} instance.
  *
  */
-ACameraManager* ACameraManager_create();
+ACameraManager* ACameraManager_create() __INTRODUCED_IN(24);
 
 /**
  * <p>Delete the {@link ACameraManager} instance and free its resources. </p>
  *
  * @param manager the {@link ACameraManager} instance to be deleted.
  */
-void ACameraManager_delete(ACameraManager* manager);
-
-/// Struct to hold list of camera devices
-typedef struct ACameraIdList {
-    int numCameras;          ///< Number of connected camera devices
-    const char** cameraIds;  ///< list of identifier of connected camera devices
-} ACameraIdList;
+void ACameraManager_delete(ACameraManager* manager) __INTRODUCED_IN(24);
 
 /**
  * Create a list of currently connected camera devices, including
@@ -89,6 +85,11 @@ typedef struct ACameraIdList {
  * <p>ACameraManager_getCameraIdList will allocate and return an {@link ACameraIdList}.
  * The caller must call {@link ACameraManager_deleteCameraIdList} to free the memory</p>
  *
+ * <p>Note: the returned camera list might be a subset to the output of <a href=
+ * "https://developer.android.com/reference/android/hardware/camera2/CameraManager.html#getCameraIdList()">
+ * SDK CameraManager#getCameraIdList API</a> as the NDK API does not support some legacy camera
+ * hardware.</p>
+ *
  * @param manager the {@link ACameraManager} of interest
  * @param cameraIdList the output {@link ACameraIdList} will be filled in here if the method call
  *        succeeds.
@@ -100,14 +101,14 @@ typedef struct ACameraIdList {
  *         <li>{@link ACAMERA_ERROR_NOT_ENOUGH_MEMORY} if allocating memory fails.</li></ul>
  */
 camera_status_t ACameraManager_getCameraIdList(ACameraManager* manager,
-                                              /*out*/ACameraIdList** cameraIdList);
+        /*out*/ACameraIdList** cameraIdList) __INTRODUCED_IN(24);
 
 /**
  * Delete a list of camera devices allocated via {@link ACameraManager_getCameraIdList}.
  *
  * @param cameraIdList the {@link ACameraIdList} to be deleted.
  */
-void ACameraManager_deleteCameraIdList(ACameraIdList* cameraIdList);
+void ACameraManager_deleteCameraIdList(ACameraIdList* cameraIdList) __INTRODUCED_IN(24);
 
 /**
  * Definition of camera availability callbacks.
@@ -118,7 +119,8 @@ void ACameraManager_deleteCameraIdList(ACameraIdList* cameraIdList);
  *                 argument is owned by camera framework and will become invalid immediately after
  *                 this callback returns.
  */
-typedef void (*ACameraManager_AvailabilityCallback)(void* context, const char* cameraId);
+typedef void (*ACameraManager_AvailabilityCallback)(void* context,
+        const char* cameraId);
 
 /**
  * A listener for camera devices becoming available or unavailable to open.
@@ -166,7 +168,8 @@ typedef struct ACameraManager_AvailabilityListener {
  *                  {ACameraManager_AvailabilityCallbacks#onCameraUnavailable} is NULL.</li></ul>
  */
 camera_status_t ACameraManager_registerAvailabilityCallback(
-        ACameraManager* manager, const ACameraManager_AvailabilityCallbacks* callback);
+        ACameraManager* manager,
+        const ACameraManager_AvailabilityCallbacks* callback) __INTRODUCED_IN(24);
 
 /**
  * Unregister camera availability callbacks.
@@ -183,7 +186,8 @@ camera_status_t ACameraManager_registerAvailabilityCallback(
  *                  {ACameraManager_AvailabilityCallbacks#onCameraUnavailable} is NULL.</li></ul>
  */
 camera_status_t ACameraManager_unregisterAvailabilityCallback(
-        ACameraManager* manager, const ACameraManager_AvailabilityCallbacks* callback);
+        ACameraManager* manager,
+        const ACameraManager_AvailabilityCallbacks* callback) __INTRODUCED_IN(24);
 
 /**
  * Query the capabilities of a camera device. These capabilities are
@@ -209,7 +213,7 @@ camera_status_t ACameraManager_unregisterAvailabilityCallback(
  */
 camera_status_t ACameraManager_getCameraCharacteristics(
         ACameraManager* manager, const char* cameraId,
-        /*out*/ACameraMetadata** characteristics);
+        /*out*/ACameraMetadata** characteristics) __INTRODUCED_IN(24);
 
 /**
  * Open a connection to a camera with the given ID. The opened camera device will be
@@ -230,18 +234,18 @@ camera_status_t ACameraManager_getCameraCharacteristics(
  * priority when accessing the camera, and this method will succeed even if the camera device is
  * in use by another camera API client. Any lower-priority application that loses control of the
  * camera in this way will receive an
- * {@link ACameraDevice_stateCallbacks#onDisconnected} callback.</p>
+ * {@link ACameraDevice_StateCallbacks#onDisconnected} callback.</p>
  *
  * <p>Once the camera is successfully opened,the ACameraDevice can then be set up
  * for operation by calling {@link ACameraDevice_createCaptureSession} and
  * {@link ACameraDevice_createCaptureRequest}.</p>
  *
  * <p>If the camera becomes disconnected after this function call returns,
- * {@link ACameraDevice_stateCallbacks#onDisconnected} with a
+ * {@link ACameraDevice_StateCallbacks#onDisconnected} with a
  * ACameraDevice in the disconnected state will be called.</p>
  *
  * <p>If the camera runs into error after this function call returns,
- * {@link ACameraDevice_stateCallbacks#onError} with a
+ * {@link ACameraDevice_StateCallbacks#onError} with a
  * ACameraDevice in the error state will be called.</p>
  *
  * @param manager the {@link ACameraManager} of interest.
@@ -269,12 +273,128 @@ camera_status_t ACameraManager_getCameraCharacteristics(
 camera_status_t ACameraManager_openCamera(
         ACameraManager* manager, const char* cameraId,
         ACameraDevice_StateCallbacks* callback,
-        /*out*/ACameraDevice** device);
+        /*out*/ACameraDevice** device) __INTRODUCED_IN(24);
 
-#ifdef __cplusplus
-} // extern "C"
+#endif /* __ANDROID_API__ >= 24 */
+
+#if __ANDROID_API__ >= 29
+
+/**
+ * Definition of camera access permission change callback.
+ *
+ * <p>Notification that camera access priorities have changed and the camera may
+ * now be openable. An application that was previously denied camera access due to
+ * a higher-priority user already using the camera, or that was disconnected from an
+ * active camera session due to a higher-priority user trying to open the camera,
+ * should try to open the camera again if it still wants to use it.  Note that
+ * multiple applications may receive this callback at the same time, and only one of
+ * them will succeed in opening the camera in practice, depending on exact access
+ * priority levels and timing. This method is useful in cases where multiple
+ * applications may be in the resumed state at the same time, and the user switches
+ * focus between them, or if the current camera-using application moves between
+ * full-screen and Picture-in-Picture (PiP) states. In such cases, the camera
+ * available/unavailable callbacks will not be invoked, but another application may
+ * now have higher priority for camera access than the current camera-using
+ * application.</p>
+
+ * @param context The optional application context provided by user in
+ *                {@link ACameraManager_AvailabilityListener}.
+ */
+typedef void (*ACameraManager_AccessPrioritiesChangedCallback)(void* context);
+
+/**
+ * A listener for camera devices becoming available/unavailable to open or when
+ * the camera access permissions change.
+ *
+ * <p>Cameras become available when they are no longer in use, or when a new
+ * removable camera is connected. They become unavailable when some
+ * application or service starts using a camera, or when a removable camera
+ * is disconnected.</p>
+ *
+ * @see ACameraManager_registerExtendedAvailabilityCallback
+ */
+typedef struct ACameraManager_ExtendedAvailabilityListener {
+    ///
+    ACameraManager_AvailabilityCallbacks availabilityCallbacks;
+
+    /// Called when there is camera access permission change
+    ACameraManager_AccessPrioritiesChangedCallback onCameraAccessPrioritiesChanged;
+
+    /// Reserved for future use, please ensure that all entries are set to NULL
+    void *reserved[6];
+} ACameraManager_ExtendedAvailabilityCallbacks;
+
+/**
+ * Register camera extended availability callbacks.
+ *
+ * <p>onCameraUnavailable will be called whenever a camera device is opened by any camera API
+ * client. Other camera API clients may still be able to open such a camera device, evicting the
+ * existing client if they have higher priority than the existing client of a camera device.
+ * See {@link ACameraManager_openCamera} for more details.</p>
+ *
+ * <p>The callbacks will be called on a dedicated thread shared among all ACameraManager
+ * instances.</p>
+ *
+ * <p>Since this callback will be registered with the camera service, remember to unregister it
+ * once it is no longer needed; otherwise the callback will continue to receive events
+ * indefinitely and it may prevent other resources from being released. Specifically, the
+ * callbacks will be invoked independently of the general activity lifecycle and independently
+ * of the state of individual ACameraManager instances.</p>
+ *
+ * @param manager the {@link ACameraManager} of interest.
+ * @param callback the {@link ACameraManager_ExtendedAvailabilityCallbacks} to be registered.
+ *
+ * @return <ul>
+ *         <li>{@link ACAMERA_OK} if the method call succeeds.</li>
+ *         <li>{@link ACAMERA_ERROR_INVALID_PARAMETER} if manager or callback is NULL, or
+ *                  {ACameraManager_ExtendedAvailabilityCallbacks#onCameraAccessPrioritiesChanged}
+ *                  or {ACameraManager_AvailabilityCallbacks#onCameraAvailable} or
+ *                  {ACameraManager_AvailabilityCallbacks#onCameraUnavailable} is NULL.</li></ul>
+ */
+camera_status_t ACameraManager_registerExtendedAvailabilityCallback(
+        ACameraManager* manager,
+        const ACameraManager_ExtendedAvailabilityCallbacks* callback) __INTRODUCED_IN(29);
+
+/**
+ * Unregister camera extended availability callbacks.
+ *
+ * <p>Removing a callback that isn't registered has no effect.</p>
+ *
+ * @param manager the {@link ACameraManager} of interest.
+ * @param callback the {@link ACameraManager_ExtendedAvailabilityCallbacks} to be unregistered.
+ *
+ * @return <ul>
+ *         <li>{@link ACAMERA_OK} if the method call succeeds.</li>
+ *         <li>{@link ACAMERA_ERROR_INVALID_PARAMETER} if callback,
+ *                  {ACameraManager_ExtendedAvailabilityCallbacks#onCameraAccessPrioritiesChanged}
+ *                  or {ACameraManager_AvailabilityCallbacks#onCameraAvailable} or
+ *                  {ACameraManager_AvailabilityCallbacks#onCameraUnavailable} is NULL.</li></ul>
+ */
+camera_status_t ACameraManager_unregisterExtendedAvailabilityCallback(
+        ACameraManager* manager,
+        const ACameraManager_ExtendedAvailabilityCallbacks* callback) __INTRODUCED_IN(29);
+
+#ifdef __ANDROID_VNDK__
+/**
+ * Retrieve the tag value, given the tag name and camera id.
+ * This method is device specific since some metadata might be defined by device manufacturers
+ * and might only be accessible for specific cameras.
+ * @param manager The {@link ACameraManager} of interest.
+ * @param cameraId The cameraId, which is used to query camera characteristics.
+ * @param name The name of the tag being queried.
+ * @param tag The output tag assigned by this method.
+ *
+ * @return ACAMERA_OK only if the function call was successful.
+ */
+camera_status_t ACameraManager_getTagFromName(ACameraManager *manager, const char* cameraId,
+        const char *name, /*out*/uint32_t *tag)
+        __INTRODUCED_IN(29);
 #endif
 
-#endif //_NDK_CAMERA_MANAGER_H
+#endif /* __ANDROID_API__ >= 29 */
+
+__END_DECLS
+
+#endif /* _NDK_CAMERA_MANAGER_H */
 
 /** @} */

@@ -25,8 +25,13 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#ifndef _TERMIOS_H_
-#define _TERMIOS_H_
+
+#pragma once
+
+/**
+ * @file termios.h
+ * @brief General terminal interfaces.
+ */
 
 #include <sys/cdefs.h>
 #include <sys/ioctl.h>
@@ -35,20 +40,113 @@
 
 __BEGIN_DECLS
 
-speed_t cfgetispeed(const struct termios*);
-speed_t cfgetospeed(const struct termios*);
-void cfmakeraw(struct termios*);
-int cfsetispeed(struct termios*, speed_t);
-int cfsetospeed(struct termios*, speed_t);
-int cfsetspeed(struct termios*, speed_t);
-int tcdrain(int);
-int tcflow(int, int);
-int tcflush(int, int);
-int tcgetattr(int, struct termios*);
-pid_t tcgetsid(int);
-int tcsendbreak(int, int);
-int tcsetattr(int, int, const struct termios*);
+#if __ANDROID_API__ >= __ANDROID_API_L__
+// This file is implemented as static inlines before API level 21.
+
+/**
+ * [cfgetispeed(3)](http://man7.org/linux/man-pages/man3/cfgetispeed.3.html)
+ * returns the terminal input baud rate.
+ */
+speed_t cfgetispeed(const struct termios* __t) __INTRODUCED_IN(21);
+
+/**
+ * [cfgetospeed(3)](http://man7.org/linux/man-pages/man3/cfgetospeed.3.html)
+ * returns the terminal output baud rate.
+ */
+speed_t cfgetospeed(const struct termios* __t) __INTRODUCED_IN(21);
+
+/**
+ * [cfmakeraw(3)](http://man7.org/linux/man-pages/man3/cfmakeraw.3.html)
+ * configures the terminal for "raw" mode.
+ */
+void cfmakeraw(struct termios* __t) __INTRODUCED_IN(21);
+
+/**
+ * [cfsetspeed(3)](http://man7.org/linux/man-pages/man3/cfsetspeed.3.html)
+ * sets the terminal input and output baud rate.
+ *
+ * Returns 0 on success and returns -1 and sets `errno` on failure.
+ */
+int cfsetspeed(struct termios* __t, speed_t __speed) __INTRODUCED_IN(21);
+
+/**
+ * [cfsetispeed(3)](http://man7.org/linux/man-pages/man3/cfsetispeed.3.html)
+ * sets the terminal input baud rate.
+ *
+ * Returns 0 on success and returns -1 and sets `errno` on failure.
+ */
+int cfsetispeed(struct termios* __t, speed_t __speed) __INTRODUCED_IN(21);
+
+/**
+ * [cfsetospeed(3)](http://man7.org/linux/man-pages/man3/cfsetospeed.3.html)
+ * sets the terminal output baud rate.
+ *
+ * Returns 0 on success and returns -1 and sets `errno` on failure.
+ */
+int cfsetospeed(struct termios* __t, speed_t __speed) __INTRODUCED_IN(21);
+
+/**
+ * [tcdrain(3)](http://man7.org/linux/man-pages/man3/tcdrain.3.html)
+ * waits until all output has been written.
+ *
+ * Returns 0 on success and returns -1 and sets `errno` on failure.
+ */
+int tcdrain(int __fd) __INTRODUCED_IN(21);
+
+/**
+ * [tcflow(3)](http://man7.org/linux/man-pages/man3/tcflow.3.html)
+ * suspends (`TCOOFF`) or resumes (`TCOON`) output, or transmits a
+ * stop (`TCIOFF`) or start (`TCION`) to suspend or resume input.
+ *
+ * Returns 0 on success and returns -1 and sets `errno` on failure.
+ */
+int tcflow(int __fd, int __action) __INTRODUCED_IN(21);
+
+/**
+ * [tcflush(3)](http://man7.org/linux/man-pages/man3/tcflush.3.html)
+ * discards pending input (`TCIFLUSH`), output (`TCOFLUSH`), or
+ * both (`TCIOFLUSH`). (In `<stdio.h>` terminology, this is a purge rather
+ * than a flush.)
+ *
+ * Returns 0 on success and returns -1 and sets `errno` on failure.
+ */
+int tcflush(int __fd, int __queue) __INTRODUCED_IN(21);
+
+/**
+ * [tcgetattr(3)](http://man7.org/linux/man-pages/man3/tcgetattr.3.html)
+ * reads the configuration of the given terminal.
+ *
+ * Returns 0 on success and returns -1 and sets `errno` on failure.
+ */
+int tcgetattr(int __fd, struct termios* __t) __INTRODUCED_IN(21);
+
+/**
+ * [tcgetsid(3)](http://man7.org/linux/man-pages/man3/tcgetsid.3.html)
+ * returns the session id corresponding to the given fd.
+ *
+ * Returns a non-negative session id on success and
+ * returns -1 and sets `errno` on failure.
+ */
+pid_t tcgetsid(int __fd) __INTRODUCED_IN(21);
+
+/**
+ * [tcsendbreak(3)](http://man7.org/linux/man-pages/man3/tcsendbreak.3.html)
+ * sends a break.
+ *
+ * Returns 0 on success and returns -1 and sets `errno` on failure.
+ */
+int tcsendbreak(int __fd, int __duration) __INTRODUCED_IN(21);
+
+/**
+ * [tcsetattr(3)](http://man7.org/linux/man-pages/man3/tcsetattr.3.html)
+ * writes the configuration of the given terminal.
+ *
+ * Returns 0 on success and returns -1 and sets `errno` on failure.
+ */
+int tcsetattr(int __fd, int __optional_actions, const struct termios* __t) __INTRODUCED_IN(21);
+
+#endif
 
 __END_DECLS
 
-#endif /* _TERMIOS_H_ */
+#include <android/legacy_termios_inlines.h>

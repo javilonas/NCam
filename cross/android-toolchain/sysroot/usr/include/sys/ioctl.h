@@ -25,8 +25,13 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#ifndef _SYS_IOCTL_H_
-#define _SYS_IOCTL_H_
+
+#pragma once
+
+/**
+ * @file sys/ioctl.h
+ * @brief The ioctl() function.
+ */
 
 #include <sys/cdefs.h>
 #include <linux/ioctl.h>
@@ -35,15 +40,6 @@
  * terminal-related ioctl data structures such as struct winsize.
  */
 #include <linux/termios.h>
-#include <asm/ioctls.h>
-#include <asm/termbits.h>
-#include <sys/ioctl_compat.h>
 #include <linux/tty.h>
 
-__BEGIN_DECLS
-
-extern int ioctl(int, int, ...);
-
-__END_DECLS
-
-#endif /* _SYS_IOCTL_H_ */
+#include <bits/ioctl.h>

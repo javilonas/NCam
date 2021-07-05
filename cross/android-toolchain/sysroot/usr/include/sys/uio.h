@@ -25,6 +25,7 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+
 #ifndef _SYS_UIO_H_
 #define _SYS_UIO_H_
 
@@ -34,9 +35,29 @@
 
 __BEGIN_DECLS
 
-int readv(int, const struct iovec *, int);
-int writev(int, const struct iovec *, int);
+ssize_t readv(int __fd, const struct iovec* __iov, int __count);
+ssize_t writev(int __fd, const struct iovec* __iov, int __count);
+
+#if defined(__USE_GNU)
+
+#if __ANDROID_API__ >= 24
+ssize_t preadv(int __fd, const struct iovec* __iov, int __count, off_t __offset) __RENAME_IF_FILE_OFFSET64(preadv64) __INTRODUCED_IN(24);
+ssize_t pwritev(int __fd, const struct iovec* __iov, int __count, off_t __offset) __RENAME_IF_FILE_OFFSET64(pwritev64) __INTRODUCED_IN(24);
+ssize_t preadv64(int __fd, const struct iovec* __iov, int __count, off64_t __offset) __INTRODUCED_IN(24);
+ssize_t pwritev64(int __fd, const struct iovec* __iov, int __count, off64_t __offset) __INTRODUCED_IN(24);
+#endif /* __ANDROID_API__ >= 24 */
+
+#endif
+
+#if defined(__USE_GNU)
+
+#if __ANDROID_API__ >= 23
+ssize_t process_vm_readv(pid_t __pid, const struct iovec* __local_iov, unsigned long __local_iov_count, const struct iovec* __remote_iov, unsigned long __remote_iov_count, unsigned long __flags) __INTRODUCED_IN(23);
+ssize_t process_vm_writev(pid_t __pid, const struct iovec* __local_iov, unsigned long __local_iov_count, const struct iovec* __remote_iov, unsigned long __remote_iov_count, unsigned long __flags) __INTRODUCED_IN(23);
+#endif /* __ANDROID_API__ >= 23 */
+
+#endif
 
 __END_DECLS
 
-#endif /* _SYS_UIO_H_ */
+#endif

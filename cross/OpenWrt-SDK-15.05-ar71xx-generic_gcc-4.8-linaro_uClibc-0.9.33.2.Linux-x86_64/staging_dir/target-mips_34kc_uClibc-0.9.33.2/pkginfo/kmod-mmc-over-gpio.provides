@@ -1,8 +1,0 @@
-configfs.ko
-crc-itu-t.ko
-crc7.ko
-gpiommc.ko
-mmc_block.ko
-mmc_core.ko
-mmc_spi.ko
-spi_gpio_old.ko

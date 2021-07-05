@@ -17,11 +17,11 @@
 #ifndef OPENMAX_AL_ANDROID_H_
 #define OPENMAX_AL_ANDROID_H_
 
+#include "OpenMAXAL.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "OpenMAXAL.h"
 
 /*---------------------------------------------------------------------------*/
 /* Android common types                                                      */
@@ -58,6 +58,13 @@ typedef const struct XAAndroidBufferQueueItf_ * const * XAAndroidBufferQueueItf;
 #define XA_ANDROID_ITEMKEY_DISCONTINUITY    ((XAuint32) 0x00000002)
 #define XA_ANDROID_ITEMKEY_BUFFERQUEUEEVENT ((XAuint32) 0x00000003)
 #define XA_ANDROID_ITEMKEY_FORMAT_CHANGE    ((XAuint32) 0x00000004)
+
+// optional data for XA_ANDROID_ITEMKEY_FORMAT_CHANGE, used when only one stream changes format,
+//   and the others remain continuous (i.e. no temporal discontinuity is introduced for them)
+//   candidate for being exposed in NDK
+#define XA_ANDROID_FORMATCHANGE_ITEMDATA_VIDEO  ((XAuint32) 0x00000001)
+//   not supported at this stage, for illustration purposes only
+//#define XA_ANDROID_FORMATCHANGE_ITEMDATA_AUDIO ((XAuint32) 0x00000002)
 
 #define XA_ANDROIDBUFFERQUEUEEVENT_NONE        ((XAuint32) 0x00000000)
 #define XA_ANDROIDBUFFERQUEUEEVENT_PROCESSED   ((XAuint32) 0x00000001)

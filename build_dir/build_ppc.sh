@@ -20,18 +20,30 @@
 export INIT_TIME=`date +'%d/%m/%y %H:%M:%S'`
 export START_TIME=`date +%s`
 export TIME_LOG=`date +%Y%m%d_%H%M`
-export ROOTFS_PATH=/home/*/NCam
+export user=`id -g -n`
+export ROOTFS_PATH=/home/$user/NCam
 export PARCH_LOGS=$ROOTFS_PATH/build_dir/logs
 export ARCH=ppc
 export target=ppc
 export NCAM_BIN=ncam.ppc
-export CROSS=$ROOTFS_PATH/cross/powerpc-tuxbox-linux-gnu/bin/powerpc-linux-
+export CROSS=$ROOTFS_PATH/cross/Toolchain-PPC-Tuxbox/bin/powerpc-linux-
+export CC=$ROOTFS_PATH/cross/Toolchain-PPC-Tuxbox/bin/powerpc-linux-gcc
+export RANLIB=$ROOTFS_PATH/cross/Toolchain-PPC-Tuxbox/bin/powerpc-linux-ranlib
 export DCMAKE=cross-powerpc-tuxbox-linux
 export SCRIPT=build_ppc.sh
 
-export LIB_RT="$ROOTFS_PATH/cross/powerpc-tuxbox-linux-gnu/lib/librt.a -lrt"
-export LIB_PTHREAD="$ROOTFS_PATH/cross/powerpc-tuxbox-linux-gnu/lib/libpthread.a -lrt"
-export PATH=$PATH:~$ROOTFS_PATH/cross/powerpc-tuxbox-linux-gnu/bin
+export EXTRA_LIBS="-lrt"
+
+export OPENSSLDIR=$ROOTFS_PATH/cross/Toolchain-PPC-Tuxbox/include/openssl/
+
+export LIB_RT="$ROOTFS_PATH/cross/Toolchain-PPC-Tuxbox/lib/librt.a -lrt"
+export LIB_PTHREAD="$ROOTFS_PATH/cross/Toolchain-PPC-Tuxbox/lib/libpthread.a -lrt"
+export LIBCRYPT="$ROOTFS_PATH/cross/Toolchain-PPC-Tuxbox/lib/libcrypt.a -lrt"
+
+export LIBCRYPTO="$ROOTFS_PATH/cross/Toolchain-PPC-Tuxbox/lib/libcrypto.a -lrt"
+export LIB_SSL="$ROOTFS_PATH/cross/Toolchain-PPC-Tuxbox/lib/libssl.a -lrt"
+
+export PATH=$PATH:~$ROOTFS_PATH/cross/Toolchain-PPC-Tuxbox/bin
 
 # BEGIN THE LOG
 cd $PARCH_LOGS/
@@ -62,7 +74,12 @@ echo ""
 echo ""
 rm -f $ROOTFS_PATH/Distribution/$NCAM_BIN > /dev/null 2>&1
 rm -f $ROOTFS_PATH/Distribution/$NCAM_BIN.debug > /dev/null 2>&1
-sh ./clean_all.sh > /dev/null 2>&1
+rm -f $ROOTFS_PATH/webif/pages_gen $ROOTFS_PATH/webif/pages.dep $ROOTFS_PATH/webif/pages.bin $ROOTFS_PATH/webif/pages.bin.compressed \
+      $ROOTFS_PATH/webif/pages.h $ROOTFS_PATH/webif/pages.c $ROOTFS_PATH/webif/is_defined.txt > /dev/null 2>&1
+echo ""
+cd $ROOTFS_PATH/webif
+make clean > /dev/null 2>&1
+cd ..
 sleep 0.8s
 sync
 echo " Cleaning performed correctly"

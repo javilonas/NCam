@@ -1,8 +1,8 @@
 .TH ncam.user 5
 .SH NAME
-\fBncam.user\fR - user configuration file for NCAm
+\fBncam.user\fR - user configuration file for NCam
 .SH SYNOPSIS
-The user configuration file for NCAm contains user definitions. [account]
+The user configuration file for NCam contains user definitions. [account]
 sections in \fBncam.user\fR are \fIrecurring\fR (more than one account).
 .SH DESCRIPTIONS
 .SS "The [account] section"
@@ -76,12 +76,12 @@ unique level:
 
  \fB0\fP = disabled (default)
  \fB1\fP = only one connection per user is allowed
- \fB2\fP = set user to fake if source ip is different 
+ \fB2\fP = set user to fake if source ip is different
      (e.g. for newcamd clients with different CAIDs and ports)
- \fB3\fP = only one connection per user, but only the last login 
+ \fB3\fP = only one connection per user, but only the last login
      will survive (old MpCS behavior)
- \fB4\fP = set user only to fake if source ip is different, 
-     but only the last login will survive 
+ \fB4\fP = set user only to fake if source ip is different,
+     but only the last login will survive
 .RE
 .PP
 \fBnumusers\fP = \fBquantity\fP
@@ -194,12 +194,12 @@ set cache exchange mode
 
  \fB0\fP: disable cache exchange mode (default)
  \fB1\fP: enable cache exchange pull mode
- \fB2\fP: enable cache exchange push mode for camd 3.5x / 3.57x and 
+ \fB2\fP: enable cache exchange push mode for camd 3.5x / 3.57x and
     CCcam protocol
- \fB3\fP: enable reverse cache exchange push mode for camd 3.5x / 3.57x 
+ \fB3\fP: enable reverse cache exchange push mode for camd 3.5x / 3.57x
     and CCcam protocol
 
-\fIIdentical cache exchange modes must be set on local NCAm user account and remote NCAm server.\fR
+\fIIdentical cache exchange modes must be set on local NCam user account and remote NCam server.\fR
 
 \fIPlease consider memory consumption.\fR
 .RE
@@ -212,7 +212,7 @@ define maximum hops for cache exchange, default=10
 \fBno_wait_time\fP = \fB0\fP|\fB1\fP
 .RS 3n
 set wait time behaviour:
- 
+
  \fB0\fP: use \fBwait_time\fP set in \fBncam.conf\fP (default)
  \fB1\fP: do not use \fBwait_time\fP set in \fBncam.conf\fP
 .RE
@@ -249,12 +249,12 @@ time waiting for inactive user, default:none
 .PP
 \fBsleepsend\fP = \fB0\fP|\fB255\fP
 .RS 3n
-255 = \fINCAm client only\fR: stopping requests until next zap, 255 = \fIcamd 3.x only\fR: stopping requests until restart of camd 3.x client, default:0
+255 = \fINCam client only\fR: stopping requests until next zap, 255 = \fIcamd 3.x only\fR: stopping requests until restart of camd 3.x client, default:0
 .RE
 .PP
 \fBsuppresscmd08\fP = \fB0\fP|\fB1\fP
 .RS 3n
-0 = tell camd 3.5x, 3.57x and 3.78x clients not to request again for rejected 
+0 = tell camd 3.5x, 3.57x and 3.78x clients not to request again for rejected
 CAID, service ID and provider ID combination, 1 =  disable, default:0
 .RE
 .PP
@@ -283,7 +283,7 @@ example: caid = 0100
 .RS 3n
 AU setting, default:none:
 
-  \fBlabel of reader\fP = sending EMMs to specified reader 
+  \fBlabel of reader\fP = sending EMMs to specified reader
                     \fI(security issue: clients can see SC data!)\fR
   \fB1\fP               = auto AU is sending EMMs to \fIall\fR readers
                     \fI(security issue: clients can see SC data!)\fR
@@ -309,9 +309,9 @@ The ServiceID can also be used for wildcarded CAIDs.
 .PP
 \fBemmreassembly\fP = \fB0\fP|\fB1\fP||\fB2\fP
 .RS 3n
-EMM reassembly, should be set for Viaccess and Cryptoworks readers if the 
-client that you are using to send EMMs is reassembling them instead of 
-just sending them to NCAm for processing.
+EMM reassembly, should be set for Viaccess and Cryptoworks readers if the
+client that you are using to send EMMs is reassembling them instead of
+just sending them to NCam for processing.
 
   \fB0\fP: disabled
   \fB1\fP: enabled for DVB API
@@ -351,16 +351,6 @@ monitor level:
  \fB4\fP = complete access
 .RE
 .PP
-\fBlb_force_reopen_user\fP = \fB0\fP|\fB1\fP
-.RS 3n
-1 = specific user force reopening immidiatly all failing readers if no matching was found, default:0
-.RE
-.PP
-\fBlb_force_reopen_user_lb_min\fP = \fB0\fP|\fB1\fP
-.RS 3n
-1 = specific user force reopening immidiatly all failing readers if no matching was found only if lb count reached lb_min_ecmcount, default:0
-.RE
-.PP
 \fBcccmaxhops\fP = \fBhops\fP
 .RS 3
 maximum hops limit for CCcam clients, default:10
@@ -395,10 +385,10 @@ CCcam ignore reshare setting:
 CCcam stealth:
 
  \fB-1\fP = use CCcam stealth of \fBncam.conf\fR (default)
-  \fB0\fP = use extended NCAm-CCcam protocol
-  \fB1\fP = behaviour like the original CCcam: no activate partner 
-      detection and extended NCAm-CCcam protocol, prevent 
-      other NCAm to detect the server as NCAm server
+  \fB0\fP = use extended NCam-CCcam protocol
+  \fB1\fP = behaviour like the original CCcam: no activate partner
+      detection and extended NCam-CCcam protocol, prevent
+      other NCam to detect the server as NCam server
 .RE
 .SH EXAMPLES
  [account]
@@ -408,7 +398,7 @@ CCcam stealth:
  au         = myserialmousereader
  services   = myservice
  betatunnel = 0100.0001:0101,0100.0002:0101
- caid       = 0100 
+ caid       = 0100
  ident      = 0100:000000
  uniq       = 1
 .SH "SEE ALSO"

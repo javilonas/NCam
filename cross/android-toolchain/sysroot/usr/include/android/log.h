@@ -14,29 +14,18 @@
  * limitations under the License.
  */
 
-#ifndef _ANDROID_LOG_H
-#define _ANDROID_LOG_H
+#pragma once
 
-/******************************************************************
- *
- * IMPORTANT NOTICE:
- *
- *   This file is part of Android's set of stable system headers
- *   exposed by the Android NDK (Native Development Kit) since
- *   platform release 1.5
- *
- *   Third-party source AND binary code relies on the definitions
- *   here to be FROZEN ON ALL UPCOMING PLATFORM RELEASES.
- *
- *   - DO NOT MODIFY ENUMS (EXCEPT IF YOU ADD NEW 32-BIT VALUES)
- *   - DO NOT MODIFY CONSTANTS OR FUNCTIONAL MACROS
- *   - DO NOT CHANGE THE SIGNATURE OF FUNCTIONS IN ANY WAY
- *   - DO NOT CHANGE THE LAYOUT OR SIZE OF STRUCTURES
+/**
+ * @addtogroup Logging
+ * @{
  */
 
-/*
- * Support routines to send messages to the Android in-kernel log buffer,
- * which can later be accessed through the 'logcat' utility.
+/**
+ * \file
+ *
+ * Support routines to send messages to the Android log buffer,
+ * which can later be accessed through the `logcat` utility.
  *
  * Each log message must have
  *   - a priority
@@ -47,24 +36,22 @@
  * and should be reasonably small.
  *
  * Log message text may be truncated to less than an implementation-specific
- * limit (e.g. 1023 characters max).
+ * limit (1023 bytes).
  *
  * Note that a newline character ("\n") will be appended automatically to your
- * log message, if not already there. It is not possible to send several messages
- * and have them appear on a single line in logcat.
+ * log message, if not already there. It is not possible to send several
+ * messages and have them appear on a single line in logcat.
  *
- * PLEASE USE LOGS WITH MODERATION:
+ * Please use logging in moderation:
  *
  *  - Sending log messages eats CPU and slow down your application and the
  *    system.
  *
- *  - The circular log buffer is pretty small (<64KB), sending many messages
- *    might push off other important log messages from the rest of the system.
+ *  - The circular log buffer is pretty small, so sending many messages
+ *    will hide other important log messages.
  *
  *  - In release builds, only send log messages to account for exceptional
  *    conditions.
- *
- * NOTE: These functions MUST be implemented by /system/lib/liblog.so
  */
 
 #include <stdarg.h>
@@ -73,51 +60,131 @@
 extern "C" {
 #endif
 
-/*
- * Android log priority values, in ascending priority order.
+/**
+ * Android log priority values, in increasing order of priority.
  */
 typedef enum android_LogPriority {
-    ANDROID_LOG_UNKNOWN = 0,
-    ANDROID_LOG_DEFAULT,    /* only for SetMinPriority() */
-    ANDROID_LOG_VERBOSE,
-    ANDROID_LOG_DEBUG,
-    ANDROID_LOG_INFO,
-    ANDROID_LOG_WARN,
-    ANDROID_LOG_ERROR,
-    ANDROID_LOG_FATAL,
-    ANDROID_LOG_SILENT,     /* only for SetMinPriority(); must be last */
+  /** For internal use only.  */
+  ANDROID_LOG_UNKNOWN = 0,
+  /** The default priority, for internal use only.  */
+  ANDROID_LOG_DEFAULT, /* only for SetMinPriority() */
+  /** Verbose logging. Should typically be disabled for a release apk. */
+  ANDROID_LOG_VERBOSE,
+  /** Debug logging. Should typically be disabled for a release apk. */
+  ANDROID_LOG_DEBUG,
+  /** Informational logging. Should typically be disabled for a release apk. */
+  ANDROID_LOG_INFO,
+  /** Warning logging. For use with recoverable failures. */
+  ANDROID_LOG_WARN,
+  /** Error logging. For use with unrecoverable failures. */
+  ANDROID_LOG_ERROR,
+  /** Fatal logging. For use when aborting. */
+  ANDROID_LOG_FATAL,
+  /** For internal use only.  */
+  ANDROID_LOG_SILENT, /* only for SetMinPriority(); must be last */
 } android_LogPriority;
 
-/*
- * Send a simple string to the log.
+/**
+ * Writes the constant string `text` to the log, with priority `prio` and tag
+ * `tag`.
  */
-int __android_log_write(int prio, const char *tag, const char *text);
+int __android_log_write(int prio, const char* tag, const char* text);
 
-/*
- * Send a formatted string to the log, used like printf(fmt,...)
+/**
+ * Writes a formatted string to the log, with priority `prio` and tag `tag`.
+ * The details of formatting are the same as for
+ * [printf(3)](http://man7.org/linux/man-pages/man3/printf.3.html).
  */
-int __android_log_print(int prio, const char *tag,  const char *fmt, ...)
+int __android_log_print(int prio, const char* tag, const char* fmt, ...)
 #if defined(__GNUC__)
-    __attribute__ ((format(printf, 3, 4)))
+    __attribute__((__format__(printf, 3, 4)))
 #endif
     ;
 
-/*
- * A variant of __android_log_print() that takes a va_list to list
- * additional parameters.
+/**
+ * Equivalent to `__android_log_print`, but taking a `va_list`.
+ * (If `__android_log_print` is like `printf`, this is like `vprintf`.)
  */
-int __android_log_vprint(int prio, const char *tag,
-                         const char *fmt, va_list ap);
-
-/*
- * Log an assertion failure and SIGTRAP the process to have a chance
- * to inspect it, if a debugger is attached. This uses the FATAL priority.
- */
-void __android_log_assert(const char *cond, const char *tag,
-			  const char *fmt, ...)    
+int __android_log_vprint(int prio, const char* tag, const char* fmt, va_list ap)
 #if defined(__GNUC__)
-    __attribute__ ((noreturn))
-    __attribute__ ((format(printf, 3, 4)))
+    __attribute__((__format__(printf, 3, 0)))
+#endif
+    ;
+
+/**
+ * Writes an assertion failure to the log (as `ANDROID_LOG_FATAL`) and to
+ * stderr, before calling
+ * [abort(3)](http://man7.org/linux/man-pages/man3/abort.3.html).
+ *
+ * If `fmt` is non-null, `cond` is unused. If `fmt` is null, the string
+ * `Assertion failed: %s` is used with `cond` as the string argument.
+ * If both `fmt` and `cond` are null, a default string is provided.
+ *
+ * Most callers should use
+ * [assert(3)](http://man7.org/linux/man-pages/man3/assert.3.html) from
+ * `<assert.h>` instead, or the `__assert` and `__assert2` functions provided by
+ * bionic if more control is needed. They support automatically including the
+ * source filename and line number more conveniently than this function.
+ */
+void __android_log_assert(const char* cond, const char* tag, const char* fmt,
+                          ...)
+#if defined(__GNUC__)
+    __attribute__((__noreturn__))
+    __attribute__((__format__(printf, 3, 4)))
+#endif
+    ;
+
+#ifndef log_id_t_defined
+#define log_id_t_defined
+/**
+ * Identifies a specific log buffer for __android_log_buf_write()
+ * and __android_log_buf_print().
+ */
+typedef enum log_id {
+  LOG_ID_MIN = 0,
+
+  /** The main log buffer. This is the only log buffer available to apps. */
+  LOG_ID_MAIN = 0,
+  /** The radio log buffer. */
+  LOG_ID_RADIO = 1,
+  /** The event log buffer. */
+  LOG_ID_EVENTS = 2,
+  /** The system log buffer. */
+  LOG_ID_SYSTEM = 3,
+  /** The crash log buffer. */
+  LOG_ID_CRASH = 4,
+  /** The statistics log buffer. */
+  LOG_ID_STATS = 5,
+  /** The security log buffer. */
+  LOG_ID_SECURITY = 6,
+  /** The kernel log buffer. */
+  LOG_ID_KERNEL = 7,
+
+  LOG_ID_MAX
+} log_id_t;
+#endif
+
+/**
+ * Writes the constant string `text` to the log buffer `id`,
+ * with priority `prio` and tag `tag`.
+ *
+ * Apps should use __android_log_write() instead.
+ */
+int __android_log_buf_write(int bufID, int prio, const char* tag,
+                            const char* text);
+
+/**
+ * Writes a formatted string to log buffer `id`,
+ * with priority `prio` and tag `tag`.
+ * The details of formatting are the same as for
+ * [printf(3)](http://man7.org/linux/man-pages/man3/printf.3.html).
+ *
+ * Apps should use __android_log_print() instead.
+ */
+int __android_log_buf_print(int bufID, int prio, const char* tag,
+                            const char* fmt, ...)
+#if defined(__GNUC__)
+    __attribute__((__format__(printf, 4, 5)))
 #endif
     ;
 
@@ -125,4 +192,4 @@ void __android_log_assert(const char *cond, const char *tag,
 }
 #endif
 
-#endif /* _ANDROID_LOG_H */
+/** @} */

@@ -36,25 +36,38 @@
 
 __BEGIN_DECLS
 
+/* The kernel header doesn't have these, but POSIX does. */
+#define RLIM_SAVED_CUR RLIM_INFINITY
+#define RLIM_SAVED_MAX RLIM_INFINITY
+
 typedef unsigned long rlim_t;
 
-extern int getrlimit(int, struct rlimit*);
-extern int setrlimit(int, const struct rlimit*);
+int getrlimit(int __resource, struct rlimit* __limit);
+int setrlimit(int __resource, const struct rlimit* __limit);
 
-extern int getrlimit64(int, struct rlimit64*);
-extern int setrlimit64(int, const struct rlimit64*);
 
-extern int getpriority(int, int);
-extern int setpriority(int, int, int);
+#if __ANDROID_API__ >= 21
+int getrlimit64(int __resource, struct rlimit64* __limit) __INTRODUCED_IN(21);
+int setrlimit64(int __resource, const struct rlimit64* __limit) __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
 
-extern int getrusage(int, struct rusage*);
 
-#if __LP64__
-/* Implementing prlimit for 32-bit isn't worth the effort. */
-extern int prlimit(pid_t, int, const struct rlimit*, struct rlimit*);
-#endif
-extern int prlimit64(pid_t, int, const struct rlimit64*, struct rlimit64*);
+int getpriority(int __which, id_t __who);
+int setpriority(int __which, id_t __who, int __priority);
+
+int getrusage(int __who, struct rusage* __usage);
+
+
+#if (!defined(__LP64__) && __ANDROID_API__ >= 24) || (defined(__LP64__))
+int prlimit(pid_t __pid, int __resource, const struct rlimit* __new_limit, struct rlimit* __old_limit) __INTRODUCED_IN_32(24) __INTRODUCED_IN_64(21);
+#endif /* (!defined(__LP64__) && __ANDROID_API__ >= 24) || (defined(__LP64__)) */
+
+
+#if __ANDROID_API__ >= 21
+int prlimit64(pid_t __pid, int __resource, const struct rlimit64* __new_limit, struct rlimit64* __old_limit) __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
+
 
 __END_DECLS
 
-#endif /* _SYS_RESOURCE_H_ */
+#endif

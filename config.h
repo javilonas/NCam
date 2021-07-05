@@ -2,6 +2,7 @@
 #define CONFIG_H_
 
 #define WITH_EMU 1
+#define WITH_SOFTCAM 1
 #define WEBIF 1
 #define WEBIF_LIVELOG 1
 #define WEBIF_JQUERY 1
@@ -10,6 +11,7 @@
 #if defined(__linux__) || defined(__CYGWIN__)
 #define HAVE_DVBAPI 1
 #endif
+//#define WITH_NEUTRINO 1
 #define READ_SDT_CHARSETS 1
 //#define CLOCKFIX 1
 #define IRDETO_GUESSING 1
@@ -29,7 +31,7 @@
 #define MODULE_NEWCAMD 1
 #define MODULE_CCCAM 1
 #define MODULE_CCCSHARE 1
-//#define MODULE_GBOX 1
+#define MODULE_GBOX 1
 #define MODULE_RADEGAST 1
 #define MODULE_SERIAL 1
 #define MODULE_CONSTCW 1
@@ -42,6 +44,7 @@
 #ifdef WITH_CARDREADER
 
 #define READER_NAGRA 1
+#define READER_NAGRA_MERLIN 1
 #define READER_IRDETO 1
 #define READER_CONAX 1
 #define READER_CRYPTOWORKS 1

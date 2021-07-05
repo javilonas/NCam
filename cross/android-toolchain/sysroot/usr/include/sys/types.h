@@ -25,6 +25,7 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+
 #ifndef _SYS_TYPES_H_
 #define _SYS_TYPES_H_
 
@@ -34,6 +35,8 @@
 
 #include <linux/types.h>
 #include <linux/posix_types.h>
+
+#include <bits/pthread_types.h>
 
 /* gids, uids, and pids are all 32-bit. */
 typedef __kernel_gid32_t __gid_t;
@@ -66,6 +69,8 @@ typedef __key_t key_t;
 typedef __kernel_ino_t __ino_t;
 typedef __ino_t ino_t;
 
+typedef uint64_t ino64_t;
+
 typedef uint32_t __nlink_t;
 typedef __nlink_t nlink_t;
 
@@ -91,30 +96,15 @@ typedef __kernel_time_t __time_t;
 typedef __time_t time_t;
 
 /* This historical accident means that we had a 32-bit off_t on 32-bit architectures. */
-#if !defined(__LP64__)
+/* See https://android.googlesource.com/platform/bionic/+/master/docs/32-bit-abi.md */
+#if defined(__USE_FILE_OFFSET64) || defined(__LP64__)
+typedef int64_t off_t;
+typedef off_t loff_t;
+typedef loff_t off64_t;
+#else
 typedef __kernel_off_t off_t;
 typedef __kernel_loff_t loff_t;
 typedef loff_t off64_t;
-#else
-/* We could re-use the LP32 definitions, but that would mean that although off_t and loff_t/off64_t
- * would be the same size, they wouldn't actually be the same type, which can lead to warnings. */
-typedef __kernel_off_t off_t;
-typedef off_t loff_t;
-typedef loff_t off64_t;
-#endif
-
-/* while POSIX wants these in <sys/types.h>, we
- * declare then in <pthread.h> instead */
-#if 0
-typedef  .... pthread_attr_t;
-typedef  .... pthread_cond_t;
-typedef  .... pthread_condattr_t;
-typedef  .... pthread_key_t;
-typedef  .... pthread_mutex_t;
-typedef  .... pthread_once_t;
-typedef  .... pthread_rwlock_t;
-typedef  .... pthread_rwlock_attr_t;
-typedef  .... pthread_t;
 #endif
 
 #if !defined(__LP64__)
@@ -141,19 +131,16 @@ typedef __kernel_ssize_t ssize_t;
 typedef unsigned int        uint_t;
 typedef unsigned int        uint;
 
-/* for some applications */
-#include <sys/sysmacros.h>
+#if defined(__USE_BSD) || defined(__BIONIC__) /* Historically bionic exposed these. */
+typedef unsigned char  u_char;
+typedef unsigned short u_short;
+typedef unsigned int   u_int;
+typedef unsigned long  u_long;
 
-#ifdef __BSD_VISIBLE
-typedef	unsigned char	u_char;
-typedef	unsigned short	u_short;
-typedef	unsigned int	u_int;
-typedef	unsigned long	u_long;
-
-typedef uint32_t       u_int32_t;
-typedef uint16_t       u_int16_t;
-typedef uint8_t        u_int8_t;
-typedef uint64_t       u_int64_t;
+typedef uint32_t u_int32_t;
+typedef uint16_t u_int16_t;
+typedef uint8_t  u_int8_t;
+typedef uint64_t u_int64_t;
 #endif
 
 #endif

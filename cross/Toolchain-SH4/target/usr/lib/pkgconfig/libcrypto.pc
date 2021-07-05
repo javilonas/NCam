@@ -1,0 +1,11 @@
+prefix=/opt/simnew/toolchains/sh4/sh4-linux/sys-root/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: OpenSSL-libcrypto
+Description: OpenSSL cryptography library
+Version: 0.9.8
+Requires: 
+Libs: -L${libdir} -lcrypto -ldl
+Cflags: -I${includedir} 

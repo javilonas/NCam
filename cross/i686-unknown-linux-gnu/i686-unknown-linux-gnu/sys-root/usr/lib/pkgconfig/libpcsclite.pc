@@ -1,9 +1,9 @@
-prefix=/home/lonas/toolchains/i686-unknown-linux-gnu/i686-unknown-linux-gnu/sys-root/usr
-exec_prefix=/home/lonas/toolchains/i686-unknown-linux-gnu/i686-unknown-linux-gnu/sys-root/usr
+prefix=/home/lonas/NCam/cross/i686-unknown-linux-gnu/i686-unknown-linux-gnu/sys-root/usr/
+exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include/PCSC
-usbdropdir=/home/lonas/toolchains/i686-unknown-linux-gnu/i686-unknown-linux-gnu/sys-root/usr/lib/pcsc/drivers
-serialconfdir=/home/lonas/toolchains/i686-unknown-linux-gnu/i686-unknown-linux-gnu/sys-root/usr/etc/reader.conf.d
+usbdropdir=/home/lonas/NCam/cross/i686-unknown-linux-gnu/i686-unknown-linux-gnu/sys-root/usr/lib/pcsc/drivers
+serialconfdir=/home/lonas/NCam/cross/i686-unknown-linux-gnu/i686-unknown-linux-gnu/sys-root/usr/etc/reader.conf.d
 
 Name: PCSC Lite
 Description: PC/SC smart card interface

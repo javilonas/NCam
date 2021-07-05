@@ -14,6 +14,14 @@
  * limitations under the License.
  */
 
+/**
+ * @addtogroup Media
+ * @{
+ */
+
+/**
+ * @file NdkMediaError.h
+ */
 
 /*
  * This file defines an NDK API.
@@ -28,12 +36,23 @@
 #ifndef _NDK_MEDIA_ERROR_H
 #define _NDK_MEDIA_ERROR_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <sys/cdefs.h>
+
+__BEGIN_DECLS
 
 typedef enum {
     AMEDIA_OK = 0,
+
+    /**
+     * This indicates required resource was not able to be allocated.
+     */
+    AMEDIACODEC_ERROR_INSUFFICIENT_RESOURCE = 1100,
+
+    /**
+     * This indicates the resource manager reclaimed the media resource used by the codec.
+     * With this error, the codec must be released, as it has moved to terminal state.
+     */
+    AMEDIACODEC_ERROR_RECLAIMED             = 1101,
 
     AMEDIA_ERROR_BASE                  = -10000,
     AMEDIA_ERROR_UNKNOWN               = AMEDIA_ERROR_BASE,
@@ -41,6 +60,10 @@ typedef enum {
     AMEDIA_ERROR_UNSUPPORTED           = AMEDIA_ERROR_BASE - 2,
     AMEDIA_ERROR_INVALID_OBJECT        = AMEDIA_ERROR_BASE - 3,
     AMEDIA_ERROR_INVALID_PARAMETER     = AMEDIA_ERROR_BASE - 4,
+    AMEDIA_ERROR_INVALID_OPERATION     = AMEDIA_ERROR_BASE - 5,
+    AMEDIA_ERROR_END_OF_STREAM         = AMEDIA_ERROR_BASE - 6,
+    AMEDIA_ERROR_IO                    = AMEDIA_ERROR_BASE - 7,
+    AMEDIA_ERROR_WOULD_BLOCK           = AMEDIA_ERROR_BASE - 8,
 
     AMEDIA_DRM_ERROR_BASE              = -20000,
     AMEDIA_DRM_NOT_PROVISIONED         = AMEDIA_DRM_ERROR_BASE - 1,
@@ -56,12 +79,14 @@ typedef enum {
     AMEDIA_IMGREADER_ERROR_BASE          = -30000,
     AMEDIA_IMGREADER_NO_BUFFER_AVAILABLE = AMEDIA_IMGREADER_ERROR_BASE - 1,
     AMEDIA_IMGREADER_MAX_IMAGES_ACQUIRED = AMEDIA_IMGREADER_ERROR_BASE - 2,
+    AMEDIA_IMGREADER_CANNOT_LOCK_IMAGE   = AMEDIA_IMGREADER_ERROR_BASE - 3,
+    AMEDIA_IMGREADER_CANNOT_UNLOCK_IMAGE = AMEDIA_IMGREADER_ERROR_BASE - 4,
+    AMEDIA_IMGREADER_IMAGE_NOT_LOCKED    = AMEDIA_IMGREADER_ERROR_BASE - 5,
 
 } media_status_t;
 
-
-#ifdef __cplusplus
-} // extern "C"
-#endif
+__END_DECLS
 
 #endif // _NDK_MEDIA_ERROR_H
+
+/** @} */

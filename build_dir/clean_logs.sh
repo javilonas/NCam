@@ -16,7 +16,8 @@
 # limitations under the License.
 #
 
-export ROOTFS_PATH=/home/*/NCam
+export user=`id -g -n`
+export ROOTFS_PATH=/home/$user/NCam
 export PARCH_LOGS=$ROOTFS_PATH/build_dir/logs
 export SCRIPT=clean_logs.sh
 echo ""

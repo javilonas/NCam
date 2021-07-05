@@ -20,21 +20,18 @@
 #define __ASM_GENERIC_SEMBUF_H
 #include <asm/bitsperlong.h>
 struct semid64_ds {
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
- struct ipc64_perm sem_perm;
- __kernel_time_t sem_otime;
-#if __BITS_PER_LONG != 64
- unsigned long __unused1;
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
+  struct ipc64_perm sem_perm;
+#if __BITS_PER_LONG == 64
+  __kernel_time_t sem_otime;
+  __kernel_time_t sem_ctime;
+#else
+  unsigned long sem_otime;
+  unsigned long sem_otime_high;
+  unsigned long sem_ctime;
+  unsigned long sem_ctime_high;
 #endif
- __kernel_time_t sem_ctime;
-#if __BITS_PER_LONG != 64
- unsigned long __unused2;
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
-#endif
- unsigned long sem_nsems;
- unsigned long __unused3;
- unsigned long __unused4;
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
+  unsigned long sem_nsems;
+  unsigned long __unused3;
+  unsigned long __unused4;
 };
 #endif

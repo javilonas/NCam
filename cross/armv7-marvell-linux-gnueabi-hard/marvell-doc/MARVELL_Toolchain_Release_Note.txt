@@ -1,0 +1,353 @@
+Release Note:	Marvell GCC C/C++ Compiler Toolchain
+Release:	2013Q2 (gcc version 4.6.4)
+Date:		2013/06
+Directory:
+
+	0. Marvell GCC Toolchain
+	1. Marvell GCC Release Website
+	2. Binary Packages
+	3. Source Code Packages
+	4. Support
+	5. Feature Listing
+
+
+
+
+
+--------------------------------------------------------------------------------
+0. Marvell GCC Toolchain
+--------------------------------------------------------------------------------
+
+    The Marvell GCC C/C++ Compiler Toolchain (Marvell GCC, or MGCC) is a
+collection of open source tools include gcc C/C++ compilers, binutils, C/C++
+libraries, gdb debugger, etc.  Marvell makes some bug-fixes and tuned features
+especially for the Marvell CPUs that are ARMv5te/ARMv7-a compatible.
+
+    Release 2013Q2 of MGCC is the alpha release with the major tool GCC 4.6.4.
+
+    Note that Marvell only collects and tunes these packages, and all products
+or services mentioned herin may be trademarks of their respective owners.
+
+
+
+
+
+--------------------------------------------------------------------------------
+1. Marvell GCC Release Website
+--------------------------------------------------------------------------------
+
+    MGCC source code and pre-built executables for some platforms can be
+download from the website:
+
+	http://10.19.133.165/release/gcc/
+
+    The details will be mentioned in the following context.
+
+
+
+
+
+--------------------------------------------------------------------------------
+2. Binary Packages
+--------------------------------------------------------------------------------
+
+    Download the binary toolchains from the MGCC Release Website according to
+the following rules/subdirectories:
+
+(1) The MGCC Major Version
+
+    For example:
+
+	mgcc-4.2/
+	mgcc-4.4/
+	mgcc-4.6/
+
+    These are according to the GCC, the most important tool, version number.
+
+(2) Tool Building Version
+
+    They are always named by 'YYYYMM-NNN-VERSION'.  For example:
+
+	201208-1593-4.6.4/
+
+    The newer version has fixed more bugs and add more Marvell-tuned features.
+
+(3) The Default Target Endian
+
+	big-endian/
+	little-endian/
+
+    'big-endian' includes ARMv5's BE32 and ARMv7's BE8 versions.  The MGCC
+    runtime libraries and C/C++ libraries comes from big-endian subdirectory
+    are compiled with the default 'gcc -mbig-endian' option, while from
+    little-endian with the default 'gcc -mlittle-endian' option.
+
+    There may be extra MGCC toolchains for other target.  For example, the
+    Android target is at:
+
+	android/
+    
+    Note that users can also get the MGCC source code and extra documents
+    from the subdirectories:
+
+	src/
+	doc/
+
+(4) The Default Target ARM Instruction Set
+
+    For example:
+
+	v5/
+	v7/
+
+    MGCC from v5 subdirectory generates ARMv5 instruction set, while v7
+    generates ARMv7 instructions set by default.
+
+(5) The Host Execution Environment
+
+    For example:
+
+	host-arm-linux/
+	host-i686-linux/
+	host-windows-mingw32/
+	host-x86_64-linux/
+	...
+
+    Select suitable hardware and O.S platform on which MGCC would be executed.
+
+    For not mentioned host environment, users may download the MGCC source
+    code and build MGCC on that host.  If fails to build, please ask Marvell
+    Compiler Team for help.
+
+(6) The Binary Package
+
+    They are always named by
+
+	arm<ARCH>-marvell-<ABI>-<VFP>_<HOST>_<YYYYMM>.tar.bz2
+
+    with different target features.  For example: 
+
+	...
+	armebv5-marvell-native-softfp_201212.tar.bz2
+	armv5-marvell-linux-gnueabi-soft_i686_201212.tar.bz2
+	armebv7-marvell-eabi-hard_x86_64_201212.tar.bz2
+	armv7-marvell-linux-gnueabi-soft-mingw32_201212.zip
+	...
+
+    <ARCH> : v5, v7, ebv5, ebv7.
+
+	'v5' means ARMv5 instruction set, and while 'v7' means ARMv7.
+
+	The prefix 'armv5' or 'armv7' is the little-endian target, 'armebv5'
+	is BE32, and 'armebv7' is BE8.
+
+    <ABI> : native, linux-gnueabi, eabi
+
+	'native' is the native-compilers running on ARM Linux hosts and
+	generating the target ARM code.  The 'gcc -mabi=aapcs-linux' is
+	used by default.  The accompanying C library is glibc.  The compiled
+	programes would be executed on the Linux environment with the
+	compatible glibc shared library.
+
+	'linux-gnueabi' with the default 'gcc -mabi=aapcs-linux' is always for
+	the target of ARM Linux platform.  The accompanying C library is glibc.
+	The compiled programes would be executed on the ARM Linux environment
+	with the compatible glibc shared library.
+
+	'eabi' with the default 'gcc -mabi=aapcs' is always for the target of
+	ARM bare board or semihosting environment.  The accompanying C library
+	is Newlib.  If you are developing embedded system without any O.S.
+	support, you should select this package to develop your programs.
+
+    <VFP> : hard, soft, softfp
+
+	The 'hard', 'soft' and 'softfp' mean the default 'gcc -mfloat-abi='
+	option, and the libraries, e.g. glibc and newlib, are compiled with
+	that default option.
+
+	'soft' tool generates non-VFP code, and the others may generate
+	VFP/Neon code.  Objects compiled by 'soft' and 'softfp' are
+	compatible, but not 'hard'.
+
+    <HOST> : i686, x86_64, mingw32
+
+	This specifies the host on which the MGCC toolchain executes.
+
+
+    After downloading the suitable package, use 'tar' or other unpacking tools
+to unpack it.  E.g.
+
+	$ tar jxvf armv7-marvell-linux-gnueabi-softfp_x86_64_201212.tar.bz2
+	$ cd Marvell_toolchain_201212/armv7-marvell-linux-gnueabi-softfp_x86_64
+	$ ls bin/				# executable files
+	$ ls arm-marvell-linux-gnueabi/libc	# sysroot
+
+    For 'linux-gnueabi' version, users may need to update the shared libraries
+(*.so) from the MGCC sysroot on the target ARM Linux environment if the
+compiled program fails to run because of wrong *.so version.
+
+
+
+
+
+--------------------------------------------------------------------------------
+3. Source Code Packages
+--------------------------------------------------------------------------------
+
+    Download the toolchain source code from the Marvell GCC Release Website,
+and untar them.
+
+    The below listing is the source code packages and where they come from:
+
+    marvell-gcc			Marvell-tuned GCC C/C++ Compiler Source Code
+    |
+    +-- script			Building scripts and documents
+    |   |
+    |   +-- doc
+    |
+    +-- src
+        |
+        +-- binutils-src	Marvell-tuned Binutils originally from FSF.
+        |                       http://www.gnu.org/software/binutils/ 
+        |
+        +-- cloog-src		CLooG from FSF for building GCC.
+        |			http://www.cloog.org/
+        |			ftp://gcc.gnu.org/pub/gcc/infrastructure/
+        |
+        +-- expat-src		The Expat XML Parser.
+        |			http://www.libexpat.org/
+        |
+        +-- extra-src		Extra packages as addends to the MGCC
+        |			toolchains for different purposes.
+        |
+        +-- gcc-src		Marvell-tuned GCC originally from FSF and
+        |			Linaro.
+        |			http://gcc.gnu.org/
+        |			http://www.linaro.org/
+        |
+        +-- gdb-src		GDB from FSF and Linaro.
+        |			http://www.gnu.org/software/gdb/
+        |			http://www.linaro.org/
+        |
+        +-- glibc-ports-src	GNU glibc 2.15 from CodeSourcery for ARM
+	|			porting.
+        |
+        +-- glibc-src		GNU glibc 2.15 from CodeSourcery for
+	|			arm-marvell-linux-gnueabi.
+        |
+        +-- gmp-src		The GNU Multiple Precision Arithmetic Library
+        |			for building GCC.
+        |			http://gmplib.org/
+        |			http://ftp.gnu.org/gnu/gmp/
+        |
+        +-- linux-src		Header files for arm-marvell-linux-gnueabi.
+        |			https://www.kernel.org/
+        |
+        +-- mpc-src		GNU MPC Library from FSF for building GCC.
+        |			http://www.multiprecision.org/
+        |			http://ftp.gnu.org/gnu/mpc/
+        |
+        +-- mpfr-src		GNU MPFR Library for building GCC.
+        |			http://www.mpfr.org/
+        |			http://ftp.gnu.org/gnu/mpfr/
+        |
+        +-- ncurses-src		Ncurses (new curses) library from FSF.
+        |			http://www.gnu.org/software/ncurses/
+        |			http://ftp.gnu.org/pub/gnu/ncurses/
+	|
+        +-- newlib-src		Newlib for arm-marvell-eabi.
+        |			http://www.sourceware.org/newlib/
+        |
+        +-- ppl-src		Parma Polyhedra Library (PPL) for building GCC.
+	|			http://bugseng.com/products/ppl/
+        |
+	+-- uclibc-src		A C library for embedded Linux.
+	|			http://www.uclibc.org/
+	|
+	+-- zlib-src		zlib data compression library.
+				http://www.zlib.net/
+				http://www.gzip.org/
+
+    Extra packages (src/extra-src) is as addends to the MGCC toolchains.  Refer
+to the documents "MARVELL_GCC_Extra_Libraries_for_Various_Platforms.txt" and
+"MARVELL_GCC_Dump_Optimization_Options_Plugin.txt" for details.
+
+    Refer to 'marvell-gcc/script/INSTALL' for building toolchains.  The
+following commands show the supported targets and simple building commands:
+
+	$ cd marvell-gcc
+	$ make -f script/Makefile.marvell
+
+    For any qeuestions and special request, please ask FAE or Marvell Compiler
+Team for help.
+
+
+
+
+
+--------------------------------------------------------------------------------
+4. Support
+--------------------------------------------------------------------------------
+
+. Internal Bug Report Email:
+
+	marvell-gcc-bugs@lists.marvell.com
+
+
+. Internal Bug Report Mailing List:
+
+	http://lists.marvell.com/mailman/listinfo/marvell-gcc-bugs
+
+. External Bug Report Email:
+
+	mrvlgccbug@gmail.com
+
+
+
+--------------------------------------------------------------------------------
+5. Feature Listing
+--------------------------------------------------------------------------------
+
+
+. MGCC toolchains building process for different hosts and configured with
+  multiple target features.
+
+
+. Support Marvell's extension instructions.
+
+
+. Support Marvell's WMMX intrinsics and auto-vectorization.  For details,
+  refer to the following document in the ${MGCC_TOOCHAINS}/script/doc/
+  directory:
+
+	MARVELL_Using_GCC_IWMMXT_Autovect.txt
+	MARVELL_Using_GCC_IWMMXT.doc
+	MARVELL_Using_GCC_IWMMXT_Intrinsic.pdf
+	MARVELL_Using_GCC_IWMMXT.pdf
+	MARVELL_Using_GCC_IWMMXT_Vector_Class_Header_File.pdf
+	MARVELL_Using_GCC_Neon_Auto_Vectorization.pdf
+
+
+. Optimized instruction scheduling for Marvell CPUs including PJ1 and PJ4
+  series.
+
+
+. Marvell-specified options.  For details, refer to:
+
+	${MGCC_TOOCHAINS}/script/doc/MARVELL_GCC_Options.txt
+
+
+. Refer to the file named 'ChangeLog.Marvell' in the source code directories
+  for the modification. E.g.
+
+	${MGCC_TOOCHAINS}/src/binutils-src/ChangeLog.Marvell
+	${MGCC_TOOCHAINS}/src/gcc-src/ChangeLog.Marvell
+
+  These ChangeLogs are only simple log from our git repertory.
+
+
+. For the changes, new features, and fixes of official gcc from 4.4 to 4.6,
+  please refer to:
+
+	http://gcc.gnu.org/gcc-4.5/changes.html
+	http://gcc.gnu.org/gcc-4.6/changes.html

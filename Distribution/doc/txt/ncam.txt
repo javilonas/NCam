@@ -3,14 +3,14 @@ ncam(1)					     General Commands Manual						 ncam(1)
 
 
 NAME
-       NCAm - SC server
+       NCam - SC server
 
 DESCRIPTIONS
-       The NCAm software is an open source multi-protocol/multi-platform SC server.
+       The NCam software is an open source multi-protocol/multi-platform SC server.
 
        Please check the compile options for included features in the binary.
 
-       NCAm supports the following protocols:
+       NCam supports the following protocols:
 
        ·  newcamd with cascading/remote server ECM support
 
@@ -30,7 +30,7 @@ DESCRIPTIONS
 
        ·  radegast
 
-       NCAm works on the following platforms:
+       NCam works on the following platforms:
 
        ·  Linux (Tuxbox, ARM, MIPS, MIPSel, SH-4, PowerPC, ...)
 
@@ -40,7 +40,7 @@ DESCRIPTIONS
 
 OPTIONS
        -a|--crash-dump
-	  write ncam.crash on segfault (needs installed GDB and NCAm compiled with debug infos -ggdb)
+	  write ncam.crash on segfault (needs installed GDB and NCam compiled with debug infos -ggdb)
 
        -b|--daemon
 	  starts in background, writing ncam.version with starttime and version info in temporary directory
@@ -49,7 +49,7 @@ OPTIONS
 	  set PID file, overrides pidfile of ncam.conf, default:none
 
        -c|--config-dir <directory>
-	  read	configuration  from  <directory>,  default:see	CS_CONFDIR  in globals.h, while starting NCAm prints warnings on
+	  read	configuration  from  <directory>,  default:see	CS_CONFDIR  in globals.h, while starting NCam prints warnings on
 	  invalid keywords, comment lines start with # character.
 
 	  Autodiscover of the following directories will be done:
@@ -127,7 +127,7 @@ OPTIONS
 	  enable output of web interface in UTF-8 charset
 
        -V|--build-info
-	  show NCAm version info
+	  show NCam version info
 
        -w|--wait <seconds>
 	  time waiting for system time to be set correctly
@@ -144,8 +144,8 @@ SIGNALS
 	  get reader SC info
 
 SEE ALSO
-       list_smargo(1),	 ncam.ac(5),	ncam.cacheex(5),   ncam.cert(5),   ncam.conf(5),   ncam.dvbapi(5),	ncam.fakecws(5),
-       ncam.guess(5), ncam.ird(5), ncam.provid(5),  ncam.ratelimit(5),  ncam.server(5),  ncam.services(5),  ncam.srvid(5),
+       list_smargo(1), ncam.ac(5), ncam.cacheex(5), ncam.cert(5), ncam.conf(5), ncam.dvbapi(5), ncam.fakecws(5),
+       ncam.guess(5), ncam.ird(5), ncam.provid(5), ncam.ratelimit(5), ncam.server(5), ncam.services(5), ncam.srvid(5),
        ncam.srvid2(5), ncam.tiers(5), ncam.user(5), ncam.whitelist(5)
 
 

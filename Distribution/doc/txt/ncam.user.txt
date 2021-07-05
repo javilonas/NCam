@@ -3,10 +3,10 @@ ncam.user(5)					       File Formats Manual					    ncam.user(5)
 
 
 NAME
-       ncam.user - user configuration file for NCAm
+       ncam.user - user configuration file for NCam
 
 SYNOPSIS
-       The user configuration file for NCAm contains user definitions. [account] sections in ncam.user are recurring (more than
+       The user configuration file for NCam contains user definitions. [account] sections in ncam.user are recurring (more than
        one account).
 
 DESCRIPTIONS
@@ -37,9 +37,9 @@ DESCRIPTIONS
 
        allowedtimeframe = DAY@HH:MM-HH:MM[,HH:MM-HH:MM][,HH:MM-HH:MM][;DAY@HH:MM-HH:MM[,HH:MM-HH:MM][,HH:MM-HH:MM]]
                     where DAY=SUN,MON,TUE,WED,THU,FRI,SAT or ALL (for all possible days)
-                    
+
 	  account enabled from hh:mm to hh:mm for the specified day(s), default:none
-	  
+
       comma (,) to separate times and semicolon(; ) to separate the different days.
       You can use ALL@ if you want the same time frames for everyday.
 
@@ -49,6 +49,7 @@ DESCRIPTIONS
       If you use: DAY@22:00-05:00 this will be turned into DAY@00:00-05:00,22:00-24:00
 
       ALL@ is always checked and used, so you can watch TV the whole day on FRIday in this exemple. There is no problem to overlap ALL@ in a day definition, like for SAT@ definition.
+
        max_connections = count
 	  maximum allowed connections per user when unique level will be adducted, default:1
 
@@ -81,7 +82,7 @@ DESCRIPTIONS
 
 	    0 = disable fake delay
 	   -1 = fake delay of ncam.conf (default)
-	   
+
 	    acosc_max_ecms_per_minute = count
 	  maximum ecms per minute, 0 = unlimited, default:0
 
@@ -148,7 +149,7 @@ DESCRIPTIONS
 	   3: enable reverse cache exchange push mode for camd 3.5x / 3.57x
 	      and CCcam protocol
 
-	  Identical cache exchange modes must be set on local NCAm user account and remote NCAm server.
+	  Identical cache exchange modes must be set on local NCam user account and remote NCam server.
 
 	  Please consider memory consumption.
 
@@ -180,7 +181,7 @@ DESCRIPTIONS
 	  time waiting for inactive user, default:none
 
        sleepsend = 0|255
-	  255 = NCAm client only: stopping requests until next zap, 255 = camd 3.x only: stopping requests until restart of camd
+	  255 = NCam client only: stopping requests until next zap, 255 = camd 3.x only: stopping requests until restart of camd
 	  3.x client, default:0
 
        suppresscmd08 = 0|1
@@ -225,7 +226,7 @@ DESCRIPTIONS
 
        emmreassembly = 0|1||2
 	  EMM  reassembly,  should  be	set for Viaccess and Cryptoworks readers if the client that you are using to send EMMs is
-	  reassembling them instead of just sending them to NCAm for processing.
+	  reassembling them instead of just sending them to NCam for processing.
 
 	    0: disabled
 	    1: enabled for DVB API
@@ -253,7 +254,7 @@ DESCRIPTIONS
 	   2 = all procs, but viewing only
 	   3 = all procs, reload of ncam.user possible
 	   4 = complete access
-	   
+
        lb_force_reopen_user = 0|1
            0 = disabled
            1 = specific user force reopening immidiatly all failing readers if no matching was found
@@ -289,10 +290,10 @@ DESCRIPTIONS
 	  CCcam stealth:
 
 	   -1 = use CCcam stealth of ncam.conf (default)
-	    0 = use extended NCAm-CCcam protocol
+	    0 = use extended NCam-CCcam protocol
 	    1 = behaviour like the original CCcam: no activate partner
-		detection and extended NCAm-CCcam protocol, prevent
-		other NCAm to detect the server as NCAm server
+		detection and extended NCam-CCcam protocol, prevent
+		other NCam to detect the server as NCam server
 
 EXAMPLES
 	[account]
@@ -307,8 +308,8 @@ EXAMPLES
 	uniq	   = 1
 
 SEE ALSO
-       list_smargo(1), ncam(1), ncam.ac(5), ncam.cacheex(5), ncam.cert(5), ncam.conf(5), ncam.dvbapi(5),	ncam.fakecws(5),
-       ncam.guess(5),	ncam.ird(5),  ncam.provid(5),  ncam.ratelimit(5),  ncam.server(5), ncam.services(5), ncam.tiers(5),
+       list_smargo(1), ncam(1), ncam.ac(5), ncam.cacheex(5), ncam.cert(5), ncam.conf(5), ncam.dvbapi(5), ncam.fakecws(5),
+       ncam.guess(5), ncam.ird(5), ncam.provid(5), ncam.ratelimit(5), ncam.server(5), ncam.services(5), ncam.tiers(5),
        ncam.srvid(5), ncam.srvid2(5), ncam.whitelist(5)
 
 

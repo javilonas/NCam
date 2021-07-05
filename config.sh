@@ -1,8 +1,8 @@
 #!/bin/sh
 
-addons="WEBIF WEBIF_LIVELOG WEBIF_JQUERY TOUCH WITH_SSL HAVE_DVBAPI READ_SDT_CHARSETS IRDETO_GUESSING CS_ANTICASC WITH_DEBUG MODULE_MONITOR WITH_LB CS_CACHEEX CW_CYCLE_CHECK LCDSUPPORT LEDSUPPORT CLOCKFIX IPV6SUPPORT WITH_EMU"
+addons="WEBIF WEBIF_LIVELOG WEBIF_JQUERY TOUCH WITH_SSL HAVE_DVBAPI WITH_NEUTRINO READ_SDT_CHARSETS IRDETO_GUESSING CS_ANTICASC WITH_DEBUG MODULE_MONITOR WITH_LB CS_CACHEEX CW_CYCLE_CHECK LCDSUPPORT LEDSUPPORT CLOCKFIX IPV6SUPPORT WITH_EMU WITH_SOFTCAM"
 protocols="MODULE_CAMD33 MODULE_CAMD35 MODULE_CAMD35_TCP MODULE_NEWCAMD MODULE_CCCAM MODULE_CCCSHARE MODULE_GBOX MODULE_RADEGAST MODULE_SCAM MODULE_SERIAL MODULE_CONSTCW MODULE_PANDORA MODULE_GHTTP"
-readers="READER_NAGRA READER_IRDETO READER_CONAX READER_CRYPTOWORKS READER_SECA READER_VIACCESS READER_VIDEOGUARD READER_DRE READER_TONGFANG READER_STREAMGUARD READER_JET READER_BULCRYPT READER_GRIFFIN READER_DGCRYPT"
+readers="READER_NAGRA READER_NAGRA_MERLIN READER_IRDETO READER_CONAX READER_CRYPTOWORKS READER_SECA READER_VIACCESS READER_VIDEOGUARD READER_DRE READER_TONGFANG READER_STREAMGUARD READER_JET READER_BULCRYPT READER_GRIFFIN READER_DGCRYPT"
 card_readers="CARDREADER_PHOENIX CARDREADER_INTERNAL CARDREADER_SC8IN1 CARDREADER_MP35 CARDREADER_SMARGO CARDREADER_DB2COM CARDREADER_STAPI CARDREADER_STAPI5 CARDREADER_STINGER CARDREADER_DRECAS"
 
 defconfig="
@@ -12,6 +12,7 @@ CONFIG_WEBIF_JQUERY=y
 CONFIG_TOUCH=y
 # CONFIG_WITH_SSL=n
 CONFIG_HAVE_DVBAPI=y
+# CONFIG_WITH_NEUTRINO=n
 CONFIG_READ_SDT_CHARSETS=y
 CONFIG_IRDETO_GUESSING=y
 CONFIG_CS_ANTICASC=y
@@ -25,6 +26,7 @@ CONFIG_CW_CYCLE_CHECK=y
 # CONFIG_CLOCKFIX=n
 # CONFIG_IPV6SUPPORT=n
 CONFIG_WITH_EMU=y
+CONFIG_WITH_SOFTCAM=y
 # CONFIG_MODULE_CAMD33=n
 CONFIG_MODULE_CAMD35=y
 CONFIG_MODULE_CAMD35_TCP=y
@@ -39,7 +41,9 @@ CONFIG_MODULE_PANDORA=y
 CONFIG_MODULE_SCAM=y
 CONFIG_MODULE_GHTTP=y
 CONFIG_WITH_CARDREADER=y
+CONFIG_READER_NAGRA_COMMON=y
 CONFIG_READER_NAGRA=y
+CONFIG_READER_NAGRA_MERLIN=y
 CONFIG_READER_IRDETO=y
 CONFIG_READER_CONAX=y
 CONFIG_READER_CRYPTOWORKS=y
@@ -61,13 +65,13 @@ CARDREADER_MP35=y
 CARDREADER_SMARGO=y
 CARDREADER_DB2COM=y
 CARDREADER_STAPI=y
-# CARDREADER_STAPI5=n
+CARDREADER_STAPI5=y
 CARDREADER_STINGER=y
 "
 
 usage() {
 	echo \
-"NCAm config
+"NCam config
 Usage: `basename $0` [parameters]
 
  -g, --gui                 Start interactive configuration
@@ -94,8 +98,9 @@ Usage: `basename $0` [parameters]
 
  -R, --restore             Restore default config.
 
- -v, --ncam-version       Display NCAm version.
- -r, --ncam-revision      Display NCAm SVN revision.
+ -v, --ncam-version       Display NCam version.
+ -r, --ncam-revision      Display NCam SVN revision.
+ -i, --git-revision       Display NCam GIT revision.
 
  -O, --detect-osx-sdk-version  Find where OS X SDK is located
 
@@ -301,6 +306,7 @@ update_deps() {
 	enabled WITH_EMU && enable_opt READER_VIACCESS >/dev/null
 	enabled WITH_EMU && enable_opt READER_DRE >/dev/null
 	enabled WITH_EMU && enable_opt MODULE_NEWCAMD >/dev/null
+	enabled WITH_EMU && enable_opt WITH_SOFTCAM >/dev/null
 }
 
 list_config() {
@@ -350,10 +356,14 @@ list_config() {
 	not_have_flag USE_LIBCRYPTO && echo "CONFIG_LIB_AES=y" || echo "# CONFIG_LIB_AES=n"
 	enabled MODULE_CCCAM && echo "CONFIG_LIB_RC6=y" || echo "# CONFIG_LIB_RC6=n"
 	not_have_flag USE_LIBCRYPTO && enabled MODULE_CCCAM && echo "CONFIG_LIB_SHA1=y" || echo "# CONFIG_LIB_SHA1=n"
-	enabled_any READER_DRE MODULE_SCAM READER_VIACCESS READER_TONGFANG READER_STREAMGUARD READER_JET WITH_EMU && echo "CONFIG_LIB_DES=y" || echo "# CONFIG_LIB_DES=n"
-	enabled_any MODULE_CCCAM READER_NAGRA READER_SECA WITH_EMU && echo "CONFIG_LIB_IDEA=y" || echo "# CONFIG_LIB_IDEA=n"
 	enabled_any READER_JET && echo "CONFIG_LIB_TWOFISH=y" || echo "CONFIG_LIB_TWOFISH=n"
-	not_have_flag USE_LIBCRYPTO && enabled_any READER_CONAX READER_CRYPTOWORKS READER_NAGRA WITH_EMU && echo "CONFIG_LIB_BIGNUM=y" || echo "# CONFIG_LIB_BIGNUM=n"
+	enabled_any READER_DRE MODULE_SCAM READER_VIACCESS READER_NAGRA READER_NAGRA_MERLIN READER_VIDEOGUARD READER_TONGFANG READER_STREAMGUARD READER_JET WITH_EMU && echo "CONFIG_LIB_DES=y" || echo "# CONFIG_LIB_DES=n"
+	enabled_any MODULE_CCCAM READER_NAGRA READER_NAGRA_MERLIN READER_SECA WITH_EMU && echo "CONFIG_LIB_IDEA=y" || echo "# CONFIG_LIB_IDEA=n"
+	not_have_flag USE_LIBCRYPTO && enabled_any READER_CONAX READER_CRYPTOWORKS READER_NAGRA READER_NAGRA_MERLIN WITH_EMU && echo "CONFIG_LIB_BIGNUM=y" || echo "# CONFIG_LIB_BIGNUM=n"
+	enabled READER_NAGRA_MERLIN && echo "CONFIG_LIB_MDC2=y" || echo "# CONFIG_LIB_MDC2=n"
+	enabled READER_NAGRA_MERLIN && echo "CONFIG_LIB_FAST_AES=y" || echo "# CONFIG_LIB_FAST_AES=n"
+	enabled READER_NAGRA_MERLIN && echo "CONFIG_LIB_SHA256=y" || echo "# CONFIG_LIB_SHA256=n"
+	enabled_any READER_NAGRA READER_NAGRA_MERLIN && echo "CONFIG_READER_NAGRA_COMMON=y" || echo "# CONFIG_READER_NAGRA_COMMON=n"
 }
 
 make_config_c() {
@@ -452,6 +462,7 @@ menu_addons() {
 		TOUCH				"Touch Web Interface"					$(check_test "TOUCH") \
 		WITH_SSL			"OpenSSL support"						$(check_test "WITH_SSL") \
 		HAVE_DVBAPI			"DVB API"								$(check_test "HAVE_DVBAPI") \
+		WITH_NEUTRINO		"Neutrino support"						$(check_test "WITH_NEUTRINO") \
 		READ_SDT_CHARSETS	"DVB API read-sdt charsets"				$(check_test "READ_SDT_CHARSETS") \
 		IRDETO_GUESSING		"Irdeto guessing"						$(check_test "IRDETO_GUESSING") \
 		CS_ANTICASC			"Anti cascading"						$(check_test "CS_ANTICASC") \
@@ -465,6 +476,7 @@ menu_addons() {
 		CLOCKFIX			"Clockfix (disable on old systems!)"	$(check_test "CLOCKFIX") \
 		IPV6SUPPORT			"IPv6 support (experimental)"			$(check_test "IPV6SUPPORT") \
 		WITH_EMU			"Emulator support"						$(check_test "WITH_EMU") \
+		WITH_SOFTCAM		"Built-in SoftCam.Key"					$(check_test "WITH_SOFTCAM") \
 		2> ${tempfile}
 
 	opt=${?}
@@ -501,6 +513,7 @@ menu_protocols() {
 menu_readers() {
 	${DIALOG} --checklist "\nChoose readers (CA systems):\n " $height $width $listheight \
 		READER_NAGRA		"Nagravision"		$(check_test "READER_NAGRA") \
+		READER_NAGRA_MERLIN	"Nagra Merlin"		$(check_test "READER_NAGRA_MERLIN") \
 		READER_IRDETO		"Irdeto"			$(check_test "READER_IRDETO") \
 		READER_CONAX		"Conax"				$(check_test "READER_CONAX") \
 		READER_CRYPTOWORKS	"Cryptoworks"		$(check_test "READER_CRYPTOWORKS") \
@@ -711,6 +724,21 @@ do
 		fi
 		echo $revision > .revision
 		echo $revision
+		break
+	;;
+	'-i'|'--git-revision')
+		revision=$(git rev-list --count HEAD 2>/dev/null; git rev-list --all --max-count=1 2>/dev/null | cut -c1-7)
+		if [ -n "$revision" ]; then
+			revision="git $revision"
+		else
+			revision=$(svn info 2>/dev/null | grep Revision | cut -d ' ' -f 2)
+			[ -n "$revision" ] && revision="svn $revision"
+		fi
+		echo $revision
+		break
+	;;
+	'--emu-version')
+		grep EMU_VERSION module-emulator-nemu.h | awk '{ print $3 }'
 		break
 	;;
 	'-O'|'--detect-osx-sdk-version')

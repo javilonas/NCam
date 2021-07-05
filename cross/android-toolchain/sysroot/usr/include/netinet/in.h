@@ -25,6 +25,7 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+
 #ifndef _NETINET_IN_H_
 #define _NETINET_IN_H_
 
@@ -39,15 +40,20 @@
 
 __BEGIN_DECLS
 
-#define IPPORT_RESERVED  1024
-
 #define INET_ADDRSTRLEN 16
 
-extern int bindresvport (int sd, struct sockaddr_in *sin);
+typedef uint16_t in_port_t;
 
+int bindresvport(int __fd, struct sockaddr_in* __sin);
+
+#if __ANDROID_API__ >= __ANDROID_API_N__
+extern const struct in6_addr in6addr_any __INTRODUCED_IN(24);
+extern const struct in6_addr in6addr_loopback __INTRODUCED_IN(24);
+#else
 static const struct in6_addr in6addr_any = IN6ADDR_ANY_INIT;
 static const struct in6_addr in6addr_loopback = IN6ADDR_LOOPBACK_INIT;
+#endif /* __ANDROID_API__ >= __ANDROID_API_N__ */
 
 __END_DECLS
 
-#endif /* _NETINET_IN_H_ */
+#endif

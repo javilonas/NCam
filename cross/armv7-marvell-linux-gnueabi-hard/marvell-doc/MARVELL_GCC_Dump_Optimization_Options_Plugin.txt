@@ -1,0 +1,123 @@
+
+
+GCC Plugins
+===========
+
+1. Introduction
+2. GCC Dump Optimization Options Plugin
+3. GCC Function Optimization Options Plugin 
+4. Miscellaneous
+
+
+
+--------------------------------------------------------------------------------
+1. Introduction
+--------------------------------------------------------------------------------
+
+    GCC plugins (or loadable modules) make it possible for us to add new functionalities
+without modifying the GCC itself. It shortens the time needed to build and test. Only
+the code needed to implement the new functionality needs to be compiled. The Marvell GCC
+plugins are for internal use, therefore, not suitable for inclusion in the main GCC distribution.
+
+
+--------------------------------------------------------------------------------
+2. GCC Dump Optimization Options Plugin
+--------------------------------------------------------------------------------
+
+    For various GCC versions, different optimization options are provided. It is a difficult
+and time-consuming task to monitor the difference manually, therefore, the "GCC Optimization Options Plugin"
+is provided to resolve the issue. By the plugin, the optimization options of various GCC versions
+can be displayed automatically.
+
+    Then, GYM project uses those optimization options to find out the best options set to compile
+the target program.
+
+
+--------------------------------------------------------------------------------
+3. GCC Function Optimization Options Plugin
+--------------------------------------------------------------------------------
+
+    With the help of attributes and #pragmas, a single function can be complied by GCC with
+specific optimization options. But this will involve source code modifications. Without source
+code modifications, the unit to apply optimization options by GCC is a single file. Due to
+the complexity of target program, it is a difficult and time-consuming task to modify source
+code to compile a single function with specific optimization options. By the plugin, various
+optimization options can be applied to a single function without source code modifications.
+
+    Then, GYM project can use the plugin to find out the best optimization options set based on
+a single function to compile the target program.
+
+
+--------------------------------------------------------------------------------
+4. Miscellaneous
+--------------------------------------------------------------------------------
+    The GCC Dump Optimization Options Plugin source code is in marvell gcc 4.6 toolchain sources.
+Follows the instructions in http://10.19.133.152/wiki/doku.php?id=marvell_gcc-4.6_toolchain to get
+the toolchain sources and build that toolchain.
+
+    The source code of GCC Dump Optimization Options Plugin is at "mcc4.6"/src/extra-src/gcc-plugins/dopts.
+Enter the plugin source directory and build it:
+
+	cd gcc-4.6/src/extra-src/gcc-plugins/dopts
+	make
+	Note:
+		The gcc 4.6 toolchain has to be built first
+		Makefile variables
+			* GCC
+				Current value is i486-linux-gnu-gcc, if necessary, change it according to
+				your build environment
+			* CROSS
+				Current value is arm-marvell-linux-gnueabi-, if necessary, change it according to
+				the marvell toolchain you built
+
+    The following make targets are provided to simplify the execution:
+
+	* make runm
+		Dump minimum optimization options
+	* make runc
+		Dump minimum optimization options with configuration file conf/mincfg.txt
+	* make runx
+		Dump maximum optimization options
+	* make runa
+		Dump all optimization options
+	* make runi
+		Dump all optimization options initial values
+	* make run0
+		Dump all optimization options current values for -O0
+	* make run1
+		Dump all optimization options current values for -O1
+	* make run2
+		Dump all optimization options current values for -O2
+	* make run3
+		Dump all optimization options current values for -O3
+	* make runs
+		Dump all optimization options current values for -Os
+	* make runf
+		Dump all optimization options current values for -Ofast
+
+
+    The GCC Function Optimization Options Plugin source code is in marvell gcc 4.6 toolchain sources.
+Follows the instructions in http://10.19.133.152/wiki/doku.php?id=marvell_gcc-4.6_toolchain to get
+the toolchain sources and build that toolchain.
+
+    The source code of GCC Function Optimization Options Plugin is at "mgcc4.6"/src/extra-src/gcc-plugins/fopts.
+Enter the plugin source directory and build it:
+
+	cd gcc-4.6/src/extra-src/gcc-plugins/fopts
+	make
+	Note:
+		The gcc 4.6 toolchain has to be built first
+		Makefile variables
+			* GCC
+				Current value is i486-linux-gnu-gcc, if necessary, change it according to
+				your build environment
+			* CROSS
+				Current value is arm-marvell-linux-gnueabi-, if necessary, change it according to
+				the marvell toolchain you built
+
+    The make target run is provided to demo the execution:
+
+	* make run
+		Apply the specific optimization options to the specified function according to configuration file
+		conf/optcfg.txt
+

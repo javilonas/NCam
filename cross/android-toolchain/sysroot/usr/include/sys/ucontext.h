@@ -29,6 +29,8 @@
 #ifndef _SYS_UCONTEXT_H_
 #define _SYS_UCONTEXT_H_
 
+#include <sys/cdefs.h>
+
 #include <signal.h>
 #include <sys/user.h>
 
@@ -38,21 +40,37 @@ __BEGIN_DECLS
 
 enum {
   REG_R0 = 0,
+#define REG_R0 REG_R0
   REG_R1,
+#define REG_R1 REG_R1
   REG_R2,
+#define REG_R2 REG_R2
   REG_R3,
+#define REG_R3 REG_R3
   REG_R4,
+#define REG_R4 REG_R4
   REG_R5,
+#define REG_R5 REG_R5
   REG_R6,
+#define REG_R6 REG_R6
   REG_R7,
+#define REG_R7 REG_R7
   REG_R8,
+#define REG_R8 REG_R8
   REG_R9,
+#define REG_R9 REG_R9
   REG_R10,
+#define REG_R10 REG_R10
   REG_R11,
+#define REG_R11 REG_R11
   REG_R12,
+#define REG_R12 REG_R12
   REG_R13,
+#define REG_R13 REG_R13
   REG_R14,
+#define REG_R14 REG_R14
   REG_R15,
+#define REG_R15 REG_R15
 };
 
 #define NGREG 18 /* Like glibc. */
@@ -69,10 +87,15 @@ typedef struct ucontext {
   struct ucontext* uc_link;
   stack_t uc_stack;
   mcontext_t uc_mcontext;
-  sigset_t uc_sigmask;
-  // Android has a wrong (smaller) sigset_t on ARM.
-  uint32_t __padding_rt_sigset;
-  // The kernel adds extra padding after uc_sigmask to match glibc sigset_t on ARM.
+  union {
+    struct {
+      sigset_t uc_sigmask;
+      /* Android has a wrong (smaller) sigset_t on ARM. */
+      uint32_t __padding_rt_sigset;
+    };
+    sigset64_t uc_sigmask64;
+  };
+  /* The kernel adds extra padding after uc_sigmask to match glibc sigset_t on ARM. */
   char __padding[120];
   unsigned long uc_regspace[128] __attribute__((__aligned__(8)));
 } ucontext_t;
@@ -91,8 +114,11 @@ typedef struct ucontext {
   unsigned long uc_flags;
   struct ucontext *uc_link;
   stack_t uc_stack;
-  sigset_t uc_sigmask;
-  // The kernel adds extra padding after uc_sigmask to match glibc sigset_t on ARM64.
+  union {
+    sigset_t uc_sigmask;
+    sigset64_t uc_sigmask64;
+  };
+  /* The kernel adds extra padding after uc_sigmask to match glibc sigset_t on ARM64. */
   char __padding[128 - sizeof(sigset_t)];
   mcontext_t uc_mcontext;
 } ucontext_t;
@@ -101,25 +127,45 @@ typedef struct ucontext {
 
 enum {
   REG_GS = 0,
+#define REG_GS REG_GS
   REG_FS,
+#define REG_FS REG_FS
   REG_ES,
+#define REG_ES REG_ES
   REG_DS,
+#define REG_DS REG_DS
   REG_EDI,
+#define REG_EDI REG_EDI
   REG_ESI,
+#define REG_ESI REG_ESI
   REG_EBP,
+#define REG_EBP REG_EBP
   REG_ESP,
+#define REG_ESP REG_ESP
   REG_EBX,
+#define REG_EBX REG_EBX
   REG_EDX,
+#define REG_EDX REG_EDX
   REG_ECX,
+#define REG_ECX REG_ECX
   REG_EAX,
+#define REG_EAX REG_EAX
   REG_TRAPNO,
+#define REG_TRAPNO REG_TRAPNO
   REG_ERR,
+#define REG_ERR REG_ERR
   REG_EIP,
+#define REG_EIP REG_EIP
   REG_CS,
+#define REG_CS REG_CS
   REG_EFL,
+#define REG_EFL REG_EFL
   REG_UESP,
+#define REG_UESP REG_UESP
   REG_SS,
+#define REG_SS REG_SS
   NGREG
+#define NGREG NGREG
 };
 
 typedef int greg_t;
@@ -156,9 +202,14 @@ typedef struct ucontext {
   struct ucontext* uc_link;
   stack_t uc_stack;
   mcontext_t uc_mcontext;
-  sigset_t uc_sigmask;
-  // Android has a wrong (smaller) sigset_t on x86.
-  uint32_t __padding_rt_sigset;
+  union {
+    struct {
+      sigset_t uc_sigmask;
+      /* Android has a wrong (smaller) sigset_t on x86. */
+      uint32_t __padding_rt_sigset;
+    };
+    sigset64_t uc_sigmask64;
+  };
   struct _libc_fpstate __fpregs_mem;
 } ucontext_t;
 
@@ -228,36 +279,63 @@ typedef struct ucontext {
   struct ucontext* uc_link;
   stack_t uc_stack;
   mcontext_t uc_mcontext;
-  sigset_t uc_sigmask;
+  union {
+    sigset_t uc_sigmask;
+    sigset64_t uc_sigmask64;
+  };
 } ucontext_t;
 
 #elif defined(__x86_64__)
 
 enum {
   REG_R8 = 0,
+#define REG_R8 REG_R8
   REG_R9,
+#define REG_R9 REG_R9
   REG_R10,
+#define REG_R10 REG_R10
   REG_R11,
+#define REG_R11 REG_R11
   REG_R12,
+#define REG_R12 REG_R12
   REG_R13,
+#define REG_R13 REG_R13
   REG_R14,
+#define REG_R14 REG_R14
   REG_R15,
+#define REG_R15 REG_R15
   REG_RDI,
+#define REG_RDI REG_RDI
   REG_RSI,
+#define REG_RSI REG_RSI
   REG_RBP,
+#define REG_RBP REG_RBP
   REG_RBX,
+#define REG_RBX REG_RBX
   REG_RDX,
+#define REG_RDX REG_RDX
   REG_RAX,
+#define REG_RAX REG_RAX
   REG_RCX,
+#define REG_RCX REG_RCX
   REG_RSP,
+#define REG_RSP REG_RSP
   REG_RIP,
+#define REG_RIP REG_RIP
   REG_EFL,
+#define REG_EFL REG_EFL
   REG_CSGSFS,
+#define REG_CSGSFS REG_CSGSFS
   REG_ERR,
+#define REG_ERR REG_ERR
   REG_TRAPNO,
+#define REG_TRAPNO REG_TRAPNO
   REG_OLDMASK,
+#define REG_OLDMASK REG_OLDMASK
   REG_CR2,
+#define REG_CR2 REG_CR2
   NGREG
+#define NGREG NGREG
 };
 
 typedef long greg_t;
@@ -300,7 +378,10 @@ typedef struct ucontext {
   struct ucontext* uc_link;
   stack_t uc_stack;
   mcontext_t uc_mcontext;
-  sigset_t uc_sigmask;
+  union {
+    sigset_t uc_sigmask;
+    sigset64_t uc_sigmask64;
+  };
   struct _libc_fpstate __fpregs_mem;
 } ucontext_t;
 

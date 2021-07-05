@@ -20,62 +20,80 @@
 #define _PTP_CLOCK_H_
 #include <linux/ioctl.h>
 #include <linux/types.h>
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
-#define PTP_ENABLE_FEATURE (1<<0)
-#define PTP_RISING_EDGE (1<<1)
-#define PTP_FALLING_EDGE (1<<2)
+#define PTP_ENABLE_FEATURE (1 << 0)
+#define PTP_RISING_EDGE (1 << 1)
+#define PTP_FALLING_EDGE (1 << 2)
 struct ptp_clock_time {
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
- __s64 sec;
- __u32 nsec;
- __u32 reserved;
+  __s64 sec;
+  __u32 nsec;
+  __u32 reserved;
 };
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
 struct ptp_clock_caps {
- int max_adj;
- int n_alarm;
- int n_ext_ts;
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
- int n_per_out;
- int pps;
- int rsv[15];
+  int max_adj;
+  int n_alarm;
+  int n_ext_ts;
+  int n_per_out;
+  int pps;
+  int n_pins;
+  int cross_timestamping;
+  int rsv[13];
 };
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
 struct ptp_extts_request {
- unsigned int index;
- unsigned int flags;
- unsigned int rsv[2];
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
+  unsigned int index;
+  unsigned int flags;
+  unsigned int rsv[2];
 };
 struct ptp_perout_request {
- struct ptp_clock_time start;
- struct ptp_clock_time period;
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
- unsigned int index;
- unsigned int flags;
- unsigned int rsv[4];
+  struct ptp_clock_time start;
+  struct ptp_clock_time period;
+  unsigned int index;
+  unsigned int flags;
+  unsigned int rsv[4];
 };
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
 #define PTP_MAX_SAMPLES 25
 struct ptp_sys_offset {
- unsigned int n_samples;
- unsigned int rsv[3];
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
- struct ptp_clock_time ts[2 * PTP_MAX_SAMPLES + 1];
+  unsigned int n_samples;
+  unsigned int rsv[3];
+  struct ptp_clock_time ts[2 * PTP_MAX_SAMPLES + 1];
+};
+struct ptp_sys_offset_extended {
+  unsigned int n_samples;
+  unsigned int rsv[3];
+  struct ptp_clock_time ts[PTP_MAX_SAMPLES][3];
+};
+struct ptp_sys_offset_precise {
+  struct ptp_clock_time device;
+  struct ptp_clock_time sys_realtime;
+  struct ptp_clock_time sys_monoraw;
+  unsigned int rsv[4];
+};
+enum ptp_pin_function {
+  PTP_PF_NONE,
+  PTP_PF_EXTTS,
+  PTP_PF_PEROUT,
+  PTP_PF_PHYSYNC,
+};
+struct ptp_pin_desc {
+  char name[64];
+  unsigned int index;
+  unsigned int func;
+  unsigned int chan;
+  unsigned int rsv[5];
 };
 #define PTP_CLK_MAGIC '='
 #define PTP_CLOCK_GETCAPS _IOR(PTP_CLK_MAGIC, 1, struct ptp_clock_caps)
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
 #define PTP_EXTTS_REQUEST _IOW(PTP_CLK_MAGIC, 2, struct ptp_extts_request)
 #define PTP_PEROUT_REQUEST _IOW(PTP_CLK_MAGIC, 3, struct ptp_perout_request)
 #define PTP_ENABLE_PPS _IOW(PTP_CLK_MAGIC, 4, int)
 #define PTP_SYS_OFFSET _IOW(PTP_CLK_MAGIC, 5, struct ptp_sys_offset)
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
+#define PTP_PIN_GETFUNC _IOWR(PTP_CLK_MAGIC, 6, struct ptp_pin_desc)
+#define PTP_PIN_SETFUNC _IOW(PTP_CLK_MAGIC, 7, struct ptp_pin_desc)
+#define PTP_SYS_OFFSET_PRECISE _IOWR(PTP_CLK_MAGIC, 8, struct ptp_sys_offset_precise)
+#define PTP_SYS_OFFSET_EXTENDED _IOWR(PTP_CLK_MAGIC, 9, struct ptp_sys_offset_extended)
 struct ptp_extts_event {
- struct ptp_clock_time t;
- unsigned int index;
- unsigned int flags;
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
- unsigned int rsv[2];
+  struct ptp_clock_time t;
+  unsigned int index;
+  unsigned int flags;
+  unsigned int rsv[2];
 };
 #endif

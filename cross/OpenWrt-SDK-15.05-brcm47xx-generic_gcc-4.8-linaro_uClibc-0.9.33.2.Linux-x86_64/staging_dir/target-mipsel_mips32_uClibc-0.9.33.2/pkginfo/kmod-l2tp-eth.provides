@@ -1,6 +1,0 @@
-ip6_udp_tunnel.ko
-ipv6.ko
-l2tp_core.ko
-l2tp_eth.ko
-l2tp_netlink.ko
-udp_tunnel.ko

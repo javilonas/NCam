@@ -26,19 +26,33 @@
  * SUCH DAMAGE.
  */
 
+#ifndef _NET_IF_H_
+#define _NET_IF_H_
+
 #include <sys/socket.h>
 #include <linux/if.h>
 #include <sys/cdefs.h>
+
 #ifndef IF_NAMESIZE
 #define IF_NAMESIZE IFNAMSIZ
 #endif
 
 __BEGIN_DECLS
 
-/*
- * Map an interface name into its corresponding index.
- */
-extern unsigned int if_nametoindex(const char *);
-extern char*        if_indextoname(unsigned ifindex, char *ifname);
+struct if_nameindex {
+  unsigned if_index;
+  char* if_name;
+};
+
+char* if_indextoname(unsigned __index, char* __buf);
+unsigned if_nametoindex(const char* __name);
+
+#if __ANDROID_API__ >= 24
+struct if_nameindex* if_nameindex(void) __INTRODUCED_IN(24);
+void if_freenameindex(struct if_nameindex* __ptr) __INTRODUCED_IN(24);
+#endif /* __ANDROID_API__ >= 24 */
+
 
 __END_DECLS
+
+#endif

@@ -18,7 +18,7 @@
 
 clear
 
-version=0.2
+version=0.3
 user=`id -g -n`
 
 echo 
@@ -36,10 +36,9 @@ echo
 echo "  The binary is generated in /home/$user/NCam/Distribution"
 echo "  The logs is generated in /home/$user/NCam/build_dir/logs"
 echo
-echo "  For help and discussion : https://goo.gl/NP4Ka2"
-echo "  Follow on Twitter       : https://goo.gl/4dl8ln"
-echo "  Follow on Github        : https://goo.gl/67O47V"
-echo "  For Paypal donations    : https://goo.gl/KAm3HI"
+echo "  Official Support   : https://www.lonasdigital.com"
+echo "  Sources NCam       : https://github.com/javilonas/NCam"
+echo "  Paypal donations   : https://www.paypal.me/Javilonas"
 echo "------------------------------------------------------------"
 echo
 

@@ -1,0 +1,17 @@
+GMP version: 4.3.2 b17e6a2b
+MPFR version: 3.0.1 0a399661
+CLOOG version: 0.16.2 dc4cade2
+PPL version: 0.11.2 9fee73f2
+MPC version: 0.9 e77a1f2b
+ZLIB version: 1.2.3 2a2efc59
+EXPAT version: 2.0.0 f1c366a9
+TERMCAP version: 1.3.1 d84fee1c
+NCURSES version: 5.9 9116f321
+BINUTILS version: 2.22.0 14e8b44f
+GCC version: 4.6.4 3d181f66
+GDB version: 7.4-2012.06-1~bzr da463bce
+LINUX version: 3.2.10 14f4c09d
+GLIBC version: 2.15 3c864a35
+GLIBC_PORTS_SRC version:
+EXTRA version: 5f0b86cc
+SCRIPT version: 2372a06d

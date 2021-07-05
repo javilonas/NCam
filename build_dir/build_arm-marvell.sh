@@ -20,14 +20,30 @@
 export INIT_TIME=`date +'%d/%m/%y %H:%M:%S'`
 export START_TIME=`date +%s`
 export TIME_LOG=`date +%Y%m%d_%H%M`
-export ROOTFS_PATH=/home/*/NCam
+export user=`id -g -n`
+export ROOTFS_PATH=/home/$user/NCam
 export PARCH_LOGS=$ROOTFS_PATH/build_dir/logs
 export ARCH=arm
 export target=arm
 export NCAM_BIN=ncam.arm-marvell
-export CROSS=$ROOTFS_PATH/cross/arm_v7/bin/arm-marvell-linux-gnueabi-
+export CROSS=$ROOTFS_PATH/cross/armv7-marvell-linux-gnueabi-hard/bin/arm-marvell-linux-gnueabi-
+export CC=$ROOTFS_PATH/cross/armv7-marvell-linux-gnueabi-hard/bin/arm-marvell-linux-gnueabi-gcc
+export RANLIB=$ROOTFS_PATH/cross/armv7-marvell-linux-gnueabi-hard/bin/arm-marvell-linux-gnueabi-ranlib
 export DCMAKE=cross-arm-marvell-linux
 export SCRIPT=build_arm-marvell.sh
+
+export EXTRA_LIBS="-lrt"
+
+export EXTRA_LDFLAGS="-L$ROOTFS_PATH/cross/armv7-marvell-linux-gnueabi-hard/arm-marvell-linux-gnueabi/libc/usr/lib -mfloat-abi=hard -mhard-float -mfpu=vfpv3"
+
+export OPENSSLDIR=$ROOTFS_PATH/cross/armv7-marvell-linux-gnueabi-hard/arm-marvell-linux-gnueabi/libc/usr/include/openssl/
+
+export LIB_RT="$ROOTFS_PATH/cross/armv7-marvell-linux-gnueabi-hard/arm-marvell-linux-gnueabi/libc/usr/lib/librt.a -lrt"
+export LIB_PTHREAD="$ROOTFS_PATH/cross/armv7-marvell-linux-gnueabi-hard/arm-marvell-linux-gnueabi/libc/usr/lib/libpthread.a -lrt"
+export LIBCRYPT="$ROOTFS_PATH/cross/armv7-marvell-linux-gnueabi-hard/arm-marvell-linux-gnueabi/libc/usr/lib/libcrypt.a -lrt"
+
+export LIBCRYPTO="$ROOTFS_PATH/cross/armv7-marvell-linux-gnueabi-hard/arm-marvell-linux-gnueabi/libc/usr/lib/libcrypto.a -lrt"
+export LIB_SSL="$ROOTFS_PATH/cross/armv7-marvell-linux-gnueabi-hard/arm-marvell-linux-gnueabi/libc/usr/lib/libssl.a -lrt"
 
 # BEGIN THE LOG
 cd $PARCH_LOGS/
@@ -58,7 +74,12 @@ echo ""
 echo ""
 rm -f $ROOTFS_PATH/Distribution/$NCAM_BIN > /dev/null 2>&1
 rm -f $ROOTFS_PATH/Distribution/$NCAM_BIN.debug > /dev/null 2>&1
-sh ./clean_all.sh > /dev/null 2>&1
+rm -f $ROOTFS_PATH/webif/pages_gen $ROOTFS_PATH/webif/pages.dep $ROOTFS_PATH/webif/pages.bin $ROOTFS_PATH/webif/pages.bin.compressed \
+      $ROOTFS_PATH/webif/pages.h $ROOTFS_PATH/webif/pages.c $ROOTFS_PATH/webif/is_defined.txt > /dev/null 2>&1
+echo ""
+cd $ROOTFS_PATH/webif
+make clean > /dev/null 2>&1
+cd ..
 sleep 0.8s
 sync
 echo " Cleaning performed correctly"

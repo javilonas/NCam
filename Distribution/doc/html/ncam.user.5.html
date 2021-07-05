@@ -8,11 +8,11 @@ Section: File Formats (5)<BR><A HREF="#index">Index</A>
 <A NAME="lbAB">&nbsp;</A>
 <H2>NAME</H2>
 
-<B>ncam.user</B> - user configuration file for NCAm
+<B>ncam.user</B> - user configuration file for NCam
 <A NAME="lbAC">&nbsp;</A>
 <H2>SYNOPSIS</H2>
 
-The user configuration file for NCAm contains user definitions. [account]
+The user configuration file for NCam contains user definitions. [account]
 sections in <B>ncam.user</B> are <I>recurring</I> (more than one account).
 <A NAME="lbAD">&nbsp;</A>
 <H2>DESCRIPTIONS</H2>
@@ -75,7 +75,7 @@ list of all allowed connection protocols, default:all connection protocols
 <P>
 
 <B>allowedtimeframe</B> = <B>DAY@hh:mm-hh:mm[,hh:mm-hh:mm][,hh:mm-hh:mm][;DAY@hh:mm-hh:mm[,hh:mm-hh:mm][,hh:mm-hh:mm]]</B><BR>
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 where <B>DAY</B> is <B>SUN,MON,TUE,WED,THU,FRI,SAT</B> or <B>ALL</B> (for all possible days)</B>
 <DL COMPACT><DT><DD>
 account enabled from hh:mm to hh:mm for the specified days, default:none<BR>
@@ -263,7 +263,7 @@ set cache exchange mode
 <BR>&nbsp;<B>3</B>:&nbsp;enable&nbsp;reverse&nbsp;cache&nbsp;exchange&nbsp;push&nbsp;mode&nbsp;for&nbsp;camd&nbsp;3.5x&nbsp;/&nbsp;3.57x&nbsp;
 <BR>&nbsp;&nbsp;&nbsp;&nbsp;and&nbsp;CCcam&nbsp;protocol
 <P>
-<I>Identical cache exchange modes must be set on local NCAm user account and remote NCAm server.</I>
+<I>Identical cache exchange modes must be set on local NCam user account and remote NCam server.</I>
 <P>
 <I>Please consider memory consumption.</I>
 </DL>
@@ -331,14 +331,14 @@ time waiting for inactive user, default:none
 
 <B>sleepsend</B> = <B>0</B>|<B>255</B>
 <DL COMPACT><DT><DD>
-255 = <I>NCAm client only</I>: stopping requests until next zap, 255 = <I>camd 3.x only</I>: stopping requests until restart of camd 3.x client, default:0
+255 = <I>NCam client only</I>: stopping requests until next zap, 255 = <I>camd 3.x only</I>: stopping requests until restart of camd 3.x client, default:0
 </DL>
 
 <P>
 
 <B>suppresscmd08</B> = <B>0</B>|<B>1</B>
 <DL COMPACT><DT><DD>
-0 = tell camd 3.5x, 3.57x and 3.78x clients not to request again for rejected 
+0 = tell camd 3.5x, 3.57x and 3.78x clients not to request again for rejected
 CAID, service ID and provider ID combination, 1 =  disable, default:0
 </DL>
 
@@ -407,9 +407,9 @@ The ServiceID can also be used for wildcarded CAIDs.
 
 <B>emmreassembly</B> = <B>0</B>|<B>1</B>||<B>2</B>
 <DL COMPACT><DT><DD>
-EMM reassembly, should be set for Viaccess and Cryptoworks readers if the 
-client that you are using to send EMMs is reassembling them instead of 
-just sending them to NCAm for processing.
+EMM reassembly, should be set for Viaccess and Cryptoworks readers if the
+client that you are using to send EMMs is reassembling them instead of
+just sending them to NCam for processing.
 <P>
 <BR>&nbsp;&nbsp;<B>0</B>:&nbsp;disabled
 <BR>&nbsp;&nbsp;<B>1</B>:&nbsp;enabled&nbsp;for&nbsp;DVB&nbsp;API
@@ -513,10 +513,10 @@ CCcam ignore reshare setting:
 CCcam stealth:
 <P>
 <BR>&nbsp;<B>-1</B>&nbsp;=&nbsp;use&nbsp;CCcam&nbsp;stealth&nbsp;of&nbsp;<B>ncam.conf</B>&nbsp;(default)
-<BR>&nbsp;&nbsp;<B>0</B>&nbsp;=&nbsp;use&nbsp;extended&nbsp;NCAm-CCcam&nbsp;protocol
+<BR>&nbsp;&nbsp;<B>0</B>&nbsp;=&nbsp;use&nbsp;extended&nbsp;NCam-CCcam&nbsp;protocol
 <BR>&nbsp;&nbsp;<B>1</B>&nbsp;=&nbsp;behaviour&nbsp;like&nbsp;the&nbsp;original&nbsp;CCcam:&nbsp;no&nbsp;activate&nbsp;partner&nbsp;
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;detection&nbsp;and&nbsp;extended&nbsp;NCAm-CCcam&nbsp;protocol,&nbsp;prevent&nbsp;
-<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;other&nbsp;NCAm&nbsp;to&nbsp;detect&nbsp;the&nbsp;server&nbsp;as&nbsp;NCAm&nbsp;server
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;detection&nbsp;and&nbsp;extended&nbsp;NCam-CCcam&nbsp;protocol,&nbsp;prevent&nbsp;
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;other&nbsp;NCam&nbsp;to&nbsp;detect&nbsp;the&nbsp;server&nbsp;as&nbsp;NCam&nbsp;server
 </DL>
 
 <A NAME="lbAF">&nbsp;</A>

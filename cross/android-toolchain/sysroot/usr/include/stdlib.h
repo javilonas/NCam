@@ -25,145 +25,254 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#ifndef _STDLIB_H_
-#define _STDLIB_H_
 
-#include <sys/cdefs.h>
+#ifndef _STDLIB_H
+#define _STDLIB_H
 
-#include <stddef.h>
-#include <string.h>
 #include <alloca.h>
-#include <strings.h>
-#include <memory.h>
+#include <bits/wait.h>
+#include <malloc.h>
+#include <stddef.h>
+#include <sys/cdefs.h>
+#include <xlocale.h>
 
 __BEGIN_DECLS
 
 #define EXIT_FAILURE 1
 #define EXIT_SUCCESS 0
 
-extern __noreturn void abort(void);
-extern __noreturn void exit(int);
-extern __noreturn void _Exit(int);
-extern int atexit(void (*)(void));
-
-#if __ISO_C_VISIBLE >= 2011 || __cplusplus >= 201103L
-int at_quick_exit(void (*)(void));
-void quick_exit(int) __noreturn;
+__noreturn void abort(void);
+__noreturn void exit(int __status);
+#if __ANDROID_API__ >= __ANDROID_API_L__
+__noreturn void _Exit(int __status) __INTRODUCED_IN(21);
+#else
+__noreturn void _Exit(int) __RENAME(_exit);
 #endif
 
-extern char* getenv(const char*);
-extern int putenv(char*);
-extern int setenv(const char*, const char*, int);
-extern int unsetenv(const char*);
-extern int clearenv(void);
+int atexit(void (*__fn)(void));
 
-extern char* mkdtemp(char*);
-extern char* mktemp(char*) __warnattr("mktemp possibly used unsafely; consider using mkstemp");
-extern int mkstemp(char*);
-extern int mkstemp64(char*);
 
-extern long strtol(const char *, char **, int);
-extern long long strtoll(const char *, char **, int);
-extern unsigned long strtoul(const char *, char **, int);
-extern unsigned long long strtoull(const char *, char **, int);
+#if __ANDROID_API__ >= 21
+int at_quick_exit(void (*__fn)(void)) __INTRODUCED_IN(21);
+void quick_exit(int __status) __noreturn __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
 
-extern int posix_memalign(void **memptr, size_t alignment, size_t size);
 
-extern double atof(const char*);
+char* getenv(const char* __name);
+int putenv(char* __assignment);
+int setenv(const char* __name, const char* __value, int __overwrite);
+int unsetenv(const char* __name);
+int clearenv(void);
 
-extern double strtod(const char*, char**) __LIBC_ABI_PUBLIC__;
-extern float strtof(const char*, char**) __LIBC_ABI_PUBLIC__;
-extern long double strtold(const char*, char**) __LIBC_ABI_PUBLIC__;
+char* mkdtemp(char* __template);
+char* mktemp(char* __template) __attribute__((deprecated("mktemp is unsafe, use mkstemp or tmpfile instead")));
 
-extern long double strtold_l(const char *, char **, locale_t) __LIBC_ABI_PUBLIC__;
-extern long long strtoll_l(const char *, char **, int, locale_t) __LIBC_ABI_PUBLIC__;
-extern unsigned long long strtoull_l(const char *, char **, int, locale_t) __LIBC_ABI_PUBLIC__;
 
-extern int atoi(const char*) __purefunc;
-extern long atol(const char*) __purefunc;
-extern long long atoll(const char*) __purefunc;
+#if __ANDROID_API__ >= 23
+int mkostemp64(char* __template, int __flags) __INTRODUCED_IN(23);
+int mkostemp(char* __template, int __flags) __INTRODUCED_IN(23);
+int mkostemps64(char* __template, int __suffix_length, int __flags) __INTRODUCED_IN(23);
+int mkostemps(char* __template, int __suffix_length, int __flags) __INTRODUCED_IN(23);
+#endif /* __ANDROID_API__ >= 23 */
 
-extern int abs(int) __pure2;
-extern long labs(long) __pure2;
-extern long long llabs(long long) __pure2;
 
-extern char * realpath(const char *path, char *resolved);
-extern int system(const char * string);
+#if __ANDROID_API__ >= 21
+int mkstemp64(char* __template) __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
 
-extern void * bsearch(const void *key, const void *base0,
-	size_t nmemb, size_t size,
-	int (*compar)(const void *, const void *));
+int mkstemp(char* __template);
 
-extern void qsort(void *, size_t, size_t, int (*)(const void *, const void *));
+#if __ANDROID_API__ >= 23
+int mkstemps64(char* __template, int __flags) __INTRODUCED_IN(23);
+#endif /* __ANDROID_API__ >= 23 */
 
-extern long jrand48(unsigned short *);
-extern long mrand48(void);
-extern long nrand48(unsigned short *);
-extern long lrand48(void);
-extern unsigned short *seed48(unsigned short*);
-extern double erand48(unsigned short xsubi[3]);
-extern double drand48(void);
-extern void srand48(long);
+int mkstemps(char* __template, int __flags);
 
-unsigned int arc4random(void);
-unsigned int arc4random_uniform(unsigned int);
-void arc4random_buf(void*, size_t);
+long strtol(const char* __s, char** __end_ptr, int __base);
+long long strtoll(const char* __s, char** __end_ptr, int __base);
+unsigned long strtoul(const char* __s, char** __end_ptr, int __base);
+unsigned long long strtoull(const char* __s, char** __end_ptr, int __base);
+
+
+#if __ANDROID_API__ >= 17
+int posix_memalign(void** __memptr, size_t __alignment, size_t __size) __INTRODUCED_IN(17);
+#endif /* __ANDROID_API__ >= 17 */
+
+
+
+#if __ANDROID_API__ >= 28
+void* aligned_alloc(size_t __alignment, size_t __size) __INTRODUCED_IN(28);
+#endif /* __ANDROID_API__ >= 28 */
+
+
+double strtod(const char* __s, char** __end_ptr);
+long double strtold(const char* __s, char** __end_ptr) __RENAME_LDBL(strtod, 3, 21);
+
+
+#if __ANDROID_API__ >= 26
+unsigned long strtoul_l(const char* __s, char** __end_ptr, int __base, locale_t __l) __INTRODUCED_IN(26);
+#endif /* __ANDROID_API__ >= 26 */
+
+
+int atoi(const char* __s) __attribute_pure__;
+long atol(const char* __s) __attribute_pure__;
+long long atoll(const char* __s) __attribute_pure__;
+
+char* realpath(const char* __path, char* __resolved);
+int system(const char* __command);
+
+void* bsearch(const void* __key, const void* __base, size_t __nmemb, size_t __size, int (*__comparator)(const void* __lhs, const void* __rhs));
+
+void qsort(void* __base, size_t __nmemb, size_t __size, int (*__comparator)(const void* __lhs, const void* __rhs));
+
+uint32_t arc4random(void);
+uint32_t arc4random_uniform(uint32_t __upper_bound);
+void arc4random_buf(void* __buf, size_t __n);
 
 #define RAND_MAX 0x7fffffff
 
-int rand(void);
-int rand_r(unsigned int*);
-void srand(unsigned int);
 
-char* initstate(unsigned int, char*, size_t);
-long random(void);
-char* setstate(char*);
-void srandom(unsigned int);
+#if __ANDROID_API__ >= 21
+int rand_r(unsigned int* __seed_ptr) __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
+
+
+double drand48(void);
+double erand48(unsigned short __xsubi[3]);
+long jrand48(unsigned short __xsubi[3]);
+
+#if __ANDROID_API__ >= 23
+void lcong48(unsigned short __param[7]) __INTRODUCED_IN(23);
+#endif /* __ANDROID_API__ >= 23 */
+
+long lrand48(void);
+long mrand48(void);
+long nrand48(unsigned short __xsubi[3]);
+unsigned short* seed48(unsigned short __seed16v[3]);
+void srand48(long __seed);
+
+
+#if __ANDROID_API__ >= 21
+char* initstate(unsigned int __seed, char* __state, size_t __n) __INTRODUCED_IN(21);
+char* setstate(char* __state) __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
+
 
 int getpt(void);
-int grantpt(int);
-int posix_openpt(int);
-char* ptsname(int) __warnattr("ptsname is not thread-safe; use ptsname_r instead");
-int ptsname_r(int, char*, size_t);
-int unlockpt(int);
+
+#if __ANDROID_API__ >= 21
+int posix_openpt(int __flags) __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
+
+char* ptsname(int __fd);
+int ptsname_r(int __fd, char* __buf, size_t __n);
+int unlockpt(int __fd);
+
+
+#if __ANDROID_API__ >= 26
+int getsubopt(char** __option, char* const* __tokens, char** __value_ptr) __INTRODUCED_IN(26);
+#endif /* __ANDROID_API__ >= 26 */
+
 
 typedef struct {
-    int  quot;
-    int  rem;
+  int quot;
+  int rem;
 } div_t;
 
-extern div_t   div(int, int) __pure2;
+div_t div(int __numerator, int __denominator) __attribute_const__;
 
 typedef struct {
-    long int  quot;
-    long int  rem;
+  long int quot;
+  long int rem;
 } ldiv_t;
 
-extern ldiv_t   ldiv(long, long) __pure2;
+ldiv_t ldiv(long __numerator, long __denominator) __attribute_const__;
 
 typedef struct {
-    long long int  quot;
-    long long int  rem;
+  long long int quot;
+  long long int rem;
 } lldiv_t;
 
-extern lldiv_t   lldiv(long long, long long) __pure2;
+lldiv_t lldiv(long long __numerator, long long __denominator) __attribute_const__;
+
+/**
+ * [getloadavg(3)](http://man7.org/linux/man-pages/man3/getloadavg.3.html) queries the
+ * number of runnable processes averaged over time. The Linux kernel supports averages
+ * over the last 1, 5, and 15 minutes.
+ *
+ * Returns the number of samples written to `__averages` (at most 3), and returns -1 on failure.
+ */
+
+#if __ANDROID_API__ >= 29
+int getloadavg(double __averages[], int __n) __INTRODUCED_IN(29);
+#endif /* __ANDROID_API__ >= 29 */
+
 
 /* BSD compatibility. */
-extern const char* getprogname(void);
-extern void setprogname(const char*);
 
-/* make STLPort happy */
-extern int      mblen(const char *, size_t);
-extern size_t   mbstowcs(wchar_t *, const char *, size_t);
-extern int      mbtowc(wchar_t *, const char *, size_t);
+#if __ANDROID_API__ >= 21
+const char* getprogname(void) __INTRODUCED_IN(21);
+void setprogname(const char* __name) __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
 
-/* Likewise, make libstdc++-v3 happy.  */
-extern int	wctomb(char *, wchar_t);
-extern size_t	wcstombs(char *, const wchar_t *, size_t);
 
-extern size_t __ctype_get_mb_cur_max(void);
+int mblen(const char* __s, size_t __n) __INTRODUCED_IN(26) __VERSIONER_NO_GUARD;
+size_t mbstowcs(wchar_t* __dst, const char* __src, size_t __n);
+int mbtowc(wchar_t* __wc_ptr, const char* __s, size_t __n) __INTRODUCED_IN(21) __VERSIONER_NO_GUARD;
+int wctomb(char* __dst, wchar_t __wc) __INTRODUCED_IN(21) __VERSIONER_NO_GUARD;
+
+size_t wcstombs(char* __dst, const wchar_t* __src, size_t __n);
+
+#if __ANDROID_API__ >= __ANDROID_API_L__
+size_t __ctype_get_mb_cur_max(void) __INTRODUCED_IN(21);
 #define MB_CUR_MAX __ctype_get_mb_cur_max()
+#else
+/*
+ * Pre-L we didn't have any locale support and so we were always the POSIX
+ * locale. POSIX specifies that MB_CUR_MAX for the POSIX locale is 1:
+ * http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/stdlib.h.html
+ */
+#define MB_CUR_MAX 1
+#endif
+
+#if defined(__BIONIC_INCLUDE_FORTIFY_HEADERS)
+#include <bits/fortify/stdlib.h>
+#endif
+
+#if __ANDROID_API__ >= __ANDROID_API_K__
+int abs(int __x) __attribute_const__ __INTRODUCED_IN(19);
+long labs(long __x) __attribute_const__ __INTRODUCED_IN(19);
+long long llabs(long long __x) __attribute_const__ __INTRODUCED_IN(19);
+#else
+// Implemented as static inlines before 19.
+#endif
+
+#if __ANDROID_API__ >= __ANDROID_API_L__
+float strtof(const char* __s, char** __end_ptr) __INTRODUCED_IN(21);
+double atof(const char* __s) __attribute_pure__ __INTRODUCED_IN(21);
+int rand(void) __INTRODUCED_IN(21);
+void srand(unsigned int __seed) __INTRODUCED_IN(21);
+long random(void) __INTRODUCED_IN(21);
+void srandom(unsigned int __seed) __INTRODUCED_IN(21);
+int grantpt(int __fd) __INTRODUCED_IN(21);
+
+long long strtoll_l(const char* __s, char** __end_ptr, int __base, locale_t __l) __INTRODUCED_IN(21);
+unsigned long long strtoull_l(const char* __s, char** __end_ptr, int __base, locale_t __l) __INTRODUCED_IN(21);
+long double strtold_l(const char* __s, char** __end_ptr, locale_t __l) __INTRODUCED_IN(21);
+#else
+// Implemented as static inlines before 21.
+#endif
+
+#if __ANDROID_API__ >= __ANDROID_API_O__
+double strtod_l(const char* __s, char** __end_ptr, locale_t __l) __INTRODUCED_IN(26);
+float strtof_l(const char* __s, char** __end_ptr, locale_t __l) __INTRODUCED_IN(26);
+long strtol_l(const char* __s, char** __end_ptr, int, locale_t __l) __INTRODUCED_IN(26);
+#else
+// Implemented as static inlines before 26.
+#endif
 
 __END_DECLS
 
-#endif /* _STDLIB_H_ */
+#include <android/legacy_stdlib_inlines.h>
+
+#endif /* _STDLIB_H */

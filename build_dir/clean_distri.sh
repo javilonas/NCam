@@ -16,7 +16,8 @@
 # limitations under the License.
 #
 
-export ROOTFS_PATH=/home/*/NCam
+export user=`id -g -n`
+export ROOTFS_PATH=/home/$user/NCam
 export DISTRI=$ROOTFS_PATH/Distribution
 export NCAM_BIN=ncam*
 export SCRIPT=clean_distri.sh

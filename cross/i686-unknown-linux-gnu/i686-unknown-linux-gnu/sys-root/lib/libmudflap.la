@@ -29,4 +29,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='/home/slug/optware/i686g25/toolchain/i686-unknown-linux-gnu/i686-unknown-linux-gnu/lib'
+libdir='/home/lonas/NCam/cross/i686-unknown-linux-gnu/i686-unknown-linux-gnu/lib'

@@ -2,11 +2,15 @@
 #define MODULE_DVBAPI_STAPI_H_
 
 int32_t stapi_open(void);
-int32_t stapi_set_filter(int32_t demux_id, uint16_t pid, uchar *filter, uchar *mask, int32_t num, char *pmtfile);
+int32_t stapi_set_filter(int32_t demux_id, uint16_t pid, uint8_t *filter, uint8_t *mask, int32_t num, char *pmtfile);
 int32_t stapi_remove_filter(int32_t demux_id, int32_t num, char *pmtfile);
-int32_t stapi_set_pid(int32_t demux_id, int32_t num, ca_index_t idx, uint16_t pid, char *pmtfile);
-int32_t stapi_write_cw(int32_t demux_id, uchar *cw, uint16_t *, int32_t, char *pmtfile);
-int32_t stapi_activate_section_filter(int32_t fd, uchar *filter, uchar *mask);
+int32_t stapi_set_pid(int32_t demux_id, int32_t num, uint32_t idx, uint16_t pid, char *pmtfile);
+#if defined(WITH_WI) && defined(WITH_EXTENDED_CW)
+int32_t stapi_write_cw(int32_t demux_id, uint8_t *cw, uint16_t *, int32_t, char *pmtfile, int cw_ex_mode, int cw_ex_algo);
+#else
+int32_t stapi_write_cw(int32_t demux_id, uint8_t *cw, uint16_t *, int32_t, char *pmtfile);
+#endif
+int32_t stapi_activate_section_filter(int32_t fd, uint8_t *filter, uint8_t *mask);
 
 #ifdef WITH_STAPI5
 

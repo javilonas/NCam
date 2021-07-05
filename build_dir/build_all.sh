@@ -20,14 +20,15 @@
 export INIT_TIME=`date +'%d/%m/%y %H:%M:%S'`
 export START_TIME=`date +%s`
 export TIME_LOG=`date +%Y%m%d_%H%M`
-export ROOTFS_PATH=/home/*/NCam
+export user=`id -g -n`
+export ROOTFS_PATH=/home/$user/NCam
 export BUILD_DIR=$ROOTFS_PATH/build_dir
 export PARCH_LOGS=$ROOTFS_PATH/build_dir/logs
 export NCAM_ALL=ncam_all
 export SCRIPT=build_all.sh
 
 echo ""
-echo " MINIMUM PERIOD 12 MINUTES :("
+echo " This may take..."
 echo ""
 echo ""
 echo ""
@@ -35,7 +36,7 @@ sleep 0.8s
 echo ""
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
 echo ""
 echo ""
 echo ""
@@ -62,7 +63,7 @@ sleep 0.8s
 echo ""
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
 echo ""
 sync
 echo ""
@@ -81,7 +82,7 @@ sleep 0.8s
 echo ""
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
 echo ""
 sync
 echo ""
@@ -100,7 +101,7 @@ sleep 0.8s
 echo ""
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
 echo ""
 sync
 echo ""
@@ -119,7 +120,7 @@ sleep 0.8s
 echo ""
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
 echo ""
 sync
 echo ""
@@ -138,7 +139,7 @@ sleep 0.8s
 echo ""
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
 echo ""
 sync
 echo ""
@@ -157,7 +158,7 @@ sleep 0.8s
 echo ""
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
 echo ""
 sync
 echo ""
@@ -176,7 +177,7 @@ sleep 0.8s
 echo ""
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
 echo ""
 sync
 echo ""
@@ -195,7 +196,7 @@ sleep 0.8s
 echo ""
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
 echo ""
 sync
 echo ""
@@ -214,7 +215,7 @@ sleep 0.8s
 echo ""
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
 echo ""
 sync
 echo ""
@@ -233,7 +234,7 @@ sleep 0.8s
 echo ""
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
 echo ""
 sync
 echo ""
@@ -252,7 +253,7 @@ sleep 0.8s
 echo ""
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
 echo ""
 sync
 echo ""
@@ -271,7 +272,45 @@ sleep 0.8s
 echo ""
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
+echo ""
+sync
+echo ""
+echo ""
+sleep 35
+sync
+echo ""
+echo " Build PPC-OLD-EXP..."
+echo ""
+sh $BUILD_DIR/build_ppc-old-exp.sh > /dev/null 2>&1
+sync
+echo ""
+echo ""
+echo ""
+sleep 0.8s
+echo ""
+echo ""
+echo ""
+echo " PLEASE WAIT..."
+echo ""
+sync
+echo ""
+echo ""
+sleep 35
+sync
+echo ""
+echo " Build PPC-OLD-EXP-LIBUSB..."
+echo ""
+sh $BUILD_DIR/build_ppc-old-exp-libusb.sh > /dev/null 2>&1
+sync
+echo ""
+echo ""
+echo ""
+sleep 0.8s
+echo ""
+echo ""
+echo ""
+echo " PLEASE WAIT..."
 echo ""
 sync
 echo ""
@@ -290,7 +329,7 @@ sleep 0.8s
 echo ""
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
 echo ""
 sync
 echo ""
@@ -309,7 +348,7 @@ sleep 0.8s
 echo ""
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
 echo ""
 sync
 echo ""
@@ -328,7 +367,7 @@ sleep 0.8s
 echo ""
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
 echo ""
 sync
 echo ""
@@ -347,7 +386,7 @@ sleep 0.8s
 echo ""
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
 echo ""
 sync
 echo ""
@@ -366,7 +405,7 @@ sleep 0.8s
 echo ""
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
 echo ""
 sync
 echo ""
@@ -385,7 +424,7 @@ sleep 0.8s
 echo ""
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
 echo ""
 sync
 echo ""
@@ -404,7 +443,7 @@ sleep 0.8s
 echo ""
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
 echo ""
 sync
 echo ""
@@ -423,7 +462,7 @@ sleep 0.8s
 echo ""
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
 echo ""
 sync
 echo ""
@@ -442,7 +481,7 @@ sleep 0.8s
 echo ""
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
 echo ""
 sync
 echo ""
@@ -461,7 +500,45 @@ sleep 0.8s
 echo ""
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
+echo ""
+sync
+echo ""
+echo ""
+sleep 35
+sync
+echo ""
+echo " Build ARM-ARMADA37XX..."
+echo ""
+sh $BUILD_DIR/build_arm-armada37xx.sh > /dev/null 2>&1
+sync
+echo ""
+echo ""
+echo ""
+sleep 0.8s
+echo ""
+echo ""
+echo ""
+echo " PLEASE WAIT..."
+echo ""
+sync
+echo ""
+echo ""
+sleep 35
+sync
+echo ""
+echo " Build ARM-ARMADA37XX-LIBUSB..."
+echo ""
+sh $BUILD_DIR/build_arm-armada37xx-libusb.sh > /dev/null 2>&1
+sync
+echo ""
+echo ""
+echo ""
+sleep 0.8s
+echo ""
+echo ""
+echo ""
+echo " PLEASE WAIT..."
 echo ""
 sync
 echo ""
@@ -480,7 +557,7 @@ sleep 0.8s
 echo ""
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
 echo ""
 sync
 echo ""
@@ -499,14 +576,14 @@ sleep 0.8s
 echo ""
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
 echo ""
 echo ""
 sleep 35
 sync
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
 echo ""
 sync
 echo ""
@@ -525,7 +602,7 @@ sleep 0.8s
 echo ""
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
 echo ""
 sync
 echo ""
@@ -548,7 +625,7 @@ sleep 35
 sync
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
 echo ""
 sync
 echo ""
@@ -567,7 +644,7 @@ sleep 0.8s
 echo ""
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
 echo ""
 sync
 echo ""
@@ -586,7 +663,7 @@ sleep 0.8s
 echo ""
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
 echo ""
 sync
 echo ""
@@ -605,7 +682,7 @@ sleep 0.8s
 echo ""
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
 echo ""
 sync
 echo ""
@@ -624,7 +701,7 @@ sleep 0.8s
 echo ""
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
 echo ""
 sync
 echo ""
@@ -643,11 +720,49 @@ sleep 0.8s
 echo ""
 echo ""
 echo ""
-echo " PLEASE WAIT...."
+echo " PLEASE WAIT..."
 echo ""
 sync
 echo ""
-echo " We are finalizing ..."
+echo ""
+sleep 35
+sync
+echo ""
+echo " Build SamsungTV..."
+echo ""
+sh $BUILD_DIR/build_arm-samsungtv.sh > /dev/null 2>&1
+sync
+echo ""
+echo ""
+echo ""
+sleep 0.8s
+echo ""
+echo ""
+echo ""
+echo " PLEASE WAIT..."
+echo ""
+sync
+echo ""
+echo ""
+sleep 35
+sync
+echo ""
+echo " Build x86_64 Synology-ATOM..."
+echo ""
+sh $BUILD_DIR/build_x86_64_syn_atom.sh > /dev/null 2>&1
+sync
+echo ""
+echo ""
+echo ""
+sleep 0.8s
+echo ""
+echo ""
+echo ""
+echo " PLEASE WAIT..."
+echo ""
+sync
+echo ""
+echo " We are finalizing..."
 echo ""
 sleep 35
 sync

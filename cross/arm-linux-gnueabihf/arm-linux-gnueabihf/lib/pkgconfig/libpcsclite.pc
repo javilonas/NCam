@@ -1,0 +1,12 @@
+prefix=/opt/simplebuild.test/ext_libs/rasb_hard
+exec_prefix=/opt/simplebuild.test/ext_libs/rasb_hard
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include/PCSC
+usbdropdir=/opt/simplebuild.test/ext_libs/rasb_hard/lib/pcsc/drivers
+
+Name: PCSC Lite
+Description: PC/SC smart card interface
+Version: 1.7.4
+Libs: -L${libdir} -lpcsclite
+Libs.private: 
+Cflags: -I${includedir} -pthread

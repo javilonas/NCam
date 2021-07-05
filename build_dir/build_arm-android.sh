@@ -20,14 +20,21 @@
 export INIT_TIME=`date +'%d/%m/%y %H:%M:%S'`
 export START_TIME=`date +%s`
 export TIME_LOG=`date +%Y%m%d_%H%M`
-export ROOTFS_PATH=/home/*/NCam
+export user=`id -g -n`
+export ROOTFS_PATH=/home/$user/NCam
 export PARCH_LOGS=$ROOTFS_PATH/build_dir/logs
 export ARCH=arm
 export target=arm
 export NCAM_BIN=ncam.arm-android
 export CROSS=$ROOTFS_PATH/cross/android-toolchain/bin/arm-linux-androideabi-
+export CC=$ROOTFS_PATH/cross/android-toolchain/bin/arm-linux-androideabi-gcc
+export RANLIB=$ROOTFS_PATH/cross/android-toolchain/bin/arm-linux-androideabi-ranlib
 export DCMAKE=android-arm
 export SCRIPT=build_arm-android.sh
+
+export NDK=$ANDROID_NDK
+
+export OPENSSLDIR=$ROOTFS_PATH/cross/android-toolchain/sysroot/usr/include/openssl/
 
 export LIBCRYPTO_LIB="$ROOTFS_PATH/cross/android-toolchain/sysroot/usr/lib/libcrypto.a -lrt"
 export SSL_LIB="$ROOTFS_PATH/cross/android-toolchain/sysroot/usr/lib/libssl.a -lrt"
@@ -61,7 +68,12 @@ echo ""
 echo ""
 rm -f $ROOTFS_PATH/Distribution/$NCAM_BIN > /dev/null 2>&1
 rm -f $ROOTFS_PATH/Distribution/$NCAM_BIN.debug > /dev/null 2>&1
-sh ./clean_all.sh > /dev/null 2>&1
+rm -f $ROOTFS_PATH/webif/pages_gen $ROOTFS_PATH/webif/pages.dep $ROOTFS_PATH/webif/pages.bin $ROOTFS_PATH/webif/pages.bin.compressed \
+      $ROOTFS_PATH/webif/pages.h $ROOTFS_PATH/webif/pages.c $ROOTFS_PATH/webif/is_defined.txt > /dev/null 2>&1
+echo ""
+cd $ROOTFS_PATH/webif
+make clean > /dev/null 2>&1
+cd ..
 sleep 0.8s
 sync
 echo " Cleaning performed correctly"
@@ -81,7 +93,7 @@ echo ""
 sleep 0.8s
 sync
 echo "+-------------------------------------------------------------------------------"
-nice -n 10 make NCAM_BIN=$NCAM_BIN ARCH=$ARCH target=$target -j`grep 'processor' /proc/cpuinfo | wc -l` $DCMAKE || exit 1
+nice -n 10 make NCAM_BIN=$NCAM_BIN ARCH=$ARCH NDK=$ANDROID_NDK target=$target -j`grep 'processor' /proc/cpuinfo | wc -l` $DCMAKE || exit 1
 sleep 0.8s
 sync
 echo ""

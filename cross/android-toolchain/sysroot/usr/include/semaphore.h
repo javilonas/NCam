@@ -25,6 +25,7 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+
 #ifndef _SEMAPHORE_H
 #define _SEMAPHORE_H
 
@@ -32,30 +33,41 @@
 
 __BEGIN_DECLS
 
+struct timespec;
+
 typedef struct {
-  volatile unsigned int count;
+  unsigned int count;
 #ifdef __LP64__
   int __reserved[3];
 #endif
 } sem_t;
 
-#define SEM_FAILED NULL
+#define SEM_FAILED __BIONIC_CAST(reinterpret_cast, sem_t*, 0)
 
-extern int sem_init(sem_t *sem, int pshared, unsigned int value);
+int sem_destroy(sem_t* __sem);
+int sem_getvalue(sem_t* __sem, int* __value);
+int sem_init(sem_t* __sem, int __shared, unsigned int __value);
+int sem_post(sem_t* __sem);
+int sem_timedwait(sem_t* __sem, const struct timespec* __ts);
+/*
+ * POSIX only supports using sem_timedwait() with CLOCK_REALTIME, however that is typically
+ * inappropriate, since that clock can change dramatically, causing the timeout to either
+ * expire earlier or much later than intended.  This function is added to use a timespec based
+ * on CLOCK_MONOTONIC that does not suffer from this issue.
+ */
 
-extern int    sem_close(sem_t *);
-extern int    sem_destroy(sem_t *);
-extern int    sem_getvalue(sem_t *, int *);
-extern int    sem_init(sem_t *, int, unsigned int);
-extern sem_t *sem_open(const char *, int, ...);
-extern int    sem_post(sem_t *);
-extern int    sem_trywait(sem_t *);
-extern int    sem_unlink(const char *);
-extern int    sem_wait(sem_t *);
+#if __ANDROID_API__ >= 28
+int sem_timedwait_monotonic_np(sem_t* __sem, const struct timespec* __ts) __INTRODUCED_IN(28);
+#endif /* __ANDROID_API__ >= 28 */
 
-struct timespec;
-extern int    sem_timedwait(sem_t *sem, const struct timespec *abs_timeout);
+int sem_trywait(sem_t* __sem);
+int sem_wait(sem_t* __sem);
+
+/* These aren't actually implemented. */
+sem_t* sem_open(const char* __name, int _flags, ...);
+int sem_close(sem_t* __sem);
+int sem_unlink(const char* __name);
 
 __END_DECLS
 
-#endif /* _SEMAPHORE_H */
+#endif

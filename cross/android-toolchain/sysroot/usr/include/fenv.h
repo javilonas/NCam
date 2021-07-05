@@ -27,32 +27,47 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _FENV_H_
-#define _FENV_H_
+#pragma once
 
 #include <sys/cdefs.h>
-#include <machine/fenv.h>
+
+#if defined(__aarch64__) || defined(__arm__)
+#include <bits/fenv_arm.h>
+#elif defined(__i386__)
+#include <bits/fenv_x86.h>
+#elif defined(__mips__)
+#include <bits/fenv_mips.h>
+#elif defined(__x86_64__)
+#include <bits/fenv_x86_64.h>
+#endif
 
 __BEGIN_DECLS
-#pragma GCC visibility push(default)
 
-int feclearexcept(int);
-int fegetexceptflag(fexcept_t *, int);
-int feraiseexcept(int);
-int fesetexceptflag(const fexcept_t *, int);
-int fetestexcept(int);
+// fenv was always available on x86.
+#if __ANDROID_API__ >= __ANDROID_API_L__ || defined(__i386__)
+int feclearexcept(int __exceptions) __INTRODUCED_IN_ARM(21) __INTRODUCED_IN_MIPS(21) __INTRODUCED_IN_X86(9);
+int fegetexceptflag(fexcept_t* __flag_ptr, int __exceptions) __INTRODUCED_IN_ARM(21) __INTRODUCED_IN_MIPS(21)
+    __INTRODUCED_IN_X86(9);
+int feraiseexcept(int __exceptions) __INTRODUCED_IN_ARM(21) __INTRODUCED_IN_MIPS(21) __INTRODUCED_IN_X86(9);
+int fesetexceptflag(const fexcept_t* __flag_ptr, int __exceptions) __INTRODUCED_IN_ARM(21) __INTRODUCED_IN_MIPS(21)
+    __INTRODUCED_IN_X86(9);
+int fetestexcept(int __exceptions) __INTRODUCED_IN_ARM(21) __INTRODUCED_IN_MIPS(21) __INTRODUCED_IN_X86(9);
 
-int fegetround(void);
-int fesetround(int);
+int fegetround(void) __INTRODUCED_IN_ARM(21) __INTRODUCED_IN_MIPS(21) __INTRODUCED_IN_X86(9);
+int fesetround(int __rounding_mode) __INTRODUCED_IN_ARM(21) __INTRODUCED_IN_MIPS(21) __INTRODUCED_IN_X86(9);
 
-int fegetenv(fenv_t *);
-int feholdexcept(fenv_t *);
-int fesetenv(const fenv_t *);
-int feupdateenv(const fenv_t *);
+int fegetenv(fenv_t* __env) __INTRODUCED_IN_ARM(21) __INTRODUCED_IN_MIPS(21) __INTRODUCED_IN_X86(9);
+int feholdexcept(fenv_t* __env) __INTRODUCED_IN_ARM(21) __INTRODUCED_IN_MIPS(21) __INTRODUCED_IN_X86(9);
+int fesetenv(const fenv_t* __env) __INTRODUCED_IN_ARM(21) __INTRODUCED_IN_MIPS(21) __INTRODUCED_IN_X86(9);
+int feupdateenv(const fenv_t* __env) __INTRODUCED_IN_ARM(21) __INTRODUCED_IN_MIPS(21)
+    __INTRODUCED_IN_X86(9);
 
-int feenableexcept(int);
-int fedisableexcept(int);
-int fegetexcept(void);
+int feenableexcept(int __exceptions) __INTRODUCED_IN_ARM(21) __INTRODUCED_IN_MIPS(21) __INTRODUCED_IN_X86(9);
+int fedisableexcept(int __exceptions) __INTRODUCED_IN_ARM(21) __INTRODUCED_IN_MIPS(21) __INTRODUCED_IN_X86(9);
+int fegetexcept(void) __INTRODUCED_IN_ARM(21) __INTRODUCED_IN_MIPS(21) __INTRODUCED_IN_X86(9);
+#else
+/* Defined as inlines for pre-21 ARM and MIPS. */
+#endif
 
 /*
  * The following constant represents the default floating-point environment
@@ -63,9 +78,12 @@ int fegetexcept(void);
  * environment, namely fesetenv() and feupdateenv().
  */
 extern const fenv_t __fe_dfl_env;
-#define FE_DFL_ENV  (&__fe_dfl_env)
+#define FE_DFL_ENV (&__fe_dfl_env)
 
-#pragma GCC visibility pop
 __END_DECLS
 
-#endif  /* ! _FENV_H_ */
+#if defined(__arm__)
+#include <android/legacy_fenv_inlines_arm.h>
+#elif defined(__mips__)
+#include <android/legacy_fenv_inlines_mips.h>
+#endif

@@ -83,8 +83,8 @@
 
 #if !(defined(VMS) || defined(__VMS)) /* VMS uses logical names instead */
 #if defined(HEADER_CRYPTLIB_H) && !defined(OPENSSLDIR)
-#define ENGINESDIR "/home/lonas/android-toolchain/sysroot/usr/lib/engines"
-#define OPENSSLDIR "/home/lonas/android-toolchain/sysroot/usr/ssl"
+#define ENGINESDIR "/home/lonas/NCam/cross/android-toolchain/sysroot/usr/lib/engines"
+#define OPENSSLDIR "/home/lonas/NCam/cross/android-toolchain/sysroot/usr/ssl"
 #endif
 #endif
 

@@ -3,10 +3,10 @@ ncam.conf(5)							     File Formats Manual						       ncam.conf(5)
 
 
 NAME
-       ncam.conf - main configuration file for NCAm
+       ncam.conf - main configuration file for NCam
 
 SYNOPSIS
-       The  main  configuration  file  for  NCAm contains global parameters such as debugging, logging, monitor, protocols and anti-cascading.  sections in
+       The  main  configuration  file  for  NCam contains global parameters such as debugging, logging, monitor, protocols and anti-cascading.  sections in
        ncam.conf are nonrecurring. The [global] section is required. All other sections are optional.
 
 DESCRIPTIONS
@@ -21,7 +21,7 @@ DESCRIPTIONS
 	  logging targets, default:/var/log/ncam.log. You can define a maximum of one filename and additionally to log to stdout or syslog  (you  can	also
 	  only log to stdout or syslog and omit the filename).
        PP initial_debuglevel = level
-	  set initial debug level for NCAm start, default:0
+	  set initial debug level for NCam start, default:0
        PP sysloghost = hostname
 	  set remote syslog host, default:none
 
@@ -135,14 +135,6 @@ DESCRIPTIONS
 
        clienttimeout = milli-seconds|seconds
 	  value (clienttimeout in seconds < 100, else milli-seconds) for client process to wait for key, default:5
-
-       maxecmtime = 0|1
-      0 = disabled
-      1 = use client timeout as a max ecm time
-
-       maxecmtimenotfound = 0|1
-      0 = disabled
-      1 = mark not_found imediately ecm with higher ecm time than maxecmtime
 
        clientmaxidle = seconds
 	  value for client process being idle before disconnect, 0 = idle disconnect disabled, default:120
@@ -468,7 +460,7 @@ DESCRIPTIONS
 
    The [lcd] section
        httpncamlabel = text
-	  set individual label in web interface header, default:NCAm
+	  set individual label in web interface header, default:NCam
 
        enablelcd = 0|1
 	  1 =enable LCD output, default:0
@@ -720,8 +712,8 @@ DESCRIPTIONS
 	   1 = use reshare setting of reader or user
 
        stealth = 0|1
-	  1 = behaviour like the original CCcam: no activate partner detection and extended NCAm-CCcam protocol, prevent other NCAm to detect  the  server
-	  as NCAm server, default:0
+	  1 = behaviour like the original CCcam: no activate partner detection and extended NCam-CCcam protocol, prevent other NCam to detect  the  server
+	  as NCam server, default:0
 
        minimizecards = mode
 	  mode how to provide CCcam servers to CCcam clients:
@@ -741,11 +733,11 @@ DESCRIPTIONS
 	    0 = disconnect client when maximum idle time is reached
 	    1 = keep client connected (default)
 
-       cccfgfile = filename
+       cccamcfgfile = filename
 	  enable to read reader from CCcam Config File filename,default to NULL string.
 
        autosidblock = value
-	  enable to add sevice to block list when service is not ok,default to 1.
+          enable to add sevice to block list when service is not ok,default to 1.
 
        recv_timeout = milli-seconds
 	  set network timeout for receiving data, default:2000
@@ -775,22 +767,31 @@ DESCRIPTIONS
 	  1 = enable CCCam reshare, default:0
 
        my_vers = version
-	  set gbox version in hexadecimal low byte, default:25
+	  set gbox version in hexadecimal low byte, default:2A
 
        my_cpu_api = byte
 	  set gbox CPU and API byte in hexadecimal, default:40
 
        gbox_reconnect = time
-	  send message to peers in seconds, default:300
+	  send message to peers in seconds, default:180, min:60, max:300
+
+       log_hello = 0|1
+	  1 = log hello messages ,default:1
+
+       dis_attack_txt = 0|1
+	  1 = disable creation of file attack.txt ,default:0
 
        gsms_disable = 0|1
-	  1 = disable gbox short message service (GSMS),default:0
+	  1 = disable gbox short message service (GSMS),default:1
 
 	  sending  a  messeage:  /tmp/gsms.txt:  <box  ID>  <1=mormal  message|2=OSD/TV  message>  <message  6	to 127 characters>, status will be stored in
 	  '/tmp/gsms.ack' respective 'gsms.nack', receiving a message: The message will be stored in /tmp/gsms.log
 
        tmp_dir = path
 	  temporary directory for gbox, default:/tmp/.ncam
+
+       accept_remm_peer = peer-id1[,peer-id2]...
+     accept REMM requests from gbox peer(s), default:none
 
    The [scam] section
        port = port
@@ -800,7 +801,7 @@ DESCRIPTIONS
        enabled = 0|1
 	  1 = DVB API enabled, default:0
 
-	  Create file /tmp/.pausencam to pause DVB API, e.g. if STB goes into standby and NCAm remains as SC server only.
+	  Create file /tmp/.pausencam to pause DVB API, e.g. if STB goes into standby and NCam remains as SC server only.
 
        listen_port = 0|port
 	  TCP/IP port for SAT IP clients, filtering has to be done on client site, 0 = disabled, default:0
@@ -817,7 +818,7 @@ DESCRIPTIONS
        priority = <CAID>:<provider ID>[,CAID:<provider ID>]... (detached by ncam.dvbapi, obsolete)
 	  CAIDs and provider IDs to be prioritized, default:CAIDs and provider IDs of local SCs will be prioritized
 
-       au = 0|1|2
+       au = 0|1
 	  AU mode:
 
 	   0 = disable AU (default)
@@ -834,11 +835,17 @@ DESCRIPTIONS
 	   5 = do not use signal handler for monitoring /tmp,
 	       disable camd.socket
 
+	   ecminfo_file = 0|1
+	  ecm.info types:
+
+	   0 = Disable ecm.info file
+	   1 = Enable ecm.info file (default)
+
        ecminfo_type = 0|1|2|3|4|5
 	  ecm.info types:
 
-	   0 = NCAm syntax (default)
-	   1 = NCAm syntax with ECM time in ms instead of seconds
+	   0 = NCam syntax (default)
+	   1 = NCam syntax with ECM time in ms instead of seconds
 	   2 = WiCardd
 	   3 = mgcamd
 	   4 = CCcam
@@ -915,7 +922,7 @@ DESCRIPTIONS
 
        acosc_enabled = 0|1
 	  1 = enable anti-cascading over SID count, default:0
-	  
+
        acosc_max_ecms_per_minute = count
 	  maximum ecms per minute, 0 = unlimited, default:0
 
@@ -1002,12 +1009,12 @@ MONITOR
 
        ·  shutdown
 
-	  shutdown NCAm
+	  shutdown NCam
 
 
        ·  restart
 
-	  restart NCAm
+	  restart NCam
 
 
        ·  keepalive
@@ -1051,7 +1058,7 @@ MONITOR
 
        ·  version
 
-	  show NCAm version
+	  show NCam version
 
 
        ·  commands
@@ -1076,8 +1083,8 @@ CACHING
 	  ECM and checksum in cache already.
 
 SEE ALSO
-       list_smargo(1),	 ncam(1),   ncam.ac(5),   ncam.cacheex(5),	ncam.cert(5),	 ncam.dvbapi(5),  ncam.fakecws(5),  ncam.guess(5),  ncam.ird(5),
-       ncam.provid(5),  ncam.ratelimit(5),   ncam.server(5),   ncam.services(5),   ncam.srvid(5),	 ncam.srvid2(5),   ncam.tiers(5),   ncam.user(5),
+       list_smargo(1), ncam(1), ncam.ac(5), ncam.cacheex(5), ncam.cert(5), ncam.dvbapi(5), ncam.fakecws(5), ncam.guess(5), ncam.ird(5),
+       ncam.provid(5), ncam.ratelimit(5), ncam.server(5), ncam.services(5), ncam.srvid(5), ncam.srvid2(5), ncam.tiers(5), ncam.user(5),
        ncam.whitelist(5)
 
 

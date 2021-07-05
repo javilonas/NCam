@@ -1,6 +1,0 @@
-nls_base.ko
-usb-common.ko
-usbcore.ko
-xhci-hcd.ko
-xhci-pci.ko
-xhci-plat-hcd.ko

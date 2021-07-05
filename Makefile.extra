@@ -104,20 +104,19 @@ i686-pc-cygwin-pcsc:
 		CROSS=i686-pc-cygwin- \
 		USE_PCSC=1 \
 		PCSC_LIB="-lwinscard" \
+		EXTRA_LIBS="-lSetupAPI -lOle32 -lshell32" \
 		EXTRA_FLAGS="-D_WIN32 -I /tmp/include -I ./cygwin -I/usr/include/w32api -static" \
 		EXTRA_LDFLAGS="" \
 		$(MAKEFLAGS)
 
-i686-pc-cygwin-libusb:
+x86_64-pc-cygwin-pcsc-libusb:
 	$(MAKE) --no-print-directory \
-		CROSS=i686-pc-cygwin- \
 		USE_LIBUSB=1 \
-		LIBUSB_LIB="/usr/lib/libusb-1.0.a" \
+		LIBUSB_LIB="/lib/libusb-1.0.dll.a" \
 		USE_PCSC=1 \
 		PCSC_LIB="-lwinscard" \
-		EXTRA_LIBS="-lSetupAPI -lOle32 -lshell32" \
-		EXTRA_FLAGS="-D_WIN32 -I /tmp/include -I ./cygwin -I/usr/include/w32api -static" \
-		EXTRA_LDFLAGS="" \
+		EXTRA_FLAGS="-D_WIN64 -I /tmp/include -I ./cygwin -I/usr/include/w32api -static" \
+		EXTRA_LDFLAGS="-L/cygdrive/c/WINDOWS/system32" \
 		$(MAKEFLAGS)
 
 x86_64-pc-cygwin:
@@ -131,6 +130,12 @@ x86_64-pc-cygwin-pcsc:
 		PCSC_LIB="-lwinscard" \
 		EXTRA_FLAGS="-D_WIN64 -I /tmp/include -I ./cygwin -I/usr/include/w32api -static" \
 		EXTRA_LDFLAGS="-L/cygdrive/c/WINDOWS/system32" \
+		$(MAKEFLAGS)
+
+cross-x86_64-pc-w64-mingw32:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		EXTRA_FLAGS="-D_WIN64 -I /tmp/include -static" \
 		$(MAKEFLAGS)
 
 cross-sparc-sun-solaris2.7:
@@ -162,89 +167,206 @@ cross-mips-sgi-irix6.5:
 cross-mipsel-routerwrtbrcm47xx-linux-uclibc:
 	$(MAKE) --no-print-directory \
 		CROSS=$(CROSS) \
-		LIB_RT= \
+		LIB_RT=$(LIB_RT) \
 		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
+		CONF_DIR=/usr/local/etc \
 		EXTRA_FLAGS="-static-libgcc -I. -s" \
 		EXTRA_LDFLAGS="-static" \
-		CONF_DIR=/usr/local/etc \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
 		$(MAKEFLAGS)
 
 cross-mips-routerwrtbrcm47xx-linux-uclibc-libusb:
 	$(MAKE) --no-print-directory \
 		CROSS=$(CROSS) \
-		LIB_RT= \
+		LIB_RT=$(LIB_RT) \
 		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
+		CONF_DIR=/usr/local/etc \
 		EXTRA_FLAGS="-static-libgcc -I. -s" \
+		EXTRA_LDFLAGS="-static" \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
 		USE_LIBUSB=1 \
 		LIBUSB_LIB=$(LIBUSB_LIB) \
-		EXTRA_LDFLAGS="-static" \
+		$(MAKEFLAGS)
+
+cross-mips-routerwrtbrcm47xx-linux-uclibc-ssl-libusb:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		LIB_RT=$(LIB_RT) \
+		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
 		CONF_DIR=/usr/local/etc \
+		EXTRA_FLAGS="-static-libgcc -I. -s" \
+		EXTRA_LDFLAGS="-static" \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
+		USE_LIBUSB=1 \
+		LIBUSB_LIB=$(LIBUSB_LIB) \
 		$(MAKEFLAGS)
 
 cross-mips-routerwrtbrcm63xx-linux-uclibc:
 	$(MAKE) --no-print-directory \
 		CROSS=$(CROSS) \
-		LIB_RT= \
+		LIB_RT=$(LIB_RT) \
 		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
+		CONF_DIR=/usr/local/etc \
 		EXTRA_FLAGS="-static-libgcc -I. -s" \
 		EXTRA_LDFLAGS="-static" \
-		CONF_DIR=/usr/local/etc \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
 		$(MAKEFLAGS)
 
 cross-mips-routerwrtbrcm63xx-linux-uclibc-libusb:
 	$(MAKE) --no-print-directory \
 		CROSS=$(CROSS) \
-		LIB_RT= \
+		LIB_RT=$(LIB_RT) \
 		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
+		CONF_DIR=/usr/local/etc \
 		EXTRA_FLAGS="-static-libgcc -I. -s" \
+		EXTRA_LDFLAGS="-static" \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
 		USE_LIBUSB=1 \
 		LIBUSB_LIB=$(LIBUSB_LIB) \
-		EXTRA_LDFLAGS="-static" \
+		$(MAKEFLAGS)
+
+cross-mips-routerwrtbrcm63xx-linux-uclibc-ssl-libusb:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		LIB_RT=$(LIB_RT) \
+		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
 		CONF_DIR=/usr/local/etc \
+		EXTRA_FLAGS="-static-libgcc -I. -s" \
+		EXTRA_LDFLAGS="-static" \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
+		USE_SSL=1 \
+		USE_LIBUSB=1 \
+		LIBUSB_LIB=$(LIBUSB_LIB) \
 		$(MAKEFLAGS)
 
 cross-mips-routerwrtar71xx-linux-uclibc:
 	$(MAKE) --no-print-directory \
 		CROSS=$(CROSS) \
-		LIB_RT= \
+		LIB_RT=$(LIB_RT) \
 		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
+		CONF_DIR=/usr/local/etc \
 		EXTRA_FLAGS="-static-libgcc -I. -s" \
 		EXTRA_LDFLAGS="-static" \
-		CONF_DIR=/usr/local/etc \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
 		$(MAKEFLAGS)
 
 cross-mips-routerwrtar71xx-linux-uclibc-libusb:
 	$(MAKE) --no-print-directory \
 		CROSS=$(CROSS) \
-		LIB_RT= \
+		LIB_RT=$(LIB_RT) \
 		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
+		CONF_DIR=/usr/local/etc \
 		EXTRA_FLAGS="-static-libgcc -I. -s" \
+		EXTRA_LDFLAGS="-static" \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
 		USE_LIBUSB=1 \
 		LIBUSB_LIB=$(LIBUSB_LIB) \
-		EXTRA_LDFLAGS="-static" \
+		$(MAKEFLAGS)
+
+cross-mips-routerwrtar71xx-linux-uclibc-ssl-libusb:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		LIB_RT=$(LIB_RT) \
+		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
 		CONF_DIR=/usr/local/etc \
+		EXTRA_FLAGS="-static-libgcc -I. -s" \
+		EXTRA_LDFLAGS="-static" \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
+		USE_SSL=1 \
+		USE_LIBUSB=1 \
+		LIBUSB_LIB=$(LIBUSB_LIB) \
+		$(MAKEFLAGS)
+
+cross-mipsel-router-linux-uclibc-ssl-libusb:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		LIB_RT=$(LIB_RT) \
+		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
+		MODFLAGS_WARN=$(MODFLAGS_WARN) \
+		CONF_DIR=/usr/local/etc \
+		EXTRA_FLAGS="-static-libgcc -I. -s" \
+		LDFLAGS=" " \
+		EXTRA_LDFLAGS="-static" \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
+		USE_SSL=1 \
+		USE_LIBUSB=1 \
+		LIBUSB_LIB=$(LIBUSB_LIB) \
 		$(MAKEFLAGS)
 
 cross-mipsel-router-linux-uclibc-libusb:
 	$(MAKE) --no-print-directory \
 		CROSS=$(CROSS) \
-		LIB_RT= \
+		LIB_RT=$(LIB_RT) \
 		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
+		MODFLAGS_WARN=$(MODFLAGS_WARN) \
+		CONF_DIR=/usr/local/etc \
 		EXTRA_FLAGS="-static-libgcc -I. -s" \
+		LDFLAGS=" " \
+		EXTRA_LDFLAGS="-static" \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
 		USE_LIBUSB=1 \
 		LIBUSB_LIB=$(LIBUSB_LIB) \
-		EXTRA_LDFLAGS="-static" \
-		CONF_DIR=/usr/local/etc \
 		$(MAKEFLAGS)
 
 cross-mipsel-router-linux-uclibc:
 	$(MAKE) --no-print-directory \
 		CROSS=$(CROSS) \
-		LIB_RT= \
+		LIB_RT=$(LIB_RT) \
 		LIB_PTHREAD=$(LIB_PTHREAD) \
-		EXTRA_FLAGS="-static-libgcc -I. -s" \
-		EXTRA_LDFLAGS="-static" \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
+		MODFLAGS_WARN=$(MODFLAGS_WARN) \
 		CONF_DIR=/usr/local/etc \
+		EXTRA_FLAGS="-static-libgcc -I. -s" \
+		LDFLAGS=" " \
+		EXTRA_LDFLAGS="-static" \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
 		$(MAKEFLAGS)
 
 cross-mipsel-router-linux-uclibc927: cross-mipsel-router-linux-uclibc
@@ -253,14 +375,14 @@ cross-mipsel-router-linux-uclibc929: cross-mipsel-router-linux-uclibc
 
 cross-mipsel-router-linux-uclibc929-static:
 	$(MAKE) --no-print-directory \
-		CROSS=mipsel-linux-uclibc- \
+		CROSS=$(CROSS) \
 		EXTRA_FLAGS="-static-libgcc" \
 		EXTRA_LDFLAGS="-static" \
 		$(MAKEFLAGS)
 
 cross-mips-router-linux-uclibc:
 	$(MAKE) --no-print-directory \
-		CROSS=mips-linux-uclibc- \
+		CROSS=$(CROSS) \
 		EXTRA_FLAGS="-static-libgcc" \
 		$(MAKEFLAGS)
 
@@ -268,18 +390,58 @@ cross-mips-router-linux-uclibc930: cross-mips-router-linux-uclibc
 cross-mips-router-linux-uclibc931: cross-mips-router-linux-uclibc930
 cross-mipsel-fonera2: cross-mips-router-linux-uclibc
 
+cross-mipsel-tuxbox-linux-gnu-ssl-libusb-pcsc:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		LIB_RT=$(LIB_RT) \
+		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
+		CONF_DIR=/var/tuxbox/config \
+		EXTRA_FLAGS="-mips1 -static-libgcc -EL -I. -s" \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
+		USE_SSL=1 \
+		USE_PCSC=1 \
+		PCSC_LIB=$(PCSC_LIB) \
+		USE_LIBUSB=1 \
+		LIBUSB_LIB=$(LIBUSB_LIB) \
+		$(MAKEFLAGS)
+
 cross-mipsel-tuxbox-linux-gnu-libusb-pcsc:
 	$(MAKE) --no-print-directory \
 		CROSS=$(CROSS) \
+		LIB_RT=$(LIB_RT) \
+		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
 		CONF_DIR=/var/tuxbox/config \
+		EXTRA_FLAGS="-mips1 -static-libgcc -EL -I. -s" \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
 		USE_PCSC=1 \
 		PCSC_LIB=$(PCSC_LIB) \
-		EXTRA_FLAGS="-mips1 -static-libgcc -EL -I. -s" \
 		USE_LIBUSB=1 \
 		LIBUSB_LIB=$(LIBUSB_LIB) \
 		$(MAKEFLAGS)
 
 cross-mipsel-tuxbox-linux-gnu:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		LIB_RT=$(LIB_RT) \
+		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
+		CONF_DIR=/var/tuxbox/config \
+		EXTRA_FLAGS="-mips1 -static-libgcc -EL -I. -s" \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
+		$(MAKEFLAGS)
+
+cross-mipsel-unknown-linux-gnu:
 	$(MAKE) --no-print-directory \
 		CROSS=$(CROSS) \
 		CONF_DIR=/var/tuxbox/config \
@@ -288,7 +450,7 @@ cross-mipsel-tuxbox-linux-gnu:
 
 cross-mipsel-tuxbox-linux:
 	$(MAKE) --no-print-directory \
-		CROSS=mipsel-unknown-linux-gnu- \
+		CROSS=$(CROSS) \
 		CONF_DIR=/var/tuxbox/config \
 		EXTRA_FLAGS="-mips1 -static-libgcc -EL -I. -s" \
 		$(MAKEFLAGS)
@@ -296,33 +458,69 @@ cross-mipsel-tuxbox-linux:
 cross-mipsel-linux-uclibc-libusb-pcsc:
 	$(MAKE) --no-print-directory \
 		CROSS=$(CROSS) \
+		LIB_RT=$(LIB_RT) \
+		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
 		CONF_DIR=/var/tuxbox/config \
+		EXTRA_FLAGS="-mips1 -static-libgcc -EL -I. -s" \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
 		USE_PCSC=1 \
 		PCSC_LIB=$(PCSC_LIB) \
-		EXTRA_FLAGS="-mips1 -static-libgcc -EL -I. -s" \
 		USE_LIBUSB=1 \
 		LIBUSB_LIB=$(LIBUSB_LIB) \
+		LIB_SSL=$(LIB_SSL) \
 		$(MAKEFLAGS)
 
 cross-mipsel-linux-uclibc:
 	$(MAKE) --no-print-directory \
 		CROSS=$(CROSS) \
+		LIB_RT=$(LIB_RT) \
+		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
 		CONF_DIR=/var/tuxbox/config \
 		EXTRA_FLAGS="-mips1 -static-libgcc -EL -I. -s" \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
 		$(MAKEFLAGS)
 
 cross-mipsel-tuxbox-linux-glibc:
 	$(MAKE) --no-print-directory \
-		CROSS=mipsel-linux-glibc- \
+		CROSS=$(CROSS) \
 		CONF_DIR=/var/tuxbox/config \
 		EXTRA_FLAGS="-mips1 -static-libgcc -EL -I. -s" \
+		$(MAKEFLAGS)
+
+cross-arm-tuxbox-linux-ssl-libusb:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		LIB_RT=$(LIB_RT) \
+		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
+		CONF_DIR=/var/tuxbox/config \
+		EXTRA_FLAGS="-mtune=cortex-a9 -mcpu=cortex-a9 -mfpu=neon-vfpv4 -static-libgcc -I. -s" \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
+		USE_SSL=1 \
+		USE_LIBUSB=1 \
+		LIBUSB_LIB=$(LIBUSB_LIB) \
 		$(MAKEFLAGS)
 
 cross-arm-tuxbox-linux-libusb:
 	$(MAKE) --no-print-directory \
 		CROSS=$(CROSS) \
+		LIB_RT=$(LIB_RT) \
+		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
 		CONF_DIR=/var/tuxbox/config \
 		EXTRA_FLAGS="-mtune=cortex-a9 -mcpu=cortex-a9 -mfpu=neon-vfpv4 -static-libgcc -I. -s" \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
 		USE_LIBUSB=1 \
 		LIBUSB_LIB=$(LIBUSB_LIB) \
 		$(MAKEFLAGS)
@@ -330,8 +528,46 @@ cross-arm-tuxbox-linux-libusb:
 cross-arm-tuxbox-linux:
 	$(MAKE) --no-print-directory \
 		CROSS=$(CROSS) \
+		LIB_RT=$(LIB_RT) \
+		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
 		CONF_DIR=/var/tuxbox/config \
 		EXTRA_FLAGS="-mtune=cortex-a9 -mcpu=cortex-a9 -mfpu=neon-vfpv4 -static-libgcc -I. -s" \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
+		$(MAKEFLAGS)
+
+cross-aarch64-tuxbox-linux-libusb:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		CONF_DIR=/var/tuxbox/config \
+		EXTRA_FLAGS="-static-libgcc -I. -s" \
+		LIBUSB_LIB=$(LIBUSB_LIB) \
+		$(MAKEFLAGS)
+
+cross-aarch64-tuxbox-linux:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		CONF_DIR=/var/tuxbox/config \
+		EXTRA_FLAGS="-static-libgcc -I. -s" \
+		$(MAKEFLAGS)
+
+cross-arm-raspbian-linux-ssl-libusb:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		LIB_RT=$(LIB_RT) \
+		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
+		CONF_DIR=/var/tuxbox/config \
+		EXTRA_FLAGS="-static-libgcc -I. -s" \
+		LIB_SSL=$(LIB_SSL) \
+		USE_SSL=1 \
+		USE_LIBUSB=1 \
+		LIBUSB_LIB=$(LIBUSB_LIB) \
 		$(MAKEFLAGS)
 
 cross-arm-raspbian-linux-libusb:
@@ -343,27 +579,147 @@ cross-arm-raspbian-linux-libusb:
 		LIBUSB_LIB=$(LIBUSB_LIB) \
 		$(MAKEFLAGS)
 
+cross-arm-raspbian-linux-ssl:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		LIB_RT=$(LIB_RT) \
+		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
+		CONF_DIR=/var/tuxbox/config \
+		EXTRA_FLAGS="-static-libgcc -I. -s" \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
+		USE_SSL=1 \
+		$(MAKEFLAGS)
+
 cross-arm-raspbian-linux:
 	$(MAKE) --no-print-directory \
 		CROSS=$(CROSS) \
+		USE_LIBCRYPTO=1 \
 		CONF_DIR=/var/tuxbox/config \
 		EXTRA_FLAGS="-static-libgcc -I. -s" \
+		$(MAKEFLAGS)
+
+cross-arm-samsungtv-linux:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		LIB_RT=$(LIB_RT) \
+		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
+		CONF_DIR=/mtd_rwcommon/ncam \
+		EXTRA_FLAGS="-static-libgcc -I. -s" \
+		EXTRA_LDFLAGS=$(EXTRA_LDFLAGS) \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		USE_PCSC=1 \
+		PCSC_LIB=$(PCSC_LIB) \
+		USE_LIBUSB=1 \
+		LIBUSB_LIB=$(LIBUSB_LIB) \
+		LIB_SSL=$(LIB_SSL) \
+		USE_SSL=1 \
+		$(MAKEFLAGS)
+
+cross-arm-marvell-linux-ssl-libusb:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		LIB_RT=$(LIB_RT) \
+		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
+		CONF_DIR=/var/tuxbox/config \
+		EXTRA_FLAGS="-mhard-float -mfloat-abi=hard -mtune=cortex-a9 -mcpu=cortex-a9 -mfpu=vfpv3 -static-libgcc -I. -s" \
+		EXTRA_LDFLAGS=$(EXTRA_LDFLAGS) \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		USE_LIBUSB=1 \
+		LIBUSB_LIB=$(LIBUSB_LIB) \
+		LIB_SSL=$(LIB_SSL) \
+		USE_SSL=1 \
 		$(MAKEFLAGS)
 
 cross-arm-marvell-linux-libusb:
 	$(MAKE) --no-print-directory \
 		CROSS=$(CROSS) \
+		LIB_RT=$(LIB_RT) \
+		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
 		CONF_DIR=/var/tuxbox/config \
-		EXTRA_FLAGS="-static-libgcc -I. -s" \
+		EXTRA_FLAGS="-mhard-float -mfloat-abi=hard -mtune=cortex-a9 -mcpu=cortex-a9 -mfpu=vfpv3 -static-libgcc -I. -s" \
+		EXTRA_LDFLAGS=$(EXTRA_LDFLAGS) \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
 		USE_LIBUSB=1 \
 		LIBUSB_LIB=$(LIBUSB_LIB) \
+		LIB_SSL=$(LIB_SSL) \
 		$(MAKEFLAGS)
 
 cross-arm-marvell-linux:
 	$(MAKE) --no-print-directory \
 		CROSS=$(CROSS) \
+		LIB_RT=$(LIB_RT) \
+		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
+		CONF_DIR=/var/tuxbox/config \
+		EXTRA_FLAGS="-mhard-float -mfloat-abi=hard -mtune=cortex-a9 -mcpu=cortex-a9 -mfpu=vfpv3 -static-libgcc -I. -s" \
+		EXTRA_LDFLAGS=$(EXTRA_LDFLAGS) \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
+		$(MAKEFLAGS)
+
+cross-arm-armada37xx-linux:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		LIB_RT=$(LIB_RT) \
+		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
 		CONF_DIR=/var/tuxbox/config \
 		EXTRA_FLAGS="-static-libgcc -I. -s" \
+		EXTRA_LDFLAGS=$(EXTRA_LDFLAGS) \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
+		$(MAKEFLAGS)
+
+cross-arm-armada37xx-linux-ssl-libusb:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		LIB_RT=$(LIB_RT) \
+		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
+		CONF_DIR=/var/tuxbox/config \
+		EXTRA_FLAGS="-static-libgcc -I. -s" \
+		EXTRA_LDFLAGS=$(EXTRA_LDFLAGS) \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		USE_LIBUSB=1 \
+		LIBUSB_LIB=$(LIBUSB_LIB) \
+		LIB_SSL=$(LIB_SSL) \
+		USE_SSL=1 \
+		$(MAKEFLAGS)
+
+cross-arm-armada37xx-linux-libusb:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		LIB_RT=$(LIB_RT) \
+		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
+		CONF_DIR=/var/tuxbox/config \
+		EXTRA_FLAGS="-static-libgcc -I. -s" \
+		EXTRA_LDFLAGS=$(EXTRA_LDFLAGS) \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		USE_LIBUSB=1 \
+		LIBUSB_LIB=$(LIBUSB_LIB) \
+		LIB_SSL=$(LIB_SSL) \
 		$(MAKEFLAGS)
 
 cross-sh4-tuxbox-linux-libusb-pcsc:
@@ -384,13 +740,57 @@ cross-sh4-tuxbox-linux:
 		EXTRA_FLAGS="-static-libgcc -I. -s" \
 		$(MAKEFLAGS)
 
+cross-x86_64-syn_atom:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		LIB_RT=$(LIB_RT) \
+		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
+		CONF_DIR=/usr/local/etc \
+		EXTRA_FLAGS="-static-libgcc -m64 -I. -s" \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		MODFLAGS_WARN=$(MODFLAGS_WARN) \
+		USE_PCSC=1 \
+		PCSC_LIB=$(PCSC_LIB) \
+		USE_LIBUSB=1 \
+		LIBUSB_LIB=$(LIBUSB_LIB) \
+		LIB_SSL=$(LIB_SSL) \
+		USE_SSL=1 \
+		$(MAKEFLAGS)
+
+cross-x86_64-tuxbox-linux-ssl-libusb-pcsc:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		LIB_RT=$(LIB_RT) \
+		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
+		CONF_DIR=/var/tuxbox/config \
+		USE_PCSC=1 \
+		EXTRA_FLAGS="-m64 -I. -s" \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
+		USE_SSL=1 \
+		USE_LIBUSB=1 \
+		LIBUSB_LIB=$(LIBUSB_LIB) \
+		$(MAKEFLAGS)
+
 cross-x86_64-tuxbox-linux-libusb-pcsc:
 	$(MAKE) --no-print-directory \
 		CROSS=$(CROSS) \
+		LIB_RT=$(LIB_RT) \
+		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
 		CONF_DIR=/var/tuxbox/config \
 		USE_PCSC=1 \
-		PCSC_LIB=$(PCSC_LIB) \
 		EXTRA_FLAGS="-m64 -I. -s" \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
 		USE_LIBUSB=1 \
 		LIBUSB_LIB=$(LIBUSB_LIB) \
 		$(MAKEFLAGS)
@@ -398,17 +798,50 @@ cross-x86_64-tuxbox-linux-libusb-pcsc:
 cross-x86_64-tuxbox-linux:
 	$(MAKE) --no-print-directory \
 		CROSS=$(CROSS) \
+		LIB_RT=$(LIB_RT) \
+		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
 		CONF_DIR=/var/tuxbox/config \
 		EXTRA_FLAGS="-m64 -I. -s" \
+		LIB_SSL=$(LIB_SSL) \
+		$(MAKEFLAGS)
+
+cross-x86-tuxbox-linux-ssl-libusb-pcsc:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		MODFLAGS_WARN=$(MODFLAGS_WARN) \
+		LIB_RT=$(LIB_RT) \
+		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
+		CONF_DIR=/var/tuxbox/config \
+		USE_PCSC=1 \
+		EXTRA_FLAGS="-m32 -I. -s" \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
+		USE_SSL=1 \
+		USE_LIBUSB=1 \
+		LIBUSB_LIB=$(LIBUSB_LIB) \
 		$(MAKEFLAGS)
 
 cross-x86-tuxbox-linux-libusb-pcsc:
 	$(MAKE) --no-print-directory \
 		CROSS=$(CROSS) \
+		MODFLAGS_WARN=$(MODFLAGS_WARN) \
+		LIB_RT=$(LIB_RT) \
+		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
 		CONF_DIR=/var/tuxbox/config \
 		USE_PCSC=1 \
 		PCSC_LIB=$(PCSC_LIB) \
 		EXTRA_FLAGS="-m32 -I. -s" \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
 		USE_LIBUSB=1 \
 		LIBUSB_LIB=$(LIBUSB_LIB) \
 		$(MAKEFLAGS)
@@ -416,8 +849,32 @@ cross-x86-tuxbox-linux-libusb-pcsc:
 cross-x86-tuxbox-linux:
 	$(MAKE) --no-print-directory \
 		CROSS=$(CROSS) \
+		MODFLAGS_WARN=$(MODFLAGS_WARN) \
+		LIB_RT=$(LIB_RT) \
+		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
 		CONF_DIR=/var/tuxbox/config \
 		EXTRA_FLAGS="-m32 -I. -s" \
+		LIB_SSL=$(LIB_SSL) \
+		$(MAKEFLAGS)
+
+cross-powerpc-tuxbox-linux-ssl-libusb:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		LIB_RT=$(LIB_RT) \
+		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
+		CONF_DIR=/var/tuxbox/config \
+		EXTRA_FLAGS="-static-libgcc -I. -s" \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
+		USE_SSL=1 \
+		USE_LIBUSB=1 \
+		LIBUSB_LIB=$(LIBUSB_LIB) \
 		$(MAKEFLAGS)
 
 cross-powerpc-tuxbox-linux-libusb:
@@ -425,8 +882,13 @@ cross-powerpc-tuxbox-linux-libusb:
 		CROSS=$(CROSS) \
 		LIB_RT=$(LIB_RT) \
 		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
 		CONF_DIR=/var/tuxbox/config \
 		EXTRA_FLAGS="-static-libgcc -I. -s" \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
 		USE_LIBUSB=1 \
 		LIBUSB_LIB=$(LIBUSB_LIB) \
 		$(MAKEFLAGS)
@@ -436,8 +898,29 @@ cross-powerpc-tuxbox-linux:
 		CROSS=$(CROSS) \
 		LIB_RT=$(LIB_RT) \
 		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
 		CONF_DIR=/var/tuxbox/config \
 		EXTRA_FLAGS="-static-libgcc -I. -s" \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
+		$(MAKEFLAGS)
+
+cross-powerpc-tuxbox-linux-exp-libusb:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		LIB_RT=$(LIB_RT) \
+		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
+		CONF_DIR=/var/tuxbox/config \
+		EXTRA_FLAGS="-static-libgcc -I. -s" \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
+		USE_LIBUSB=1 \
+		LIBUSB_LIB=$(LIBUSB_LIB) \
 		$(MAKEFLAGS)
 
 cross-powerpc-tuxbox-linux-exp:
@@ -445,8 +928,13 @@ cross-powerpc-tuxbox-linux-exp:
 		CROSS=$(CROSS) \
 		LIB_RT=$(LIB_RT) \
 		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
 		CONF_DIR=/var/tuxbox/config \
 		EXTRA_FLAGS="-static-libgcc -I. -s" \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
 		$(MAKEFLAGS)
 
 cross-ppc-tuxbox-linux:
@@ -454,8 +942,13 @@ cross-ppc-tuxbox-linux:
 		CROSS=$(CROSS) \
 		LIB_RT=$(LIB_RT) \
 		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
 		CONF_DIR=/var/tuxbox/config \
 		EXTRA_FLAGS="-static-libgcc -I. -s" \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
 		$(MAKEFLAGS)
 
 cross-ppc-tuxbox-linux-libusb:
@@ -463,8 +956,30 @@ cross-ppc-tuxbox-linux-libusb:
 		CROSS=$(CROSS) \
 		LIB_RT=$(LIB_RT) \
 		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
 		CONF_DIR=/var/tuxbox/config \
 		EXTRA_FLAGS="-static-libgcc -I. -s" \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
+		USE_LIBUSB=1 \
+		LIBUSB_LIB=$(LIBUSB_LIB) \
+		$(MAKEFLAGS)
+
+cross-ppc-tuxbox-linux-ssl-libusb:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		LIB_RT=$(LIB_RT) \
+		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
+		CONF_DIR=/var/tuxbox/config \
+		EXTRA_FLAGS="-static-libgcc -I. -s" \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
+		USE_SSL=1 \
 		USE_LIBUSB=1 \
 		LIBUSB_LIB=$(LIBUSB_LIB) \
 		$(MAKEFLAGS)
@@ -502,6 +1017,22 @@ mca:
 		CROSS=$(CROSS) \
 		CONF_DIR=/var/mca/d1 \
 		USE_MCA=1 \
+		$(MAKEFLAGS)
+
+mca-ssl:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		LIB_RT=$(LIB_RT) \
+		LIB_PTHREAD=$(LIB_PTHREAD) \
+		LIBCRYPT=$(LIBCRYPT) \
+		LIBCRYPTO=$(LIBCRYPTO) \
+		USE_LIBCRYPTO=1 \
+		CONF_DIR=/var/mca/d1 \
+		USE_MCA=1 \
+		EXTRA_LDFLAGS=$(EXTRA_LDFLAGS) \
+		EXTRA_LIBS=$(EXTRA_LIBS) \
+		LIB_SSL=$(LIB_SSL) \
+		USE_SSL=1 \
 		$(MAKEFLAGS)
 
 cool:
@@ -585,7 +1116,6 @@ android-arm:
 		SSL_LIB=$(SSL_LIB) \
 		USE_LIBCRYPTO=1 \
 		LIBCRYPTO_LIB=$(LIBCRYPTO_LIB) \
-		EXTRA_FLAGS="-pie -I. -s" \
 		$(MAKEFLAGS)
 
 android-arm-libusb:
@@ -598,9 +1128,18 @@ android-arm-libusb:
 		SSL_LIB=$(SSL_LIB) \
 		USE_LIBCRYPTO=1 \
 		LIBCRYPTO_LIB=$(LIBCRYPTO_LIB) \
-		EXTRA_FLAGS="-pie -I. -s" \
 		USE_LIBUSB=1 \
 		LIBUSB_LIB=$(LIBUSB_LIB) \
+		$(MAKEFLAGS)
+
+android-arm-stapi:
+	$(MAKE) --no-print-directory \
+		CROSS=$(CROSS) \
+		LIB_RT= \
+		LIB_PTHREAD= \
+		USE_LIBCRYPTO=1 \
+		CONF_DIR=/data/plugin/ncam \
+		USE_WI=1 \
 		$(MAKEFLAGS)
 
 uclinux:
@@ -608,4 +1147,3 @@ uclinux:
 		LIB_DL= STRIP=true \
 		CROSS=m68k-uclinux- \
 		$(MAKEFLAGS)
-

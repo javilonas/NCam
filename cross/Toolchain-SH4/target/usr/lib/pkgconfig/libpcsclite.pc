@@ -1,0 +1,12 @@
+prefix=/opt/simnew/toolchains/sh4/sh4-linux/sys-root/usr
+exec_prefix=/opt/simnew/toolchains/sh4/sh4-linux/sys-root/usr
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include/PCSC
+usbdropdir=/opt/simnew/toolchains/sh4/sh4-linux/sys-root/usr/lib/pcsc/drivers
+
+Name: PCSC Lite
+Description: PC/SC smart card interface
+Version: 1.7.4
+Libs: -L${libdir} -lpcsclite
+Libs.private: 
+Cflags: -I${includedir} -pthread

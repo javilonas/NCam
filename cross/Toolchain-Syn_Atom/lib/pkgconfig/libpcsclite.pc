@@ -1,0 +1,12 @@
+prefix=/opt/simnew/toolchains/syn_atom
+exec_prefix=/opt/simnew/toolchains/syn_atom
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include/PCSC
+usbdropdir=/opt/simnew/toolchains/syn_atom/lib/pcsc/drivers
+
+Name: PCSC Lite
+Description: PC/SC smart card interface
+Version: 1.7.4
+Libs: -L${libdir} -lpcsclite
+Libs.private: 
+Cflags: -I${includedir} -pthread

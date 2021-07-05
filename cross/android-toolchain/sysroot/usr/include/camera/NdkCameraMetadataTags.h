@@ -36,6 +36,12 @@
 #ifndef _NDK_CAMERA_METADATA_TAGS_H
 #define _NDK_CAMERA_METADATA_TAGS_H
 
+#include <sys/cdefs.h>
+
+__BEGIN_DECLS
+
+#if __ANDROID_API__ >= 24
+
 typedef enum acamera_metadata_section {
     ACAMERA_COLOR_CORRECTION,
     ACAMERA_CONTROL,
@@ -63,6 +69,10 @@ typedef enum acamera_metadata_section {
     ACAMERA_SYNC,
     ACAMERA_REPROCESS,
     ACAMERA_DEPTH,
+    ACAMERA_LOGICAL_MULTI_CAMERA,
+    ACAMERA_DISTORTION_CORRECTION,
+    ACAMERA_HEIC,
+    ACAMERA_HEIC_INFO,
     ACAMERA_SECTION_COUNT,
 
     ACAMERA_VENDOR = 0x8000
@@ -98,6 +108,14 @@ typedef enum acamera_metadata_section_start {
     ACAMERA_SYNC_START             = ACAMERA_SYNC              << 16,
     ACAMERA_REPROCESS_START        = ACAMERA_REPROCESS         << 16,
     ACAMERA_DEPTH_START            = ACAMERA_DEPTH             << 16,
+    ACAMERA_LOGICAL_MULTI_CAMERA_START
+                                   = ACAMERA_LOGICAL_MULTI_CAMERA
+                                                                << 16,
+    ACAMERA_DISTORTION_CORRECTION_START
+                                   = ACAMERA_DISTORTION_CORRECTION
+                                                                << 16,
+    ACAMERA_HEIC_START             = ACAMERA_HEIC              << 16,
+    ACAMERA_HEIC_INFO_START        = ACAMERA_HEIC_INFO         << 16,
     ACAMERA_VENDOR_START           = ACAMERA_VENDOR            << 16
 } acamera_metadata_section_start_t;
 
@@ -109,11 +127,13 @@ typedef enum acamera_metadata_tag {
      * <p>The mode control selects how the image data is converted from the
      * sensor's native color into linear sRGB color.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_color_correction_mode_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>When auto-white balance (AWB) is enabled with ACAMERA_CONTROL_AWB_MODE, this
      * control is overridden by the AWB routine. When AWB is disabled, the
@@ -158,17 +178,19 @@ typedef enum acamera_metadata_tag {
      * @see ACAMERA_COLOR_CORRECTION_TRANSFORM
      * @see ACAMERA_CONTROL_AWB_MODE
      */
-    ACAMERA_COLOR_CORRECTION_MODE =                             // byte (enum)
+    ACAMERA_COLOR_CORRECTION_MODE =                             // byte (acamera_metadata_enum_android_color_correction_mode_t)
             ACAMERA_COLOR_CORRECTION_START,
     /**
      * <p>A color transform matrix to use to transform
      * from sensor RGB color space to output linear sRGB color space.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: rational[3*3]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This matrix is either set by the camera device when the request
      * ACAMERA_COLOR_CORRECTION_MODE is not TRANSFORM_MATRIX, or
@@ -190,11 +212,13 @@ typedef enum acamera_metadata_tag {
      * <p>Gains applying to Bayer raw color channels for
      * white-balance.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: float[4]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>These per-channel gains are either set by the camera device
      * when the request ACAMERA_COLOR_CORRECTION_MODE is not
@@ -215,11 +239,13 @@ typedef enum acamera_metadata_tag {
     /**
      * <p>Mode of operation for the chromatic aberration correction algorithm.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_color_correction_aberration_mode_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Chromatic (color) aberration is caused by the fact that different wavelengths of light
      * can not focus on the same point after exiting from the lens. This metadata defines
@@ -233,7 +259,7 @@ typedef enum acamera_metadata_tag {
      * applying aberration correction.</p>
      * <p>LEGACY devices will always be in FAST mode.</p>
      */
-    ACAMERA_COLOR_CORRECTION_ABERRATION_MODE =                  // byte (enum)
+    ACAMERA_COLOR_CORRECTION_ABERRATION_MODE =                  // byte (acamera_metadata_enum_android_color_correction_aberration_mode_t)
             ACAMERA_COLOR_CORRECTION_START + 3,
     /**
      * <p>List of aberration correction modes for ACAMERA_COLOR_CORRECTION_ABERRATION_MODE that are
@@ -241,10 +267,12 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_COLOR_CORRECTION_ABERRATION_MODE
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte[n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This key lists the valid modes for ACAMERA_COLOR_CORRECTION_ABERRATION_MODE.  If no
      * aberration correction modes are available for a device, this list will solely include
@@ -263,11 +291,13 @@ typedef enum acamera_metadata_tag {
      * <p>The desired setting for the camera device's auto-exposure
      * algorithm's antibanding compensation.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_control_ae_antibanding_mode_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Some kinds of lighting fixtures, such as some fluorescent
      * lights, flicker at the rate of the power supply frequency
@@ -304,17 +334,19 @@ typedef enum acamera_metadata_tag {
      * @see ACAMERA_CONTROL_MODE
      * @see ACAMERA_STATISTICS_SCENE_FLICKER
      */
-    ACAMERA_CONTROL_AE_ANTIBANDING_MODE =                       // byte (enum)
+    ACAMERA_CONTROL_AE_ANTIBANDING_MODE =                       // byte (acamera_metadata_enum_android_control_ae_antibanding_mode_t)
             ACAMERA_CONTROL_START,
     /**
      * <p>Adjustment to auto-exposure (AE) target image
      * brightness.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>The adjustment is measured as a count of steps, with the
      * step size defined by ACAMERA_CONTROL_AE_COMPENSATION_STEP and the
@@ -344,11 +376,13 @@ typedef enum acamera_metadata_tag {
      * <p>Whether auto-exposure (AE) is currently locked to its latest
      * calculated values.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_control_ae_lock_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>When set to <code>true</code> (ON), the AE algorithm is locked to its latest parameters,
      * and will not change exposure settings until the lock is set to <code>false</code> (OFF).</p>
@@ -392,17 +426,19 @@ typedef enum acamera_metadata_tag {
      * @see ACAMERA_SENSOR_EXPOSURE_TIME
      * @see ACAMERA_SENSOR_SENSITIVITY
      */
-    ACAMERA_CONTROL_AE_LOCK =                                   // byte (enum)
+    ACAMERA_CONTROL_AE_LOCK =                                   // byte (acamera_metadata_enum_android_control_ae_lock_t)
             ACAMERA_CONTROL_START + 2,
     /**
      * <p>The desired mode for the camera device's
      * auto-exposure routine.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_control_ae_mode_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This control is only effective if ACAMERA_CONTROL_MODE is
      * AUTO.</p>
@@ -430,30 +466,43 @@ typedef enum acamera_metadata_tag {
      * @see ACAMERA_SENSOR_FRAME_DURATION
      * @see ACAMERA_SENSOR_SENSITIVITY
      */
-    ACAMERA_CONTROL_AE_MODE =                                   // byte (enum)
+    ACAMERA_CONTROL_AE_MODE =                                   // byte (acamera_metadata_enum_android_control_ae_mode_t)
             ACAMERA_CONTROL_START + 3,
     /**
      * <p>List of metering areas to use for auto-exposure adjustment.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32[5*area_count]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Not available if android.control.maxRegionsAe is 0.
      * Otherwise will always be present.</p>
      * <p>The maximum number of regions supported by the device is determined by the value
      * of android.control.maxRegionsAe.</p>
-     * <p>The data representation is int[5 * area_count].
-     * Every five elements represent a metering region of (xmin, ymin, xmax, ymax, weight).
-     * The rectangle is defined to be inclusive on xmin and ymin, but exclusive on xmax and
-     * ymax.</p>
-     * <p>The coordinate system is based on the active pixel array,
-     * with (0,0) being the top-left pixel in the active pixel array, and
+     * <p>For devices not supporting ACAMERA_DISTORTION_CORRECTION_MODE control, the coordinate
+     * system always follows that of ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE, with (0,0) being
+     * the top-left pixel in the active pixel array, and
      * (ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE.width - 1,
-     * ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE.height - 1) being the
-     * bottom-right pixel in the active pixel array.</p>
+     * ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE.height - 1) being the bottom-right pixel in the
+     * active pixel array.</p>
+     * <p>For devices supporting ACAMERA_DISTORTION_CORRECTION_MODE control, the coordinate
+     * system depends on the mode being set.
+     * When the distortion correction mode is OFF, the coordinate system follows
+     * ACAMERA_SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE, with
+     * <code>(0, 0)</code> being the top-left pixel of the pre-correction active array, and
+     * (ACAMERA_SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE.width - 1,
+     * ACAMERA_SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE.height - 1) being the bottom-right
+     * pixel in the pre-correction active pixel array.
+     * When the distortion correction mode is not OFF, the coordinate system follows
+     * ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE, with
+     * <code>(0, 0)</code> being the top-left pixel of the active array, and
+     * (ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE.width - 1,
+     * ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE.height - 1) being the bottom-right pixel in the
+     * active pixel array.</p>
      * <p>The weight must be within <code>[0, 1000]</code>, and represents a weight
      * for every pixel in the area. This means that a large metering area
      * with the same weight as a smaller area will have more effect in
@@ -469,9 +518,15 @@ typedef enum acamera_metadata_tag {
      * region and output only the intersection rectangle as the metering region in the result
      * metadata.  If the region is entirely outside the crop region, it will be ignored and
      * not reported in the result metadata.</p>
+     * <p>The data representation is <code>int[5 * area_count]</code>.
+     * Every five elements represent a metering region of <code>(xmin, ymin, xmax, ymax, weight)</code>.
+     * The rectangle is defined to be inclusive on xmin and ymin, but exclusive on xmax and
+     * ymax.</p>
      *
+     * @see ACAMERA_DISTORTION_CORRECTION_MODE
      * @see ACAMERA_SCALER_CROP_REGION
      * @see ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE
+     * @see ACAMERA_SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE
      */
     ACAMERA_CONTROL_AE_REGIONS =                                // int32[5*area_count]
             ACAMERA_CONTROL_START + 4,
@@ -480,11 +535,13 @@ typedef enum acamera_metadata_tag {
      * adjust the capture frame rate to maintain good
      * exposure.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32[2]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Only constrains auto-exposure (AE) algorithm, not
      * manual control of ACAMERA_SENSOR_EXPOSURE_TIME and
@@ -499,11 +556,13 @@ typedef enum acamera_metadata_tag {
      * <p>Whether the camera device will trigger a precapture
      * metering sequence when it processes this request.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_control_ae_precapture_trigger_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This entry is normally set to IDLE, or is not
      * included at all in the request settings. When included and
@@ -557,17 +616,19 @@ typedef enum acamera_metadata_tag {
      * @see ACAMERA_CONTROL_AF_TRIGGER
      * @see ACAMERA_CONTROL_CAPTURE_INTENT
      */
-    ACAMERA_CONTROL_AE_PRECAPTURE_TRIGGER =                     // byte (enum)
+    ACAMERA_CONTROL_AE_PRECAPTURE_TRIGGER =                     // byte (acamera_metadata_enum_android_control_ae_precapture_trigger_t)
             ACAMERA_CONTROL_START + 6,
     /**
      * <p>Whether auto-focus (AF) is currently enabled, and what
      * mode it is set to.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_control_af_mode_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Only effective if ACAMERA_CONTROL_MODE = AUTO and the lens is not fixed focus
      * (i.e. <code>ACAMERA_LENS_INFO_MINIMUM_FOCUS_DISTANCE &gt; 0</code>). Also note that
@@ -584,30 +645,43 @@ typedef enum acamera_metadata_tag {
      * @see ACAMERA_CONTROL_MODE
      * @see ACAMERA_LENS_INFO_MINIMUM_FOCUS_DISTANCE
      */
-    ACAMERA_CONTROL_AF_MODE =                                   // byte (enum)
+    ACAMERA_CONTROL_AF_MODE =                                   // byte (acamera_metadata_enum_android_control_af_mode_t)
             ACAMERA_CONTROL_START + 7,
     /**
      * <p>List of metering areas to use for auto-focus.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32[5*area_count]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Not available if android.control.maxRegionsAf is 0.
      * Otherwise will always be present.</p>
      * <p>The maximum number of focus areas supported by the device is determined by the value
      * of android.control.maxRegionsAf.</p>
-     * <p>The data representation is int[5 * area_count].
-     * Every five elements represent a metering region of (xmin, ymin, xmax, ymax, weight).
-     * The rectangle is defined to be inclusive on xmin and ymin, but exclusive on xmax and
-     * ymax.</p>
-     * <p>The coordinate system is based on the active pixel array,
-     * with (0,0) being the top-left pixel in the active pixel array, and
+     * <p>For devices not supporting ACAMERA_DISTORTION_CORRECTION_MODE control, the coordinate
+     * system always follows that of ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE, with (0,0) being
+     * the top-left pixel in the active pixel array, and
      * (ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE.width - 1,
-     * ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE.height - 1) being the
-     * bottom-right pixel in the active pixel array.</p>
+     * ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE.height - 1) being the bottom-right pixel in the
+     * active pixel array.</p>
+     * <p>For devices supporting ACAMERA_DISTORTION_CORRECTION_MODE control, the coordinate
+     * system depends on the mode being set.
+     * When the distortion correction mode is OFF, the coordinate system follows
+     * ACAMERA_SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE, with
+     * <code>(0, 0)</code> being the top-left pixel of the pre-correction active array, and
+     * (ACAMERA_SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE.width - 1,
+     * ACAMERA_SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE.height - 1) being the bottom-right
+     * pixel in the pre-correction active pixel array.
+     * When the distortion correction mode is not OFF, the coordinate system follows
+     * ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE, with
+     * <code>(0, 0)</code> being the top-left pixel of the active array, and
+     * (ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE.width - 1,
+     * ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE.height - 1) being the bottom-right pixel in the
+     * active pixel array.</p>
      * <p>The weight must be within <code>[0, 1000]</code>, and represents a weight
      * for every pixel in the area. This means that a large metering area
      * with the same weight as a smaller area will have more effect in
@@ -617,26 +691,35 @@ typedef enum acamera_metadata_tag {
      * is used, all non-zero weights will have the same effect. A region with 0 weight is
      * ignored.</p>
      * <p>If all regions have 0 weight, then no specific metering area needs to be used by the
-     * camera device.</p>
+     * camera device. The capture result will either be a zero weight region as well, or
+     * the region selected by the camera device as the focus area of interest.</p>
      * <p>If the metering region is outside the used ACAMERA_SCALER_CROP_REGION returned in
      * capture result metadata, the camera device will ignore the sections outside the crop
      * region and output only the intersection rectangle as the metering region in the result
      * metadata. If the region is entirely outside the crop region, it will be ignored and
      * not reported in the result metadata.</p>
+     * <p>The data representation is <code>int[5 * area_count]</code>.
+     * Every five elements represent a metering region of <code>(xmin, ymin, xmax, ymax, weight)</code>.
+     * The rectangle is defined to be inclusive on xmin and ymin, but exclusive on xmax and
+     * ymax.</p>
      *
+     * @see ACAMERA_DISTORTION_CORRECTION_MODE
      * @see ACAMERA_SCALER_CROP_REGION
      * @see ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE
+     * @see ACAMERA_SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE
      */
     ACAMERA_CONTROL_AF_REGIONS =                                // int32[5*area_count]
             ACAMERA_CONTROL_START + 8,
     /**
      * <p>Whether the camera device will trigger autofocus for this request.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_control_af_trigger_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This entry is normally set to IDLE, or is not
      * included at all in the request settings.</p>
@@ -659,17 +742,19 @@ typedef enum acamera_metadata_tag {
      * @see ACAMERA_CONTROL_AE_PRECAPTURE_TRIGGER
      * @see ACAMERA_CONTROL_AF_STATE
      */
-    ACAMERA_CONTROL_AF_TRIGGER =                                // byte (enum)
+    ACAMERA_CONTROL_AF_TRIGGER =                                // byte (acamera_metadata_enum_android_control_af_trigger_t)
             ACAMERA_CONTROL_START + 9,
     /**
      * <p>Whether auto-white balance (AWB) is currently locked to its
      * latest calculated values.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_control_awb_lock_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>When set to <code>true</code> (ON), the AWB algorithm is locked to its latest parameters,
      * and will not change color balance settings until the lock is set to <code>false</code> (OFF).</p>
@@ -693,18 +778,20 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_CONTROL_AWB_MODE
      */
-    ACAMERA_CONTROL_AWB_LOCK =                                  // byte (enum)
+    ACAMERA_CONTROL_AWB_LOCK =                                  // byte (acamera_metadata_enum_android_control_awb_lock_t)
             ACAMERA_CONTROL_START + 10,
     /**
      * <p>Whether auto-white balance (AWB) is currently setting the color
      * transform fields, and what its illumination target
      * is.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_control_awb_mode_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This control is only effective if ACAMERA_CONTROL_MODE is AUTO.</p>
      * <p>When set to the ON mode, the camera device's auto-white balance
@@ -733,31 +820,44 @@ typedef enum acamera_metadata_tag {
      * @see ACAMERA_CONTROL_AWB_LOCK
      * @see ACAMERA_CONTROL_MODE
      */
-    ACAMERA_CONTROL_AWB_MODE =                                  // byte (enum)
+    ACAMERA_CONTROL_AWB_MODE =                                  // byte (acamera_metadata_enum_android_control_awb_mode_t)
             ACAMERA_CONTROL_START + 11,
     /**
      * <p>List of metering areas to use for auto-white-balance illuminant
      * estimation.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32[5*area_count]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Not available if android.control.maxRegionsAwb is 0.
      * Otherwise will always be present.</p>
      * <p>The maximum number of regions supported by the device is determined by the value
      * of android.control.maxRegionsAwb.</p>
-     * <p>The data representation is int[5 * area_count].
-     * Every five elements represent a metering region of (xmin, ymin, xmax, ymax, weight).
-     * The rectangle is defined to be inclusive on xmin and ymin, but exclusive on xmax and
-     * ymax.</p>
-     * <p>The coordinate system is based on the active pixel array,
-     * with (0,0) being the top-left pixel in the active pixel array, and
+     * <p>For devices not supporting ACAMERA_DISTORTION_CORRECTION_MODE control, the coordinate
+     * system always follows that of ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE, with (0,0) being
+     * the top-left pixel in the active pixel array, and
      * (ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE.width - 1,
-     * ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE.height - 1) being the
-     * bottom-right pixel in the active pixel array.</p>
+     * ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE.height - 1) being the bottom-right pixel in the
+     * active pixel array.</p>
+     * <p>For devices supporting ACAMERA_DISTORTION_CORRECTION_MODE control, the coordinate
+     * system depends on the mode being set.
+     * When the distortion correction mode is OFF, the coordinate system follows
+     * ACAMERA_SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE, with
+     * <code>(0, 0)</code> being the top-left pixel of the pre-correction active array, and
+     * (ACAMERA_SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE.width - 1,
+     * ACAMERA_SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE.height - 1) being the bottom-right
+     * pixel in the pre-correction active pixel array.
+     * When the distortion correction mode is not OFF, the coordinate system follows
+     * ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE, with
+     * <code>(0, 0)</code> being the top-left pixel of the active array, and
+     * (ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE.width - 1,
+     * ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE.height - 1) being the bottom-right pixel in the
+     * active pixel array.</p>
      * <p>The weight must range from 0 to 1000, and represents a weight
      * for every pixel in the area. This means that a large metering area
      * with the same weight as a smaller area will have more effect in
@@ -773,9 +873,15 @@ typedef enum acamera_metadata_tag {
      * region and output only the intersection rectangle as the metering region in the result
      * metadata.  If the region is entirely outside the crop region, it will be ignored and
      * not reported in the result metadata.</p>
+     * <p>The data representation is <code>int[5 * area_count]</code>.
+     * Every five elements represent a metering region of <code>(xmin, ymin, xmax, ymax, weight)</code>.
+     * The rectangle is defined to be inclusive on xmin and ymin, but exclusive on xmax and
+     * ymax.</p>
      *
+     * @see ACAMERA_DISTORTION_CORRECTION_MODE
      * @see ACAMERA_SCALER_CROP_REGION
      * @see ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE
+     * @see ACAMERA_SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE
      */
     ACAMERA_CONTROL_AWB_REGIONS =                               // int32[5*area_count]
             ACAMERA_CONTROL_START + 12,
@@ -785,32 +891,39 @@ typedef enum acamera_metadata_tag {
      * of this capture, to help the camera device to decide optimal 3A
      * strategy.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_control_capture_intent_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This control (except for MANUAL) is only effective if
      * <code>ACAMERA_CONTROL_MODE != OFF</code> and any 3A routine is active.</p>
-     * <p>ZERO_SHUTTER_LAG will be supported if ACAMERA_REQUEST_AVAILABLE_CAPABILITIES
-     * contains PRIVATE_REPROCESSING or YUV_REPROCESSING. MANUAL will be supported if
-     * ACAMERA_REQUEST_AVAILABLE_CAPABILITIES contains MANUAL_SENSOR. Other intent values are
-     * always supported.</p>
+     * <p>All intents are supported by all devices, except that:
+     *   * ZERO_SHUTTER_LAG will be supported if ACAMERA_REQUEST_AVAILABLE_CAPABILITIES contains
+     * PRIVATE_REPROCESSING or YUV_REPROCESSING.
+     *   * MANUAL will be supported if ACAMERA_REQUEST_AVAILABLE_CAPABILITIES contains
+     * MANUAL_SENSOR.
+     *   * MOTION_TRACKING will be supported if ACAMERA_REQUEST_AVAILABLE_CAPABILITIES contains
+     * MOTION_TRACKING.</p>
      *
      * @see ACAMERA_CONTROL_MODE
      * @see ACAMERA_REQUEST_AVAILABLE_CAPABILITIES
      */
-    ACAMERA_CONTROL_CAPTURE_INTENT =                            // byte (enum)
+    ACAMERA_CONTROL_CAPTURE_INTENT =                            // byte (acamera_metadata_enum_android_control_capture_intent_t)
             ACAMERA_CONTROL_START + 13,
     /**
      * <p>A special color effect to apply.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_control_effect_mode_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>When this mode is set, a color effect will be applied
      * to images produced by the camera device. The interpretation
@@ -819,17 +932,19 @@ typedef enum acamera_metadata_tag {
      * depended on to be consistent (or present) across all
      * devices.</p>
      */
-    ACAMERA_CONTROL_EFFECT_MODE =                               // byte (enum)
+    ACAMERA_CONTROL_EFFECT_MODE =                               // byte (acamera_metadata_enum_android_control_effect_mode_t)
             ACAMERA_CONTROL_START + 14,
     /**
      * <p>Overall mode of 3A (auto-exposure, auto-white-balance, auto-focus) control
      * routines.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_control_mode_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This is a top-level 3A control switch. When set to OFF, all 3A control
      * by the camera device is disabled. The application must set the fields for
@@ -837,11 +952,10 @@ typedef enum acamera_metadata_tag {
      * <p>When set to AUTO, the individual algorithm controls in
      * ACAMERA_CONTROL_* are in effect, such as ACAMERA_CONTROL_AF_MODE.</p>
      * <p>When set to USE_SCENE_MODE, the individual controls in
-     * ACAMERA_CONTROL_* are mostly disabled, and the camera device implements
-     * one of the scene mode settings (such as ACTION, SUNSET, or PARTY)
-     * as it wishes. The camera device scene mode 3A settings are provided by
-     * capture results {@link ACameraMetadata} from
-     * {@link ACameraCaptureSession_captureCallback_result}.</p>
+     * ACAMERA_CONTROL_* are mostly disabled, and the camera device
+     * implements one of the scene mode settings (such as ACTION,
+     * SUNSET, or PARTY) as it wishes. The camera device scene mode
+     * 3A settings are provided by {@link ACameraCaptureSession_captureCallback_result capture results}.</p>
      * <p>When set to OFF_KEEP_STATE, it is similar to OFF mode, the only difference
      * is that this frame will not be used by camera device background 3A statistics
      * update, as if this frame is never captured. This mode can be used in the scenario
@@ -850,16 +964,18 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_CONTROL_AF_MODE
      */
-    ACAMERA_CONTROL_MODE =                                      // byte (enum)
+    ACAMERA_CONTROL_MODE =                                      // byte (acamera_metadata_enum_android_control_mode_t)
             ACAMERA_CONTROL_START + 15,
     /**
      * <p>Control for which scene mode is currently active.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_control_scene_mode_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Scene modes are custom camera modes optimized for a certain set of conditions and
      * capture settings.</p>
@@ -877,17 +993,19 @@ typedef enum acamera_metadata_tag {
      * @see ACAMERA_CONTROL_AWB_MODE
      * @see ACAMERA_CONTROL_MODE
      */
-    ACAMERA_CONTROL_SCENE_MODE =                                // byte (enum)
+    ACAMERA_CONTROL_SCENE_MODE =                                // byte (acamera_metadata_enum_android_control_scene_mode_t)
             ACAMERA_CONTROL_START + 16,
     /**
      * <p>Whether video stabilization is
      * active.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_control_video_stabilization_mode_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Video stabilization automatically warps images from
      * the camera in order to stabilize motion between consecutive frames.</p>
@@ -917,7 +1035,7 @@ typedef enum acamera_metadata_tag {
      * @see ACAMERA_LENS_OPTICAL_STABILIZATION_MODE
      * @see ACAMERA_SCALER_CROP_REGION
      */
-    ACAMERA_CONTROL_VIDEO_STABILIZATION_MODE =                  // byte (enum)
+    ACAMERA_CONTROL_VIDEO_STABILIZATION_MODE =                  // byte (acamera_metadata_enum_android_control_video_stabilization_mode_t)
             ACAMERA_CONTROL_START + 17,
     /**
      * <p>List of auto-exposure antibanding modes for ACAMERA_CONTROL_AE_ANTIBANDING_MODE that are
@@ -925,10 +1043,12 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_CONTROL_AE_ANTIBANDING_MODE
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte[n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Not all of the auto-exposure anti-banding modes may be
      * supported by a given camera device. This field lists the
@@ -946,10 +1066,12 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_CONTROL_AE_MODE
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte[n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Not all the auto-exposure modes may be supported by a
      * given camera device, especially if no flash unit is
@@ -974,10 +1096,12 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_CONTROL_AE_TARGET_FPS_RANGE
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32[2*n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>For devices at the LEGACY level or above:</p>
      * <ul>
@@ -985,20 +1109,18 @@ typedef enum acamera_metadata_tag {
      * <p>For constant-framerate recording, for each normal
      * <a href="https://developer.android.com/reference/android/media/CamcorderProfile.html">CamcorderProfile</a>, that is, a
      * <a href="https://developer.android.com/reference/android/media/CamcorderProfile.html">CamcorderProfile</a> that has
-     * <a href="https://developer.android.com/reference/android/media/CamcorderProfile.html#quality">quality</a>
-     * in the range [
-     * <a href="https://developer.android.com/reference/android/media/CamcorderProfile.html#QUALITY_LOW">QUALITY_LOW</a>,
-     * <a href="https://developer.android.com/reference/android/media/CamcorderProfile.html#QUALITY_2160P">QUALITY_2160P</a>],
-     * if the profile is supported by the device and has
-     * <a href="https://developer.android.com/reference/android/media/CamcorderProfile.html#videoFrameRate">videoFrameRate</a>
-     * <code>x</code>, this list will always include (<code>x</code>,<code>x</code>).</p>
+     * <a href="https://developer.android.com/reference/android/media/CamcorderProfile.html#quality">quality</a> in
+     * the range [<a href="https://developer.android.com/reference/android/media/CamcorderProfile.html#QUALITY_LOW">QUALITY_LOW</a>,
+     * <a href="https://developer.android.com/reference/android/media/CamcorderProfile.html#QUALITY_2160P">QUALITY_2160P</a>], if the profile is
+     * supported by the device and has
+     * <a href="https://developer.android.com/reference/android/media/CamcorderProfile.html#videoFrameRate">videoFrameRate</a> <code>x</code>, this list will
+     * always include (<code>x</code>,<code>x</code>).</p>
      * </li>
      * <li>
      * <p>Also, a camera device must either not support any
      * <a href="https://developer.android.com/reference/android/media/CamcorderProfile.html">CamcorderProfile</a>,
      * or support at least one
-     * normal <a href="https://developer.android.com/reference/android/media/CamcorderProfile.html">CamcorderProfile</a>
-     * that has
+     * normal <a href="https://developer.android.com/reference/android/media/CamcorderProfile.html">CamcorderProfile</a> that has
      * <a href="https://developer.android.com/reference/android/media/CamcorderProfile.html#videoFrameRate">videoFrameRate</a> <code>x</code> &gt;= 24.</p>
      * </li>
      * </ul>
@@ -1019,12 +1141,13 @@ typedef enum acamera_metadata_tag {
      * @see ACAMERA_CONTROL_AE_COMPENSATION_STEP
      * @see ACAMERA_CONTROL_AE_EXPOSURE_COMPENSATION
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32[2]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
-     * <p>None</p>
      */
     ACAMERA_CONTROL_AE_COMPENSATION_RANGE =                     // int32[2]
             ACAMERA_CONTROL_START + 21,
@@ -1032,10 +1155,12 @@ typedef enum acamera_metadata_tag {
      * <p>Smallest step by which the exposure compensation
      * can be changed.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: rational</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This is the unit for ACAMERA_CONTROL_AE_EXPOSURE_COMPENSATION. For example, if this key has
      * a value of <code>1/2</code>, then a setting of <code>-2</code> for ACAMERA_CONTROL_AE_EXPOSURE_COMPENSATION means
@@ -1053,10 +1178,12 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_CONTROL_AF_MODE
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte[n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Not all the auto-focus modes may be supported by a
      * given camera device. This entry lists the valid modes for
@@ -1080,10 +1207,12 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_CONTROL_EFFECT_MODE
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte[n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This list contains the color effect modes that can be applied to
      * images produced by the camera device.
@@ -1105,10 +1234,12 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_CONTROL_SCENE_MODE
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte[n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This list contains scene modes that can be set for the camera device.
      * Only scene modes that have been fully implemented for the
@@ -1130,10 +1261,12 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_CONTROL_VIDEO_STABILIZATION_MODE
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte[n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>OFF will always be listed.</p>
      */
@@ -1145,10 +1278,12 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_CONTROL_AWB_MODE
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte[n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Not all the auto-white-balance modes may be supported by a
      * given camera device. This entry lists the valid modes for
@@ -1177,22 +1312,25 @@ typedef enum acamera_metadata_tag {
      * @see ACAMERA_CONTROL_AF_REGIONS
      * @see ACAMERA_CONTROL_AWB_REGIONS
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32[3]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
-     * <p>None</p>
      */
     ACAMERA_CONTROL_MAX_REGIONS =                               // int32[3]
             ACAMERA_CONTROL_START + 28,
     /**
      * <p>Current state of the auto-exposure (AE) algorithm.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_control_ae_state_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Switching between or enabling AE modes (ACAMERA_CONTROL_AE_MODE) always
      * resets the AE state to INACTIVE. Similarly, switching between ACAMERA_CONTROL_MODE,
@@ -1208,7 +1346,7 @@ typedef enum acamera_metadata_tag {
      * <p>State       | Transition Cause | New State | Notes
      * :------------:|:----------------:|:---------:|:-----------------------:
      * INACTIVE      |                  | INACTIVE  | Camera device auto exposure algorithm is disabled</p>
-     * <p>When ACAMERA_CONTROL_AE_MODE is AE_MODE_ON_*:</p>
+     * <p>When ACAMERA_CONTROL_AE_MODE is AE_MODE_ON*:</p>
      * <p>State        | Transition Cause                             | New State      | Notes
      * :-------------:|:--------------------------------------------:|:--------------:|:-----------------:
      * INACTIVE       | Camera device initiates AE scan              | SEARCHING      | Values changing
@@ -1229,10 +1367,13 @@ typedef enum acamera_metadata_tag {
      * LOCKED         | aeLock is ON and aePrecaptureTrigger is CANCEL| LOCKED        | Precapture trigger is ignored when AE is already locked
      * Any state (excluding LOCKED) | ACAMERA_CONTROL_AE_PRECAPTURE_TRIGGER is START | PRECAPTURE     | Start AE precapture metering sequence
      * Any state (excluding LOCKED) | ACAMERA_CONTROL_AE_PRECAPTURE_TRIGGER is CANCEL| INACTIVE       | Currently active precapture metering sequence is canceled</p>
+     * <p>If the camera device supports AE external flash mode (ON_EXTERNAL_FLASH is included in
+     * ACAMERA_CONTROL_AE_AVAILABLE_MODES), ACAMERA_CONTROL_AE_STATE must be FLASH_REQUIRED after
+     * the camera device finishes AE scan and it's too dark without flash.</p>
      * <p>For the above table, the camera device may skip reporting any state changes that happen
      * without application intervention (i.e. mode switch, trigger, locking). Any state that
      * can be skipped in that manner is called a transient state.</p>
-     * <p>For example, for above AE modes (AE_MODE_ON_*), in addition to the state transitions
+     * <p>For example, for above AE modes (AE_MODE_ON*), in addition to the state transitions
      * listed in above table, it is also legal for the camera device to skip one or more
      * transient states between two results. See below table for examples:</p>
      * <p>State        | Transition Cause                                            | New State      | Notes
@@ -1245,21 +1386,25 @@ typedef enum acamera_metadata_tag {
      * CONVERGED      | Camera device finished AE scan                              | FLASH_REQUIRED | Converged but too dark w/o flash after a new scan, transient states are skipped by camera device.
      * FLASH_REQUIRED | Camera device finished AE scan                              | CONVERGED      | Converged after a new scan, transient states are skipped by camera device.</p>
      *
+     * @see ACAMERA_CONTROL_AE_AVAILABLE_MODES
      * @see ACAMERA_CONTROL_AE_LOCK
      * @see ACAMERA_CONTROL_AE_MODE
      * @see ACAMERA_CONTROL_AE_PRECAPTURE_TRIGGER
+     * @see ACAMERA_CONTROL_AE_STATE
      * @see ACAMERA_CONTROL_MODE
      * @see ACAMERA_CONTROL_SCENE_MODE
      */
-    ACAMERA_CONTROL_AE_STATE =                                  // byte (enum)
+    ACAMERA_CONTROL_AE_STATE =                                  // byte (acamera_metadata_enum_android_control_ae_state_t)
             ACAMERA_CONTROL_START + 31,
     /**
      * <p>Current state of auto-focus (AF) algorithm.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_control_af_state_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Switching between or enabling AF modes (ACAMERA_CONTROL_AF_MODE) always
      * resets the AF state to INACTIVE. Similarly, switching between ACAMERA_CONTROL_MODE,
@@ -1351,15 +1496,17 @@ typedef enum acamera_metadata_tag {
      * @see ACAMERA_CONTROL_MODE
      * @see ACAMERA_CONTROL_SCENE_MODE
      */
-    ACAMERA_CONTROL_AF_STATE =                                  // byte (enum)
+    ACAMERA_CONTROL_AF_STATE =                                  // byte (acamera_metadata_enum_android_control_af_state_t)
             ACAMERA_CONTROL_START + 32,
     /**
      * <p>Current state of auto-white balance (AWB) algorithm.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_control_awb_state_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Switching between or enabling AWB modes (ACAMERA_CONTROL_AWB_MODE) always
      * resets the AWB state to INACTIVE. Similarly, switching between ACAMERA_CONTROL_MODE,
@@ -1402,37 +1549,41 @@ typedef enum acamera_metadata_tag {
      * @see ACAMERA_CONTROL_MODE
      * @see ACAMERA_CONTROL_SCENE_MODE
      */
-    ACAMERA_CONTROL_AWB_STATE =                                 // byte (enum)
+    ACAMERA_CONTROL_AWB_STATE =                                 // byte (acamera_metadata_enum_android_control_awb_state_t)
             ACAMERA_CONTROL_START + 34,
     /**
      * <p>Whether the camera device supports ACAMERA_CONTROL_AE_LOCK</p>
      *
      * @see ACAMERA_CONTROL_AE_LOCK
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_control_ae_lock_available_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Devices with MANUAL_SENSOR capability or BURST_CAPTURE capability will always
      * list <code>true</code>. This includes FULL devices.</p>
      */
-    ACAMERA_CONTROL_AE_LOCK_AVAILABLE =                         // byte (enum)
+    ACAMERA_CONTROL_AE_LOCK_AVAILABLE =                         // byte (acamera_metadata_enum_android_control_ae_lock_available_t)
             ACAMERA_CONTROL_START + 36,
     /**
      * <p>Whether the camera device supports ACAMERA_CONTROL_AWB_LOCK</p>
      *
      * @see ACAMERA_CONTROL_AWB_LOCK
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_control_awb_lock_available_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Devices with MANUAL_POST_PROCESSING capability or BURST_CAPTURE capability will
      * always list <code>true</code>. This includes FULL devices.</p>
      */
-    ACAMERA_CONTROL_AWB_LOCK_AVAILABLE =                        // byte (enum)
+    ACAMERA_CONTROL_AWB_LOCK_AVAILABLE =                        // byte (acamera_metadata_enum_android_control_awb_lock_available_t)
             ACAMERA_CONTROL_START + 37,
     /**
      * <p>List of control modes for ACAMERA_CONTROL_MODE that are supported by this camera
@@ -1440,10 +1591,12 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_CONTROL_MODE
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte[n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This list contains control modes that can be set for the camera device.
      * LEGACY mode devices will always support AUTO mode. LIMITED and FULL
@@ -1457,10 +1610,12 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_CONTROL_POST_RAW_SENSITIVITY_BOOST
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32[2]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Devices support post RAW sensitivity boost  will advertise
      * ACAMERA_CONTROL_POST_RAW_SENSITIVITY_BOOST key for controling
@@ -1478,11 +1633,13 @@ typedef enum acamera_metadata_tag {
      * <p>The amount of additional sensitivity boost applied to output images
      * after RAW sensor data is captured.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Some camera devices support additional digital sensitivity boosting in the
      * camera processing pipeline after sensor RAW image is captured.
@@ -1509,17 +1666,80 @@ typedef enum acamera_metadata_tag {
      */
     ACAMERA_CONTROL_POST_RAW_SENSITIVITY_BOOST =                // int32
             ACAMERA_CONTROL_START + 40,
+    /**
+     * <p>Allow camera device to enable zero-shutter-lag mode for requests with
+     * ACAMERA_CONTROL_CAPTURE_INTENT == STILL_CAPTURE.</p>
+     *
+     * @see ACAMERA_CONTROL_CAPTURE_INTENT
+     *
+     * <p>Type: byte (acamera_metadata_enum_android_control_enable_zsl_t)</p>
+     *
+     * <p>This tag may appear in:
+     * <ul>
+     *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
+     *   <li>ACaptureRequest</li>
+     * </ul></p>
+     *
+     * <p>If enableZsl is <code>true</code>, the camera device may enable zero-shutter-lag mode for requests with
+     * STILL_CAPTURE capture intent. The camera device may use images captured in the past to
+     * produce output images for a zero-shutter-lag request. The result metadata including the
+     * ACAMERA_SENSOR_TIMESTAMP reflects the source frames used to produce output images.
+     * Therefore, the contents of the output images and the result metadata may be out of order
+     * compared to previous regular requests. enableZsl does not affect requests with other
+     * capture intents.</p>
+     * <p>For example, when requests are submitted in the following order:
+     *   Request A: enableZsl is ON, ACAMERA_CONTROL_CAPTURE_INTENT is PREVIEW
+     *   Request B: enableZsl is ON, ACAMERA_CONTROL_CAPTURE_INTENT is STILL_CAPTURE</p>
+     * <p>The output images for request B may have contents captured before the output images for
+     * request A, and the result metadata for request B may be older than the result metadata for
+     * request A.</p>
+     * <p>Note that when enableZsl is <code>true</code>, it is not guaranteed to get output images captured in
+     * the past for requests with STILL_CAPTURE capture intent.</p>
+     * <p>For applications targeting SDK versions O and newer, the value of enableZsl in
+     * TEMPLATE_STILL_CAPTURE template may be <code>true</code>. The value in other templates is always
+     * <code>false</code> if present.</p>
+     * <p>For applications targeting SDK versions older than O, the value of enableZsl in all
+     * capture templates is always <code>false</code> if present.</p>
+     * <p>For application-operated ZSL, use CAMERA3_TEMPLATE_ZERO_SHUTTER_LAG template.</p>
+     *
+     * @see ACAMERA_CONTROL_CAPTURE_INTENT
+     * @see ACAMERA_SENSOR_TIMESTAMP
+     */
+    ACAMERA_CONTROL_ENABLE_ZSL =                                // byte (acamera_metadata_enum_android_control_enable_zsl_t)
+            ACAMERA_CONTROL_START + 41,
+    /**
+     * <p>Whether a significant scene change is detected within the currently-set AF
+     * region(s).</p>
+     *
+     * <p>Type: byte (acamera_metadata_enum_android_control_af_scene_change_t)</p>
+     *
+     * <p>This tag may appear in:
+     * <ul>
+     *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
+     * </ul></p>
+     *
+     * <p>When the camera focus routine detects a change in the scene it is looking at,
+     * such as a large shift in camera viewpoint, significant motion in the scene, or a
+     * significant illumination change, this value will be set to DETECTED for a single capture
+     * result. Otherwise the value will be NOT_DETECTED. The threshold for detection is similar
+     * to what would trigger a new passive focus scan to begin in CONTINUOUS autofocus modes.</p>
+     * <p>This key will be available if the camera device advertises this key via {@link ACAMERA_REQUEST_AVAILABLE_RESULT_KEYS }.</p>
+     */
+    ACAMERA_CONTROL_AF_SCENE_CHANGE =                           // byte (acamera_metadata_enum_android_control_af_scene_change_t)
+            ACAMERA_CONTROL_START + 42,
     ACAMERA_CONTROL_END,
 
     /**
      * <p>Operation mode for edge
      * enhancement.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_edge_mode_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Edge enhancement improves sharpness and details in the captured image. OFF means
      * no enhancement will be applied by the camera device.</p>
@@ -1541,7 +1761,7 @@ typedef enum acamera_metadata_tag {
      * The camera device may adjust its internal edge enhancement parameters for best
      * image quality based on the android.reprocess.effectiveExposureFactor, if it is set.</p>
      */
-    ACAMERA_EDGE_MODE =                                         // byte (enum)
+    ACAMERA_EDGE_MODE =                                         // byte (acamera_metadata_enum_android_edge_mode_t)
             ACAMERA_EDGE_START,
     /**
      * <p>List of edge enhancement modes for ACAMERA_EDGE_MODE that are supported by this camera
@@ -1549,10 +1769,12 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_EDGE_MODE
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte[n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Full-capability camera devices must always support OFF; camera devices that support
      * YUV_REPROCESSING or PRIVATE_REPROCESSING will list ZERO_SHUTTER_LAG; all devices will
@@ -1565,11 +1787,13 @@ typedef enum acamera_metadata_tag {
     /**
      * <p>The desired mode for for the camera device's flash control.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_flash_mode_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This control is only effective when flash unit is available
      * (<code>ACAMERA_FLASH_INFO_AVAILABLE == true</code>).</p>
@@ -1590,16 +1814,18 @@ typedef enum acamera_metadata_tag {
      * @see ACAMERA_FLASH_INFO_AVAILABLE
      * @see ACAMERA_FLASH_STATE
      */
-    ACAMERA_FLASH_MODE =                                        // byte (enum)
+    ACAMERA_FLASH_MODE =                                        // byte (acamera_metadata_enum_android_flash_mode_t)
             ACAMERA_FLASH_START + 2,
     /**
      * <p>Current state of the flash
      * unit.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_flash_state_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>When the camera device doesn't have flash unit
      * (i.e. <code>ACAMERA_FLASH_INFO_AVAILABLE == false</code>), this state will always be UNAVAILABLE.
@@ -1619,7 +1845,7 @@ typedef enum acamera_metadata_tag {
      * @see ACAMERA_FLASH_INFO_AVAILABLE
      * @see ACAMERA_FLASH_MODE
      */
-    ACAMERA_FLASH_STATE =                                       // byte (enum)
+    ACAMERA_FLASH_STATE =                                       // byte (acamera_metadata_enum_android_flash_state_t)
             ACAMERA_FLASH_START + 5,
     ACAMERA_FLASH_END,
 
@@ -1627,33 +1853,37 @@ typedef enum acamera_metadata_tag {
      * <p>Whether this camera device has a
      * flash unit.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_flash_info_available_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Will be <code>false</code> if no flash is available.</p>
      * <p>If there is no flash unit, none of the flash controls do
      * anything.</p>
      */
-    ACAMERA_FLASH_INFO_AVAILABLE =                              // byte (enum)
+    ACAMERA_FLASH_INFO_AVAILABLE =                              // byte (acamera_metadata_enum_android_flash_info_available_t)
             ACAMERA_FLASH_INFO_START,
     ACAMERA_FLASH_INFO_END,
 
     /**
      * <p>Operational mode for hot pixel correction.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_hot_pixel_mode_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Hotpixel correction interpolates out, or otherwise removes, pixels
      * that do not accurately measure the incoming light (i.e. pixels that
      * are stuck at an arbitrary value or are oversensitive).</p>
      */
-    ACAMERA_HOT_PIXEL_MODE =                                    // byte (enum)
+    ACAMERA_HOT_PIXEL_MODE =                                    // byte (acamera_metadata_enum_android_hot_pixel_mode_t)
             ACAMERA_HOT_PIXEL_START,
     /**
      * <p>List of hot pixel correction modes for ACAMERA_HOT_PIXEL_MODE that are supported by this
@@ -1661,10 +1891,12 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_HOT_PIXEL_MODE
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte[n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>FULL mode camera devices will always support FAST.</p>
      */
@@ -1676,13 +1908,15 @@ typedef enum acamera_metadata_tag {
      * <p>GPS coordinates to include in output JPEG
      * EXIF.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: double[3]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
-     * <p>None</p>
+     * <p>This tag is also used for HEIC image capture.</p>
      */
     ACAMERA_JPEG_GPS_COORDINATES =                              // double[3]
             ACAMERA_JPEG_START,
@@ -1690,13 +1924,15 @@ typedef enum acamera_metadata_tag {
      * <p>32 characters describing GPS algorithm to
      * include in EXIF.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
-     * <p>None</p>
+     * <p>This tag is also used for HEIC image capture.</p>
      */
     ACAMERA_JPEG_GPS_PROCESSING_METHOD =                        // byte
             ACAMERA_JPEG_START + 1,
@@ -1704,24 +1940,28 @@ typedef enum acamera_metadata_tag {
      * <p>Time GPS fix was made to include in
      * EXIF.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int64</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
-     * <p>None</p>
+     * <p>This tag is also used for HEIC image capture.</p>
      */
     ACAMERA_JPEG_GPS_TIMESTAMP =                                // int64
             ACAMERA_JPEG_START + 2,
     /**
      * <p>The orientation for a JPEG image.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>The clockwise rotation angle in degrees, relative to the orientation
      * to the camera, that the JPEG picture needs to be rotated by, to be viewed
@@ -1731,8 +1971,8 @@ typedef enum acamera_metadata_tag {
      * the thumbnail data will also be rotated.</p>
      * <p>Note that this orientation is relative to the orientation of the camera sensor, given
      * by ACAMERA_SENSOR_ORIENTATION.</p>
-     * <p>To translate from the device orientation given by the Android sensor APIs, the following
-     * sample code may be used:</p>
+     * <p>To translate from the device orientation given by the Android sensor APIs for camera
+     * sensors which are not EXTERNAL, the following sample code may be used:</p>
      * <pre><code>private int getJpegOrientation(CameraCharacteristics c, int deviceOrientation) {
      *     if (deviceOrientation == android.view.OrientationEventListener.ORIENTATION_UNKNOWN) return 0;
      *     int sensorOrientation = c.get(CameraCharacteristics.SENSOR_ORIENTATION);
@@ -1751,6 +1991,12 @@ typedef enum acamera_metadata_tag {
      *     return jpegOrientation;
      * }
      * </code></pre>
+     * <p>For EXTERNAL cameras the sensor orientation will always be set to 0 and the facing will
+     * also be set to EXTERNAL. The above code is not relevant in such case.</p>
+     * <p>This tag is also used to describe the orientation of the HEIC image capture, in which
+     * case the rotation is reflected by
+     * <a href="https://developer.android.com/reference/android/media/ExifInterface.html#TAG_ORIENTATION">EXIF orientation flag</a>, and not by
+     * rotating the image data itself.</p>
      *
      * @see ACAMERA_SENSOR_ORIENTATION
      */
@@ -1760,13 +2006,16 @@ typedef enum acamera_metadata_tag {
      * <p>Compression quality of the final JPEG
      * image.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
-     * <p>85-95 is typical usage range.</p>
+     * <p>85-95 is typical usage range. This tag is also used to describe the quality
+     * of the HEIC image capture.</p>
      */
     ACAMERA_JPEG_QUALITY =                                      // byte
             ACAMERA_JPEG_START + 4,
@@ -1774,24 +2023,28 @@ typedef enum acamera_metadata_tag {
      * <p>Compression quality of JPEG
      * thumbnail.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
-     * <p>None</p>
+     * <p>This tag is also used to describe the quality of the HEIC image capture.</p>
      */
     ACAMERA_JPEG_THUMBNAIL_QUALITY =                            // byte
             ACAMERA_JPEG_START + 5,
     /**
      * <p>Resolution of embedded JPEG thumbnail.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32[2]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>When set to (0, 0) value, the JPEG EXIF will not contain thumbnail,
      * but the captured JPEG will still be a valid image.</p>
@@ -1806,15 +2059,19 @@ typedef enum acamera_metadata_tag {
      * <p>When an ACAMERA_JPEG_ORIENTATION of non-zero degree is requested,
      * the camera device will handle thumbnail rotation in one of the following ways:</p>
      * <ul>
-     * <li>Set the
-     *   <a href="https://developer.android.com/reference/android/media/ExifInterface.html#TAG_ORIENTATION">EXIF orientation flag</a>
+     * <li>Set the <a href="https://developer.android.com/reference/android/media/ExifInterface.html#TAG_ORIENTATION">EXIF orientation flag</a>
      *   and keep jpeg and thumbnail image data unrotated.</li>
      * <li>Rotate the jpeg and thumbnail image data and not set
-     *   <a href="https://developer.android.com/reference/android/media/ExifInterface.html#TAG_ORIENTATION">EXIF orientation flag</a>.
-     *   In this case, LIMITED or FULL hardware level devices will report rotated thumnail size
-     *   in capture result, so the width and height will be interchanged if 90 or 270 degree
-     *   orientation is requested. LEGACY device will always report unrotated thumbnail size.</li>
+     *   <a href="https://developer.android.com/reference/android/media/ExifInterface.html#TAG_ORIENTATION">EXIF orientation flag</a>. In this
+     *   case, LIMITED or FULL hardware level devices will report rotated thumnail size in
+     *   capture result, so the width and height will be interchanged if 90 or 270 degree
+     *   orientation is requested. LEGACY device will always report unrotated thumbnail
+     *   size.</li>
      * </ul>
+     * <p>The tag is also used as thumbnail size for HEIC image format capture, in which case the
+     * the thumbnail rotation is reflected by
+     * <a href="https://developer.android.com/reference/android/media/ExifInterface.html#TAG_ORIENTATION">EXIF orientation flag</a>, and not by
+     * rotating the thumbnail data itself.</p>
      *
      * @see ACAMERA_JPEG_ORIENTATION
      */
@@ -1826,10 +2083,12 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_JPEG_THUMBNAIL_SIZE
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32[2*n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This list will include at least one non-zero resolution, plus <code>(0,0)</code> for indicating no
      * thumbnail should be generated.</p>
@@ -1846,6 +2105,7 @@ typedef enum acamera_metadata_tag {
      * and vice versa.</li>
      * <li>All non-<code>(0, 0)</code> sizes will have non-zero widths and heights.</li>
      * </ul>
+     * <p>This list is also used as supported thumbnail sizes for HEIC image format capture.</p>
      *
      * @see ACAMERA_SCALER_AVAILABLE_STREAM_CONFIGURATIONS
      */
@@ -1857,11 +2117,13 @@ typedef enum acamera_metadata_tag {
      * <p>The desired lens aperture size, as a ratio of lens focal length to the
      * effective aperture diameter.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: float</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Setting this value is only supported on the camera devices that have a variable
      * aperture lens.</p>
@@ -1889,11 +2151,13 @@ typedef enum acamera_metadata_tag {
     /**
      * <p>The desired setting for the lens neutral density filter(s).</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: float</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This control will not be supported on most camera devices.</p>
      * <p>Lens filters are typically used to lower the amount of light the
@@ -1915,11 +2179,13 @@ typedef enum acamera_metadata_tag {
     /**
      * <p>The desired lens focal length; used for optical zoom.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: float</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This setting controls the physical focal length of the camera
      * device's lens. Changing the focal length changes the field of
@@ -1941,11 +2207,13 @@ typedef enum acamera_metadata_tag {
      * <p>Desired distance to plane of sharpest focus,
      * measured from frontmost surface of the lens.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: float</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Should be zero for fixed-focus cameras</p>
      */
@@ -1955,11 +2223,13 @@ typedef enum acamera_metadata_tag {
      * <p>Sets whether the camera device uses optical image stabilization (OIS)
      * when capturing images.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_lens_optical_stabilization_mode_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>OIS is used to compensate for motion blur due to small
      * movements of the camera during capture. Unlike digital image
@@ -1982,30 +2252,33 @@ typedef enum acamera_metadata_tag {
      * @see ACAMERA_CONTROL_VIDEO_STABILIZATION_MODE
      * @see ACAMERA_LENS_INFO_AVAILABLE_OPTICAL_STABILIZATION
      */
-    ACAMERA_LENS_OPTICAL_STABILIZATION_MODE =                   // byte (enum)
+    ACAMERA_LENS_OPTICAL_STABILIZATION_MODE =                   // byte (acamera_metadata_enum_android_lens_optical_stabilization_mode_t)
             ACAMERA_LENS_START + 4,
     /**
      * <p>Direction the camera faces relative to
      * device screen.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_lens_facing_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
-     * <p>None</p>
      */
-    ACAMERA_LENS_FACING =                                       // byte (enum)
+    ACAMERA_LENS_FACING =                                       // byte (acamera_metadata_enum_android_lens_facing_t)
             ACAMERA_LENS_START + 5,
     /**
      * <p>The orientation of the camera relative to the sensor
      * coordinate system.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: float[4]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>The four coefficients that describe the quaternion
      * rotation from the Android sensor coordinate system to a
@@ -2039,44 +2312,45 @@ typedef enum acamera_metadata_tag {
     /**
      * <p>Position of the camera optical center.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: float[3]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>The position of the camera device's lens optical center,
-     * as a three-dimensional vector <code>(x,y,z)</code>, relative to the
-     * optical center of the largest camera device facing in the
-     * same direction as this camera, in the
-     * <a href="https://developer.android.com/reference/android/hardware/SensorEvent.html">Android sensor coordinate axes</a>.
-     * Note that only the axis definitions are shared with
-     * the sensor coordinate system, but not the origin.</p>
-     * <p>If this device is the largest or only camera device with a
-     * given facing, then this position will be <code>(0, 0, 0)</code>; a
-     * camera device with a lens optical center located 3 cm from
-     * the main sensor along the +X axis (to the right from the
-     * user's perspective) will report <code>(0.03, 0, 0)</code>.</p>
-     * <p>To transform a pixel coordinates between two cameras
-     * facing the same direction, first the source camera
-     * ACAMERA_LENS_RADIAL_DISTORTION must be corrected for.  Then
-     * the source camera ACAMERA_LENS_INTRINSIC_CALIBRATION needs
-     * to be applied, followed by the ACAMERA_LENS_POSE_ROTATION
-     * of the source camera, the translation of the source camera
-     * relative to the destination camera, the
-     * ACAMERA_LENS_POSE_ROTATION of the destination camera, and
-     * finally the inverse of ACAMERA_LENS_INTRINSIC_CALIBRATION
-     * of the destination camera. This obtains a
-     * radial-distortion-free coordinate in the destination
-     * camera pixel coordinates.</p>
-     * <p>To compare this against a real image from the destination
-     * camera, the destination camera image then needs to be
-     * corrected for radial distortion before comparison or
-     * sampling.</p>
+     * as a three-dimensional vector <code>(x,y,z)</code>.</p>
+     * <p>Prior to Android P, or when ACAMERA_LENS_POSE_REFERENCE is PRIMARY_CAMERA, this position
+     * is relative to the optical center of the largest camera device facing in the same
+     * direction as this camera, in the <a href="https://developer.android.com/reference/android/hardware/SensorEvent.html">Android sensor
+     * coordinate axes</a>. Note that only the axis definitions are shared with the sensor
+     * coordinate system, but not the origin.</p>
+     * <p>If this device is the largest or only camera device with a given facing, then this
+     * position will be <code>(0, 0, 0)</code>; a camera device with a lens optical center located 3 cm
+     * from the main sensor along the +X axis (to the right from the user's perspective) will
+     * report <code>(0.03, 0, 0)</code>.  Note that this means that, for many computer vision
+     * applications, the position needs to be negated to convert it to a translation from the
+     * camera to the origin.</p>
+     * <p>To transform a pixel coordinates between two cameras facing the same direction, first
+     * the source camera ACAMERA_LENS_DISTORTION must be corrected for.  Then the source
+     * camera ACAMERA_LENS_INTRINSIC_CALIBRATION needs to be applied, followed by the
+     * ACAMERA_LENS_POSE_ROTATION of the source camera, the translation of the source camera
+     * relative to the destination camera, the ACAMERA_LENS_POSE_ROTATION of the destination
+     * camera, and finally the inverse of ACAMERA_LENS_INTRINSIC_CALIBRATION of the destination
+     * camera. This obtains a radial-distortion-free coordinate in the destination camera pixel
+     * coordinates.</p>
+     * <p>To compare this against a real image from the destination camera, the destination camera
+     * image then needs to be corrected for radial distortion before comparison or sampling.</p>
+     * <p>When ACAMERA_LENS_POSE_REFERENCE is GYROSCOPE, then this position is relative to
+     * the center of the primary gyroscope on the device. The axis definitions are the same as
+     * with PRIMARY_CAMERA.</p>
      *
+     * @see ACAMERA_LENS_DISTORTION
      * @see ACAMERA_LENS_INTRINSIC_CALIBRATION
+     * @see ACAMERA_LENS_POSE_REFERENCE
      * @see ACAMERA_LENS_POSE_ROTATION
-     * @see ACAMERA_LENS_RADIAL_DISTORTION
      */
     ACAMERA_LENS_POSE_TRANSLATION =                             // float[3]
             ACAMERA_LENS_START + 7,
@@ -2084,10 +2358,12 @@ typedef enum acamera_metadata_tag {
      * <p>The range of scene distances that are in
      * sharp focus (depth of field).</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: float[2]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>If variable focus not supported, can still report
      * fixed depth of field range</p>
@@ -2097,10 +2373,12 @@ typedef enum acamera_metadata_tag {
     /**
      * <p>Current lens status.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_lens_state_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>For lens parameters ACAMERA_LENS_FOCAL_LENGTH, ACAMERA_LENS_FOCUS_DISTANCE,
      * ACAMERA_LENS_FILTER_DENSITY and ACAMERA_LENS_APERTURE, when changes are requested,
@@ -2131,17 +2409,19 @@ typedef enum acamera_metadata_tag {
      * @see ACAMERA_LENS_INFO_AVAILABLE_FOCAL_LENGTHS
      * @see ACAMERA_LENS_INFO_MINIMUM_FOCUS_DISTANCE
      */
-    ACAMERA_LENS_STATE =                                        // byte (enum)
+    ACAMERA_LENS_STATE =                                        // byte (acamera_metadata_enum_android_lens_state_t)
             ACAMERA_LENS_START + 9,
     /**
      * <p>The parameters for this camera device's intrinsic
      * calibration.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: float[5]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>The five calibration parameters that describe the
      * transform from camera-centric 3D coordinates to sensor
@@ -2159,13 +2439,15 @@ typedef enum acamera_metadata_tag {
      * </code></pre>
      * <p>which can then be combined with the camera pose rotation
      * <code>R</code> and translation <code>t</code> (ACAMERA_LENS_POSE_ROTATION and
-     * ACAMERA_LENS_POSE_TRANSLATION, respective) to calculate the
+     * ACAMERA_LENS_POSE_TRANSLATION, respectively) to calculate the
      * complete transform from world coordinates to pixel
      * coordinates:</p>
-     * <pre><code>P = [ K 0   * [ R t
-     *      0 1 ]     0 1 ]
+     * <pre><code>P = [ K 0   * [ R -Rt
+     *      0 1 ]      0 1 ]
      * </code></pre>
-     * <p>and with <code>p_w</code> being a point in the world coordinate system
+     * <p>(Note the negation of poseTranslation when mapping from camera
+     * to world coordinates, and multiplication by the rotation).</p>
+     * <p>With <code>p_w</code> being a point in the world coordinate system
      * and <code>p_s</code> being a point in the camera active pixel array
      * coordinate system, and with the mapping including the
      * homogeneous division by z:</p>
@@ -2180,39 +2462,71 @@ typedef enum acamera_metadata_tag {
      * where <code>(0,0)</code> is the top-left of the
      * preCorrectionActiveArraySize rectangle. Once the pose and
      * intrinsic calibration transforms have been applied to a
-     * world point, then the ACAMERA_LENS_RADIAL_DISTORTION
+     * world point, then the ACAMERA_LENS_DISTORTION
      * transform needs to be applied, and the result adjusted to
      * be in the ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE coordinate
      * system (where <code>(0, 0)</code> is the top-left of the
      * activeArraySize rectangle), to determine the final pixel
      * coordinate of the world point for processed (non-RAW)
      * output buffers.</p>
+     * <p>For camera devices, the center of pixel <code>(x,y)</code> is located at
+     * coordinate <code>(x + 0.5, y + 0.5)</code>.  So on a device with a
+     * precorrection active array of size <code>(10,10)</code>, the valid pixel
+     * indices go from <code>(0,0)-(9,9)</code>, and an perfectly-built camera would
+     * have an optical center at the exact center of the pixel grid, at
+     * coordinates <code>(5.0, 5.0)</code>, which is the top-left corner of pixel
+     * <code>(5,5)</code>.</p>
      *
+     * @see ACAMERA_LENS_DISTORTION
      * @see ACAMERA_LENS_POSE_ROTATION
      * @see ACAMERA_LENS_POSE_TRANSLATION
-     * @see ACAMERA_LENS_RADIAL_DISTORTION
      * @see ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE
      * @see ACAMERA_SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE
      */
     ACAMERA_LENS_INTRINSIC_CALIBRATION =                        // float[5]
             ACAMERA_LENS_START + 10,
+    ACAMERA_LENS_RADIAL_DISTORTION =                            // Deprecated! DO NOT USE
+            ACAMERA_LENS_START + 11,
+    /**
+     * <p>The origin for ACAMERA_LENS_POSE_TRANSLATION.</p>
+     *
+     * @see ACAMERA_LENS_POSE_TRANSLATION
+     *
+     * <p>Type: byte (acamera_metadata_enum_android_lens_pose_reference_t)</p>
+     *
+     * <p>This tag may appear in:
+     * <ul>
+     *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
+     * </ul></p>
+     *
+     * <p>Different calibration methods and use cases can produce better or worse results
+     * depending on the selected coordinate origin.</p>
+     */
+    ACAMERA_LENS_POSE_REFERENCE =                               // byte (acamera_metadata_enum_android_lens_pose_reference_t)
+            ACAMERA_LENS_START + 12,
     /**
      * <p>The correction coefficients to correct for this camera device's
      * radial and tangential lens distortion.</p>
+     * <p>Replaces the deprecated ACAMERA_LENS_RADIAL_DISTORTION field, which was
+     * inconsistently defined.</p>
      *
-     * <p>This tag may appear in:</p>
+     * @see ACAMERA_LENS_RADIAL_DISTORTION
+     *
+     * <p>Type: float[5]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
-     * </ul>
+     * </ul></p>
      *
-     * <p>Four radial distortion coefficients <code>[kappa_0, kappa_1, kappa_2,
+     * <p>Three radial distortion coefficients <code>[kappa_1, kappa_2,
      * kappa_3]</code> and two tangential distortion coefficients
      * <code>[kappa_4, kappa_5]</code> that can be used to correct the
      * lens's geometric distortion with the mapping equations:</p>
-     * <pre><code> x_c = x_i * ( kappa_0 + kappa_1 * r^2 + kappa_2 * r^4 + kappa_3 * r^6 ) +
+     * <pre><code> x_c = x_i * ( 1 + kappa_1 * r^2 + kappa_2 * r^4 + kappa_3 * r^6 ) +
      *        kappa_4 * (2 * x_i * y_i) + kappa_5 * ( r^2 + 2 * x_i^2 )
-     *  y_c = y_i * ( kappa_0 + kappa_1 * r^2 + kappa_2 * r^4 + kappa_3 * r^6 ) +
+     *  y_c = y_i * ( 1 + kappa_1 * r^2 + kappa_2 * r^4 + kappa_3 * r^6 ) +
      *        kappa_5 * (2 * x_i * y_i) + kappa_4 * ( r^2 + 2 * y_i^2 )
      * </code></pre>
      * <p>Here, <code>[x_c, y_c]</code> are the coordinates to sample in the
@@ -2220,23 +2534,21 @@ typedef enum acamera_metadata_tag {
      * corrected image at the coordinate <code>[x_i, y_i]</code>:</p>
      * <pre><code> correctedImage(x_i, y_i) = sample_at(x_c, y_c, inputImage)
      * </code></pre>
-     * <p>The pixel coordinates are defined in a normalized
-     * coordinate system related to the
-     * ACAMERA_LENS_INTRINSIC_CALIBRATION calibration fields.
-     * Both <code>[x_i, y_i]</code> and <code>[x_c, y_c]</code> have <code>(0,0)</code> at the
-     * lens optical center <code>[c_x, c_y]</code>. The maximum magnitudes
-     * of both x and y coordinates are normalized to be 1 at the
-     * edge further from the optical center, so the range
-     * for both dimensions is <code>-1 &lt;= x &lt;= 1</code>.</p>
+     * <p>The pixel coordinates are defined in a coordinate system
+     * related to the ACAMERA_LENS_INTRINSIC_CALIBRATION
+     * calibration fields; see that entry for details of the mapping stages.
+     * Both <code>[x_i, y_i]</code> and <code>[x_c, y_c]</code>
+     * have <code>(0,0)</code> at the lens optical center <code>[c_x, c_y]</code>, and
+     * the range of the coordinates depends on the focal length
+     * terms of the intrinsic calibration.</p>
      * <p>Finally, <code>r</code> represents the radial distance from the
-     * optical center, <code>r^2 = x_i^2 + y_i^2</code>, and its magnitude
-     * is therefore no larger than <code>|r| &lt;= sqrt(2)</code>.</p>
+     * optical center, <code>r^2 = x_i^2 + y_i^2</code>.</p>
      * <p>The distortion model used is the Brown-Conrady model.</p>
      *
      * @see ACAMERA_LENS_INTRINSIC_CALIBRATION
      */
-    ACAMERA_LENS_RADIAL_DISTORTION =                            // float[6]
-            ACAMERA_LENS_START + 11,
+    ACAMERA_LENS_DISTORTION =                                   // float[5]
+            ACAMERA_LENS_START + 13,
     ACAMERA_LENS_END,
 
     /**
@@ -2245,10 +2557,12 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_LENS_APERTURE
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: float[n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>If the camera device doesn't support a variable lens aperture,
      * this list will contain only one value, which is the fixed aperture size.</p>
@@ -2263,10 +2577,12 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_LENS_FILTER_DENSITY
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: float[n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>If a neutral density filter is not supported by this camera device,
      * this list will contain only 0. Otherwise, this list will include every
@@ -2280,10 +2596,12 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_LENS_FOCAL_LENGTH
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: float[n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>If optical zoom is not supported, this list will only contain
      * a single value corresponding to the fixed focal length of the
@@ -2298,10 +2616,12 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_LENS_OPTICAL_STABILIZATION_MODE
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte[n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>If OIS is not supported by a given camera device, this list will
      * contain only OFF.</p>
@@ -2311,10 +2631,12 @@ typedef enum acamera_metadata_tag {
     /**
      * <p>Hyperfocal distance for this lens.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: float</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>If the lens is not fixed focus, the camera device will report this
      * field when ACAMERA_LENS_INFO_FOCUS_DISTANCE_CALIBRATION is APPROXIMATE or CALIBRATED.</p>
@@ -2327,10 +2649,12 @@ typedef enum acamera_metadata_tag {
      * <p>Shortest distance from frontmost surface
      * of the lens that can be brought into sharp focus.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: float</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>If the lens is fixed-focus, this will be
      * 0.</p>
@@ -2340,10 +2664,12 @@ typedef enum acamera_metadata_tag {
     /**
      * <p>Dimensions of lens shading map.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32[2]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>The map should be on the order of 30-40 rows and columns, and
      * must be smaller than 64x64.</p>
@@ -2353,10 +2679,12 @@ typedef enum acamera_metadata_tag {
     /**
      * <p>The lens focus distance calibration quality.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_lens_info_focus_distance_calibration_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>The lens focus distance calibration quality determines the reliability of
      * focus related metadata entries, i.e. ACAMERA_LENS_FOCUS_DISTANCE,
@@ -2377,18 +2705,20 @@ typedef enum acamera_metadata_tag {
      * @see ACAMERA_LENS_INFO_HYPERFOCAL_DISTANCE
      * @see ACAMERA_LENS_INFO_MINIMUM_FOCUS_DISTANCE
      */
-    ACAMERA_LENS_INFO_FOCUS_DISTANCE_CALIBRATION =              // byte (enum)
+    ACAMERA_LENS_INFO_FOCUS_DISTANCE_CALIBRATION =              // byte (acamera_metadata_enum_android_lens_info_focus_distance_calibration_t)
             ACAMERA_LENS_INFO_START + 7,
     ACAMERA_LENS_INFO_END,
 
     /**
      * <p>Mode of operation for the noise reduction algorithm.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_noise_reduction_mode_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>The noise reduction algorithm attempts to improve image quality by removing
      * excessive noise added by the capture process, especially in dark conditions.</p>
@@ -2418,7 +2748,7 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_NOISE_REDUCTION_AVAILABLE_NOISE_REDUCTION_MODES
      */
-    ACAMERA_NOISE_REDUCTION_MODE =                              // byte (enum)
+    ACAMERA_NOISE_REDUCTION_MODE =                              // byte (acamera_metadata_enum_android_noise_reduction_mode_t)
             ACAMERA_NOISE_REDUCTION_START,
     /**
      * <p>List of noise reduction modes for ACAMERA_NOISE_REDUCTION_MODE that are supported
@@ -2426,10 +2756,12 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_NOISE_REDUCTION_MODE
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte[n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Full-capability camera devices will always support OFF and FAST.</p>
      * <p>Camera devices that support YUV_REPROCESSING or PRIVATE_REPROCESSING will support
@@ -2444,10 +2776,12 @@ typedef enum acamera_metadata_tag {
      * <p>The maximum numbers of different types of output streams
      * that can be configured and used simultaneously by a camera device.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32[3]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This is a 3 element tuple that contains the max number of output simultaneous
      * streams for raw sensor, processed (but not stalling), and processed (and stalling)
@@ -2462,11 +2796,12 @@ typedef enum acamera_metadata_tag {
      * into the 3 stream types as below:</p>
      * <ul>
      * <li>Processed (but stalling): any non-RAW format with a stallDurations &gt; 0.
-     *   Typically {@link AIMAGE_FORMAT_JPEG} format.</li>
-     * <li>Raw formats: {@link AIMAGE_FORMAT_RAW16}, {@link AIMAGE_FORMAT_RAW10}, or
-     *   {@link AIMAGE_FORMAT_RAW12}.</li>
-     * <li>Processed (but not-stalling): any non-RAW format without a stall duration.
-     *   Typically {@link AIMAGE_FORMAT_YUV_420_888}.</li>
+     *   Typically {@link AIMAGE_FORMAT_JPEG JPEG format}.</li>
+     * <li>Raw formats: {@link AIMAGE_FORMAT_RAW16 RAW_SENSOR}, {@link AIMAGE_FORMAT_RAW10 RAW10}, or
+     *   {@link AIMAGE_FORMAT_RAW12 RAW12}.</li>
+     * <li>Processed (but not-stalling): any non-RAW format without a stall duration.  Typically
+     *   {@link AIMAGE_FORMAT_YUV_420_888 YUV_420_888},
+     *   <a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#NV21">NV21</a>, <a href="https://developer.android.com/reference/android/graphics/ImageFormat.html#YV12">YV12</a>, or {@link AIMAGE_FORMAT_Y8 Y8} .</li>
      * </ul>
      *
      * @see ACAMERA_SCALER_AVAILABLE_STREAM_CONFIGURATIONS
@@ -2478,10 +2813,12 @@ typedef enum acamera_metadata_tag {
      * through from when it was exposed to when the final completed result
      * was available to the framework.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Depending on what settings are used in the request, and
      * what streams are configured, the data may undergo less processing,
@@ -2497,10 +2834,12 @@ typedef enum acamera_metadata_tag {
      * has to go through from when it's exposed to when it's available
      * to the framework.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>A typical minimum value for this is 2 (one stage to expose,
      * one stage to readout) from the sensor. The ISP then usually adds
@@ -2523,10 +2862,12 @@ typedef enum acamera_metadata_tag {
      * <p>Defines how many sub-components
      * a result will be composed of.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>In order to combat the pipeline latency, partial results
      * may be delivered to the application layer from the camera device as
@@ -2547,10 +2888,12 @@ typedef enum acamera_metadata_tag {
      * <p>List of capabilities that this camera device
      * advertises as fully supporting.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte[n] (acamera_metadata_enum_android_request_available_capabilities_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>A capability is a contract that the camera device makes in order
      * to be able to satisfy one or more use cases.</p>
@@ -2575,16 +2918,18 @@ typedef enum acamera_metadata_tag {
      * @see ACAMERA_REQUEST_AVAILABLE_REQUEST_KEYS
      * @see ACAMERA_REQUEST_AVAILABLE_RESULT_KEYS
      */
-    ACAMERA_REQUEST_AVAILABLE_CAPABILITIES =                    // byte[n] (enum)
+    ACAMERA_REQUEST_AVAILABLE_CAPABILITIES =                    // byte[n] (acamera_metadata_enum_android_request_available_capabilities_t)
             ACAMERA_REQUEST_START + 12,
     /**
      * <p>A list of all keys that the camera device has available
-     * to use with {@link ACaptureRequest}.</p>
+     * to use with {@link ACaptureRequest }.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32[n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Attempting to set a key into a CaptureRequest that is not
      * listed here will result in an invalid request and will be rejected
@@ -2599,14 +2944,14 @@ typedef enum acamera_metadata_tag {
     ACAMERA_REQUEST_AVAILABLE_REQUEST_KEYS =                    // int32[n]
             ACAMERA_REQUEST_START + 13,
     /**
-     * <p>A list of all keys that the camera device has available
-     * to query with {@link ACameraMetadata} from
-     * {@link ACameraCaptureSession_captureCallback_result}.</p>
+     * <p>A list of all keys that the camera device has available to use with {@link ACameraCaptureSession_captureCallback_result }.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32[n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Attempting to get a key from a CaptureResult that is not
      * listed here will always return a <code>null</code> value. Getting a key from
@@ -2630,14 +2975,14 @@ typedef enum acamera_metadata_tag {
     ACAMERA_REQUEST_AVAILABLE_RESULT_KEYS =                     // int32[n]
             ACAMERA_REQUEST_START + 14,
     /**
-     * <p>A list of all keys that the camera device has available
-     * to query with {@link ACameraMetadata} from
-     * {@link ACameraManager_getCameraCharacteristics}.</p>
+     * <p>A list of all keys that the camera device has available to use with {@link ACameraManager_getCameraCharacteristics }.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32[n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This entry follows the same rules as
      * ACAMERA_REQUEST_AVAILABLE_RESULT_KEYS (except that it applies for
@@ -2648,22 +2993,106 @@ typedef enum acamera_metadata_tag {
      */
     ACAMERA_REQUEST_AVAILABLE_CHARACTERISTICS_KEYS =            // int32[n]
             ACAMERA_REQUEST_START + 15,
+    /**
+     * <p>A subset of the available request keys that the camera device
+     * can pass as part of the capture session initialization.</p>
+     *
+     * <p>Type: int32[n]</p>
+     *
+     * <p>This tag may appear in:
+     * <ul>
+     *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
+     * </ul></p>
+     *
+     * <p>This is a subset of ACAMERA_REQUEST_AVAILABLE_REQUEST_KEYS which
+     * contains a list of keys that are difficult to apply per-frame and
+     * can result in unexpected delays when modified during the capture session
+     * lifetime. Typical examples include parameters that require a
+     * time-consuming hardware re-configuration or internal camera pipeline
+     * change. For performance reasons we advise clients to pass their initial
+     * values as part of
+     * {@link ACameraDevice_createCaptureSessionWithSessionParameters }.
+     * Once the camera capture session is enabled it is also recommended to avoid
+     * changing them from their initial values set in
+     * {@link ACameraDevice_createCaptureSessionWithSessionParameters }.
+     * Control over session parameters can still be exerted in capture requests
+     * but clients should be aware and expect delays during their application.
+     * An example usage scenario could look like this:</p>
+     * <ul>
+     * <li>The camera client starts by quering the session parameter key list via
+     *   {@link ACameraManager_getCameraCharacteristics }.</li>
+     * <li>Before triggering the capture session create sequence, a capture request
+     *   must be built via
+     *   {@link ACameraDevice_createCaptureRequest }
+     *   using an appropriate template matching the particular use case.</li>
+     * <li>The client should go over the list of session parameters and check
+     *   whether some of the keys listed matches with the parameters that
+     *   they intend to modify as part of the first capture request.</li>
+     * <li>If there is no such match, the capture request can be  passed
+     *   unmodified to
+     *   {@link ACameraDevice_createCaptureSessionWithSessionParameters }.</li>
+     * <li>If matches do exist, the client should update the respective values
+     *   and pass the request to
+     *   {@link ACameraDevice_createCaptureSessionWithSessionParameters }.</li>
+     * <li>After the capture session initialization completes the session parameter
+     *   key list can continue to serve as reference when posting or updating
+     *   further requests. As mentioned above further changes to session
+     *   parameters should ideally be avoided, if updates are necessary
+     *   however clients could expect a delay/glitch during the
+     *   parameter switch.</li>
+     * </ul>
+     *
+     * @see ACAMERA_REQUEST_AVAILABLE_REQUEST_KEYS
+     */
+    ACAMERA_REQUEST_AVAILABLE_SESSION_KEYS =                    // int32[n]
+            ACAMERA_REQUEST_START + 16,
+    /**
+     * <p>A subset of the available request keys that can be overridden for
+     * physical devices backing a logical multi-camera.</p>
+     *
+     * <p>Type: int32[n]</p>
+     *
+     * <p>This tag may appear in:
+     * <ul>
+     *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
+     * </ul></p>
+     *
+     * <p>This is a subset of ACAMERA_REQUEST_AVAILABLE_REQUEST_KEYS which contains a list
+     * of keys that can be overridden using <a href="https://developer.android.com/reference/CaptureRequest/Builder.html#setPhysicalCameraKey">Builder#setPhysicalCameraKey</a>.
+     * The respective value of such request key can be obtained by calling
+     * <a href="https://developer.android.com/reference/CaptureRequest/Builder.html#getPhysicalCameraKey">Builder#getPhysicalCameraKey</a>. Capture requests that contain
+     * individual physical device requests must be built via
+     * <a href="https://developer.android.com/reference/android/hardware/camera2/CameraDevice.html#createCaptureRequest(int,">Set)</a>.</p>
+     *
+     * @see ACAMERA_REQUEST_AVAILABLE_REQUEST_KEYS
+     */
+    ACAMERA_REQUEST_AVAILABLE_PHYSICAL_CAMERA_REQUEST_KEYS =    // int32[n]
+            ACAMERA_REQUEST_START + 17,
     ACAMERA_REQUEST_END,
 
     /**
      * <p>The desired region of the sensor to read out for this capture.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32[4]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This control can be used to implement digital zoom.</p>
-     * <p>The data representation is int[4], which maps to (left, top, width, height).</p>
-     * <p>The crop region coordinate system is based off
-     * ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE, with <code>(0, 0)</code> being the
-     * top-left corner of the sensor active array.</p>
+     * <p>For devices not supporting ACAMERA_DISTORTION_CORRECTION_MODE control, the coordinate
+     * system always follows that of ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE, with <code>(0, 0)</code> being
+     * the top-left pixel of the active array.</p>
+     * <p>For devices supporting ACAMERA_DISTORTION_CORRECTION_MODE control, the coordinate
+     * system depends on the mode being set.
+     * When the distortion correction mode is OFF, the coordinate system follows
+     * ACAMERA_SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE, with
+     * <code>(0, 0)</code> being the top-left pixel of the pre-correction active array.
+     * When the distortion correction mode is not OFF, the coordinate system follows
+     * ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE, with
+     * <code>(0, 0)</code> being the top-left pixel of the active array.</p>
      * <p>Output streams use this rectangle to produce their output,
      * cropping to a smaller region if necessary to maintain the
      * stream's aspect ratio, then scaling the sensor input to
@@ -2682,17 +3111,26 @@ typedef enum acamera_metadata_tag {
      * outputs will crop horizontally (pillarbox), and 16:9
      * streams will match exactly. These additional crops will
      * be centered within the crop region.</p>
-     * <p>The width and height of the crop region cannot
-     * be set to be smaller than
+     * <p>If the coordinate system is ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE, the width and height
+     * of the crop region cannot be set to be smaller than
      * <code>floor( activeArraySize.width / ACAMERA_SCALER_AVAILABLE_MAX_DIGITAL_ZOOM )</code> and
      * <code>floor( activeArraySize.height / ACAMERA_SCALER_AVAILABLE_MAX_DIGITAL_ZOOM )</code>, respectively.</p>
+     * <p>If the coordinate system is ACAMERA_SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE, the width
+     * and height of the crop region cannot be set to be smaller than
+     * <code>floor( preCorrectionActiveArraySize.width / ACAMERA_SCALER_AVAILABLE_MAX_DIGITAL_ZOOM )</code>
+     * and
+     * <code>floor( preCorrectionActiveArraySize.height / ACAMERA_SCALER_AVAILABLE_MAX_DIGITAL_ZOOM )</code>,
+     * respectively.</p>
      * <p>The camera device may adjust the crop region to account
      * for rounding and other hardware requirements; the final
      * crop region used will be included in the output capture
      * result.</p>
+     * <p>The data representation is int[4], which maps to (left, top, width, height).</p>
      *
+     * @see ACAMERA_DISTORTION_CORRECTION_MODE
      * @see ACAMERA_SCALER_AVAILABLE_MAX_DIGITAL_ZOOM
      * @see ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE
+     * @see ACAMERA_SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE
      */
     ACAMERA_SCALER_CROP_REGION =                                // int32[4]
             ACAMERA_SCALER_START,
@@ -2703,10 +3141,12 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_SCALER_CROP_REGION
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: float</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This represents the maximum amount of zooming possible by
      * the camera device, or equivalently, the minimum cropping
@@ -2722,10 +3162,12 @@ typedef enum acamera_metadata_tag {
      * camera device supports
      * (i.e. format, width, height, output/input stream).</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32[n*4] (acamera_metadata_enum_android_scaler_available_stream_configurations_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>The configurations are listed as <code>(format, width, height, input?)</code>
      * tuples.</p>
@@ -2755,21 +3197,29 @@ typedef enum acamera_metadata_tag {
      * IMPLEMENTATION_DEFINED | same as YUV_420_888                  | Any            |</p>
      * <p>Refer to ACAMERA_REQUEST_AVAILABLE_CAPABILITIES for additional
      * mandatory stream configurations on a per-capability basis.</p>
+     * <p>Exception on 176x144 (QCIF) resolution: camera devices usually have a fixed capability for
+     * downscaling from larger resolution to smaller, and the QCIF resolution sometimes is not
+     * fully supported due to this limitation on devices with high-resolution image sensors.
+     * Therefore, trying to configure a QCIF resolution stream together with any other
+     * stream larger than 1920x1080 resolution (either width or height) might not be supported,
+     * and capture session creation will fail if it is not.</p>
      *
      * @see ACAMERA_INFO_SUPPORTED_HARDWARE_LEVEL
      * @see ACAMERA_REQUEST_AVAILABLE_CAPABILITIES
      * @see ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE
      */
-    ACAMERA_SCALER_AVAILABLE_STREAM_CONFIGURATIONS =            // int32[n*4] (enum)
+    ACAMERA_SCALER_AVAILABLE_STREAM_CONFIGURATIONS =            // int32[n*4] (acamera_metadata_enum_android_scaler_available_stream_configurations_t)
             ACAMERA_SCALER_START + 10,
     /**
      * <p>This lists the minimum frame duration for each
      * format/size combination.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int64[4*n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This should correspond to the frame duration when only that
      * stream is active, with all processing (typically in android.*.mode)
@@ -2791,10 +3241,12 @@ typedef enum acamera_metadata_tag {
      * <p>This lists the maximum stall duration for each
      * output format/size combination.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int64[4*n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>A stall duration is how much extra time would get added
      * to the normal minimum frame duration for a repeating request
@@ -2837,13 +3289,15 @@ typedef enum acamera_metadata_tag {
      * ignored).</p>
      * <p>The following formats may always have a stall duration:</p>
      * <ul>
-     * <li>{@link AIMAGE_FORMAT_JPEG}</li>
-     * <li>{@link AIMAGE_FORMAT_RAW16}</li>
+     * <li>{@link AIMAGE_FORMAT_JPEG }</li>
+     * <li>{@link AIMAGE_FORMAT_RAW16 }</li>
      * </ul>
      * <p>The following formats will never have a stall duration:</p>
      * <ul>
-     * <li>{@link AIMAGE_FORMAT_YUV_420_888}</li>
-     * <li>{@link AIMAGE_FORMAT_RAW10}</li>
+     * <li>{@link AIMAGE_FORMAT_YUV_420_888 }</li>
+     * <li>{@link AIMAGE_FORMAT_RAW10 }</li>
+     * <li>{@link AIMAGE_FORMAT_RAW12 }</li>
+     * <li>{@link AIMAGE_FORMAT_Y8 }</li>
      * </ul>
      * <p>All other formats may or may not have an allowed stall duration on
      * a per-capability basis; refer to ACAMERA_REQUEST_AVAILABLE_CAPABILITIES
@@ -2859,10 +3313,12 @@ typedef enum acamera_metadata_tag {
     /**
      * <p>The crop type that this camera device supports.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_scaler_cropping_type_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>When passing a non-centered crop region (ACAMERA_SCALER_CROP_REGION) to a camera
      * device that only supports CENTER_ONLY cropping, the camera device will move the
@@ -2877,19 +3333,96 @@ typedef enum acamera_metadata_tag {
      * @see ACAMERA_SCALER_CROP_REGION
      * @see ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE
      */
-    ACAMERA_SCALER_CROPPING_TYPE =                              // byte (enum)
+    ACAMERA_SCALER_CROPPING_TYPE =                              // byte (acamera_metadata_enum_android_scaler_cropping_type_t)
             ACAMERA_SCALER_START + 13,
+    /**
+     * <p>Recommended stream configurations for common client use cases.</p>
+     *
+     * <p>Type: int32[n*5] (acamera_metadata_enum_android_scaler_available_recommended_stream_configurations_t)</p>
+     *
+     * <p>This tag may appear in:
+     * <ul>
+     *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
+     * </ul></p>
+     *
+     * <p>Optional subset of the ACAMERA_SCALER_AVAILABLE_STREAM_CONFIGURATIONS that contains
+     * similar tuples listed as
+     * (i.e. width, height, format, output/input stream, usecase bit field).
+     * Camera devices will be able to suggest particular stream configurations which are
+     * power and performance efficient for specific use cases. For more information about
+     * retrieving the suggestions see
+     * <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html#getRecommendedStreamConfigurationMap">CameraCharacteristics#getRecommendedStreamConfigurationMap</a>.</p>
+     * <p>The data representation is int[5], which maps to
+     * (width, height, format, output/input stream, usecase bit field). The array can be
+     * parsed using the following pseudo code:</p>
+     * <p>struct StreamConfiguration {
+     * int32_t format;
+     * int32_t width;
+     * int32_t height;
+     * int32_t isInput; };</p>
+     * <p>void getPreferredStreamConfigurations(
+     *     int32_t *array, size_t count, int32_t usecaseId,
+     *     Vector &lt; StreamConfiguration &gt; * scs) {
+     *     const size_t STREAM_CONFIGURATION_SIZE = 5;
+     *     const size_t STREAM_WIDTH_OFFSET = 0;
+     *     const size_t STREAM_HEIGHT_OFFSET = 1;
+     *     const size_t STREAM_FORMAT_OFFSET = 2;
+     *     const size_t STREAM_IS_INPUT_OFFSET = 3;
+     *     const size_t STREAM_USECASE_BITMAP_OFFSET = 4;</p>
+     * <pre><code>for (size_t i = 0; i &lt; count; i+= STREAM_CONFIGURATION_SIZE) {
+     *     int32_t width = array[i + STREAM_WIDTH_OFFSET];
+     *     int32_t height = array[i + STREAM_HEIGHT_OFFSET];
+     *     int32_t format = array[i + STREAM_FORMAT_OFFSET];
+     *     int32_t isInput = array[i + STREAM_IS_INPUT_OFFSET];
+     *     int32_t supportedUsecases = array[i + STREAM_USECASE_BITMAP_OFFSET];
+     *     if (supportedUsecases &amp; (1 &lt;&lt; usecaseId)) {
+     *         StreamConfiguration sc = {format, width, height, isInput};
+     *         scs-&gt;add(sc);
+     *     }
+     * }
+     * </code></pre>
+     * <p>}</p>
+     *
+     * @see ACAMERA_SCALER_AVAILABLE_STREAM_CONFIGURATIONS
+     */
+    ACAMERA_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS = 
+                                                                // int32[n*5] (acamera_metadata_enum_android_scaler_available_recommended_stream_configurations_t)
+            ACAMERA_SCALER_START + 14,
+    /**
+     * <p>Recommended mappings of image formats that are supported by this
+     * camera device for input streams, to their corresponding output formats.</p>
+     *
+     * <p>Type: int32</p>
+     *
+     * <p>This tag may appear in:
+     * <ul>
+     *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
+     * </ul></p>
+     *
+     * <p>This is a recommended subset of the complete list of mappings found in
+     * android.scaler.availableInputOutputFormatsMap. The same requirements apply here as well.
+     * The list however doesn't need to contain all available and supported mappings. Instead of
+     * this developers must list only recommended and efficient entries.
+     * If set, the information will be available in the ZERO_SHUTTER_LAG recommended stream
+     * configuration see
+     * <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html#getRecommendedStreamConfigurationMap">CameraCharacteristics#getRecommendedStreamConfigurationMap</a>.</p>
+     */
+    ACAMERA_SCALER_AVAILABLE_RECOMMENDED_INPUT_OUTPUT_FORMATS_MAP = 
+                                                                // int32
+            ACAMERA_SCALER_START + 15,
     ACAMERA_SCALER_END,
 
     /**
      * <p>Duration each pixel is exposed to
      * light.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int64</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>If the sensor can't expose this exact duration, it will shorten the
      * duration exposed to the nearest possible value (rather than expose longer).
@@ -2906,11 +3439,13 @@ typedef enum acamera_metadata_tag {
      * <p>Duration from start of frame exposure to
      * start of next frame exposure.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int64</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>The maximum frame rate that can be supported by a camera subsystem is
      * a function of many factors:</p>
@@ -2947,39 +3482,29 @@ typedef enum acamera_metadata_tag {
      * can run concurrently to the rest of the camera pipeline, but
      * cannot process more than 1 capture at a time.</li>
      * </ul>
-     * <p>The necessary information for the application, given the model above,
-     * is provided via
-     * {@link ACAMERA_SCALER_AVAILABLE_MIN_FRAME_DURATIONS}.
-     * These are used to determine the maximum frame rate / minimum frame
-     * duration that is possible for a given stream configuration.</p>
+     * <p>The necessary information for the application, given the model above, is provided via
+     * {@link ACAMERA_SCALER_AVAILABLE_MIN_FRAME_DURATIONS }.
+     * These are used to determine the maximum frame rate / minimum frame duration that is
+     * possible for a given stream configuration.</p>
      * <p>Specifically, the application can use the following rules to
      * determine the minimum frame duration it can request from the camera
      * device:</p>
      * <ol>
-     * <li>Let the set of currently configured input/output streams
-     * be called <code>S</code>.</li>
-     * <li>Find the minimum frame durations for each stream in <code>S</code>, by looking
-     * it up in {@link ACAMERA_SCALER_AVAILABLE_MIN_FRAME_DURATIONS}
-     * (with its respective size/format). Let this set of frame durations be
-     * called <code>F</code>.</li>
-     * <li>For any given request <code>R</code>, the minimum frame duration allowed
-     * for <code>R</code> is the maximum out of all values in <code>F</code>. Let the streams
-     * used in <code>R</code> be called <code>S_r</code>.</li>
+     * <li>Let the set of currently configured input/output streams be called <code>S</code>.</li>
+     * <li>Find the minimum frame durations for each stream in <code>S</code>, by looking it up in {@link ACAMERA_SCALER_AVAILABLE_MIN_FRAME_DURATIONS }
+     * (with its respective size/format). Let this set of frame durations be called <code>F</code>.</li>
+     * <li>For any given request <code>R</code>, the minimum frame duration allowed for <code>R</code> is the maximum
+     * out of all values in <code>F</code>. Let the streams used in <code>R</code> be called <code>S_r</code>.</li>
      * </ol>
-     * <p>If none of the streams in <code>S_r</code> have a stall time (listed in {@link
-     * ACAMERA_SCALER_AVAILABLE_STALL_DURATIONS}
-     * using its respective size/format), then the frame duration in <code>F</code>
-     * determines the steady state frame rate that the application will get
-     * if it uses <code>R</code> as a repeating request. Let this special kind of
-     * request be called <code>Rsimple</code>.</p>
-     * <p>A repeating request <code>Rsimple</code> can be <em>occasionally</em> interleaved
-     * by a single capture of a new request <code>Rstall</code> (which has at least
-     * one in-use stream with a non-0 stall time) and if <code>Rstall</code> has the
-     * same minimum frame duration this will not cause a frame rate loss
-     * if all buffers from the previous <code>Rstall</code> have already been
-     * delivered.</p>
-     * <p>For more details about stalling, see
-     * {@link ACAMERA_SCALER_AVAILABLE_STALL_DURATIONS}.</p>
+     * <p>If none of the streams in <code>S_r</code> have a stall time (listed in {@link ACAMERA_SCALER_AVAILABLE_STALL_DURATIONS }
+     * using its respective size/format), then the frame duration in <code>F</code> determines the steady
+     * state frame rate that the application will get if it uses <code>R</code> as a repeating request. Let
+     * this special kind of request be called <code>Rsimple</code>.</p>
+     * <p>A repeating request <code>Rsimple</code> can be <em>occasionally</em> interleaved by a single capture of a
+     * new request <code>Rstall</code> (which has at least one in-use stream with a non-0 stall time) and if
+     * <code>Rstall</code> has the same minimum frame duration this will not cause a frame rate loss if all
+     * buffers from the previous <code>Rstall</code> have already been delivered.</p>
+     * <p>For more details about stalling, see {@link ACAMERA_SCALER_AVAILABLE_STALL_DURATIONS }.</p>
      * <p>This control is only effective if ACAMERA_CONTROL_AE_MODE or ACAMERA_CONTROL_MODE is set to
      * OFF; otherwise the auto-exposure algorithm will override this value.</p>
      *
@@ -2992,11 +3517,13 @@ typedef enum acamera_metadata_tag {
      * <p>The amount of gain applied to sensor data
      * before processing.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>The sensitivity is the standard ISO sensitivity value,
      * as defined in ISO 12232:2006.</p>
@@ -3027,10 +3554,12 @@ typedef enum acamera_metadata_tag {
      * @see ACAMERA_SENSOR_COLOR_TRANSFORM1
      * @see ACAMERA_SENSOR_FORWARD_MATRIX1
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_sensor_reference_illuminant1_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>The values in this key correspond to the values defined for the
      * EXIF LightSource tag. These illuminants are standard light sources
@@ -3041,13 +3570,15 @@ typedef enum acamera_metadata_tag {
      * <p>Some devices may choose to provide a second set of calibration
      * information for improved quality, including
      * ACAMERA_SENSOR_REFERENCE_ILLUMINANT2 and its corresponding matrices.</p>
+     * <p>Starting from Android Q, this key will not be present for a MONOCHROME camera, even if
+     * the camera device has RAW capability.</p>
      *
      * @see ACAMERA_SENSOR_CALIBRATION_TRANSFORM1
      * @see ACAMERA_SENSOR_COLOR_TRANSFORM1
      * @see ACAMERA_SENSOR_FORWARD_MATRIX1
      * @see ACAMERA_SENSOR_REFERENCE_ILLUMINANT2
      */
-    ACAMERA_SENSOR_REFERENCE_ILLUMINANT1 =                      // byte (enum)
+    ACAMERA_SENSOR_REFERENCE_ILLUMINANT1 =                      // byte (acamera_metadata_enum_android_sensor_reference_illuminant1_t)
             ACAMERA_SENSOR_START + 3,
     /**
      * <p>The standard reference illuminant used as the scene light source when
@@ -3059,15 +3590,19 @@ typedef enum acamera_metadata_tag {
      * @see ACAMERA_SENSOR_COLOR_TRANSFORM2
      * @see ACAMERA_SENSOR_FORWARD_MATRIX2
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>See ACAMERA_SENSOR_REFERENCE_ILLUMINANT1 for more details.</p>
      * <p>If this key is present, then ACAMERA_SENSOR_COLOR_TRANSFORM2,
      * ACAMERA_SENSOR_CALIBRATION_TRANSFORM2, and
      * ACAMERA_SENSOR_FORWARD_MATRIX2 will also be present.</p>
+     * <p>Starting from Android Q, this key will not be present for a MONOCHROME camera, even if
+     * the camera device has RAW capability.</p>
      *
      * @see ACAMERA_SENSOR_CALIBRATION_TRANSFORM2
      * @see ACAMERA_SENSOR_COLOR_TRANSFORM2
@@ -3080,10 +3615,12 @@ typedef enum acamera_metadata_tag {
      * <p>A per-device calibration transform matrix that maps from the
      * reference sensor colorspace to the actual device sensor colorspace.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: rational[3*3]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This matrix is used to correct for per-device variations in the
      * sensor colorspace, and is used for processing raw buffer data.</p>
@@ -3093,6 +3630,8 @@ typedef enum acamera_metadata_tag {
      * colorspace) into this camera device's native sensor color
      * space under the first reference illuminant
      * (ACAMERA_SENSOR_REFERENCE_ILLUMINANT1).</p>
+     * <p>Starting from Android Q, this key will not be present for a MONOCHROME camera, even if
+     * the camera device has RAW capability.</p>
      *
      * @see ACAMERA_SENSOR_REFERENCE_ILLUMINANT1
      */
@@ -3103,10 +3642,12 @@ typedef enum acamera_metadata_tag {
      * reference sensor colorspace to the actual device sensor colorspace
      * (this is the colorspace of the raw buffer data).</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: rational[3*3]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This matrix is used to correct for per-device variations in the
      * sensor colorspace, and is used for processing raw buffer data.</p>
@@ -3118,6 +3659,8 @@ typedef enum acamera_metadata_tag {
      * (ACAMERA_SENSOR_REFERENCE_ILLUMINANT2).</p>
      * <p>This matrix will only be present if the second reference
      * illuminant is present.</p>
+     * <p>Starting from Android Q, this key will not be present for a MONOCHROME camera, even if
+     * the camera device has RAW capability.</p>
      *
      * @see ACAMERA_SENSOR_REFERENCE_ILLUMINANT2
      */
@@ -3127,10 +3670,12 @@ typedef enum acamera_metadata_tag {
      * <p>A matrix that transforms color values from CIE XYZ color space to
      * reference sensor color space.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: rational[3*3]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This matrix is used to convert from the standard CIE XYZ color
      * space to the reference sensor colorspace, and is used when processing
@@ -3144,6 +3689,8 @@ typedef enum acamera_metadata_tag {
      * and the CIE XYZ colorspace when calculating this transform will
      * match the standard white point for the first reference illuminant
      * (i.e. no chromatic adaptation will be applied by this transform).</p>
+     * <p>Starting from Android Q, this key will not be present for a MONOCHROME camera, even if
+     * the camera device has RAW capability.</p>
      *
      * @see ACAMERA_SENSOR_REFERENCE_ILLUMINANT1
      */
@@ -3153,10 +3700,12 @@ typedef enum acamera_metadata_tag {
      * <p>A matrix that transforms color values from CIE XYZ color space to
      * reference sensor color space.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: rational[3*3]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This matrix is used to convert from the standard CIE XYZ color
      * space to the reference sensor colorspace, and is used when processing
@@ -3172,6 +3721,8 @@ typedef enum acamera_metadata_tag {
      * (i.e. no chromatic adaptation will be applied by this transform).</p>
      * <p>This matrix will only be present if the second reference
      * illuminant is present.</p>
+     * <p>Starting from Android Q, this key will not be present for a MONOCHROME camera, even if
+     * the camera device has RAW capability.</p>
      *
      * @see ACAMERA_SENSOR_REFERENCE_ILLUMINANT2
      */
@@ -3181,10 +3732,12 @@ typedef enum acamera_metadata_tag {
      * <p>A matrix that transforms white balanced camera colors from the reference
      * sensor colorspace to the CIE XYZ colorspace with a D50 whitepoint.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: rational[3*3]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This matrix is used to convert to the standard CIE XYZ colorspace, and
      * is used when processing raw buffer data.</p>
@@ -3196,6 +3749,8 @@ typedef enum acamera_metadata_tag {
      * this matrix is chosen so that the standard white point for this reference
      * illuminant in the reference sensor colorspace is mapped to D50 in the
      * CIE XYZ colorspace.</p>
+     * <p>Starting from Android Q, this key will not be present for a MONOCHROME camera, even if
+     * the camera device has RAW capability.</p>
      *
      * @see ACAMERA_SENSOR_REFERENCE_ILLUMINANT1
      */
@@ -3205,10 +3760,12 @@ typedef enum acamera_metadata_tag {
      * <p>A matrix that transforms white balanced camera colors from the reference
      * sensor colorspace to the CIE XYZ colorspace with a D50 whitepoint.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: rational[3*3]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This matrix is used to convert to the standard CIE XYZ colorspace, and
      * is used when processing raw buffer data.</p>
@@ -3222,6 +3779,8 @@ typedef enum acamera_metadata_tag {
      * CIE XYZ colorspace.</p>
      * <p>This matrix will only be present if the second reference
      * illuminant is present.</p>
+     * <p>Starting from Android Q, this key will not be present for a MONOCHROME camera, even if
+     * the camera device has RAW capability.</p>
      *
      * @see ACAMERA_SENSOR_REFERENCE_ILLUMINANT2
      */
@@ -3231,10 +3790,12 @@ typedef enum acamera_metadata_tag {
      * <p>A fixed black level offset for each of the color filter arrangement
      * (CFA) mosaic channels.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32[4]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This key specifies the zero light value for each of the CFA mosaic
      * channels in the camera sensor.  The maximal value output by the
@@ -3252,6 +3813,7 @@ typedef enum acamera_metadata_tag {
      * level values. For raw capture in particular, it is recommended to use
      * pixels from ACAMERA_SENSOR_OPTICAL_BLACK_REGIONS to calculate black
      * level values for each frame.</p>
+     * <p>For a MONOCHROME camera device, all of the 2x2 channels must have the same values.</p>
      *
      * @see ACAMERA_SENSOR_DYNAMIC_BLACK_LEVEL
      * @see ACAMERA_SENSOR_INFO_COLOR_FILTER_ARRANGEMENT
@@ -3265,10 +3827,12 @@ typedef enum acamera_metadata_tag {
      * <p>Maximum sensitivity that is implemented
      * purely through analog gain.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>For ACAMERA_SENSOR_SENSITIVITY values less than or
      * equal to this, all applied gain must be analog. For
@@ -3283,10 +3847,12 @@ typedef enum acamera_metadata_tag {
      * <p>Clockwise angle through which the output image needs to be rotated to be
      * upright on the device screen in its native orientation.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Also defines the direction of rolling shutter readout, which is from top to bottom in
      * the sensor's coordinate system.</p>
@@ -3297,10 +3863,12 @@ typedef enum acamera_metadata_tag {
      * <p>Time at start of exposure of first
      * row of the image sensor active array, in nanoseconds.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int64</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>The timestamps are also included in all image
      * buffers produced for the same capture, and will be identical
@@ -3311,14 +3879,12 @@ typedef enum acamera_metadata_tag {
      * timestamps for other captures from the same camera device, but are
      * not guaranteed to be comparable to any other time source.</p>
      * <p>When ACAMERA_SENSOR_INFO_TIMESTAMP_SOURCE <code>==</code> REALTIME, the
-     * timestamps measure time in the same timebase as
-     * <a href="https://developer.android.com/reference/android/os/SystemClock.html#elapsedRealtimeNanos">elapsedRealtimeNanos</a>
-     * (or CLOCK_BOOTTIME), and they can
+     * timestamps measure time in the same timebase as <a href="https://developer.android.com/reference/android/os/SystemClock.html#elapsedRealtimeNanos">SystemClock#elapsedRealtimeNanos</a>, and they can
      * be compared to other timestamps from other subsystems that
      * are using that base.</p>
      * <p>For reprocessing, the timestamp will match the start of exposure of
-     * the input image, i.e. {@link CaptureResult#SENSOR_TIMESTAMP the
-     * timestamp} in the TotalCaptureResult that was used to create the
+     * the input image, i.e. <a href="https://developer.android.com/reference/CaptureResult.html#SENSOR_TIMESTAMP">the
+     * timestamp</a> in the TotalCaptureResult that was used to create the
      * reprocess capture request.</p>
      *
      * @see ACAMERA_SENSOR_INFO_TIMESTAMP_SOURCE
@@ -3329,10 +3895,12 @@ typedef enum acamera_metadata_tag {
      * <p>The estimated camera neutral color in the native sensor colorspace at
      * the time of capture.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: rational[3]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This value gives the neutral color point encoded as an RGB value in the
      * native sensor color space.  The neutral color point indicates the
@@ -3340,16 +3908,20 @@ typedef enum acamera_metadata_tag {
      * used to interpolate between the provided color transforms when
      * processing raw sensor data.</p>
      * <p>The order of the values is R, G, B; where R is in the lowest index.</p>
+     * <p>Starting from Android Q, this key will not be present for a MONOCHROME camera, even if
+     * the camera device has RAW capability.</p>
      */
     ACAMERA_SENSOR_NEUTRAL_COLOR_POINT =                        // rational[3]
             ACAMERA_SENSOR_START + 18,
     /**
      * <p>Noise model coefficients for each CFA mosaic channel.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: double[2*CFA Channels]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This key contains two noise model coefficients for each CFA channel
      * corresponding to the sensor amplification (S) and sensor readout
@@ -3368,6 +3940,8 @@ typedef enum acamera_metadata_tag {
      * that channel.</p>
      * <p>A more detailed description of the noise model can be found in the
      * Adobe DNG specification for the NoiseProfile tag.</p>
+     * <p>For a MONOCHROME camera, there is only one color channel. So the noise model coefficients
+     * will only contain one S and one O.</p>
      *
      * @see ACAMERA_SENSOR_INFO_COLOR_FILTER_ARRANGEMENT
      */
@@ -3376,10 +3950,12 @@ typedef enum acamera_metadata_tag {
     /**
      * <p>The worst-case divergence between Bayer green channels.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: float</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This value is an estimate of the worst case split between the
      * Bayer green channels in the red and blue rows in the sensor color
@@ -3411,6 +3987,8 @@ typedef enum acamera_metadata_tag {
      * <li>R &gt; 1.20 will require strong software correction to produce
      * a usuable image (&gt;20% divergence).</li>
      * </ul>
+     * <p>Starting from Android Q, this key will not be present for a MONOCHROME camera, even if
+     * the camera device has RAW capability.</p>
      */
     ACAMERA_SENSOR_GREEN_SPLIT =                                // float
             ACAMERA_SENSOR_START + 22,
@@ -3420,11 +3998,13 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_SENSOR_TEST_PATTERN_MODE
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32[4]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Each color channel is treated as an unsigned 32-bit integer.
      * The camera device then uses the most significant X bits
@@ -3439,11 +4019,13 @@ typedef enum acamera_metadata_tag {
      * <p>When enabled, the sensor sends a test pattern instead of
      * doing a real exposure from the camera.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32 (acamera_metadata_enum_android_sensor_test_pattern_mode_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>When a test pattern is enabled, all manual sensor controls specified
      * by ACAMERA_SENSOR_* will be ignored. All other controls should
@@ -3453,7 +4035,7 @@ typedef enum acamera_metadata_tag {
      * would not actually affect it).</p>
      * <p>Defaults to OFF.</p>
      */
-    ACAMERA_SENSOR_TEST_PATTERN_MODE =                          // int32 (enum)
+    ACAMERA_SENSOR_TEST_PATTERN_MODE =                          // int32 (acamera_metadata_enum_android_sensor_test_pattern_mode_t)
             ACAMERA_SENSOR_START + 24,
     /**
      * <p>List of sensor test pattern modes for ACAMERA_SENSOR_TEST_PATTERN_MODE
@@ -3461,10 +4043,12 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_SENSOR_TEST_PATTERN_MODE
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32[n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Defaults to OFF, and always includes OFF if defined.</p>
      */
@@ -3474,10 +4058,12 @@ typedef enum acamera_metadata_tag {
      * <p>Duration between the start of first row exposure
      * and the start of last row exposure.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int64</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This is the exposure time skew between the first and last
      * row exposure start times. The first row and the last row are
@@ -3494,16 +4080,17 @@ typedef enum acamera_metadata_tag {
      * <p>List of disjoint rectangles indicating the sensor
      * optically shielded black pixel regions.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32[4*num_regions]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>In most camera sensors, the active array is surrounded by some
      * optically shielded pixel areas. By blocking light, these pixels
      * provides a reliable black reference for black level compensation
      * in active array region.</p>
-     * <p>The data representation is int[4], which maps to (left, top, width, height).</p>
      * <p>This key provides a list of disjoint rectangles specifying the
      * regions of optically shielded (with metal shield) black pixel
      * regions if the camera device is capable of reading out these black
@@ -3513,6 +4100,7 @@ typedef enum acamera_metadata_tag {
      * black level of each captured raw images.</p>
      * <p>When this key is reported, the ACAMERA_SENSOR_DYNAMIC_BLACK_LEVEL and
      * ACAMERA_SENSOR_DYNAMIC_WHITE_LEVEL will also be reported.</p>
+     * <p>The data representation is <code>int[4]</code>, which maps to <code>(left, top, width, height)</code>.</p>
      *
      * @see ACAMERA_SENSOR_BLACK_LEVEL_PATTERN
      * @see ACAMERA_SENSOR_DYNAMIC_BLACK_LEVEL
@@ -3524,10 +4112,12 @@ typedef enum acamera_metadata_tag {
      * <p>A per-frame dynamic black level offset for each of the color filter
      * arrangement (CFA) mosaic channels.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: float[4]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Camera sensor black levels may vary dramatically for different
      * capture settings (e.g. ACAMERA_SENSOR_SENSITIVITY). The fixed black
@@ -3551,9 +4141,9 @@ typedef enum acamera_metadata_tag {
      * layout key (see ACAMERA_SENSOR_INFO_COLOR_FILTER_ARRANGEMENT), i.e. the
      * nth value given corresponds to the black level offset for the nth
      * color channel listed in the CFA.</p>
-     * <p>This key will be available if ACAMERA_SENSOR_OPTICAL_BLACK_REGIONS is
-     * available or the camera device advertises this key via
-     * {@link ACAMERA_REQUEST_AVAILABLE_RESULT_KEYS}.</p>
+     * <p>For a MONOCHROME camera, all of the 2x2 channels must have the same values.</p>
+     * <p>This key will be available if ACAMERA_SENSOR_OPTICAL_BLACK_REGIONS is available or the
+     * camera device advertises this key via {@link ACAMERA_REQUEST_AVAILABLE_RESULT_KEYS }.</p>
      *
      * @see ACAMERA_SENSOR_BLACK_LEVEL_PATTERN
      * @see ACAMERA_SENSOR_INFO_COLOR_FILTER_ARRANGEMENT
@@ -3565,10 +4155,12 @@ typedef enum acamera_metadata_tag {
     /**
      * <p>Maximum raw value output by sensor for this frame.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Since the ACAMERA_SENSOR_BLACK_LEVEL_PATTERN may change for different
      * capture settings (e.g., ACAMERA_SENSOR_SENSITIVITY), the white
@@ -3577,7 +4169,7 @@ typedef enum acamera_metadata_tag {
      * estimated white level for each frame.</p>
      * <p>This key will be available if ACAMERA_SENSOR_OPTICAL_BLACK_REGIONS is
      * available or the camera device advertises this key via
-     * {@link ACAMERA_REQUEST_AVAILABLE_RESULT_KEYS}.</p>
+     * {@link ACAMERA_REQUEST_AVAILABLE_RESULT_KEYS }.</p>
      *
      * @see ACAMERA_SENSOR_BLACK_LEVEL_PATTERN
      * @see ACAMERA_SENSOR_INFO_WHITE_LEVEL
@@ -3592,10 +4184,12 @@ typedef enum acamera_metadata_tag {
      * <p>The area of the image sensor which corresponds to active pixels after any geometric
      * distortion correction has been applied.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32[4]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This is the rectangle representing the size of the active region of the sensor (i.e.
      * the region that actually receives light from the scene) after any geometric correction
@@ -3604,16 +4198,28 @@ typedef enum acamera_metadata_tag {
      * <p>This rectangle is defined relative to the full pixel array; (0,0) is the top-left of
      * the full pixel array, and the size of the full pixel array is given by
      * ACAMERA_SENSOR_INFO_PIXEL_ARRAY_SIZE.</p>
-     * <p>The data representation is int[4], which maps to (left, top, width, height).</p>
      * <p>The coordinate system for most other keys that list pixel coordinates, including
      * ACAMERA_SCALER_CROP_REGION, is defined relative to the active array rectangle given in
      * this field, with <code>(0, 0)</code> being the top-left of this rectangle.</p>
      * <p>The active array may be smaller than the full pixel array, since the full array may
-     * include black calibration pixels or other inactive regions, and geometric correction
-     * resulting in scaling or cropping may have been applied.</p>
+     * include black calibration pixels or other inactive regions.</p>
+     * <p>For devices that do not support ACAMERA_DISTORTION_CORRECTION_MODE control, the active
+     * array must be the same as ACAMERA_SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE.</p>
+     * <p>For devices that support ACAMERA_DISTORTION_CORRECTION_MODE control, the active array must
+     * be enclosed by ACAMERA_SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE. The difference between
+     * pre-correction active array and active array accounts for scaling or cropping caused
+     * by lens geometric distortion correction.</p>
+     * <p>In general, application should always refer to active array size for controls like
+     * metering regions or crop region. Two exceptions are when the application is dealing with
+     * RAW image buffers (RAW_SENSOR, RAW10, RAW12 etc), or when application explicitly set
+     * ACAMERA_DISTORTION_CORRECTION_MODE to OFF. In these cases, application should refer
+     * to ACAMERA_SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE.</p>
+     * <p>The data representation is <code>int[4]</code>, which maps to <code>(left, top, width, height)</code>.</p>
      *
+     * @see ACAMERA_DISTORTION_CORRECTION_MODE
      * @see ACAMERA_SCALER_CROP_REGION
      * @see ACAMERA_SENSOR_INFO_PIXEL_ARRAY_SIZE
+     * @see ACAMERA_SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE
      */
     ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE =                     // int32[4]
             ACAMERA_SENSOR_INFO_START,
@@ -3623,10 +4229,12 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_SENSOR_SENSITIVITY
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32[2]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>The values are the standard ISO sensitivity values,
      * as defined in ISO 12232:2006.</p>
@@ -3636,16 +4244,18 @@ typedef enum acamera_metadata_tag {
     /**
      * <p>The arrangement of color filters on sensor;
      * represents the colors in the top-left 2x2 section of
-     * the sensor, in reading order.</p>
+     * the sensor, in reading order, for a Bayer camera, or the
+     * light spectrum it captures for MONOCHROME camera.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_sensor_info_color_filter_arrangement_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
-     * <p>None</p>
      */
-    ACAMERA_SENSOR_INFO_COLOR_FILTER_ARRANGEMENT =              // byte (enum)
+    ACAMERA_SENSOR_INFO_COLOR_FILTER_ARRANGEMENT =              // byte (acamera_metadata_enum_android_sensor_info_color_filter_arrangement_t)
             ACAMERA_SENSOR_INFO_START + 2,
     /**
      * <p>The range of image exposure times for ACAMERA_SENSOR_EXPOSURE_TIME supported
@@ -3653,12 +4263,13 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_SENSOR_EXPOSURE_TIME
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int64[2]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
-     * <p>None</p>
      */
     ACAMERA_SENSOR_INFO_EXPOSURE_TIME_RANGE =                   // int64[2]
             ACAMERA_SENSOR_INFO_START + 3,
@@ -3668,16 +4279,17 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_SENSOR_FRAME_DURATION
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int64</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Attempting to use frame durations beyond the maximum will result in the frame
      * duration being clipped to the maximum. See that control for a full definition of frame
      * durations.</p>
-     * <p>Refer to {@link
-     * ACAMERA_SCALER_AVAILABLE_MIN_FRAME_DURATIONS}
+     * <p>Refer to {@link ACAMERA_SCALER_AVAILABLE_MIN_FRAME_DURATIONS }
      * for the minimum frame duration values.</p>
      */
     ACAMERA_SENSOR_INFO_MAX_FRAME_DURATION =                    // int64
@@ -3686,10 +4298,12 @@ typedef enum acamera_metadata_tag {
      * <p>The physical dimensions of the full pixel
      * array.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: float[2]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This is the physical size of the sensor pixel
      * array defined by ACAMERA_SENSOR_INFO_PIXEL_ARRAY_SIZE.</p>
@@ -3702,19 +4316,21 @@ typedef enum acamera_metadata_tag {
      * <p>Dimensions of the full pixel array, possibly
      * including black calibration pixels.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32[2]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>The pixel count of the full pixel array of the image sensor, which covers
      * ACAMERA_SENSOR_INFO_PHYSICAL_SIZE area.  This represents the full pixel dimensions of
      * the raw buffers produced by this sensor.</p>
      * <p>If a camera device supports raw sensor formats, either this or
      * ACAMERA_SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE is the maximum dimensions for the raw
-     * output formats listed in ACAMERA_SCALER_AVAILABLE_STREAM_CONFIGURATIONS (this depends on
-     * whether or not the image sensor returns buffers containing pixels that are not
-     * part of the active array region for blacklevel calibration or other purposes).</p>
+     * output formats listed in {@link ACAMERA_SCALER_AVAILABLE_STREAM_CONFIGURATIONS }
+     * (this depends on whether or not the image sensor returns buffers containing pixels that
+     * are not part of the active array region for blacklevel calibration or other purposes).</p>
      * <p>Some parts of the full pixel array may not receive light from the scene,
      * or be otherwise inactive.  The ACAMERA_SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE key
      * defines the rectangle of active pixels that will be included in processed image
@@ -3728,10 +4344,12 @@ typedef enum acamera_metadata_tag {
     /**
      * <p>Maximum raw value output by sensor.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This specifies the fully-saturated encoding level for the raw
      * sample values from the sensor.  This is typically caused by the
@@ -3757,26 +4375,30 @@ typedef enum acamera_metadata_tag {
     /**
      * <p>The time base source for sensor capture start timestamps.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_sensor_info_timestamp_source_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>The timestamps provided for captures are always in nanoseconds and monotonic, but
      * may not based on a time source that can be compared to other system time sources.</p>
      * <p>This characteristic defines the source for the timestamps, and therefore whether they
      * can be compared against other system time sources/timestamps.</p>
      */
-    ACAMERA_SENSOR_INFO_TIMESTAMP_SOURCE =                      // byte (enum)
+    ACAMERA_SENSOR_INFO_TIMESTAMP_SOURCE =                      // byte (acamera_metadata_enum_android_sensor_info_timestamp_source_t)
             ACAMERA_SENSOR_INFO_START + 8,
     /**
      * <p>Whether the RAW images output from this camera device are subject to
      * lens shading correction.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_sensor_info_lens_shading_applied_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>If TRUE, all images produced by the camera device in the RAW image formats will
      * have lens shading correction already applied to it. If FALSE, the images will
@@ -3785,18 +4407,19 @@ typedef enum acamera_metadata_tag {
      * <p>This key will be <code>null</code> for all devices do not report this information.
      * Devices with RAW capability will always report this information in this key.</p>
      */
-    ACAMERA_SENSOR_INFO_LENS_SHADING_APPLIED =                  // byte (enum)
+    ACAMERA_SENSOR_INFO_LENS_SHADING_APPLIED =                  // byte (acamera_metadata_enum_android_sensor_info_lens_shading_applied_t)
             ACAMERA_SENSOR_INFO_START + 9,
     /**
      * <p>The area of the image sensor which corresponds to active pixels prior to the
      * application of any geometric distortion correction.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32[4]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
-     * <p>The data representation is int[4], which maps to (left, top, width, height).</p>
      * <p>This is the rectangle representing the size of the active region of the sensor (i.e.
      * the region that actually receives light from the scene) before any geometric correction
      * has been applied, and should be treated as the active region rectangle for any of the
@@ -3837,18 +4460,19 @@ typedef enum acamera_metadata_tag {
      * ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE.</p>
      * <p>The currently supported fields that correct for geometric distortion are:</p>
      * <ol>
-     * <li>ACAMERA_LENS_RADIAL_DISTORTION.</li>
+     * <li>ACAMERA_LENS_DISTORTION.</li>
      * </ol>
-     * <p>If all of the geometric distortion fields are no-ops, this rectangle will be the same
-     * as the post-distortion-corrected rectangle given in
-     * ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE.</p>
+     * <p>If the camera device doesn't support geometric distortion correction, or all of the
+     * geometric distortion fields are no-ops, this rectangle will be the same as the
+     * post-distortion-corrected rectangle given in ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE.</p>
      * <p>This rectangle is defined relative to the full pixel array; (0,0) is the top-left of
      * the full pixel array, and the size of the full pixel array is given by
      * ACAMERA_SENSOR_INFO_PIXEL_ARRAY_SIZE.</p>
      * <p>The pre-correction active array may be smaller than the full pixel array, since the
      * full array may include black calibration pixels or other inactive regions.</p>
+     * <p>The data representation is <code>int[4]</code>, which maps to <code>(left, top, width, height)</code>.</p>
      *
-     * @see ACAMERA_LENS_RADIAL_DISTORTION
+     * @see ACAMERA_LENS_DISTORTION
      * @see ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE
      * @see ACAMERA_SENSOR_INFO_PIXEL_ARRAY_SIZE
      * @see ACAMERA_SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE
@@ -3861,17 +4485,19 @@ typedef enum acamera_metadata_tag {
      * <p>Quality of lens shading correction applied
      * to the image data.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_shading_mode_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>When set to OFF mode, no lens shading correction will be applied by the
      * camera device, and an identity lens shading map data will be provided
      * if <code>ACAMERA_STATISTICS_LENS_SHADING_MAP_MODE == ON</code>. For example, for lens
      * shading map with size of <code>[ 4, 3 ]</code>,
-     * the output ACAMERA_STATISTICS_LENS_SHADING_CORRECTION_MAP for this case will be an identity
+     * the output android.statistics.lensShadingCorrectionMap for this case will be an identity
      * map shown below:</p>
      * <pre><code>[ 1.0, 1.0, 1.0, 1.0,  1.0, 1.0, 1.0, 1.0,
      *  1.0, 1.0, 1.0, 1.0,  1.0, 1.0, 1.0, 1.0,
@@ -3883,7 +4509,7 @@ typedef enum acamera_metadata_tag {
      * <p>When set to other modes, lens shading correction will be applied by the camera
      * device. Applications can request lens shading map data by setting
      * ACAMERA_STATISTICS_LENS_SHADING_MAP_MODE to ON, and then the camera device will provide lens
-     * shading map data in ACAMERA_STATISTICS_LENS_SHADING_CORRECTION_MAP; the returned shading map
+     * shading map data in android.statistics.lensShadingCorrectionMap; the returned shading map
      * data will be the one applied by the camera device for this capture request.</p>
      * <p>The shading map data may depend on the auto-exposure (AE) and AWB statistics, therefore
      * the reliability of the map data may be affected by the AE and AWB algorithms. When AE and
@@ -3893,20 +4519,21 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_CONTROL_AE_MODE
      * @see ACAMERA_CONTROL_AWB_MODE
-     * @see ACAMERA_STATISTICS_LENS_SHADING_CORRECTION_MAP
      * @see ACAMERA_STATISTICS_LENS_SHADING_MAP_MODE
      */
-    ACAMERA_SHADING_MODE =                                      // byte (enum)
+    ACAMERA_SHADING_MODE =                                      // byte (acamera_metadata_enum_android_shading_mode_t)
             ACAMERA_SHADING_START,
     /**
      * <p>List of lens shading modes for ACAMERA_SHADING_MODE that are supported by this camera device.</p>
      *
      * @see ACAMERA_SHADING_MODE
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte[n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This list contains lens shading modes that can be set for the camera device.
      * Camera devices that support the MANUAL_POST_PROCESSING capability will always
@@ -3921,41 +4548,47 @@ typedef enum acamera_metadata_tag {
      * <p>Operating mode for the face detector
      * unit.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_statistics_face_detect_mode_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Whether face detection is enabled, and whether it
      * should output just the basic fields or the full set of
      * fields.</p>
      */
-    ACAMERA_STATISTICS_FACE_DETECT_MODE =                       // byte (enum)
+    ACAMERA_STATISTICS_FACE_DETECT_MODE =                       // byte (acamera_metadata_enum_android_statistics_face_detect_mode_t)
             ACAMERA_STATISTICS_START,
     /**
      * <p>Operating mode for hot pixel map generation.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_statistics_hot_pixel_map_mode_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>If set to <code>true</code>, a hot pixel map is returned in ACAMERA_STATISTICS_HOT_PIXEL_MAP.
      * If set to <code>false</code>, no hot pixel map will be returned.</p>
      *
      * @see ACAMERA_STATISTICS_HOT_PIXEL_MAP
      */
-    ACAMERA_STATISTICS_HOT_PIXEL_MAP_MODE =                     // byte (enum)
+    ACAMERA_STATISTICS_HOT_PIXEL_MAP_MODE =                     // byte (acamera_metadata_enum_android_statistics_hot_pixel_map_mode_t)
             ACAMERA_STATISTICS_START + 3,
     /**
      * <p>List of unique IDs for detected faces.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32[n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Each detected face is given a unique ID that is valid for as long as the face is visible
      * to the camera device.  A face that leaves the field of view and later returns may be
@@ -3970,16 +4603,29 @@ typedef enum acamera_metadata_tag {
      * <p>List of landmarks for detected
      * faces.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32[n*6]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
-     * </ul>
+     * </ul></p>
      *
-     * <p>The coordinate system is that of ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE, with
+     * <p>For devices not supporting ACAMERA_DISTORTION_CORRECTION_MODE control, the coordinate
+     * system always follows that of ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE, with <code>(0, 0)</code> being
+     * the top-left pixel of the active array.</p>
+     * <p>For devices supporting ACAMERA_DISTORTION_CORRECTION_MODE control, the coordinate
+     * system depends on the mode being set.
+     * When the distortion correction mode is OFF, the coordinate system follows
+     * ACAMERA_SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE, with
+     * <code>(0, 0)</code> being the top-left pixel of the pre-correction active array.
+     * When the distortion correction mode is not OFF, the coordinate system follows
+     * ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE, with
      * <code>(0, 0)</code> being the top-left pixel of the active array.</p>
      * <p>Only available if ACAMERA_STATISTICS_FACE_DETECT_MODE == FULL</p>
      *
+     * @see ACAMERA_DISTORTION_CORRECTION_MODE
      * @see ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE
+     * @see ACAMERA_SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE
      * @see ACAMERA_STATISTICS_FACE_DETECT_MODE
      */
     ACAMERA_STATISTICS_FACE_LANDMARKS =                         // int32[n*6]
@@ -3988,17 +4634,30 @@ typedef enum acamera_metadata_tag {
      * <p>List of the bounding rectangles for detected
      * faces.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32[n*4]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
-     * </ul>
+     * </ul></p>
      *
-     * <p>The data representation is int[4], which maps to (left, top, width, height).</p>
-     * <p>The coordinate system is that of ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE, with
+     * <p>For devices not supporting ACAMERA_DISTORTION_CORRECTION_MODE control, the coordinate
+     * system always follows that of ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE, with <code>(0, 0)</code> being
+     * the top-left pixel of the active array.</p>
+     * <p>For devices supporting ACAMERA_DISTORTION_CORRECTION_MODE control, the coordinate
+     * system depends on the mode being set.
+     * When the distortion correction mode is OFF, the coordinate system follows
+     * ACAMERA_SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE, with
+     * <code>(0, 0)</code> being the top-left pixel of the pre-correction active array.
+     * When the distortion correction mode is not OFF, the coordinate system follows
+     * ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE, with
      * <code>(0, 0)</code> being the top-left pixel of the active array.</p>
-     * <p>Only available if ACAMERA_STATISTICS_FACE_DETECT_MODE != OFF</p>
+     * <p>Only available if ACAMERA_STATISTICS_FACE_DETECT_MODE != OFF
+     * The data representation is <code>int[4]</code>, which maps to <code>(left, top, right, bottom)</code>.</p>
      *
+     * @see ACAMERA_DISTORTION_CORRECTION_MODE
      * @see ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE
+     * @see ACAMERA_SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE
      * @see ACAMERA_STATISTICS_FACE_DETECT_MODE
      */
     ACAMERA_STATISTICS_FACE_RECTANGLES =                        // int32[n*4]
@@ -4007,10 +4666,12 @@ typedef enum acamera_metadata_tag {
      * <p>List of the face confidence scores for
      * detected faces</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte[n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Only available if ACAMERA_STATISTICS_FACE_DETECT_MODE != OFF.</p>
      *
@@ -4020,79 +4681,31 @@ typedef enum acamera_metadata_tag {
             ACAMERA_STATISTICS_START + 7,
     /**
      * <p>The shading map is a low-resolution floating-point map
-     * that lists the coefficients used to correct for vignetting, for each
-     * Bayer color channel.</p>
-     *
-     * <p>This tag may appear in:</p>
-     * <ul>
-     *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
-     * </ul>
-     *
-     * <p>The least shaded section of the image should have a gain factor
-     * of 1; all other sections should have gains above 1.</p>
-     * <p>When ACAMERA_COLOR_CORRECTION_MODE = TRANSFORM_MATRIX, the map
-     * must take into account the colorCorrection settings.</p>
-     * <p>The shading map is for the entire active pixel array, and is not
-     * affected by the crop region specified in the request. Each shading map
-     * entry is the value of the shading compensation map over a specific
-     * pixel on the sensor.  Specifically, with a (N x M) resolution shading
-     * map, and an active pixel array size (W x H), shading map entry
-     * (x,y) ϵ (0 ... N-1, 0 ... M-1) is the value of the shading map at
-     * pixel ( ((W-1)/(N-1)) * x, ((H-1)/(M-1)) * y) for the four color channels.
-     * The map is assumed to be bilinearly interpolated between the sample points.</p>
-     * <p>The channel order is [R, Geven, Godd, B], where Geven is the green
-     * channel for the even rows of a Bayer pattern, and Godd is the odd rows.
-     * The shading map is stored in a fully interleaved format.</p>
-     * <p>The shading map should have on the order of 30-40 rows and columns,
-     * and must be smaller than 64x64.</p>
-     * <p>As an example, given a very small map defined as:</p>
-     * <pre><code>width,height = [ 4, 3 ]
-     * values =
-     * [ 1.3, 1.2, 1.15, 1.2,  1.2, 1.2, 1.15, 1.2,
-     *     1.1, 1.2, 1.2, 1.2,  1.3, 1.2, 1.3, 1.3,
-     *   1.2, 1.2, 1.25, 1.1,  1.1, 1.1, 1.1, 1.0,
-     *     1.0, 1.0, 1.0, 1.0,  1.2, 1.3, 1.25, 1.2,
-     *   1.3, 1.2, 1.2, 1.3,   1.2, 1.15, 1.1, 1.2,
-     *     1.2, 1.1, 1.0, 1.2,  1.3, 1.15, 1.2, 1.3 ]
-     * </code></pre>
-     * <p>The low-resolution scaling map images for each channel are
-     * (displayed using nearest-neighbor interpolation):</p>
-     * <p><img alt="Red lens shading map" src="../images/camera2/metadata/android.statistics.lensShadingMap/red_shading.png" />
-     * <img alt="Green (even rows) lens shading map" src="../images/camera2/metadata/android.statistics.lensShadingMap/green_e_shading.png" />
-     * <img alt="Green (odd rows) lens shading map" src="../images/camera2/metadata/android.statistics.lensShadingMap/green_o_shading.png" />
-     * <img alt="Blue lens shading map" src="../images/camera2/metadata/android.statistics.lensShadingMap/blue_shading.png" /></p>
-     * <p>As a visualization only, inverting the full-color map to recover an
-     * image of a gray wall (using bicubic interpolation for visual quality) as captured by the sensor gives:</p>
-     * <p><img alt="Image of a uniform white wall (inverse shading map)" src="../images/camera2/metadata/android.statistics.lensShadingMap/inv_shading.png" /></p>
-     *
-     * @see ACAMERA_COLOR_CORRECTION_MODE
-     */
-    ACAMERA_STATISTICS_LENS_SHADING_CORRECTION_MAP =            // byte
-            ACAMERA_STATISTICS_START + 10,
-    /**
-     * <p>The shading map is a low-resolution floating-point map
      * that lists the coefficients used to correct for vignetting and color shading,
      * for each Bayer color channel of RAW image data.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: float[4*n*m]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
-     * </ul>
+     * </ul></p>
      *
-     * <p>The lens shading correction is defined as a full shading correction that
-     * corrects both color shading for the output non-RAW images. After the
-     * shading map is applied, the output non-RAW images will be flat-field images
-     * for flat scenes under uniform illumination.</p>
-     * <p>When there is no lens shading correction applied to RAW output images
-     * (ACAMERA_SENSOR_INFO_LENS_SHADING_APPLIED <code>==</code> false), this map is a full lens
-     * shading correction map; when there is some lens shading correction applied
-     * to the RAW output image (ACAMERA_SENSOR_INFO_LENS_SHADING_APPLIED <code>==</code> true),
-     * this map reports the remaining lens shading correction map that needs to be
-     * applied to get fully shading corrected images.</p>
-     * <p>For a full shading correction map, the least shaded section of the image
-     * should have a gain factor of 1; all other sections should have gains above 1.</p>
+     * <p>The map provided here is the same map that is used by the camera device to
+     * correct both color shading and vignetting for output non-RAW images.</p>
+     * <p>When there is no lens shading correction applied to RAW
+     * output images (ACAMERA_SENSOR_INFO_LENS_SHADING_APPLIED <code>==</code>
+     * false), this map is the complete lens shading correction
+     * map; when there is some lens shading correction applied to
+     * the RAW output image (ACAMERA_SENSOR_INFO_LENS_SHADING_APPLIED<code>==</code> true), this map reports the remaining lens shading
+     * correction map that needs to be applied to get shading
+     * corrected images that match the camera device's output for
+     * non-RAW formats.</p>
+     * <p>For a complete shading correction map, the least shaded
+     * section of the image will have a gain factor of 1; all
+     * other sections will have gains above 1.</p>
      * <p>When ACAMERA_COLOR_CORRECTION_MODE = TRANSFORM_MATRIX, the map
-     * must take into account the colorCorrection settings.</p>
+     * will take into account the colorCorrection settings.</p>
      * <p>The shading map is for the entire active pixel array, and is not
      * affected by the crop region specified in the request. Each shading map
      * entry is the value of the shading compensation map over a specific
@@ -4101,13 +4714,13 @@ typedef enum acamera_metadata_tag {
      * (x,y) ϵ (0 ... N-1, 0 ... M-1) is the value of the shading map at
      * pixel ( ((W-1)/(N-1)) * x, ((H-1)/(M-1)) * y) for the four color channels.
      * The map is assumed to be bilinearly interpolated between the sample points.</p>
-     * <p>The channel order is [R, Geven, Godd, B], where Geven is the green
-     * channel for the even rows of a Bayer pattern, and Godd is the odd rows.
+     * <p>For a Bayer camera, the channel order is [R, Geven, Godd, B], where Geven is
+     * the green channel for the even rows of a Bayer pattern, and Godd is the odd rows.
      * The shading map is stored in a fully interleaved format, and its size
      * is provided in the camera static metadata by ACAMERA_LENS_INFO_SHADING_MAP_SIZE.</p>
-     * <p>The shading map should have on the order of 30-40 rows and columns,
-     * and must be smaller than 64x64.</p>
-     * <p>As an example, given a very small map defined as:</p>
+     * <p>The shading map will generally have on the order of 30-40 rows and columns,
+     * and will be smaller than 64x64.</p>
+     * <p>As an example, given a very small map for a Bayer camera defined as:</p>
      * <pre><code>ACAMERA_LENS_INFO_SHADING_MAP_SIZE = [ 4, 3 ]
      * ACAMERA_STATISTICS_LENS_SHADING_MAP =
      * [ 1.3, 1.2, 1.15, 1.2,  1.2, 1.2, 1.15, 1.2,
@@ -4127,6 +4740,17 @@ typedef enum acamera_metadata_tag {
      * image of a gray wall (using bicubic interpolation for visual quality)
      * as captured by the sensor gives:</p>
      * <p><img alt="Image of a uniform white wall (inverse shading map)" src="../images/camera2/metadata/android.statistics.lensShadingMap/inv_shading.png" /></p>
+     * <p>For a MONOCHROME camera, all of the 2x2 channels must have the same values. An example
+     * shading map for such a camera is defined as:</p>
+     * <pre><code>ACAMERA_LENS_INFO_SHADING_MAP_SIZE = [ 4, 3 ]
+     * ACAMERA_STATISTICS_LENS_SHADING_MAP =
+     * [ 1.3, 1.3, 1.3, 1.3,  1.2, 1.2, 1.2, 1.2,
+     *     1.1, 1.1, 1.1, 1.1,  1.3, 1.3, 1.3, 1.3,
+     *   1.2, 1.2, 1.2, 1.2,  1.1, 1.1, 1.1, 1.1,
+     *     1.0, 1.0, 1.0, 1.0,  1.2, 1.2, 1.2, 1.2,
+     *   1.3, 1.3, 1.3, 1.3,   1.2, 1.2, 1.2, 1.2,
+     *     1.2, 1.2, 1.2, 1.2,  1.3, 1.3, 1.3, 1.3 ]
+     * </code></pre>
      * <p>Note that the RAW image data might be subject to lens shading
      * correction not reported on this map. Query
      * ACAMERA_SENSOR_INFO_LENS_SHADING_APPLIED to see if RAW image data has subject
@@ -4150,10 +4774,12 @@ typedef enum acamera_metadata_tag {
      * <p>The camera device estimated scene illumination lighting
      * frequency.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_statistics_scene_flicker_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Many light sources, such as most fluorescent lights, flicker at a rate
      * that depends on the local utility power standards. This flicker must be
@@ -4173,15 +4799,17 @@ typedef enum acamera_metadata_tag {
      * @see ACAMERA_CONTROL_AE_MODE
      * @see ACAMERA_CONTROL_MODE
      */
-    ACAMERA_STATISTICS_SCENE_FLICKER =                          // byte (enum)
+    ACAMERA_STATISTICS_SCENE_FLICKER =                          // byte (acamera_metadata_enum_android_statistics_scene_flicker_t)
             ACAMERA_STATISTICS_START + 14,
     /**
      * <p>List of <code>(x, y)</code> coordinates of hot/defective pixels on the sensor.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32[2*n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>A coordinate <code>(x, y)</code> must lie between <code>(0, 0)</code>, and
      * <code>(width - 1, height - 1)</code> (inclusive), which are the top-left and
@@ -4199,11 +4827,13 @@ typedef enum acamera_metadata_tag {
      * <p>Whether the camera device will output the lens
      * shading map in output result metadata.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_statistics_lens_shading_map_mode_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>When set to ON,
      * ACAMERA_STATISTICS_LENS_SHADING_MAP will be provided in
@@ -4212,8 +4842,96 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_STATISTICS_LENS_SHADING_MAP
      */
-    ACAMERA_STATISTICS_LENS_SHADING_MAP_MODE =                  // byte (enum)
+    ACAMERA_STATISTICS_LENS_SHADING_MAP_MODE =                  // byte (acamera_metadata_enum_android_statistics_lens_shading_map_mode_t)
             ACAMERA_STATISTICS_START + 16,
+    /**
+     * <p>A control for selecting whether optical stabilization (OIS) position
+     * information is included in output result metadata.</p>
+     *
+     * <p>Type: byte (acamera_metadata_enum_android_statistics_ois_data_mode_t)</p>
+     *
+     * <p>This tag may appear in:
+     * <ul>
+     *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
+     *   <li>ACaptureRequest</li>
+     * </ul></p>
+     *
+     * <p>Since optical image stabilization generally involves motion much faster than the duration
+     * of individualq image exposure, multiple OIS samples can be included for a single capture
+     * result. For example, if the OIS reporting operates at 200 Hz, a typical camera operating
+     * at 30fps may have 6-7 OIS samples per capture result. This information can be combined
+     * with the rolling shutter skew to account for lens motion during image exposure in
+     * post-processing algorithms.</p>
+     */
+    ACAMERA_STATISTICS_OIS_DATA_MODE =                          // byte (acamera_metadata_enum_android_statistics_ois_data_mode_t)
+            ACAMERA_STATISTICS_START + 17,
+    /**
+     * <p>An array of timestamps of OIS samples, in nanoseconds.</p>
+     *
+     * <p>Type: int64[n]</p>
+     *
+     * <p>This tag may appear in:
+     * <ul>
+     *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
+     * </ul></p>
+     *
+     * <p>The array contains the timestamps of OIS samples. The timestamps are in the same
+     * timebase as and comparable to ACAMERA_SENSOR_TIMESTAMP.</p>
+     *
+     * @see ACAMERA_SENSOR_TIMESTAMP
+     */
+    ACAMERA_STATISTICS_OIS_TIMESTAMPS =                         // int64[n]
+            ACAMERA_STATISTICS_START + 18,
+    /**
+     * <p>An array of shifts of OIS samples, in x direction.</p>
+     *
+     * <p>Type: float[n]</p>
+     *
+     * <p>This tag may appear in:
+     * <ul>
+     *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
+     * </ul></p>
+     *
+     * <p>The array contains the amount of shifts in x direction, in pixels, based on OIS samples.
+     * A positive value is a shift from left to right in the pre-correction active array
+     * coordinate system. For example, if the optical center is (1000, 500) in pre-correction
+     * active array coordinates, a shift of (3, 0) puts the new optical center at (1003, 500).</p>
+     * <p>The number of shifts must match the number of timestamps in
+     * ACAMERA_STATISTICS_OIS_TIMESTAMPS.</p>
+     * <p>The OIS samples are not affected by whether lens distortion correction is enabled (on
+     * supporting devices). They are always reported in pre-correction active array coordinates,
+     * since the scaling of OIS shifts would depend on the specific spot on the sensor the shift
+     * is needed.</p>
+     *
+     * @see ACAMERA_STATISTICS_OIS_TIMESTAMPS
+     */
+    ACAMERA_STATISTICS_OIS_X_SHIFTS =                           // float[n]
+            ACAMERA_STATISTICS_START + 19,
+    /**
+     * <p>An array of shifts of OIS samples, in y direction.</p>
+     *
+     * <p>Type: float[n]</p>
+     *
+     * <p>This tag may appear in:
+     * <ul>
+     *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
+     * </ul></p>
+     *
+     * <p>The array contains the amount of shifts in y direction, in pixels, based on OIS samples.
+     * A positive value is a shift from top to bottom in pre-correction active array coordinate
+     * system. For example, if the optical center is (1000, 500) in active array coordinates, a
+     * shift of (0, 5) puts the new optical center at (1000, 505).</p>
+     * <p>The number of shifts must match the number of timestamps in
+     * ACAMERA_STATISTICS_OIS_TIMESTAMPS.</p>
+     * <p>The OIS samples are not affected by whether lens distortion correction is enabled (on
+     * supporting devices). They are always reported in pre-correction active array coordinates,
+     * since the scaling of OIS shifts would depend on the specific spot on the sensor the shift
+     * is needed.</p>
+     *
+     * @see ACAMERA_STATISTICS_OIS_TIMESTAMPS
+     */
+    ACAMERA_STATISTICS_OIS_Y_SHIFTS =                           // float[n]
+            ACAMERA_STATISTICS_START + 20,
     ACAMERA_STATISTICS_END,
 
     /**
@@ -4222,10 +4940,12 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_STATISTICS_FACE_DETECT_MODE
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte[n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>OFF is always supported.</p>
      */
@@ -4235,12 +4955,13 @@ typedef enum acamera_metadata_tag {
      * <p>The maximum number of simultaneously detectable
      * faces.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
-     * <p>None</p>
      */
     ACAMERA_STATISTICS_INFO_MAX_FACE_COUNT =                    // int32
             ACAMERA_STATISTICS_INFO_START + 2,
@@ -4250,10 +4971,12 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_STATISTICS_HOT_PIXEL_MAP_MODE
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte[n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>If no hotpixel map output is available for this camera device, this will contain only
      * <code>false</code>.</p>
@@ -4267,10 +4990,12 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_STATISTICS_LENS_SHADING_MAP_MODE
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte[n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>If no lens shading map output is available for this camera device, this key will
      * contain only OFF.</p>
@@ -4279,6 +5004,24 @@ typedef enum acamera_metadata_tag {
      */
     ACAMERA_STATISTICS_INFO_AVAILABLE_LENS_SHADING_MAP_MODES =  // byte[n]
             ACAMERA_STATISTICS_INFO_START + 7,
+    /**
+     * <p>List of OIS data output modes for ACAMERA_STATISTICS_OIS_DATA_MODE that
+     * are supported by this camera device.</p>
+     *
+     * @see ACAMERA_STATISTICS_OIS_DATA_MODE
+     *
+     * <p>Type: byte[n]</p>
+     *
+     * <p>This tag may appear in:
+     * <ul>
+     *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
+     * </ul></p>
+     *
+     * <p>If no OIS data output is available for this camera device, this key will
+     * contain only OFF.</p>
+     */
+    ACAMERA_STATISTICS_INFO_AVAILABLE_OIS_DATA_MODES =          // byte[n]
+            ACAMERA_STATISTICS_INFO_START + 8,
     ACAMERA_STATISTICS_INFO_END,
 
     /**
@@ -4288,11 +5031,13 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_TONEMAP_MODE
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: float[n*2]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>See ACAMERA_TONEMAP_CURVE_RED for more details.</p>
      *
@@ -4307,11 +5052,13 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_TONEMAP_MODE
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: float[n*2]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>See ACAMERA_TONEMAP_CURVE_RED for more details.</p>
      *
@@ -4326,11 +5073,13 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_TONEMAP_MODE
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: float[n*2]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Each channel's curve is defined by an array of control points:</p>
      * <pre><code>ACAMERA_TONEMAP_CURVE_RED =
@@ -4345,6 +5094,8 @@ typedef enum acamera_metadata_tag {
      * of points can be less than max (that is, the request doesn't have to
      * always provide a curve with number of points equivalent to
      * ACAMERA_TONEMAP_MAX_CURVE_POINTS).</p>
+     * <p>For devices with MONOCHROME capability, all three channels must have the same set of
+     * control points.</p>
      * <p>A few examples, and their corresponding graphical mappings; these
      * only specify the red channel and the precision is limited to 4
      * digits, for conciseness.</p>
@@ -4381,11 +5132,13 @@ typedef enum acamera_metadata_tag {
     /**
      * <p>High-level global contrast/gamma/tonemapping control.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_tonemap_mode_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>When switching to an application-defined contrast curve by setting
      * ACAMERA_TONEMAP_MODE to CONTRAST_CURVE, the curve is defined
@@ -4408,16 +5161,18 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_TONEMAP_MODE
      */
-    ACAMERA_TONEMAP_MODE =                                      // byte (enum)
+    ACAMERA_TONEMAP_MODE =                                      // byte (acamera_metadata_enum_android_tonemap_mode_t)
             ACAMERA_TONEMAP_START + 3,
     /**
      * <p>Maximum number of supported points in the
      * tonemap curve that can be used for android.tonemap.curve.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>If the actual number of points provided by the application (in ACAMERA_TONEMAPCURVE_*) is
      * less than this maximum, the camera device will resample the curve to its internal
@@ -4434,10 +5189,12 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_TONEMAP_MODE
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte[n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Camera devices that support the MANUAL_POST_PROCESSING capability will always contain
      * at least one of below mode combinations:</p>
@@ -4455,11 +5212,13 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_TONEMAP_MODE
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: float</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>The tonemap curve will be defined the following formula:
      * * OUT = pow(IN, 1.0 / gamma)
@@ -4480,11 +5239,13 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_TONEMAP_MODE
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_tonemap_preset_curve_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>The tonemap curve will be defined by specified standard.</p>
      * <p>sRGB (approximated by 16 control points):</p>
@@ -4494,17 +5255,19 @@ typedef enum acamera_metadata_tag {
      * <p>Note that above figures show a 16 control points approximation of preset
      * curves. Camera devices may apply a different approximation to the curve.</p>
      */
-    ACAMERA_TONEMAP_PRESET_CURVE =                              // byte (enum)
+    ACAMERA_TONEMAP_PRESET_CURVE =                              // byte (acamera_metadata_enum_android_tonemap_preset_curve_t)
             ACAMERA_TONEMAP_START + 7,
     ACAMERA_TONEMAP_END,
 
     /**
      * <p>Generally classifies the overall set of the camera device functionality.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_info_supported_hardware_level_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>The supported hardware level is a high-level description of the camera device's
      * capabilities, summarizing several capabilities into one field.  Each level adds additional
@@ -4515,12 +5278,26 @@ typedef enum acamera_metadata_tag {
      * the following code snippet can be used:</p>
      * <pre><code>// Returns true if the device supports the required hardware level, or better.
      * boolean isHardwareLevelSupported(CameraCharacteristics c, int requiredLevel) {
+     *     final int[] sortedHwLevels = {
+     *         CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY,
+     *         CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_EXTERNAL,
+     *         CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
+     *         CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL,
+     *         CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_3
+     *     };
      *     int deviceLevel = c.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
-     *     if (deviceLevel == CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY) {
-     *         return requiredLevel == deviceLevel;
+     *     if (requiredLevel == deviceLevel) {
+     *         return true;
      *     }
-     *     // deviceLevel is not LEGACY, can use numerical sort
-     *     return requiredLevel &lt;= deviceLevel;
+     *
+     *     for (int sortedlevel : sortedHwLevels) {
+     *         if (sortedlevel == requiredLevel) {
+     *             return true;
+     *         } else if (sortedlevel == deviceLevel) {
+     *             return false;
+     *         }
+     *     }
+     *     return false; // Should never reach here
      * }
      * </code></pre>
      * <p>At a high level, the levels are:</p>
@@ -4534,11 +5311,13 @@ typedef enum acamera_metadata_tag {
      *   post-processing settings, and image capture at a high rate.</li>
      * <li><code>LEVEL_3</code> devices additionally support YUV reprocessing and RAW image capture, along
      *   with additional output stream configurations.</li>
+     * <li><code>EXTERNAL</code> devices are similar to <code>LIMITED</code> devices with exceptions like some sensor or
+     *   lens information not reported or less stable framerates.</li>
      * </ul>
      * <p>See the individual level enums for full descriptions of the supported capabilities.  The
      * ACAMERA_REQUEST_AVAILABLE_CAPABILITIES entry describes the device's capabilities at a
      * finer-grain level, if needed. In addition, many controls have their available settings or
-     * ranges defined in individual metadata tag entries in this document.</p>
+     * ranges defined in individual entries from {@link ACameraManager_getCameraCharacteristics }.</p>
      * <p>Some features are not part of any particular hardware level or capability and must be
      * queried separately. These include:</p>
      * <ul>
@@ -4557,19 +5336,38 @@ typedef enum acamera_metadata_tag {
      * @see ACAMERA_SENSOR_INFO_TIMESTAMP_SOURCE
      * @see ACAMERA_STATISTICS_INFO_AVAILABLE_FACE_DETECT_MODES
      */
-    ACAMERA_INFO_SUPPORTED_HARDWARE_LEVEL =                     // byte (enum)
+    ACAMERA_INFO_SUPPORTED_HARDWARE_LEVEL =                     // byte (acamera_metadata_enum_android_info_supported_hardware_level_t)
             ACAMERA_INFO_START,
+    /**
+     * <p>A short string for manufacturer version information about the camera device, such as
+     * ISP hardware, sensors, etc.</p>
+     *
+     * <p>Type: byte</p>
+     *
+     * <p>This tag may appear in:
+     * <ul>
+     *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
+     * </ul></p>
+     *
+     * <p>This can be used in <a href="https://developer.android.com/reference/android/media/ExifInterface.html#TAG_IMAGE_DESCRIPTION">TAG_IMAGE_DESCRIPTION</a>
+     * in jpeg EXIF. This key may be absent if no version information is available on the
+     * device.</p>
+     */
+    ACAMERA_INFO_VERSION =                                      // byte
+            ACAMERA_INFO_START + 1,
     ACAMERA_INFO_END,
 
     /**
      * <p>Whether black-level compensation is locked
      * to its current values, or is free to vary.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_black_level_lock_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
      *   <li>ACaptureRequest</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>Whether the black level offset was locked for this frame.  Should be
      * ON if ACAMERA_BLACK_LEVEL_LOCK was ON in the capture request, unless
@@ -4578,7 +5376,7 @@ typedef enum acamera_metadata_tag {
      *
      * @see ACAMERA_BLACK_LEVEL_LOCK
      */
-    ACAMERA_BLACK_LEVEL_LOCK =                                  // byte (enum)
+    ACAMERA_BLACK_LEVEL_LOCK =                                  // byte (acamera_metadata_enum_android_black_level_lock_t)
             ACAMERA_BLACK_LEVEL_START,
     ACAMERA_BLACK_LEVEL_END,
 
@@ -4587,10 +5385,12 @@ typedef enum acamera_metadata_tag {
      * with which the output result (metadata + buffers) has been fully
      * synchronized.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int64 (acamera_metadata_enum_android_sync_frame_number_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>When a request is submitted to the camera device, there is usually a
      * delay of several frames before the controls get applied. A camera
@@ -4644,17 +5444,19 @@ typedef enum acamera_metadata_tag {
      * @see ACAMERA_REQUEST_PIPELINE_MAX_DEPTH
      * @see ACAMERA_SYNC_FRAME_NUMBER
      */
-    ACAMERA_SYNC_FRAME_NUMBER =                                 // int64 (enum)
+    ACAMERA_SYNC_FRAME_NUMBER =                                 // int64 (acamera_metadata_enum_android_sync_frame_number_t)
             ACAMERA_SYNC_START,
     /**
      * <p>The maximum number of frames that can occur after a request
      * (different than the previous) has been submitted, and before the
      * result's state becomes synchronized.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32 (acamera_metadata_enum_android_sync_max_latency_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This defines the maximum distance (in number of metadata results),
      * between the frame number of the request that has new controls to apply
@@ -4663,7 +5465,7 @@ typedef enum acamera_metadata_tag {
      * must occur before the camera device knows for a fact that the new
      * submitted camera settings have been applied in outgoing frames.</p>
      */
-    ACAMERA_SYNC_MAX_LATENCY =                                  // int32 (enum)
+    ACAMERA_SYNC_MAX_LATENCY =                                  // int32 (acamera_metadata_enum_android_sync_max_latency_t)
             ACAMERA_SYNC_START + 1,
     ACAMERA_SYNC_END,
 
@@ -4672,10 +5474,12 @@ typedef enum acamera_metadata_tag {
      * configurations that this camera device supports
      * (i.e. format, width, height, output/input stream).</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int32[n*4] (acamera_metadata_enum_android_depth_available_depth_stream_configurations_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>These are output stream configurations for use with
      * dataSpace HAL_DATASPACE_DEPTH. The configurations are
@@ -4689,16 +5493,18 @@ typedef enum acamera_metadata_tag {
      * android.depth.maxDepthSamples, 1, OUTPUT)</code> in addition to
      * the entries for HAL_PIXEL_FORMAT_Y16.</p>
      */
-    ACAMERA_DEPTH_AVAILABLE_DEPTH_STREAM_CONFIGURATIONS =       // int32[n*4] (enum)
+    ACAMERA_DEPTH_AVAILABLE_DEPTH_STREAM_CONFIGURATIONS =       // int32[n*4] (acamera_metadata_enum_android_depth_available_depth_stream_configurations_t)
             ACAMERA_DEPTH_START + 1,
     /**
      * <p>This lists the minimum frame duration for each
      * format/size combination for depth output formats.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int64[4*n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>This should correspond to the frame duration when only that
      * stream is active, with all processing (typically in android.*.mode)
@@ -4720,10 +5526,12 @@ typedef enum acamera_metadata_tag {
      * <p>This lists the maximum stall duration for each
      * output format/size combination for depth streams.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: int64[4*n]</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>A stall duration is how much extra time would get added
      * to the normal minimum frame duration for a repeating request
@@ -4743,10 +5551,12 @@ typedef enum acamera_metadata_tag {
      * DEPTH16 / DEPTH_POINT_CLOUD output, and normal color outputs (such as
      * YUV_420_888, JPEG, or RAW) simultaneously.</p>
      *
-     * <p>This tag may appear in:</p>
+     * <p>Type: byte (acamera_metadata_enum_android_depth_depth_is_exclusive_t)</p>
+     *
+     * <p>This tag may appear in:
      * <ul>
      *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     * </ul>
+     * </ul></p>
      *
      * <p>If TRUE, including both depth and color outputs in a single
      * capture request is not supported. An application must interleave color
@@ -4757,9 +5567,321 @@ typedef enum acamera_metadata_tag {
      * measure depth values, which causes the color image to be
      * corrupted during depth measurement.</p>
      */
-    ACAMERA_DEPTH_DEPTH_IS_EXCLUSIVE =                          // byte (enum)
+    ACAMERA_DEPTH_DEPTH_IS_EXCLUSIVE =                          // byte (acamera_metadata_enum_android_depth_depth_is_exclusive_t)
             ACAMERA_DEPTH_START + 4,
+    /**
+     * <p>Recommended depth stream configurations for common client use cases.</p>
+     *
+     * <p>Type: int32[n*5]</p>
+     *
+     * <p>This tag may appear in:
+     * <ul>
+     *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
+     * </ul></p>
+     *
+     * <p>Optional subset of the ACAMERA_DEPTH_AVAILABLE_DEPTH_STREAM_CONFIGURATIONS that
+     * contains similar tuples listed as
+     * (i.e. width, height, format, output/input stream, usecase bit field).
+     * Camera devices will be able to suggest particular depth stream configurations which are
+     * power and performance efficient for specific use cases. For more information about
+     * retrieving the suggestions see
+     * <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html#getRecommendedStreamConfigurationMap">CameraCharacteristics#getRecommendedStreamConfigurationMap</a>.</p>
+     * <p>For data representation please refer to
+     * ACAMERA_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS</p>
+     *
+     * @see ACAMERA_DEPTH_AVAILABLE_DEPTH_STREAM_CONFIGURATIONS
+     * @see ACAMERA_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS
+     */
+    ACAMERA_DEPTH_AVAILABLE_RECOMMENDED_DEPTH_STREAM_CONFIGURATIONS = 
+                                                                // int32[n*5]
+            ACAMERA_DEPTH_START + 5,
+    /**
+     * <p>The available dynamic depth dataspace stream
+     * configurations that this camera device supports
+     * (i.e. format, width, height, output/input stream).</p>
+     *
+     * <p>Type: int32[n*4] (acamera_metadata_enum_android_depth_available_dynamic_depth_stream_configurations_t)</p>
+     *
+     * <p>This tag may appear in:
+     * <ul>
+     *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
+     * </ul></p>
+     *
+     * <p>These are output stream configurations for use with
+     * dataSpace DYNAMIC_DEPTH. The configurations are
+     * listed as <code>(format, width, height, input?)</code> tuples.</p>
+     * <p>Only devices that support depth output for at least
+     * the HAL_PIXEL_FORMAT_Y16 dense depth map along with
+     * HAL_PIXEL_FORMAT_BLOB with the same size or size with
+     * the same aspect ratio can have dynamic depth dataspace
+     * stream configuration. ACAMERA_DEPTH_DEPTH_IS_EXCLUSIVE also
+     * needs to be set to FALSE.</p>
+     *
+     * @see ACAMERA_DEPTH_DEPTH_IS_EXCLUSIVE
+     */
+    ACAMERA_DEPTH_AVAILABLE_DYNAMIC_DEPTH_STREAM_CONFIGURATIONS = 
+                                                                // int32[n*4] (acamera_metadata_enum_android_depth_available_dynamic_depth_stream_configurations_t)
+            ACAMERA_DEPTH_START + 6,
+    /**
+     * <p>This lists the minimum frame duration for each
+     * format/size combination for dynamic depth output streams.</p>
+     *
+     * <p>Type: int64[4*n]</p>
+     *
+     * <p>This tag may appear in:
+     * <ul>
+     *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
+     * </ul></p>
+     *
+     * <p>This should correspond to the frame duration when only that
+     * stream is active, with all processing (typically in android.*.mode)
+     * set to either OFF or FAST.</p>
+     * <p>When multiple streams are used in a request, the minimum frame
+     * duration will be max(individual stream min durations).</p>
+     * <p>The minimum frame duration of a stream (of a particular format, size)
+     * is the same regardless of whether the stream is input or output.</p>
+     */
+    ACAMERA_DEPTH_AVAILABLE_DYNAMIC_DEPTH_MIN_FRAME_DURATIONS = // int64[4*n]
+            ACAMERA_DEPTH_START + 7,
+    /**
+     * <p>This lists the maximum stall duration for each
+     * output format/size combination for dynamic depth streams.</p>
+     *
+     * <p>Type: int64[4*n]</p>
+     *
+     * <p>This tag may appear in:
+     * <ul>
+     *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
+     * </ul></p>
+     *
+     * <p>A stall duration is how much extra time would get added
+     * to the normal minimum frame duration for a repeating request
+     * that has streams with non-zero stall.</p>
+     * <p>All dynamic depth output streams may have a nonzero stall
+     * duration.</p>
+     */
+    ACAMERA_DEPTH_AVAILABLE_DYNAMIC_DEPTH_STALL_DURATIONS =     // int64[4*n]
+            ACAMERA_DEPTH_START + 8,
     ACAMERA_DEPTH_END,
+
+    /**
+     * <p>String containing the ids of the underlying physical cameras.</p>
+     *
+     * <p>Type: byte[n]</p>
+     *
+     * <p>This tag may appear in:
+     * <ul>
+     *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
+     * </ul></p>
+     *
+     * <p>For a logical camera, this is concatenation of all underlying physical camera IDs.
+     * The null terminator for physical camera ID must be preserved so that the whole string
+     * can be tokenized using '\0' to generate list of physical camera IDs.</p>
+     * <p>For example, if the physical camera IDs of the logical camera are "2" and "3", the
+     * value of this tag will be ['2', '\0', '3', '\0'].</p>
+     * <p>The number of physical camera IDs must be no less than 2.</p>
+     */
+    ACAMERA_LOGICAL_MULTI_CAMERA_PHYSICAL_IDS =                 // byte[n]
+            ACAMERA_LOGICAL_MULTI_CAMERA_START,
+    /**
+     * <p>The accuracy of frame timestamp synchronization between physical cameras</p>
+     *
+     * <p>Type: byte (acamera_metadata_enum_android_logical_multi_camera_sensor_sync_type_t)</p>
+     *
+     * <p>This tag may appear in:
+     * <ul>
+     *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
+     * </ul></p>
+     *
+     * <p>The accuracy of the frame timestamp synchronization determines the physical cameras'
+     * ability to start exposure at the same time. If the sensorSyncType is CALIBRATED,
+     * the physical camera sensors usually run in master-slave mode so that their shutter
+     * time is synchronized. For APPROXIMATE sensorSyncType, the camera sensors usually run in
+     * master-master mode, and there could be offset between their start of exposure.</p>
+     * <p>In both cases, all images generated for a particular capture request still carry the same
+     * timestamps, so that they can be used to look up the matching frame number and
+     * onCaptureStarted callback.</p>
+     * <p>This tag is only applicable if the logical camera device supports concurrent physical
+     * streams from different physical cameras.</p>
+     */
+    ACAMERA_LOGICAL_MULTI_CAMERA_SENSOR_SYNC_TYPE =             // byte (acamera_metadata_enum_android_logical_multi_camera_sensor_sync_type_t)
+            ACAMERA_LOGICAL_MULTI_CAMERA_START + 1,
+    /**
+     * <p>String containing the ID of the underlying active physical camera.</p>
+     *
+     * <p>Type: byte</p>
+     *
+     * <p>This tag may appear in:
+     * <ul>
+     *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
+     * </ul></p>
+     *
+     * <p>The ID of the active physical camera that's backing the logical camera. All camera
+     * streams and metadata that are not physical camera specific will be originating from this
+     * physical camera.</p>
+     * <p>For a logical camera made up of physical cameras where each camera's lenses have
+     * different characteristics, the camera device may choose to switch between the physical
+     * cameras when application changes FOCAL_LENGTH or SCALER_CROP_REGION.
+     * At the time of lens switch, this result metadata reflects the new active physical camera
+     * ID.</p>
+     * <p>This key will be available if the camera device advertises this key via {@link ACAMERA_REQUEST_AVAILABLE_RESULT_KEYS }.
+     * When available, this must be one of valid physical IDs backing this logical multi-camera.
+     * If this key is not available for a logical multi-camera, the camera device implementation
+     * may still switch between different active physical cameras based on use case, but the
+     * current active physical camera information won't be available to the application.</p>
+     */
+    ACAMERA_LOGICAL_MULTI_CAMERA_ACTIVE_PHYSICAL_ID =           // byte
+            ACAMERA_LOGICAL_MULTI_CAMERA_START + 2,
+    ACAMERA_LOGICAL_MULTI_CAMERA_END,
+
+    /**
+     * <p>Mode of operation for the lens distortion correction block.</p>
+     *
+     * <p>Type: byte (acamera_metadata_enum_android_distortion_correction_mode_t)</p>
+     *
+     * <p>This tag may appear in:
+     * <ul>
+     *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
+     *   <li>ACaptureRequest</li>
+     * </ul></p>
+     *
+     * <p>The lens distortion correction block attempts to improve image quality by fixing
+     * radial, tangential, or other geometric aberrations in the camera device's optics.  If
+     * available, the ACAMERA_LENS_DISTORTION field documents the lens's distortion parameters.</p>
+     * <p>OFF means no distortion correction is done.</p>
+     * <p>FAST/HIGH_QUALITY both mean camera device determined distortion correction will be
+     * applied. HIGH_QUALITY mode indicates that the camera device will use the highest-quality
+     * correction algorithms, even if it slows down capture rate. FAST means the camera device
+     * will not slow down capture rate when applying correction. FAST may be the same as OFF if
+     * any correction at all would slow down capture rate.  Every output stream will have a
+     * similar amount of enhancement applied.</p>
+     * <p>The correction only applies to processed outputs such as YUV, Y8, JPEG, or DEPTH16; it is
+     * not applied to any RAW output.</p>
+     * <p>This control will be on by default on devices that support this control. Applications
+     * disabling distortion correction need to pay extra attention with the coordinate system of
+     * metering regions, crop region, and face rectangles. When distortion correction is OFF,
+     * metadata coordinates follow the coordinate system of
+     * ACAMERA_SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE. When distortion is not OFF, metadata
+     * coordinates follow the coordinate system of ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE.  The
+     * camera device will map these metadata fields to match the corrected image produced by the
+     * camera device, for both capture requests and results.  However, this mapping is not very
+     * precise, since rectangles do not generally map to rectangles when corrected.  Only linear
+     * scaling between the active array and precorrection active array coordinates is
+     * performed. Applications that require precise correction of metadata need to undo that
+     * linear scaling, and apply a more complete correction that takes into the account the app's
+     * own requirements.</p>
+     * <p>The full list of metadata that is affected in this way by distortion correction is:</p>
+     * <ul>
+     * <li>ACAMERA_CONTROL_AF_REGIONS</li>
+     * <li>ACAMERA_CONTROL_AE_REGIONS</li>
+     * <li>ACAMERA_CONTROL_AWB_REGIONS</li>
+     * <li>ACAMERA_SCALER_CROP_REGION</li>
+     * <li>android.statistics.faces</li>
+     * </ul>
+     *
+     * @see ACAMERA_CONTROL_AE_REGIONS
+     * @see ACAMERA_CONTROL_AF_REGIONS
+     * @see ACAMERA_CONTROL_AWB_REGIONS
+     * @see ACAMERA_LENS_DISTORTION
+     * @see ACAMERA_SCALER_CROP_REGION
+     * @see ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE
+     * @see ACAMERA_SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE
+     */
+    ACAMERA_DISTORTION_CORRECTION_MODE =                        // byte (acamera_metadata_enum_android_distortion_correction_mode_t)
+            ACAMERA_DISTORTION_CORRECTION_START,
+    /**
+     * <p>List of distortion correction modes for ACAMERA_DISTORTION_CORRECTION_MODE that are
+     * supported by this camera device.</p>
+     *
+     * @see ACAMERA_DISTORTION_CORRECTION_MODE
+     *
+     * <p>Type: byte[n]</p>
+     *
+     * <p>This tag may appear in:
+     * <ul>
+     *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
+     * </ul></p>
+     *
+     * <p>No device is required to support this API; such devices will always list only 'OFF'.
+     * All devices that support this API will list both FAST and HIGH_QUALITY.</p>
+     */
+    ACAMERA_DISTORTION_CORRECTION_AVAILABLE_MODES =             // byte[n]
+            ACAMERA_DISTORTION_CORRECTION_START + 1,
+    ACAMERA_DISTORTION_CORRECTION_END,
+
+    /**
+     * <p>The available HEIC (ISO/IEC 23008-12) stream
+     * configurations that this camera device supports
+     * (i.e. format, width, height, output/input stream).</p>
+     *
+     * <p>Type: int32[n*4] (acamera_metadata_enum_android_heic_available_heic_stream_configurations_t)</p>
+     *
+     * <p>This tag may appear in:
+     * <ul>
+     *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
+     * </ul></p>
+     *
+     * <p>The configurations are listed as <code>(format, width, height, input?)</code> tuples.</p>
+     * <p>If the camera device supports HEIC image format, it will support identical set of stream
+     * combinations involving HEIC image format, compared to the combinations involving JPEG
+     * image format as required by the device's hardware level and capabilities.</p>
+     * <p>All the static, control, and dynamic metadata tags related to JPEG apply to HEIC formats.
+     * Configuring JPEG and HEIC streams at the same time is not supported.</p>
+     * <p>All the configuration tuples <code>(format, width, height, input?)</code> will contain
+     * AIMAGE_FORMAT_HEIC format as OUTPUT only.</p>
+     */
+    ACAMERA_HEIC_AVAILABLE_HEIC_STREAM_CONFIGURATIONS =         // int32[n*4] (acamera_metadata_enum_android_heic_available_heic_stream_configurations_t)
+            ACAMERA_HEIC_START,
+    /**
+     * <p>This lists the minimum frame duration for each
+     * format/size combination for HEIC output formats.</p>
+     *
+     * <p>Type: int64[4*n]</p>
+     *
+     * <p>This tag may appear in:
+     * <ul>
+     *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
+     * </ul></p>
+     *
+     * <p>This should correspond to the frame duration when only that
+     * stream is active, with all processing (typically in android.*.mode)
+     * set to either OFF or FAST.</p>
+     * <p>When multiple streams are used in a request, the minimum frame
+     * duration will be max(individual stream min durations).</p>
+     * <p>See ACAMERA_SENSOR_FRAME_DURATION and
+     * ACAMERA_SCALER_AVAILABLE_STALL_DURATIONS for more details about
+     * calculating the max frame rate.</p>
+     *
+     * @see ACAMERA_SCALER_AVAILABLE_STALL_DURATIONS
+     * @see ACAMERA_SENSOR_FRAME_DURATION
+     */
+    ACAMERA_HEIC_AVAILABLE_HEIC_MIN_FRAME_DURATIONS =           // int64[4*n]
+            ACAMERA_HEIC_START + 1,
+    /**
+     * <p>This lists the maximum stall duration for each
+     * output format/size combination for HEIC streams.</p>
+     *
+     * <p>Type: int64[4*n]</p>
+     *
+     * <p>This tag may appear in:
+     * <ul>
+     *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
+     * </ul></p>
+     *
+     * <p>A stall duration is how much extra time would get added
+     * to the normal minimum frame duration for a repeating request
+     * that has streams with non-zero stall.</p>
+     * <p>This functions similarly to
+     * ACAMERA_SCALER_AVAILABLE_STALL_DURATIONS for HEIC
+     * streams.</p>
+     * <p>All HEIC output stream formats may have a nonzero stall
+     * duration.</p>
+     *
+     * @see ACAMERA_SCALER_AVAILABLE_STALL_DURATIONS
+     */
+    ACAMERA_HEIC_AVAILABLE_HEIC_STALL_DURATIONS =               // int64[4*n]
+            ACAMERA_HEIC_START + 2,
+    ACAMERA_HEIC_END,
 
 } acamera_metadata_tag_t;
 
@@ -4973,6 +6095,21 @@ typedef enum acamera_metadata_enum_acamera_control_ae_mode {
      * sequence.</p>
      */
     ACAMERA_CONTROL_AE_MODE_ON_AUTO_FLASH_REDEYE                     = 4,
+
+    /**
+     * <p>An external flash has been turned on.</p>
+     * <p>It informs the camera device that an external flash has been turned on, and that
+     * metering (and continuous focus if active) should be quickly recaculated to account
+     * for the external flash. Otherwise, this mode acts like ON.</p>
+     * <p>When the external flash is turned off, AE mode should be changed to one of the
+     * other available AE modes.</p>
+     * <p>If the camera device supports AE external flash mode, ACAMERA_CONTROL_AE_STATE must
+     * be FLASH_REQUIRED after the camera device finishes AE scan and it's too dark without
+     * flash.</p>
+     *
+     * @see ACAMERA_CONTROL_AE_STATE
+     */
+    ACAMERA_CONTROL_AE_MODE_ON_EXTERNAL_FLASH                        = 5,
 
 } acamera_metadata_enum_android_control_ae_mode_t;
 
@@ -5337,6 +6474,15 @@ typedef enum acamera_metadata_enum_acamera_control_capture_intent {
      */
     ACAMERA_CONTROL_CAPTURE_INTENT_MANUAL                            = 6,
 
+    /**
+     * <p>This request is for a motion tracking use case, where
+     * the application will use camera and inertial sensor data to
+     * locate and track objects in the world.</p>
+     * <p>The camera device auto-exposure routine will limit the exposure time
+     * of the camera to no more than 20 milliseconds, to minimize motion blur.</p>
+     */
+    ACAMERA_CONTROL_CAPTURE_INTENT_MOTION_TRACKING                   = 7,
+
 } acamera_metadata_enum_android_control_capture_intent_t;
 
 // ACAMERA_CONTROL_EFFECT_MODE
@@ -5553,7 +6699,7 @@ typedef enum acamera_metadata_enum_acamera_control_scene_mode {
 
     /**
      * <p>Optimized for dim settings where the main light source
-     * is a flame.</p>
+     * is a candle.</p>
      */
     ACAMERA_CONTROL_SCENE_MODE_CANDLELIGHT                           = 15,
 
@@ -5807,6 +6953,40 @@ typedef enum acamera_metadata_enum_acamera_control_awb_lock_available {
 
 } acamera_metadata_enum_android_control_awb_lock_available_t;
 
+// ACAMERA_CONTROL_ENABLE_ZSL
+typedef enum acamera_metadata_enum_acamera_control_enable_zsl {
+    /**
+     * <p>Requests with ACAMERA_CONTROL_CAPTURE_INTENT == STILL_CAPTURE must be captured
+     * after previous requests.</p>
+     *
+     * @see ACAMERA_CONTROL_CAPTURE_INTENT
+     */
+    ACAMERA_CONTROL_ENABLE_ZSL_FALSE                                 = 0,
+
+    /**
+     * <p>Requests with ACAMERA_CONTROL_CAPTURE_INTENT == STILL_CAPTURE may or may not be
+     * captured before previous requests.</p>
+     *
+     * @see ACAMERA_CONTROL_CAPTURE_INTENT
+     */
+    ACAMERA_CONTROL_ENABLE_ZSL_TRUE                                  = 1,
+
+} acamera_metadata_enum_android_control_enable_zsl_t;
+
+// ACAMERA_CONTROL_AF_SCENE_CHANGE
+typedef enum acamera_metadata_enum_acamera_control_af_scene_change {
+    /**
+     * <p>Scene change is not detected within the AF region(s).</p>
+     */
+    ACAMERA_CONTROL_AF_SCENE_CHANGE_NOT_DETECTED                     = 0,
+
+    /**
+     * <p>Scene change is detected within the AF region(s).</p>
+     */
+    ACAMERA_CONTROL_AF_SCENE_CHANGE_DETECTED                         = 1,
+
+} acamera_metadata_enum_android_control_af_scene_change_t;
+
 
 
 // ACAMERA_EDGE_MODE
@@ -5829,13 +7009,13 @@ typedef enum acamera_metadata_enum_acamera_edge_mode {
     ACAMERA_EDGE_MODE_HIGH_QUALITY                                   = 2,
 
     /**
-     * <p>Edge enhancement is applied at different levels for different output streams,
-     * based on resolution. Streams at maximum recording resolution (see {@link
-     * ACameraDevice_createCaptureSession}) or below have
-     * edge enhancement applied, while higher-resolution streams have no edge enhancement
-     * applied. The level of edge enhancement for low-resolution streams is tuned so that
-     * frame rate is not impacted, and the quality is equal to or better than FAST (since it
-     * is only applied to lower-resolution outputs, quality may improve from FAST).</p>
+     * <p>Edge enhancement is applied at different
+     * levels for different output streams, based on resolution. Streams at maximum recording
+     * resolution (see {@link ACameraDevice_createCaptureSession })
+     * or below have edge enhancement applied, while higher-resolution streams have no edge
+     * enhancement applied. The level of edge enhancement for low-resolution streams is tuned
+     * so that frame rate is not impacted, and the quality is equal to or better than FAST
+     * (since it is only applied to lower-resolution outputs, quality may improve from FAST).</p>
      * <p>This mode is intended to be used by applications operating in a zero-shutter-lag mode
      * with YUV or PRIVATE reprocessing, where the application continuously captures
      * high-resolution intermediate buffers into a circular buffer, from which a final image is
@@ -6014,6 +7194,27 @@ typedef enum acamera_metadata_enum_acamera_lens_state {
 
 } acamera_metadata_enum_android_lens_state_t;
 
+// ACAMERA_LENS_POSE_REFERENCE
+typedef enum acamera_metadata_enum_acamera_lens_pose_reference {
+    /**
+     * <p>The value of ACAMERA_LENS_POSE_TRANSLATION is relative to the optical center of
+     * the largest camera device facing the same direction as this camera.</p>
+     * <p>This is the default value for API levels before Android P.</p>
+     *
+     * @see ACAMERA_LENS_POSE_TRANSLATION
+     */
+    ACAMERA_LENS_POSE_REFERENCE_PRIMARY_CAMERA                       = 0,
+
+    /**
+     * <p>The value of ACAMERA_LENS_POSE_TRANSLATION is relative to the position of the
+     * primary gyroscope of this Android device.</p>
+     *
+     * @see ACAMERA_LENS_POSE_TRANSLATION
+     */
+    ACAMERA_LENS_POSE_REFERENCE_GYROSCOPE                            = 1,
+
+} acamera_metadata_enum_android_lens_pose_reference_t;
+
 
 // ACAMERA_LENS_INFO_FOCUS_DISTANCE_CALIBRATION
 typedef enum acamera_metadata_enum_acamera_lens_info_focus_distance_calibration {
@@ -6084,13 +7285,12 @@ typedef enum acamera_metadata_enum_acamera_noise_reduction_mode {
 
     /**
      * <p>Noise reduction is applied at different levels for different output streams,
-     * based on resolution. Streams at maximum recording resolution (see {@link
-     * ACameraDevice_createCaptureSession}) or below have noise
-     * reduction applied, while higher-resolution streams have MINIMAL (if supported) or no
-     * noise reduction applied (if MINIMAL is not supported.) The degree of noise reduction
-     * for low-resolution streams is tuned so that frame rate is not impacted, and the quality
-     * is equal to or better than FAST (since it is only applied to lower-resolution outputs,
-     * quality may improve from FAST).</p>
+     * based on resolution. Streams at maximum recording resolution (see {@link ACameraDevice_createCaptureSession })
+     * or below have noise reduction applied, while higher-resolution streams have MINIMAL (if
+     * supported) or no noise reduction applied (if MINIMAL is not supported.) The degree of
+     * noise reduction for low-resolution streams is tuned so that frame rate is not impacted,
+     * and the quality is equal to or better than FAST (since it is only applied to
+     * lower-resolution outputs, quality may improve from FAST).</p>
      * <p>This mode is intended to be used by applications operating in a zero-shutter-lag mode
      * with YUV or PRIVATE reprocessing, where the application continuously captures
      * high-resolution intermediate buffers into a circular buffer, from which a final image is
@@ -6177,6 +7377,10 @@ typedef enum acamera_metadata_enum_acamera_request_available_capabilities {
      * <p>If this is supported, android.scaler.streamConfigurationMap will
      * additionally return a min frame duration that is greater than
      * zero for each supported size-format combination.</p>
+     * <p>For camera devices with LOGICAL_MULTI_CAMERA capability, when the underlying active
+     * physical camera switches, exposureTime, sensitivity, and lens properties may change
+     * even if AE/AF is locked. However, the overall auto exposure and auto focus experience
+     * for users will be consistent. Refer to LOGICAL_MULTI_CAMERA capability for details.</p>
      *
      * @see ACAMERA_BLACK_LEVEL_LOCK
      * @see ACAMERA_CONTROL_AE_LOCK
@@ -6232,6 +7436,10 @@ typedef enum acamera_metadata_enum_acamera_request_available_capabilities {
      * will accurately report the values applied by AWB in the result.</p>
      * <p>A given camera device may also support additional post-processing
      * controls, but this capability only covers the above list of controls.</p>
+     * <p>For camera devices with LOGICAL_MULTI_CAMERA capability, when underlying active
+     * physical camera switches, tonemap, white balance, and shading map may change even if
+     * awb is locked. However, the overall post-processing experience for users will be
+     * consistent. Refer to LOGICAL_MULTI_CAMERA capability for details.</p>
      *
      * @see ACAMERA_COLOR_CORRECTION_ABERRATION_MODE
      * @see ACAMERA_COLOR_CORRECTION_AVAILABLE_ABERRATION_MODES
@@ -6303,22 +7511,21 @@ typedef enum acamera_metadata_enum_acamera_request_available_capabilities {
 
     /**
      * <p>The camera device supports capturing high-resolution images at &gt;= 20 frames per
-     * second, in at least the uncompressed YUV format, when post-processing settings are set
-     * to FAST. Additionally, maximum-resolution images can be captured at &gt;= 10 frames
-     * per second.  Here, 'high resolution' means at least 8 megapixels, or the maximum
-     * resolution of the device, whichever is smaller.</p>
-     * <p>More specifically, this means that at least one output {@link
-     * AIMAGE_FORMAT_YUV_420_888} size listed in
-     * {@link ACAMERA_SCALER_AVAILABLE_STREAM_CONFIGURATIONS} is larger or equal to the
-     * 'high resolution' defined above, and can be captured at at least 20 fps.
-     * For the largest {@link AIMAGE_FORMAT_YUV_420_888} size listed in
-     * {@link ACAMERA_SCALER_AVAILABLE_STREAM_CONFIGURATIONS}, camera device can capture this
-     * size for at least 10 frames per second.
-     * Also the ACAMERA_CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES entry lists at least one FPS range
-     * where the minimum FPS is &gt;= 1 / minimumFrameDuration for the largest YUV_420_888 size.</p>
-     * <p>If the device supports the {@link AIMAGE_FORMAT_RAW10}, {@link
-     * AIMAGE_FORMAT_RAW12}, then those can also be captured at the same rate
-     * as the maximum-size YUV_420_888 resolution is.</p>
+     * second, in at least the uncompressed YUV format, when post-processing settings are
+     * set to FAST. Additionally, all image resolutions less than 24 megapixels can be
+     * captured at &gt;= 10 frames per second. Here, 'high resolution' means at least 8
+     * megapixels, or the maximum resolution of the device, whichever is smaller.</p>
+     * <p>More specifically, this means that at least one output {@link AIMAGE_FORMAT_YUV_420_888 } size listed in
+     * {@link ACAMERA_SCALER_AVAILABLE_STREAM_CONFIGURATIONS }
+     * is larger or equal to the 'high resolution' defined above, and can be captured at at
+     * least 20 fps.  For the largest {@link AIMAGE_FORMAT_YUV_420_888 } size listed in
+     * {@link ACAMERA_SCALER_AVAILABLE_STREAM_CONFIGURATIONS },
+     * camera device can capture this size for at least 10 frames per second if the size is
+     * less than 24 megapixels. Also the ACAMERA_CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES entry
+     * lists at least one FPS range where the minimum FPS is &gt;= 1 / minimumFrameDuration
+     * for the largest YUV_420_888 size.</p>
+     * <p>If the device supports the {@link AIMAGE_FORMAT_RAW10 }, {@link AIMAGE_FORMAT_RAW12 }, {@link AIMAGE_FORMAT_Y8 }, then those can also be
+     * captured at the same rate as the maximum-size YUV_420_888 resolution is.</p>
      * <p>In addition, the ACAMERA_SYNC_MAX_LATENCY field is guaranted to have a value between 0
      * and 4, inclusive. ACAMERA_CONTROL_AE_LOCK_AVAILABLE and ACAMERA_CONTROL_AWB_LOCK_AVAILABLE
      * are also guaranteed to be <code>true</code> so burst capture with these two locks ON yields
@@ -6335,41 +7542,214 @@ typedef enum acamera_metadata_enum_acamera_request_available_capabilities {
      * <p>The camera device can produce depth measurements from its field of view.</p>
      * <p>This capability requires the camera device to support the following:</p>
      * <ul>
-     * <li>{@link AIMAGE_FORMAT_DEPTH16} is supported as an output format.</li>
-     * <li>{@link AIMAGE_FORMAT_DEPTH_POINT_CLOUD} is optionally supported as an
-     *   output format.</li>
-     * <li>This camera device, and all camera devices with the same ACAMERA_LENS_FACING,
-     *   will list the following calibration entries in {@link ACameraMetadata} from both
-     *   {@link ACameraManager_getCameraCharacteristics} and
-     *   {@link ACameraCaptureSession_captureCallback_result}:<ul>
+     * <li>{@link AIMAGE_FORMAT_DEPTH16 } is supported as
+     *   an output format.</li>
+     * <li>{@link AIMAGE_FORMAT_DEPTH_POINT_CLOUD } is
+     *   optionally supported as an output format.</li>
+     * <li>This camera device, and all camera devices with the same ACAMERA_LENS_FACING, will
+     *   list the following calibration metadata entries in both {@link ACameraManager_getCameraCharacteristics }
+     *   and {@link ACameraCaptureSession_captureCallback_result }:<ul>
      * <li>ACAMERA_LENS_POSE_TRANSLATION</li>
      * <li>ACAMERA_LENS_POSE_ROTATION</li>
      * <li>ACAMERA_LENS_INTRINSIC_CALIBRATION</li>
-     * <li>ACAMERA_LENS_RADIAL_DISTORTION</li>
+     * <li>ACAMERA_LENS_DISTORTION</li>
      * </ul>
      * </li>
      * <li>The ACAMERA_DEPTH_DEPTH_IS_EXCLUSIVE entry is listed by this device.</li>
+     * <li>As of Android P, the ACAMERA_LENS_POSE_REFERENCE entry is listed by this device.</li>
      * <li>A LIMITED camera with only the DEPTH_OUTPUT capability does not have to support
-     *   normal YUV_420_888, JPEG, and PRIV-format outputs. It only has to support the DEPTH16
-     *   format.</li>
+     *   normal YUV_420_888, Y8, JPEG, and PRIV-format outputs. It only has to support the
+     *   DEPTH16 format.</li>
      * </ul>
      * <p>Generally, depth output operates at a slower frame rate than standard color capture,
      * so the DEPTH16 and DEPTH_POINT_CLOUD formats will commonly have a stall duration that
-     * should be accounted for (see
-     * {@link ACAMERA_DEPTH_AVAILABLE_DEPTH_STALL_DURATIONS}).
+     * should be accounted for (see {@link ACAMERA_DEPTH_AVAILABLE_DEPTH_STALL_DURATIONS }).
      * On a device that supports both depth and color-based output, to enable smooth preview,
      * using a repeating burst is recommended, where a depth-output target is only included
      * once every N frames, where N is the ratio between preview output rate and depth output
      * rate, including depth stall time.</p>
      *
      * @see ACAMERA_DEPTH_DEPTH_IS_EXCLUSIVE
+     * @see ACAMERA_LENS_DISTORTION
      * @see ACAMERA_LENS_FACING
      * @see ACAMERA_LENS_INTRINSIC_CALIBRATION
+     * @see ACAMERA_LENS_POSE_REFERENCE
      * @see ACAMERA_LENS_POSE_ROTATION
      * @see ACAMERA_LENS_POSE_TRANSLATION
-     * @see ACAMERA_LENS_RADIAL_DISTORTION
      */
     ACAMERA_REQUEST_AVAILABLE_CAPABILITIES_DEPTH_OUTPUT              = 8,
+
+    /**
+     * <p>The camera device supports the MOTION_TRACKING value for
+     * ACAMERA_CONTROL_CAPTURE_INTENT, which limits maximum exposure time to 20 ms.</p>
+     * <p>This limits the motion blur of capture images, resulting in better image tracking
+     * results for use cases such as image stabilization or augmented reality.</p>
+     *
+     * @see ACAMERA_CONTROL_CAPTURE_INTENT
+     */
+    ACAMERA_REQUEST_AVAILABLE_CAPABILITIES_MOTION_TRACKING           = 10,
+
+    /**
+     * <p>The camera device is a logical camera backed by two or more physical cameras.</p>
+     * <p>In API level 28, the physical cameras must also be exposed to the application via
+     * <a href="https://developer.android.com/reference/android/hardware/camera2/CameraManager.html#getCameraIdList">CameraManager#getCameraIdList</a>.</p>
+     * <p>Starting from API level 29, some or all physical cameras may not be independently
+     * exposed to the application, in which case the physical camera IDs will not be
+     * available in <a href="https://developer.android.com/reference/android/hardware/camera2/CameraManager.html#getCameraIdList">CameraManager#getCameraIdList</a>. But the
+     * application can still query the physical cameras' characteristics by calling
+     * <a href="https://developer.android.com/reference/android/hardware/camera2/CameraManager.html#getCameraCharacteristics">CameraManager#getCameraCharacteristics</a>. Additionally,
+     * if a physical camera is hidden from camera ID list, the mandatory stream combinations
+     * for that physical camera must be supported through the logical camera using physical
+     * streams.</p>
+     * <p>Combinations of logical and physical streams, or physical streams from different
+     * physical cameras are not guaranteed. However, if the camera device supports
+     * {@link ACameraDevice_isSessionConfigurationSupported },
+     * application must be able to query whether a stream combination involving physical
+     * streams is supported by calling
+     * {@link ACameraDevice_isSessionConfigurationSupported }.</p>
+     * <p>Camera application shouldn't assume that there are at most 1 rear camera and 1 front
+     * camera in the system. For an application that switches between front and back cameras,
+     * the recommendation is to switch between the first rear camera and the first front
+     * camera in the list of supported camera devices.</p>
+     * <p>This capability requires the camera device to support the following:</p>
+     * <ul>
+     * <li>The IDs of underlying physical cameras are returned via
+     *   <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html#getPhysicalCameraIds">CameraCharacteristics#getPhysicalCameraIds</a>.</li>
+     * <li>This camera device must list static metadata
+     *   ACAMERA_LOGICAL_MULTI_CAMERA_SENSOR_SYNC_TYPE in
+     *   <a href="https://developer.android.com/reference/android/hardware/camera2/CameraCharacteristics.html">CameraCharacteristics</a>.</li>
+     * <li>The underlying physical cameras' static metadata must list the following entries,
+     *   so that the application can correlate pixels from the physical streams:<ul>
+     * <li>ACAMERA_LENS_POSE_REFERENCE</li>
+     * <li>ACAMERA_LENS_POSE_ROTATION</li>
+     * <li>ACAMERA_LENS_POSE_TRANSLATION</li>
+     * <li>ACAMERA_LENS_INTRINSIC_CALIBRATION</li>
+     * <li>ACAMERA_LENS_DISTORTION</li>
+     * </ul>
+     * </li>
+     * <li>The SENSOR_INFO_TIMESTAMP_SOURCE of the logical device and physical devices must be
+     *   the same.</li>
+     * <li>The logical camera must be LIMITED or higher device.</li>
+     * </ul>
+     * <p>A logical camera device's dynamic metadata may contain
+     * ACAMERA_LOGICAL_MULTI_CAMERA_ACTIVE_PHYSICAL_ID to notify the application of the current
+     * active physical camera Id. An active physical camera is the physical camera from which
+     * the logical camera's main image data outputs (YUV or RAW) and metadata come from.
+     * In addition, this serves as an indication which physical camera is used to output to
+     * a RAW stream, or in case only physical cameras support RAW, which physical RAW stream
+     * the application should request.</p>
+     * <p>Logical camera's static metadata tags below describe the default active physical
+     * camera. An active physical camera is default if it's used when application directly
+     * uses requests built from a template. All templates will default to the same active
+     * physical camera.</p>
+     * <ul>
+     * <li>ACAMERA_SENSOR_INFO_SENSITIVITY_RANGE</li>
+     * <li>ACAMERA_SENSOR_INFO_COLOR_FILTER_ARRANGEMENT</li>
+     * <li>ACAMERA_SENSOR_INFO_EXPOSURE_TIME_RANGE</li>
+     * <li>ACAMERA_SENSOR_INFO_MAX_FRAME_DURATION</li>
+     * <li>ACAMERA_SENSOR_INFO_PHYSICAL_SIZE</li>
+     * <li>ACAMERA_SENSOR_INFO_WHITE_LEVEL</li>
+     * <li>ACAMERA_SENSOR_INFO_LENS_SHADING_APPLIED</li>
+     * <li>ACAMERA_SENSOR_REFERENCE_ILLUMINANT1</li>
+     * <li>ACAMERA_SENSOR_REFERENCE_ILLUMINANT2</li>
+     * <li>ACAMERA_SENSOR_CALIBRATION_TRANSFORM1</li>
+     * <li>ACAMERA_SENSOR_CALIBRATION_TRANSFORM2</li>
+     * <li>ACAMERA_SENSOR_COLOR_TRANSFORM1</li>
+     * <li>ACAMERA_SENSOR_COLOR_TRANSFORM2</li>
+     * <li>ACAMERA_SENSOR_FORWARD_MATRIX1</li>
+     * <li>ACAMERA_SENSOR_FORWARD_MATRIX2</li>
+     * <li>ACAMERA_SENSOR_BLACK_LEVEL_PATTERN</li>
+     * <li>ACAMERA_SENSOR_MAX_ANALOG_SENSITIVITY</li>
+     * <li>ACAMERA_SENSOR_OPTICAL_BLACK_REGIONS</li>
+     * <li>ACAMERA_SENSOR_AVAILABLE_TEST_PATTERN_MODES</li>
+     * <li>ACAMERA_LENS_INFO_HYPERFOCAL_DISTANCE</li>
+     * <li>ACAMERA_LENS_INFO_MINIMUM_FOCUS_DISTANCE</li>
+     * <li>ACAMERA_LENS_INFO_FOCUS_DISTANCE_CALIBRATION</li>
+     * <li>ACAMERA_LENS_POSE_ROTATION</li>
+     * <li>ACAMERA_LENS_POSE_TRANSLATION</li>
+     * <li>ACAMERA_LENS_INTRINSIC_CALIBRATION</li>
+     * <li>ACAMERA_LENS_POSE_REFERENCE</li>
+     * <li>ACAMERA_LENS_DISTORTION</li>
+     * </ul>
+     * <p>The field of view of all non-RAW physical streams must be the same or as close as
+     * possible to that of non-RAW logical streams. If the requested FOV is outside of the
+     * range supported by the physical camera, the physical stream for that physical camera
+     * will use either the maximum or minimum scaler crop region, depending on which one is
+     * closer to the requested FOV. For example, for a logical camera with wide-tele lens
+     * configuration where the wide lens is the default, if the logical camera's crop region
+     * is set to maximum, the physical stream for the tele lens will be configured to its
+     * maximum crop region. On the other hand, if the logical camera has a normal-wide lens
+     * configuration where the normal lens is the default, when the logical camera's crop
+     * region is set to maximum, the FOV of the logical streams will be that of the normal
+     * lens. The FOV of the physical streams for the wide lens will be the same as the
+     * logical stream, by making the crop region smaller than its active array size to
+     * compensate for the smaller focal length.</p>
+     * <p>Even if the underlying physical cameras have different RAW characteristics (such as
+     * size or CFA pattern), a logical camera can still advertise RAW capability. In this
+     * case, when the application configures a RAW stream, the camera device will make sure
+     * the active physical camera will remain active to ensure consistent RAW output
+     * behavior, and not switch to other physical cameras.</p>
+     * <p>To maintain backward compatibility, the capture request and result metadata tags
+     * required for basic camera functionalities will be solely based on the
+     * logical camera capabiltity. Other request and result metadata tags, on the other
+     * hand, will be based on current active physical camera. For example, the physical
+     * cameras' sensor sensitivity and lens capability could be different from each other.
+     * So when the application manually controls sensor exposure time/gain, or does manual
+     * focus control, it must checks the current active physical camera's exposure, gain,
+     * and focus distance range.</p>
+     *
+     * @see ACAMERA_LENS_DISTORTION
+     * @see ACAMERA_LENS_INFO_FOCUS_DISTANCE_CALIBRATION
+     * @see ACAMERA_LENS_INFO_HYPERFOCAL_DISTANCE
+     * @see ACAMERA_LENS_INFO_MINIMUM_FOCUS_DISTANCE
+     * @see ACAMERA_LENS_INTRINSIC_CALIBRATION
+     * @see ACAMERA_LENS_POSE_REFERENCE
+     * @see ACAMERA_LENS_POSE_ROTATION
+     * @see ACAMERA_LENS_POSE_TRANSLATION
+     * @see ACAMERA_LOGICAL_MULTI_CAMERA_ACTIVE_PHYSICAL_ID
+     * @see ACAMERA_LOGICAL_MULTI_CAMERA_SENSOR_SYNC_TYPE
+     * @see ACAMERA_SENSOR_AVAILABLE_TEST_PATTERN_MODES
+     * @see ACAMERA_SENSOR_BLACK_LEVEL_PATTERN
+     * @see ACAMERA_SENSOR_CALIBRATION_TRANSFORM1
+     * @see ACAMERA_SENSOR_CALIBRATION_TRANSFORM2
+     * @see ACAMERA_SENSOR_COLOR_TRANSFORM1
+     * @see ACAMERA_SENSOR_COLOR_TRANSFORM2
+     * @see ACAMERA_SENSOR_FORWARD_MATRIX1
+     * @see ACAMERA_SENSOR_FORWARD_MATRIX2
+     * @see ACAMERA_SENSOR_INFO_COLOR_FILTER_ARRANGEMENT
+     * @see ACAMERA_SENSOR_INFO_EXPOSURE_TIME_RANGE
+     * @see ACAMERA_SENSOR_INFO_LENS_SHADING_APPLIED
+     * @see ACAMERA_SENSOR_INFO_MAX_FRAME_DURATION
+     * @see ACAMERA_SENSOR_INFO_PHYSICAL_SIZE
+     * @see ACAMERA_SENSOR_INFO_SENSITIVITY_RANGE
+     * @see ACAMERA_SENSOR_INFO_WHITE_LEVEL
+     * @see ACAMERA_SENSOR_MAX_ANALOG_SENSITIVITY
+     * @see ACAMERA_SENSOR_OPTICAL_BLACK_REGIONS
+     * @see ACAMERA_SENSOR_REFERENCE_ILLUMINANT1
+     * @see ACAMERA_SENSOR_REFERENCE_ILLUMINANT2
+     */
+    ACAMERA_REQUEST_AVAILABLE_CAPABILITIES_LOGICAL_MULTI_CAMERA      = 11,
+
+    /**
+     * <p>The camera device is a monochrome camera that doesn't contain a color filter array,
+     * and for YUV_420_888 stream, the pixel values on U and V planes are all 128.</p>
+     * <p>A MONOCHROME camera must support the guaranteed stream combinations required for
+     * its device level and capabilities. Additionally, if the monochrome camera device
+     * supports Y8 format, all mandatory stream combination requirements related to {@link AIMAGE_FORMAT_YUV_420_888 YUV_420_888} apply
+     * to {@link AIMAGE_FORMAT_Y8 Y8} as well. There are no
+     * mandatory stream combination requirements with regard to
+     * {@link AIMAGE_FORMAT_Y8 Y8} for Bayer camera devices.</p>
+     * <p>Starting from Android Q, the SENSOR_INFO_COLOR_FILTER_ARRANGEMENT of a MONOCHROME
+     * camera will be either MONO or NIR.</p>
+     */
+    ACAMERA_REQUEST_AVAILABLE_CAPABILITIES_MONOCHROME                = 12,
+
+    /**
+     * <p>The camera device is capable of writing image data into a region of memory
+     * inaccessible to Android userspace or the Android kernel, and only accessible to
+     * trusted execution environments (TEE).</p>
+     */
+    ACAMERA_REQUEST_AVAILABLE_CAPABILITIES_SECURE_IMAGE_DATA         = 13,
 
 } acamera_metadata_enum_android_request_available_capabilities_t;
 
@@ -6395,6 +7775,81 @@ typedef enum acamera_metadata_enum_acamera_scaler_cropping_type {
     ACAMERA_SCALER_CROPPING_TYPE_FREEFORM                            = 1,
 
 } acamera_metadata_enum_android_scaler_cropping_type_t;
+
+// ACAMERA_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS
+typedef enum acamera_metadata_enum_acamera_scaler_available_recommended_stream_configurations {
+    /**
+     * <p>Preview must only include non-stalling processed stream configurations with
+     * output formats like
+     * {@link AIMAGE_FORMAT_YUV_420_888 },
+     * {@link AIMAGE_FORMAT_PRIVATE }, etc.</p>
+     */
+    ACAMERA_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS_PREVIEW
+                                                                      = 0x0,
+
+    /**
+     * <p>Video record must include stream configurations that match the advertised
+     * supported media profiles <a href="https://developer.android.com/reference/android/media/CamcorderProfile.html">CamcorderProfile</a> with
+     * IMPLEMENTATION_DEFINED format.</p>
+     */
+    ACAMERA_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS_RECORD
+                                                                      = 0x1,
+
+    /**
+     * <p>Video snapshot must include stream configurations at least as big as
+     * the maximum RECORD resolutions and only with
+     * {@link AIMAGE_FORMAT_JPEG JPEG output format}.
+     * Additionally the configurations shouldn't cause preview glitches and also be able to
+     * run at 30 fps.</p>
+     */
+    ACAMERA_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS_VIDEO_SNAPSHOT
+                                                                      = 0x2,
+
+    /**
+     * <p>Recommended snapshot stream configurations must include at least one with
+     * size close to ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE and
+     * {@link AIMAGE_FORMAT_JPEG JPEG output format}.
+     * Taking into account restrictions on aspect ratio, alignment etc. the area of the
+     * maximum suggested size shouldn’t be less than 97% of the sensor array size area.</p>
+     *
+     * @see ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE
+     */
+    ACAMERA_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS_SNAPSHOT
+                                                                      = 0x3,
+
+    /**
+     * <p>If supported, recommended input stream configurations must only be advertised with
+     * ZSL along with other processed and/or stalling output formats.</p>
+     */
+    ACAMERA_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS_ZSL   = 0x4,
+
+    /**
+     * <p>If supported, recommended raw stream configurations must only include RAW based
+     * output formats.</p>
+     */
+    ACAMERA_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS_RAW   = 0x5,
+
+    /**
+     * <p>If supported, the recommended low latency stream configurations must have
+     * end-to-end latency that does not exceed 200 ms. under standard operating conditions
+     * (reasonable light levels, not loaded system) and using template
+     * TEMPLATE_STILL_CAPTURE. This is primarily for listing configurations for the
+     * {@link AIMAGE_FORMAT_JPEG JPEG output format}
+     * however other supported output formats can be added as well.</p>
+     */
+    ACAMERA_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS_LOW_LATENCY_SNAPSHOT
+                                                                      = 0x6,
+
+    ACAMERA_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS_PUBLIC_END
+                                                                      = 0x7,
+
+    /**
+     * <p>Vendor defined use cases. These depend on the vendor implementation.</p>
+     */
+    ACAMERA_SCALER_AVAILABLE_RECOMMENDED_STREAM_CONFIGURATIONS_VENDOR_START
+                                                                      = 0x18,
+
+} acamera_metadata_enum_android_scaler_available_recommended_stream_configurations_t;
 
 
 // ACAMERA_SENSOR_REFERENCE_ILLUMINANT1
@@ -6572,6 +8027,21 @@ typedef enum acamera_metadata_enum_acamera_sensor_info_color_filter_arrangement 
      */
     ACAMERA_SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_RGB                 = 4,
 
+    /**
+     * <p>Sensor doesn't have any Bayer color filter.
+     * Such sensor captures visible light in monochrome. The exact weighting and
+     * wavelengths captured is not specified, but generally only includes the visible
+     * frequencies. This value implies a MONOCHROME camera.</p>
+     */
+    ACAMERA_SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_MONO                = 5,
+
+    /**
+     * <p>Sensor has a near infrared filter capturing light with wavelength between
+     * roughly 750nm and 1400nm, and the same filter covers the whole sensor array. This
+     * value implies a MONOCHROME camera.</p>
+     */
+    ACAMERA_SENSOR_INFO_COLOR_FILTER_ARRANGEMENT_NIR                 = 6,
+
 } acamera_metadata_enum_android_sensor_info_color_filter_arrangement_t;
 
 // ACAMERA_SENSOR_INFO_TIMESTAMP_SOURCE
@@ -6590,8 +8060,8 @@ typedef enum acamera_metadata_enum_acamera_sensor_info_timestamp_source {
 
     /**
      * <p>Timestamps from ACAMERA_SENSOR_TIMESTAMP are in the same timebase as
-     * <a href="https://developer.android.com/reference/android/os/SystemClock.html#elapsedRealtimeNanos">elapsedRealtimeNanos</a>
-     * (or CLOCK_BOOTTIME), and they can be compared to other timestamps using that base.</p>
+     * <a href="https://developer.android.com/reference/android/os/SystemClock.html#elapsedRealtimeNanos">SystemClock#elapsedRealtimeNanos</a>,
+     * and they can be compared to other timestamps using that base.</p>
      *
      * @see ACAMERA_SENSOR_TIMESTAMP
      */
@@ -6702,6 +8172,26 @@ typedef enum acamera_metadata_enum_acamera_statistics_lens_shading_map_mode {
 
 } acamera_metadata_enum_android_statistics_lens_shading_map_mode_t;
 
+// ACAMERA_STATISTICS_OIS_DATA_MODE
+typedef enum acamera_metadata_enum_acamera_statistics_ois_data_mode {
+    /**
+     * <p>Do not include OIS data in the capture result.</p>
+     */
+    ACAMERA_STATISTICS_OIS_DATA_MODE_OFF                             = 0,
+
+    /**
+     * <p>Include OIS data in the capture result.</p>
+     * <p>ACAMERA_STATISTICS_OIS_TIMESTAMPS, ACAMERA_STATISTICS_OIS_X_SHIFTS,
+     * and ACAMERA_STATISTICS_OIS_Y_SHIFTS provide OIS data in the output result metadata.</p>
+     *
+     * @see ACAMERA_STATISTICS_OIS_TIMESTAMPS
+     * @see ACAMERA_STATISTICS_OIS_X_SHIFTS
+     * @see ACAMERA_STATISTICS_OIS_Y_SHIFTS
+     */
+    ACAMERA_STATISTICS_OIS_DATA_MODE_ON                              = 1,
+
+} acamera_metadata_enum_android_statistics_ois_data_mode_t;
+
 
 
 // ACAMERA_TONEMAP_MODE
@@ -6776,7 +8266,7 @@ typedef enum acamera_metadata_enum_acamera_info_supported_hardware_level {
      * <p>This camera device does not have enough capabilities to qualify as a <code>FULL</code> device or
      * better.</p>
      * <p>Only the stream configurations listed in the <code>LEGACY</code> and <code>LIMITED</code> tables in the
-     * {@link ACameraDevice_createCaptureSession} documentation are guaranteed to be supported.</p>
+     * {@link ACameraDevice_createCaptureSession createCaptureSession} documentation are guaranteed to be supported.</p>
      * <p>All <code>LIMITED</code> devices support the <code>BACKWARDS_COMPATIBLE</code> capability, indicating basic
      * support for color image capture. The only exception is that the device may
      * alternatively support only the <code>DEPTH_OUTPUT</code> capability, if it can only output depth
@@ -6802,7 +8292,7 @@ typedef enum acamera_metadata_enum_acamera_info_supported_hardware_level {
     /**
      * <p>This camera device is capable of supporting advanced imaging applications.</p>
      * <p>The stream configurations listed in the <code>FULL</code>, <code>LEGACY</code> and <code>LIMITED</code> tables in the
-     * {@link ACameraDevice_createCaptureSession} documentation are guaranteed to be supported.</p>
+     * {@link ACameraDevice_createCaptureSession createCaptureSession} documentation are guaranteed to be supported.</p>
      * <p>A <code>FULL</code> device will support below capabilities:</p>
      * <ul>
      * <li><code>BURST_CAPTURE</code> capability (ACAMERA_REQUEST_AVAILABLE_CAPABILITIES contains
@@ -6829,8 +8319,7 @@ typedef enum acamera_metadata_enum_acamera_info_supported_hardware_level {
 
     /**
      * <p>This camera device is running in backward compatibility mode.</p>
-     * <p>Only the stream configurations listed in the <code>LEGACY</code> table in the {@link
-     * ACameraDevice_createCaptureSession} documentation are supported.</p>
+     * <p>Only the stream configurations listed in the <code>LEGACY</code> table in the {@link ACameraDevice_createCaptureSession createCaptureSession} documentation are supported.</p>
      * <p>A <code>LEGACY</code> device does not support per-frame control, manual sensor control, manual
      * post-processing, arbitrary cropping regions, and has relaxed performance constraints.
      * No additional capabilities beyond <code>BACKWARD_COMPATIBLE</code> will ever be listed by a
@@ -6841,6 +8330,7 @@ typedef enum acamera_metadata_enum_acamera_info_supported_hardware_level {
      * fire the flash for flash power metering during precapture, and then fire the flash
      * for the final capture, if a flash is available on the device and the AE mode is set to
      * enable the flash.</p>
+     * <p>Devices that initially shipped with Android version <a href="https://developer.android.com/reference/android/os/Build.VERSION_CODES.html#Q">Q</a> or newer will not include any LEGACY-level devices.</p>
      *
      * @see ACAMERA_CONTROL_AE_PRECAPTURE_TRIGGER
      * @see ACAMERA_REQUEST_AVAILABLE_CAPABILITIES
@@ -6851,9 +8341,7 @@ typedef enum acamera_metadata_enum_acamera_info_supported_hardware_level {
      * <p>This camera device is capable of YUV reprocessing and RAW data capture, in addition to
      * FULL-level capabilities.</p>
      * <p>The stream configurations listed in the <code>LEVEL_3</code>, <code>RAW</code>, <code>FULL</code>, <code>LEGACY</code> and
-     * <code>LIMITED</code> tables in the {@link
-     * ACameraDevice_createCaptureSession}
-     * documentation are guaranteed to be supported.</p>
+     * <code>LIMITED</code> tables in the {@link ACameraDevice_createCaptureSession createCaptureSession} documentation are guaranteed to be supported.</p>
      * <p>The following additional capabilities are guaranteed to be supported:</p>
      * <ul>
      * <li><code>YUV_REPROCESSING</code> capability (ACAMERA_REQUEST_AVAILABLE_CAPABILITIES contains
@@ -6865,6 +8353,37 @@ typedef enum acamera_metadata_enum_acamera_info_supported_hardware_level {
      * @see ACAMERA_REQUEST_AVAILABLE_CAPABILITIES
      */
     ACAMERA_INFO_SUPPORTED_HARDWARE_LEVEL_3                          = 3,
+
+    /**
+     * <p>This camera device is backed by an external camera connected to this Android device.</p>
+     * <p>The device has capability identical to a LIMITED level device, with the following
+     * exceptions:</p>
+     * <ul>
+     * <li>The device may not report lens/sensor related information such as<ul>
+     * <li>ACAMERA_LENS_FOCAL_LENGTH</li>
+     * <li>ACAMERA_LENS_INFO_HYPERFOCAL_DISTANCE</li>
+     * <li>ACAMERA_SENSOR_INFO_PHYSICAL_SIZE</li>
+     * <li>ACAMERA_SENSOR_INFO_WHITE_LEVEL</li>
+     * <li>ACAMERA_SENSOR_BLACK_LEVEL_PATTERN</li>
+     * <li>ACAMERA_SENSOR_INFO_COLOR_FILTER_ARRANGEMENT</li>
+     * <li>ACAMERA_SENSOR_ROLLING_SHUTTER_SKEW</li>
+     * </ul>
+     * </li>
+     * <li>The device will report 0 for ACAMERA_SENSOR_ORIENTATION</li>
+     * <li>The device has less guarantee on stable framerate, as the framerate partly depends
+     *   on the external camera being used.</li>
+     * </ul>
+     *
+     * @see ACAMERA_LENS_FOCAL_LENGTH
+     * @see ACAMERA_LENS_INFO_HYPERFOCAL_DISTANCE
+     * @see ACAMERA_SENSOR_BLACK_LEVEL_PATTERN
+     * @see ACAMERA_SENSOR_INFO_COLOR_FILTER_ARRANGEMENT
+     * @see ACAMERA_SENSOR_INFO_PHYSICAL_SIZE
+     * @see ACAMERA_SENSOR_INFO_WHITE_LEVEL
+     * @see ACAMERA_SENSOR_ORIENTATION
+     * @see ACAMERA_SENSOR_ROLLING_SHUTTER_SKEW
+     */
+    ACAMERA_INFO_SUPPORTED_HARDWARE_LEVEL_EXTERNAL                   = 4,
 
 } acamera_metadata_enum_android_info_supported_hardware_level_t;
 
@@ -6952,8 +8471,73 @@ typedef enum acamera_metadata_enum_acamera_depth_depth_is_exclusive {
 
 } acamera_metadata_enum_android_depth_depth_is_exclusive_t;
 
+// ACAMERA_DEPTH_AVAILABLE_DYNAMIC_DEPTH_STREAM_CONFIGURATIONS
+typedef enum acamera_metadata_enum_acamera_depth_available_dynamic_depth_stream_configurations {
+    ACAMERA_DEPTH_AVAILABLE_DYNAMIC_DEPTH_STREAM_CONFIGURATIONS_OUTPUT
+                                                                      = 0,
+
+    ACAMERA_DEPTH_AVAILABLE_DYNAMIC_DEPTH_STREAM_CONFIGURATIONS_INPUT
+                                                                      = 1,
+
+} acamera_metadata_enum_android_depth_available_dynamic_depth_stream_configurations_t;
 
 
-#endif //_NDK_CAMERA_METADATA_TAGS_H
+// ACAMERA_LOGICAL_MULTI_CAMERA_SENSOR_SYNC_TYPE
+typedef enum acamera_metadata_enum_acamera_logical_multi_camera_sensor_sync_type {
+    /**
+     * <p>A software mechanism is used to synchronize between the physical cameras. As a result,
+     * the timestamp of an image from a physical stream is only an approximation of the
+     * image sensor start-of-exposure time.</p>
+     */
+    ACAMERA_LOGICAL_MULTI_CAMERA_SENSOR_SYNC_TYPE_APPROXIMATE        = 0,
+
+    /**
+     * <p>The camera device supports frame timestamp synchronization at the hardware level,
+     * and the timestamp of a physical stream image accurately reflects its
+     * start-of-exposure time.</p>
+     */
+    ACAMERA_LOGICAL_MULTI_CAMERA_SENSOR_SYNC_TYPE_CALIBRATED         = 1,
+
+} acamera_metadata_enum_android_logical_multi_camera_sensor_sync_type_t;
+
+
+// ACAMERA_DISTORTION_CORRECTION_MODE
+typedef enum acamera_metadata_enum_acamera_distortion_correction_mode {
+    /**
+     * <p>No distortion correction is applied.</p>
+     */
+    ACAMERA_DISTORTION_CORRECTION_MODE_OFF                           = 0,
+
+    /**
+     * <p>Lens distortion correction is applied without reducing frame rate
+     * relative to sensor output. It may be the same as OFF if distortion correction would
+     * reduce frame rate relative to sensor.</p>
+     */
+    ACAMERA_DISTORTION_CORRECTION_MODE_FAST                          = 1,
+
+    /**
+     * <p>High-quality distortion correction is applied, at the cost of
+     * possibly reduced frame rate relative to sensor output.</p>
+     */
+    ACAMERA_DISTORTION_CORRECTION_MODE_HIGH_QUALITY                  = 2,
+
+} acamera_metadata_enum_android_distortion_correction_mode_t;
+
+
+// ACAMERA_HEIC_AVAILABLE_HEIC_STREAM_CONFIGURATIONS
+typedef enum acamera_metadata_enum_acamera_heic_available_heic_stream_configurations {
+    ACAMERA_HEIC_AVAILABLE_HEIC_STREAM_CONFIGURATIONS_OUTPUT         = 0,
+
+    ACAMERA_HEIC_AVAILABLE_HEIC_STREAM_CONFIGURATIONS_INPUT          = 1,
+
+} acamera_metadata_enum_android_heic_available_heic_stream_configurations_t;
+
+
+
+#endif /* __ANDROID_API__ >= 24 */
+
+__END_DECLS
+
+#endif /* _NDK_CAMERA_METADATA_TAGS_H */
 
 /** @} */

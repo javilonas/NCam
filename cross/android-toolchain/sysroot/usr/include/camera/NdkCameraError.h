@@ -36,9 +36,11 @@
 #ifndef _NDK_CAMERA_ERROR_H
 #define _NDK_CAMERA_ERROR_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <sys/cdefs.h>
+
+__BEGIN_DECLS
+
+#if __ANDROID_API__ >= 24
 
 typedef enum {
     ACAMERA_OK = 0,
@@ -104,7 +106,8 @@ typedef enum {
 
     /**
      * Camera device does not support the stream configuration provided by application in
-     * {@link ACameraDevice_createCaptureSession}.
+     * {@link ACameraDevice_createCaptureSession} or {@link
+     * ACameraDevice_isSessionConfigurationSupported}.
      */
     ACAMERA_ERROR_STREAM_CONFIGURE_FAIL = ACAMERA_ERROR_BASE - 9,
 
@@ -128,13 +131,17 @@ typedef enum {
      * The application does not have permission to open camera.
      */
     ACAMERA_ERROR_PERMISSION_DENIED     = ACAMERA_ERROR_BASE - 13,
+
+    /**
+     * The operation is not supported by the camera device.
+     */
+    ACAMERA_ERROR_UNSUPPORTED_OPERATION = ACAMERA_ERROR_BASE - 14,
 } camera_status_t;
 
+#endif /* __ANDROID_API__ >= 24 */
 
-#ifdef __cplusplus
-} // extern "C"
-#endif
+__END_DECLS
 
-#endif // _NDK_CAMERA_ERROR_H
+#endif /* _NDK_CAMERA_ERROR_H */
 
 /** @} */

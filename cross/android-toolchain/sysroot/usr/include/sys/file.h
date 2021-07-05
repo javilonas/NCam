@@ -25,14 +25,27 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#ifndef _SYS_FILE_H_
-#define _SYS_FILE_H_
+
+#pragma once
+
+/**
+ * @file sys/file.h
+ * @brief The flock() function.
+ */
 
 #include <sys/cdefs.h>
 #include <sys/types.h>
 
-/* ANDROID: needed for flock() */
-#include <unistd.h>
 #include <fcntl.h>
 
-#endif /* _SYS_FILE_H_ */
+__BEGIN_DECLS
+
+/**
+ * [flock(2)](http://man7.org/linux/man-pages/man2/flock.2.html) performs
+ * advisory file lock operations.
+ *
+ * Returns 0 on success, and returns -1 and sets `errno` on failure.
+ */
+int flock(int __fd, int __op);
+
+__END_DECLS

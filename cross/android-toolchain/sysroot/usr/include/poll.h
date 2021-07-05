@@ -26,8 +26,12 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _POLL_H_
-#define _POLL_H_
+#pragma once
+
+/**
+ * @file poll.h
+ * @brief Wait for events on a set of file descriptors.
+ */
 
 #include <sys/cdefs.h>
 #include <linux/poll.h>
@@ -36,11 +40,46 @@
 
 __BEGIN_DECLS
 
+/** The type of a file descriptor count, used by poll() and ppoll(). */
 typedef unsigned int nfds_t;
 
-extern int poll(struct pollfd*, nfds_t, int);
-extern int ppoll(struct pollfd*, nfds_t, const struct timespec*, const sigset_t*);
+/**
+ * [poll(3)](http://man7.org/linux/man-pages/man3/poll.3.html) waits on a set of file descriptors.
+ *
+ * Returns the number of ready file descriptors on success, 0 for timeout,
+ * and returns -1 and sets `errno` on failure.
+ */
+int poll(struct pollfd* _Nullable __fds, nfds_t __count, int __timeout_ms);
+
+/**
+ * [ppoll(3)](http://man7.org/linux/man-pages/man3/ppoll.3.html) waits on a set of file descriptors
+ * or a signal. Set `__timeout` to null for no timeout. Set `__mask` to null to not set the signal
+ * mask.
+ *
+ * Returns the number of ready file descriptors on success, 0 for timeout,
+ * and returns -1 and sets `errno` on failure.
+ *
+ * Available since API level 28.
+ */
+
+#if __ANDROID_API__ >= 21
+int ppoll(struct pollfd* _Nullable __fds, nfds_t __count, const struct timespec* _Nullable __timeout, const sigset_t* _Nullable __mask) __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
+
+
+/**
+ * Like ppoll() but allows setting a signal mask with RT signals even from a 32-bit process.
+ */
+
+#if __ANDROID_API__ >= 28
+int ppoll64(struct pollfd* _Nullable  __fds, nfds_t __count, const struct timespec* _Nullable __timeout, const sigset64_t* _Nullable __mask) __INTRODUCED_IN(28);
+#endif /* __ANDROID_API__ >= 28 */
+
+
+#if defined(__BIONIC_INCLUDE_FORTIFY_HEADERS)
+#define _POLL_H_
+#include <bits/fortify/poll.h>
+#undef _POLL_H_
+#endif
 
 __END_DECLS
-
-#endif /* _POLL_H_ */

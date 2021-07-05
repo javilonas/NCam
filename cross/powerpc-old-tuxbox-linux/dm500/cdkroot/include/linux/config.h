@@ -1,1 +1,0 @@
-/home/gf/dreambox/cdk/linux/include/linux/config.h

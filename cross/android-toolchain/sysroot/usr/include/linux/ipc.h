@@ -20,55 +20,43 @@
 #define _UAPI_LINUX_IPC_H
 #include <linux/types.h>
 #define IPC_PRIVATE ((__kernel_key_t) 0)
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
-struct ipc_perm
-{
- __kernel_key_t key;
- __kernel_uid_t uid;
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
- __kernel_gid_t gid;
- __kernel_uid_t cuid;
- __kernel_gid_t cgid;
- __kernel_mode_t mode;
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
- unsigned short seq;
+struct __kernel_legacy_ipc_perm {
+  __kernel_key_t key;
+  __kernel_uid_t uid;
+  __kernel_gid_t gid;
+  __kernel_uid_t cuid;
+  __kernel_gid_t cgid;
+  __kernel_mode_t mode;
+  unsigned short seq;
 };
 #include <asm/ipcbuf.h>
 #define IPC_CREAT 00001000
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
 #define IPC_EXCL 00002000
 #define IPC_NOWAIT 00004000
 #define IPC_DIPC 00010000
 #define IPC_OWN 00020000
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
 #define IPC_RMID 0
 #define IPC_SET 1
 #define IPC_STAT 2
 #define IPC_INFO 3
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
 #define IPC_OLD 0
 #define IPC_64 0x0100
 struct ipc_kludge {
- struct msgbuf __user *msgp;
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
- long msgtyp;
+  struct msgbuf __user * msgp;
+  long msgtyp;
 };
 #define SEMOP 1
 #define SEMGET 2
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
 #define SEMCTL 3
 #define SEMTIMEDOP 4
 #define MSGSND 11
 #define MSGRCV 12
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
 #define MSGGET 13
 #define MSGCTL 14
 #define SHMAT 21
 #define SHMDT 22
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
 #define SHMGET 23
 #define SHMCTL 24
 #define DIPC 25
-#define IPCCALL(version,op) ((version)<<16 | (op))
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
+#define IPCCALL(version,op) ((version) << 16 | (op))
 #endif

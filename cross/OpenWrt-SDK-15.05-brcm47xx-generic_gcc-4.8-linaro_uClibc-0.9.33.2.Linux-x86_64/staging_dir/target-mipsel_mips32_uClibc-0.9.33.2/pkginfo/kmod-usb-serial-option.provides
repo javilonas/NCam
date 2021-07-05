@@ -1,6 +1,0 @@
-nls_base.ko
-option.ko
-usb-common.ko
-usb_wwan.ko
-usbcore.ko
-usbserial.ko

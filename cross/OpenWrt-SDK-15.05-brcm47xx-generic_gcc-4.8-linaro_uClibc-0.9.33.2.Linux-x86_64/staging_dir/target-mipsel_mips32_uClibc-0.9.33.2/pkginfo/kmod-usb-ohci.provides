@@ -1,7 +1,0 @@
-bcma-hcd.ko
-nls_base.ko
-ohci-hcd.ko
-ohci-platform.ko
-ssb-hcd.ko
-usb-common.ko
-usbcore.ko

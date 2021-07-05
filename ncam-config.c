@@ -15,15 +15,15 @@
 
 extern uint16_t len4caid[256];
 
-#define cs_srid             "ncam.srvid"
-#define cs_ratelimit        "ncam.ratelimit"
-#define cs_trid             "ncam.tiers"
-#define cs_l4ca             "ncam.guess"
-#define cs_sidt             "ncam.services"
-#define cs_whitelist        "ncam.whitelist"
-#define cs_provid           "ncam.provid"
-#define cs_fakecws          "ncam.fakecws"
-#define cs_twin             "ncam.twin"
+#define cs_srid      "ncam.srvid"
+#define cs_ratelimit "ncam.ratelimit"
+#define cs_trid      "ncam.tiers"
+#define cs_l4ca      "ncam.guess"
+#define cs_sidt      "ncam.services"
+#define cs_whitelist "ncam.whitelist"
+#define cs_provid    "ncam.provid"
+#define cs_fakecws   "ncam.fakecws"
+#define cs_twin      "ncam.twin"
 
 uint32_t cfg_sidtab_generation = 1;
 
@@ -392,9 +392,9 @@ int32_t init_provid(void)
 
 	cs_writelock(__func__, &config_lock);
 
-	//this allows reloading of provids, so cleanup of old data is needed:
-	last_provid = cfg.provid; //old data
-	cfg.provid = new_cfg_provid; //assign after loading, so everything is in memory
+	// this allows reloading of provids, so cleanup of old data is needed:
+	last_provid = cfg.provid; // old data
+	cfg.provid = new_cfg_provid; // assign after loading, so everything is in memory
 
 	cs_writeunlock(__func__, &config_lock);
 
@@ -407,7 +407,7 @@ int32_t init_provid(void)
 	if(last_provid)
 	{
 		ptr = last_provid;
-		while(ptr)    //cleanup old data:
+		while(ptr) // cleanup old data:
 		{
 			add_garbage(ptr->provid);
 			nptr = ptr->next;
@@ -498,19 +498,19 @@ int32_t init_srvid(void)
 		}
 
 		// allow empty strings as "||"
-		if(payload[0] == '|' && (strlen(payload)+2 < max_payload_length))
+		if(payload[0] == '|' && (strlen(payload) + 2 < max_payload_length))
 		{
 			memmove(payload+1, payload, strlen(payload)+1);
 			payload[0] = ' ';
 		}
 
-		for(k=1; ((k < max_payload_length) && (payload[k] != '\0')); k++)
+		for(k = 1; ((k < max_payload_length) && (payload[k] != '\0')); k++)
 		{
-			if(payload[k-1] == '|' && payload[k] == '|')
+			if(payload[k - 1] == '|' && payload[k] == '|')
 			{
-				if(strlen(payload+k)+2 < max_payload_length-k)
+				if(strlen(payload + k) + 2 < max_payload_length-k)
 				{
-					memmove(payload+k+1, payload+k, strlen(payload+k)+1);
+					memmove(payload + k + 1, payload + k, strlen(payload + k) + 1);
 					payload[k] = ' ';
 				}
 				else
@@ -633,15 +633,15 @@ int32_t init_srvid(void)
 					if(!cs_malloc(&srvid->caid[i].provid, sizeof(uint32_t) * srvid->caid[i].nprovid))
 					{
 						for(j = 0; j < i; j++)
-							{ NULLFREE(srvid->caid[j].provid); } 
+							{ NULLFREE(srvid->caid[j].provid); }
 						NULLFREE(srvid->caid);
 						NULLFREE(tmpptr);
 						NULLFREE(srvid);
 						return 0;
 					}
 
-					ptr2 = prov+1;
-					for(j = 0;  j < srvid->caid[i].nprovid; j++)
+					ptr2 = prov + 1;
+					for(j = 0; j < srvid->caid[i].nprovid; j++)
 					{
 						srvid->caid[i].provid[j] = dyn_word_atob(ptr2) & 0xFFFFFF;
 						ptr2 = ptr2 + strlen(ptr2) + 1;
@@ -649,7 +649,7 @@ int32_t init_srvid(void)
 				}
 				else
 				{
-					ptr2 = prov+2;
+					ptr2 = prov + 2;
 				}
 
 				prov[0] = '\0';
@@ -658,7 +658,7 @@ int32_t init_srvid(void)
 			srvid->caid[i].caid = dyn_word_atob(ptr1) & 0xFFFF;
 			if(prov)
 				{ ptr1 = ptr2; }
-			else 
+			else
 				{ ptr1 = ptr1 + strlen(ptr1) + 1; }
 		}
 
@@ -687,11 +687,12 @@ int32_t init_srvid(void)
 		if(nr > 2000)
 		{
 			cs_log("WARNING: You risk high CPU load and high ECM times with more than 2000 service-id's!");
+			cs_log("HINT: --> use optimized lists from http://www.streamboard.tv/wiki/Srvid");
 		}
 	}
 
 	cs_writelock(__func__, &config_lock);
-	//this allows reloading of srvids, so cleanup of old data is needed:
+	// this allows reloading of srvids, so cleanup of old data is needed:
 	memcpy(last_srvid, cfg.srvid, sizeof(last_srvid));  //old data
 	memcpy(cfg.srvid, new_cfg_srvid, sizeof(last_srvid));   //assign after loading, so everything is in memory
 
@@ -706,7 +707,7 @@ int32_t init_srvid(void)
 	for(i = 0; i < 16; i++)
 	{
 		ptr = last_srvid[i];
-		while(ptr)    //cleanup old data:
+		while(ptr) // cleanup old data:
 		{
 			for(j = 0; j < ptr->ncaid; j++)
 				{ add_garbage(ptr->caid[j].provid); }
@@ -725,7 +726,7 @@ int32_t init_fakecws(void)
 {
 	int32_t nr = 0, i, j, idx;
 	uint32_t alloccount[0x100], count[0x100], tmp, max_compares = 0, average_compares = 0;
-	char *token, cw_string[64]; 
+	char *token, cw_string[64];
 	uint8_t cw[16], wrong_checksum, c, have_fakecw = 0;
 	FILE *fp;
 
@@ -733,7 +734,7 @@ int32_t init_fakecws(void)
 	memset(count, 0, sizeof(alloccount));
 
 	cs_writelock(__func__, &config_lock);
-	for(i=0; i<0x100; i++)
+	for(i = 0; i < 0x100; i++)
 	{
 		cfg.fakecws[i].count = 0;
 		NULLFREE(cfg.fakecws[i].data);
@@ -756,7 +757,7 @@ int32_t init_fakecws(void)
 				if(cs_atob(cw, cw_string, 16) == 16)
 				{
 					wrong_checksum = 0;
-					
+
 					for(i = 0; i < 16; i += 4)
 					{
 						c = ((cw[i] + cw[i + 1] + cw[i + 2]) & 0xff);
@@ -772,7 +773,7 @@ int32_t init_fakecws(void)
 					}
 					else
 					{
-						idx = ((cw[0]&0xF)<<4) | (cw[8]&0xF);
+						idx = ((cw[0] & 0xF) << 4) | (cw[8] & 0xF);
 						alloccount[idx]++;
 						have_fakecw = 1;
 					}
@@ -796,7 +797,7 @@ int32_t init_fakecws(void)
 		return 0;
 	}
 
-	for(i=0; i<0x100; i++)
+	for(i = 0; i < 0x100; i++)
 	{
 		if(alloccount[i] && !cs_malloc(&cfg.fakecws[i].data, sizeof(struct s_cw)*alloccount[i]))
 		{
@@ -815,7 +816,7 @@ int32_t init_fakecws(void)
 				if(cs_atob(cw, cw_string, 16) == 16)
 				{
 					wrong_checksum = 0;
-					
+
 					for(i = 0; i < 16; i += 4)
 					{
 						c = ((cw[i] + cw[i + 1] + cw[i + 2]) & 0xff);
@@ -827,7 +828,7 @@ int32_t init_fakecws(void)
 
 					if(!wrong_checksum)
 					{
-						idx = ((cw[0]&0xF)<<4) | (cw[8]&0xF);
+						idx = ((cw[0] & 0xF) << 4) | (cw[8] & 0xF);
 
 						if(count[idx] < alloccount[idx])
 						{
@@ -847,31 +848,38 @@ int32_t init_fakecws(void)
 	if(nr > 0)
 		{ cs_log("%d fakecws's loaded", nr); }
 
+
 	cs_writelock(__func__, &config_lock);
-	for(i=0; i<0x100; i++)
+	for(i = 0; i < 0x100; i++)
 	{
 		cfg.fakecws[i].count = count[i];
 	}
 	cs_writeunlock(__func__, &config_lock);
 
-	for(i=0; i<0x100; i++)
+
+	for(i = 0; i < 0x100; i++)
 	{
 		if(count[i] > max_compares)
 			{ max_compares = count[i]; }
 	}
 
-	for(i=0; i<(0x100-1); i++) {
-		for(j=i+1; j<0x100; j++) {
-			if(count[j] < count[i]) {
+	for(i = 0; i < (0x100 - 1); i++)
+	{
+		for(j = i + 1; j < 0x100; j++)
+		{
+			if(count[j] < count[i])
+			{
 				tmp = count[i];
 				count[i] = count[j];
 				count[j] = tmp;
 			}
 		}
 	}
-	average_compares = ((count[0x100/2] + count[0x100/2 - 1]) / 2);
+	average_compares = ((count[0x100 / 2] + count[0x100 / 2 - 1]) / 2);
+
 
 	cs_log("max %d fakecw compares required, on average: %d compares", max_compares, average_compares);
+
 	return 0;
 }
 
@@ -919,8 +927,8 @@ static struct s_rlimit *ratelimit_read_int(void)
 		}
 
 		count++;
-		if (ratelimittime < 60) ratelimittime *=1000;
-		if (srvidholdtime < 60) srvidholdtime *=1000;
+		if (ratelimittime < 60) ratelimittime *= 1000;
+		if (srvidholdtime < 60) srvidholdtime *= 1000;
 		entry->rl.caid = caid;
 		entry->rl.provid = provid;
 		entry->rl.srvid = srvid;
@@ -930,7 +938,7 @@ static struct s_rlimit *ratelimit_read_int(void)
 		entry->rl.srvidholdtime = srvidholdtime;
 
 		cs_log_dbg(D_TRACE, "ratelimit: %04X@%06X:%04X:%04X:%d:%d:%d", entry->rl.caid, entry->rl.provid, entry->rl.srvid, entry->rl.chid,
-					  entry->rl.ratelimitecm, entry->rl.ratelimittime, entry->rl.srvidholdtime);
+					entry->rl.ratelimitecm, entry->rl.ratelimittime, entry->rl.srvidholdtime);
 
 		if(!new_rlimit)
 		{
@@ -1043,7 +1051,7 @@ int32_t init_tierid(void)
 		{
 			tierid->caid[i] = dyn_word_atob(ptr1);
 			tierid->ncaid = i + 1;
-			// cs_log("ld caid: %04X tierid: %04X name: %s",tierid->caid[i],tierid->tierid,tierid->name);
+			//cs_log("ld caid: %04X tierid: %04X name: %s",tierid->caid[i],tierid->tierid,tierid->name);
 		}
 		nr++;
 	}
@@ -1052,7 +1060,7 @@ int32_t init_tierid(void)
 	if(nr > 0)
 		{ cs_log("%d tier-id's loaded", nr); }
 	cs_writelock(__func__, &config_lock);
-	//reload function:
+	// reload function:
 	tierid = cfg.tierid;
 	cfg.tierid = new_cfg_tierid;
 	struct s_tierid *ptr;
@@ -1085,7 +1093,7 @@ int32_t chk_global_whitelist(ECM_REQUEST *er, uint32_t *line)
 
 	struct s_global_whitelist *entry;
 
-	//check mapping:
+	// check mapping:
 	if(cfg.global_whitelist_use_m)
 	{
 		entry = cfg.global_whitelist;
@@ -1105,7 +1113,7 @@ int32_t chk_global_whitelist(ECM_REQUEST *er, uint32_t *line)
 		}
 	}
 
-	if(cfg.global_whitelist_use_l)    //Check caid/prov/srvid etc matching, except ecm-len:
+	if(cfg.global_whitelist_use_l) // Check caid/prov/srvid etc matching, except ecm-len:
 	{
 		entry = cfg.global_whitelist;
 		int8_t caidprov_matches = 0;
@@ -1119,10 +1127,10 @@ int32_t chk_global_whitelist(ECM_REQUEST *er, uint32_t *line)
 					return 1;
 				}
 				if((!entry->caid || entry->caid == er->caid)
-						&& (!entry->provid || entry->provid == er->prid)
-						&& (!entry->srvid || entry->srvid == er->srvid)
-						&& (!entry->chid || entry->chid == er->chid)
-						&& (!entry->pid || entry->pid == er->pid))
+					&& (!entry->provid || entry->provid == er->prid)
+					&& (!entry->srvid || entry->srvid == er->srvid)
+					&& (!entry->chid || entry->chid == er->chid)
+					&& (!entry->pid || entry->pid == er->pid))
 				{
 					caidprov_matches = 1;
 					*line = entry->line;
@@ -1130,7 +1138,7 @@ int32_t chk_global_whitelist(ECM_REQUEST *er, uint32_t *line)
 			}
 			entry = entry->next;
 		}
-		if(caidprov_matches)  //...but not ecm-len!
+		if(caidprov_matches) // ...but not ecm-len!
 			{ return 0; }
 	}
 
@@ -1168,7 +1176,7 @@ static struct s_global_whitelist *global_whitelist_read_int(void)
 		{ return NULL; }
 
 	char token[1024], str1[1024];
-	unsigned char type;
+	uint8_t type;
 	int32_t i, ret, count = 0;
 	struct s_global_whitelist *new_whitelist = NULL, *entry, *last = NULL;
 	uint32_t line = 0;
@@ -1254,11 +1262,11 @@ static struct s_global_whitelist *global_whitelist_read_int(void)
 					{ cfg.global_whitelist_use_l = 1; }
 
 				if(type == 'm')
-					cs_log_dbg(D_TRACE,
-								  "whitelist: %c: %04X@%06X:%04X:%04X:%04X:%02X map to %04X@%06X", entry->type, entry->caid, entry->provid, entry->srvid, entry->pid, entry->chid, entry->ecmlen, entry->mapcaid, entry->mapprovid);
+					cs_log_dbg(D_TRACE, "whitelist: %c: %04X@%06X:%04X:%04X:%04X:%02X map to %04X@%06X",
+								entry->type, entry->caid, entry->provid, entry->srvid, entry->pid, entry->chid, entry->ecmlen, entry->mapcaid, entry->mapprovid);
 				else
-					cs_log_dbg(D_TRACE,
-								  "whitelist: %c: %04X@%06X:%04X:%04X:%04X:%02X", entry->type, entry->caid, entry->provid, entry->srvid, entry->pid, entry->chid, entry->ecmlen);
+					cs_log_dbg(D_TRACE, "whitelist: %c: %04X@%06X:%04X:%04X:%04X:%02X",
+								entry->type, entry->caid, entry->provid, entry->srvid, entry->pid, entry->chid, entry->ecmlen);
 
 				if(!new_whitelist)
 				{
@@ -1287,7 +1295,6 @@ static struct s_global_whitelist *global_whitelist_read_int(void)
 
 void global_whitelist_read(void)
 {
-
 	struct s_global_whitelist *entry, *old_list;
 
 	old_list = cfg.global_whitelist;
@@ -1374,18 +1381,20 @@ static struct s_twin *twin_read_int(void)
 		}
 
 		uint32_t caid = 0, provid = 0, srvid = 0, deg = 0, freq = 0;
-//		char hdeg[4], hfreq[4], hsrvid[4];
+		//char hdeg[4], hfreq[4], hsrvid[4];
 		memset(str1, 0, sizeof(str1));
 
 		ret = sscanf(token, "%4x:%6x:%d:%d:%d", &caid, &provid, &deg, &freq, &srvid);
 		if(ret < 1) { continue; }
-// 		snprintf(hdeg, 4, "%x", deg);
-// 		sscanf(hdeg, "%4x", &deg);
-// 		snprintf(hfreq, 4, "%x", freq);
-// 		sscanf(hfreq, "%4x", &freq);
-// 		snprintf(hsrvid, 4, "%x", srvid);
-// 		sscanf(hsrvid, "%4x", &srvid);
+
+		//snprintf(hdeg, 4, "%x", deg);
+		//sscanf(hdeg, "%4x", &deg);
+		//snprintf(hfreq, 4, "%x", freq);
+		//sscanf(hfreq, "%4x", &freq);
+		//snprintf(hsrvid, 4, "%x", srvid);
+		//sscanf(hsrvid, "%4x", &srvid);
 		strncat(str1, ",", sizeof(str1) - strlen(str1) - 1);
+
 		if(!cs_malloc(&entry, sizeof(struct s_twin)))
 		{
 			fclose(fp);
@@ -1399,8 +1408,8 @@ static struct s_twin *twin_read_int(void)
 		entry->tw.deg = deg;
 		entry->tw.freq = freq;
 
-		cs_debug_mask(D_TRACE, "channel: %04X:%06X:%d:%d:%d", entry->tw.caid, entry->tw.provid, entry->tw.deg,
-					  entry->tw.freq, entry->tw.srvid);
+		cs_debug_mask(D_TRACE, "channel: %04X:%06X:%d:%d:%d", entry->tw.caid,
+						entry->tw.provid, entry->tw.deg, entry->tw.freq, entry->tw.srvid);
 
 		if(!new_twin)
 		{
@@ -1576,11 +1585,14 @@ void * read_cccamcfg(int32_t mode)
 	int32_t port,ret;
 	int32_t caid,prid;
 
-	if(!readed_cccamcfg)
-		cs_log("load CCcam config file: %s", cfg.cc_cfgfile);
-
 	if(!cfg.cc_cfgfile || (mode != CCCAMCFGREADER && mode != CCCAMCFGUSER))
 		return NULL;
+
+	if (!strncmp(cfg.cc_cfgfile, "(null)", 6))
+		return NULL;
+
+	if(!readed_cccamcfg)
+		cs_log("load CCcam config file: %s",cfg.cc_cfgfile);
 
 	readed_cccamcfg=1;
 
@@ -1599,24 +1611,15 @@ void * read_cccamcfg(int32_t mode)
 			*p='\0';
 		strncpy(line,trim(token),MAXLINESIZE-1);
 		if(!line[0])continue;
-		if((line[0] == 'N' || line[0] == 'C' || line[0] == 'L' || line[0] == 'R' ) && line[1] == ':' && (mode == CCCAMCFGREADER)){
+		if((line[0] == 'C' || line[0] == 'L' || line[0] == 'N' || line[0] == 'R' ) && line[1] == ':' && (mode == CCCAMCFGREADER)){
 
 			int32_t paracount=0;
 			char * proto=0;
 			ret=0;
 			unsigned int ncd_key[14];
-			memset(ncd_key, 0, sizeof(ncd_key));
+			memset(ncd_key,0,sizeof(ncd_key));
 			int32_t reshare=-1;
 			switch(line[0]){
-				case 'N':
-					//proto = "newcamd|newcamd524|newcamd525|mgcamd|cccam";
-					proto = "newcamd";
-					ret=sscanf(line,"%c:%s%d%s%s%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%d",&typ,host,&port,uname,upass,
-						&ncd_key[0], &ncd_key[1], &ncd_key[2], &ncd_key[3],&ncd_key[4],
-						&ncd_key[5], &ncd_key[6], &ncd_key[7], &ncd_key[8],&ncd_key[9],
-						&ncd_key[10],&ncd_key[11],&ncd_key[12],&ncd_key[13],&reshare);
-					paracount=5;
-					break;
 				case 'C':
 					proto = "cccam";
 					ret=sscanf(line,"%c:%s%d%s%s",&typ,host,&port,uname,upass);
@@ -1625,6 +1628,14 @@ void * read_cccamcfg(int32_t mode)
 				case 'L':
 					proto = "camd35";
 					ret=sscanf(line,"%c:%s%d%s%s%x%x%d",&typ,host,&port,uname,upass,&caid,&prid,&reshare);
+					paracount=5;
+					break;
+				case 'N':
+					proto = "newcamd";
+					ret=sscanf(line,"%c:%s%d%s%s%x%x%x%x%x%x%x%x%x%x%x%x%x%x%d",&typ,host,&port,uname,upass,
+						&ncd_key[0], &ncd_key[1], &ncd_key[2], &ncd_key[3],&ncd_key[4],
+						&ncd_key[5], &ncd_key[6], &ncd_key[7], &ncd_key[8],&ncd_key[9],
+						&ncd_key[10],&ncd_key[11],&ncd_key[12],&ncd_key[13],&reshare);
 					paracount=5;
 					break;
 				case 'R':
@@ -1651,7 +1662,7 @@ void * read_cccamcfg(int32_t mode)
 				continue;
 
 			if(!cs_malloc(&rdr,sizeof(struct s_reader)))
-				continue;
+					continue;
 
 			memset(rdr, 0, sizeof(struct s_reader));
 

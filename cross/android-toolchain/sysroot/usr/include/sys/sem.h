@@ -29,6 +29,44 @@
 #ifndef _SYS_SEM_H_
 #define _SYS_SEM_H_
 
+#include <sys/cdefs.h>
+#include <sys/ipc.h>
+#include <sys/types.h>
+
+#if defined(__USE_GNU)
+#include <bits/timespec.h>
+#endif
+
 #include <linux/sem.h>
 
-#endif /* _SYS_SEM_H_ */
+__BEGIN_DECLS
+
+#define semid_ds semid64_ds
+
+union semun {
+  int val;
+  struct semid_ds* buf;
+  unsigned short* array;
+  struct seminfo* __buf;
+  void* __pad;
+};
+
+
+#if __ANDROID_API__ >= 26
+int semctl(int __sem_id, int __sem_num, int __cmd, ...) __INTRODUCED_IN(26);
+int semget(key_t __key, int __sem_count, int __flags) __INTRODUCED_IN(26);
+int semop(int __sem_id, struct sembuf* __ops, size_t __op_count) __INTRODUCED_IN(26);
+#endif /* __ANDROID_API__ >= 26 */
+
+
+#if defined(__USE_GNU)
+
+#if __ANDROID_API__ >= 26
+int semtimedop(int __sem_id, struct sembuf* __ops, size_t __op_count, const struct timespec* __timeout) __INTRODUCED_IN(26);
+#endif /* __ANDROID_API__ >= 26 */
+
+#endif
+
+__END_DECLS
+
+#endif

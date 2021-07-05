@@ -25,6 +25,7 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+
 #ifndef _MNTENT_H_
 #define _MNTENT_H_
 
@@ -33,7 +34,17 @@
 #include <paths.h>  /* for _PATH_MOUNTED */
 
 #define MOUNTED _PATH_MOUNTED
+
 #define MNTTYPE_IGNORE "ignore"
+#define MNTTYPE_NFS "nfs"
+#define MNTTYPE_SWAP "swap"
+
+#define MNTOPT_DEFAULTS "defaults"
+#define MNTOPT_NOAUTO "noauto"
+#define MNTOPT_NOSUID "nosuid"
+#define MNTOPT_RO "ro"
+#define MNTOPT_RW "rw"
+#define MNTOPT_SUID "suid"
 
 struct mntent {
   char* mnt_fsname;
@@ -46,10 +57,23 @@ struct mntent {
 
 __BEGIN_DECLS
 
-int endmntent(FILE*);
-struct mntent* getmntent(FILE*);
-struct mntent* getmntent_r(FILE*, struct mntent*, char*, int);
-FILE* setmntent(const char*, const char*);
+
+#if __ANDROID_API__ >= 21
+int endmntent(FILE* __fp) __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
+
+struct mntent* getmntent(FILE* __fp);
+
+#if __ANDROID_API__ >= 21
+struct mntent* getmntent_r(FILE* __fp, struct mntent* __entry, char* __buf, int __size) __INTRODUCED_IN(21);
+FILE* setmntent(const char* __filename, const char* __type) __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
+
+
+#if __ANDROID_API__ >= 26
+char* hasmntopt(const struct mntent* __entry, const char* __option) __INTRODUCED_IN(26);
+#endif /* __ANDROID_API__ >= 26 */
+
 
 __END_DECLS
 

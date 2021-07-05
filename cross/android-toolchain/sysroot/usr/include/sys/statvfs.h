@@ -59,11 +59,27 @@ struct statvfs64 { __STATVFS64_BODY };
 #define ST_NODIRATIME  0x0800
 #define ST_RELATIME    0x1000
 
-extern int statvfs(const char* __restrict, struct statvfs* __restrict) __nonnull((1, 2));
-extern int statvfs64(const char* __restrict, struct statvfs64* __restrict) __nonnull((1, 2));
-extern int fstatvfs(int, struct statvfs*) __nonnull((2));
-extern int fstatvfs64(int, struct statvfs64*) __nonnull((2));
+
+#if __ANDROID_API__ >= 19
+int statvfs(const char* __path, struct statvfs* __buf) __INTRODUCED_IN(19);
+#endif /* __ANDROID_API__ >= 19 */
+
+
+#if __ANDROID_API__ >= 21
+int statvfs64(const char* __path, struct statvfs64* __buf) __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
+
+
+#if __ANDROID_API__ >= 19
+int fstatvfs(int __fd, struct statvfs* __buf) __INTRODUCED_IN(19);
+#endif /* __ANDROID_API__ >= 19 */
+
+
+#if __ANDROID_API__ >= 21
+int fstatvfs64(int __fd, struct statvfs64* __buf) __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
+
 
 __END_DECLS
 
-#endif /* _SYS_STATVFS_H_ */
+#endif

@@ -1,3 +1,0 @@
-gpio_keys_polled.ko
-input-core.ko
-input-polldev.ko

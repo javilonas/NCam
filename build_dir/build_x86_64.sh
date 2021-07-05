@@ -20,14 +20,29 @@
 export INIT_TIME=`date +'%d/%m/%y %H:%M:%S'`
 export START_TIME=`date +%s`
 export TIME_LOG=`date +%Y%m%d_%H%M`
-export ROOTFS_PATH=/home/*/NCam
+export user=`id -g -n`
+export ROOTFS_PATH=/home/$user/NCam
 export PARCH_LOGS=$ROOTFS_PATH/build_dir/logs
 export ARCH=x64
 export target=x64
 export NCAM_BIN=ncam.x86_64
 export CROSS=/usr/bin/x86_64-linux-gnu-
+export CC=$ROOTFS_PATH/usr/bin/x86_64-linux-gnu-gcc
+export RANLIB=$ROOTFS_PATH/usr/bin/x86_64-linux-gnu-ranlib
+export PATH="$CROSS:$PATH"
 export DCMAKE=cross-x86_64-tuxbox-linux
 export SCRIPT=build_x86_64.sh
+
+export EXTRA_LIBS="-lrt"
+
+export OPENSSLDIR=$ROOTFS_PATH/usr/include/openssl/
+
+export LIB_RT="$ROOTFS_PATH/usr/lib/x86_64-linux-gnu/librt.a -lrt"
+export LIB_PTHREAD="$ROOTFS_PATH/usr/lib/x86_64-linux-gnu/libpthread.a -lrt"
+export LIBCRYPT="$ROOTFS_PATH/usr/lib/x86_64-linux-gnu/libcrypt.a -lrt"
+
+export LIBCRYPTO="$ROOTFS_PATH/usr/lib/x86_64-linux-gnu/libcrypto.a -lrt"
+export LIB_SSL="$ROOTFS_PATH/usr/lib/x86_64-linux-gnu/libssl.a -lrt"
 
 # BEGIN THE LOG
 cd $PARCH_LOGS/
@@ -58,7 +73,12 @@ echo ""
 echo ""
 rm -f $ROOTFS_PATH/Distribution/$NCAM_BIN > /dev/null 2>&1
 rm -f $ROOTFS_PATH/Distribution/$NCAM_BIN.debug > /dev/null 2>&1
-sh ./clean_all.sh > /dev/null 2>&1
+rm -f $ROOTFS_PATH/webif/pages_gen $ROOTFS_PATH/webif/pages.dep $ROOTFS_PATH/webif/pages.bin $ROOTFS_PATH/webif/pages.bin.compressed \
+      $ROOTFS_PATH/webif/pages.h $ROOTFS_PATH/webif/pages.c $ROOTFS_PATH/webif/is_defined.txt > /dev/null 2>&1
+echo ""
+cd $ROOTFS_PATH/webif
+make clean > /dev/null 2>&1
+cd ..
 sleep 0.8s
 sync
 echo " Cleaning performed correctly"

@@ -64,14 +64,16 @@ static int nm_cmp( DH_NUMBERS *c1, DH_NUMBERS *c2 )
 static void nm_assign( DH_NUMBERS *d, DH_NUMBERS *s )
 {
 	int l;
+
 	if (s == d)
 		return;
 
-	if ( (l = s->length) )
+	if ((l = s->length))
 		memcpy( d->values, s->values, sizeof(uint16_t) * l);
 
 	d->length = l;
 }
+
 
 static int n_sub( uint16_t *p1, uint16_t *p2, uint16_t *p3, int l, int lo )
 {
@@ -334,8 +336,9 @@ static void nm_mult( DH_NUMBERS *m1, DH_NUMBERS *m2, DH_NUMBERS *d )
 	ld = 0;
 	for (lc = 0, vp = id, p1 = d->values; lc++ < l;)
 	{
-		if ( (*p1++ = *vp++) )
-		    ld = lc;
+		if (( *p1++ = *vp++ )) {
+			ld = lc;
+		}
 	}
 
 	d->length = ld;

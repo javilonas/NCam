@@ -26,17 +26,40 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _SYS_FSUID_H_
-#define _SYS_FSUID_H_
+#pragma once
+
+/**
+ * @file sys/fsuid.h
+ * @brief Set UID/GID for filesystem checks.
+ */
 
 #include <sys/cdefs.h>
 #include <sys/types.h>
 
 __BEGIN_DECLS
 
-extern int setfsuid(uid_t);
-extern int setfsgid(gid_t);
+/**
+ * [setfsuid(2)](http://man7.org/linux/man-pages/man2/setfsuid.2.html) sets the UID used for
+ * filesystem checks.
+ *
+ * Returns the previous UID.
+ *
+ * Available since API level 21.
+ */
+
+#if __ANDROID_API__ >= 21
+int setfsuid(uid_t __uid) __INTRODUCED_IN(21);
+
+/**
+ * [setfsgid(2)](http://man7.org/linux/man-pages/man2/setfsgid.2.html) sets the GID used for
+ * filesystem checks.
+ *
+ * Returns the previous GID.
+ *
+ * Available since API level 21.
+ */
+int setfsgid(gid_t __gid) __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
+
 
 __END_DECLS
-
-#endif /* _SYS_FSUID_H_ */

@@ -1,0 +1,256 @@
+
+
+Extra Libraries for Various Platforms
+=====================================
+
+1. Concept
+2. Source Code Layout
+3. Predefined Macros
+4. Notes
+
+
+
+
+
+--------------------------------------------------------------------------------
+1. Concept
+--------------------------------------------------------------------------------
+
+    There are many requests from various SOC teams to integrate the platform-
+dependent-optimized routines into the Marvell GCC Toolchain.  Most of them are
+memory handling routines, such as "memcpy", "memset", "strcmp", etc.  There are
+no good reasons to merge all of them into the standard library, especially libc,
+and make things worse if we do so.  It's better to stand these routines alone
+for the users who need them.
+
+    We don't change the standard libraries, and let users select alternative
+platform-dependent-optimized routines and replace the standard ones.  Take
+an example.  There is a special tuned "libmrvl.a" containing "memcpy".  Users
+can link this extra library first instead of the libc.
+
+	$ arm-marvell-eabi-gcc foo.c -lmrvl
+
+    Since the extra libraries are tuned for some platforms especially, users
+should know what correct platforms they are tuned for.  Different extra
+libraries may not be suitable for each platform and misusing maybe make the
+program running slowly or crash even more worse.
+
+    We would collect all the extra library packages including the source,
+"Makefile", "README", "testsuite", etc, and place them in the source tree of
+the Marvell GCC Toolchain:
+
+	${MARVELL_TOOLCHAIN_SOURCE}/src/extra-src/${EXTRA_SOURCE}/
+
+"${MARVELL_TOOLCHAIN_SOURCE}" is the path of the source and scripts of the
+Marvell GCC Toolchain.  "${EXTRA_SOURCE}" is the path name of the extra
+package tuned for a special platform.
+
+    The toolchain's building script will invoke "make" to build the extra
+static libraries and copy them to the Marvell GCC Toolchain installing path.
+E.g.
+
+	${MARVELL_TOOLCHAIN_INSTALL}/armv5-marvell-eabi-softfp_x86_64/
+	arm-marvell-eabi/lib/lib${EXTRA}.a
+
+"${MARVELL_TOOLCHAIN_INSTALL}" is the installing path of the Marvell GCC
+Toolchain.  "lib${EXTRA}.a", e.g. "libmrvl.a" example, is the static tuned
+library.  After that, users can link it by adding "-l${EXTRA}" option to link
+these extra routines.
+
+    For simplicity, this work may only support the extra static library with
+the ARM (i.e. non-thumb) code of the platform-dependent-optimized routines.
+These routines are tuned for the various SOC targets and would take the place
+of some routines from the native standard libraries.
+
+
+
+
+
+--------------------------------------------------------------------------------
+2. Source Code Layout
+--------------------------------------------------------------------------------
+
+    All of the extra package are collected to the ${EXTRA_SOURCE} subdirectory.
+The below listing shows where the extra source code is:
+
+    ${MARVELL_TOOLCHAIN_SOURCE}	# Marvell-tuned GCC C/C++ Compiler Source Code
+    |
+    +-- script                  # Building scripts and documents
+    |
+    +-- src
+    |   |
+    |   +-- ...-src		# Individual package source, e.g. gcc,
+    |   |			# binutils, glibc, etc.
+    |   |
+    |   +-- extra-src		# Collection of all extra packages from various
+    |       |			# SOC teams.
+    |       |
+    |       +-- README		# i.e. this document.
+    |       |
+    |       +-- ${EXTRA_SOURCE}	# The extra package.
+    |       |   |
+    |       |   +-- README	# Document of this extra library.
+    |       |   |
+    |       |   +-- Makefile	# "make" script
+    |       |   |
+    |       |   +-- *.s, *.S, *.c, *.C, ...
+    |       |   |		# Source code, or puts them in the subdirectory.
+    |       |   |
+    |       |   +-- testsuite	# Subdirectory for test cases and running
+    |       |			# scripts.
+    |       |
+    |       +-- ...		# Another extra package for alternative SOC.
+    |
+    +-- Release			# Toolchain's building and installing paths.
+        +-- build
+        +-- install
+
+    The "${EXTRA_SOURCE}" should provide "Makefile" for building and detail
+"README" document.  After all the packages of the Marvell GCC Toolchain are
+built completely, the building script would copy the whole "${EXTRA_SOURCE}"
+source tree to the "Release/build" subdirectory, changes to that directory and
+executes the following command:
+
+	$ CC="${MARVELL_TOOLS}-gcc" \
+          CXX="${MARVELL_TOOLS}-g++" \
+          AS="${MARVELL_TOOLS}-as" \
+          LD="${MARVELL_TOOLS}-ld" \
+          RANLIB="${MARVELL_TOOLS}-ranlib" \
+          AR="${MARVELL_TOOLS}-ar" \
+          TOOLS="${MARVELL_TOOLS}" \
+          make
+
+    The building script doesn't know how to build the extra packages, and only
+pass the tool names to "make".  "Makefile" directs everything.
+"${MARVELL_TOOLS}" may be the prefix of installed bin with the full path, e.g. 
+
+	$ export MARVELL_TOOLS=/tools/Release/install/armv7-marvell-eabi-softfp_x86_64/bin/arm-marvell-eabi
+
+If anything is O.K., there sould be new generated static "lib*.a" files.  The
+building script would copy them to the toolchain's installing directory.
+
+    Note that the names of the generated "lib*.a" cannot conflict with the
+existing libraries, e.g. "libc.a", "libm.a", etc.  I suggest that the prefix
+name is leading with "libmrvl-", i.e. "libmrvl-${EXTRA}.a".
+
+    For O.S. execution environment, e.g. Linux, the extra libraries should be
+compiled to PIC code if they are linked into the shared library.
+
+
+
+
+
+--------------------------------------------------------------------------------
+3. Predefined Macros
+--------------------------------------------------------------------------------
+
+    The extra library may only be compiled and used under some limited
+conditions.  The programmers should consider the following conditions:
+
+	0. ARMv5te, ARMv7a, or others
+	1. ARM code, THUMB1 or THUMB2 code
+	   (We may only support ARM code now.)
+	2. non-VFP, VFP variants (e.g. v3-d16, v3, v4), NEON, WMMXT
+	   or Marvell-defined instructions
+	3. linux-gnueabi or eabi
+	4. soft, softfp or hard floating-abi
+	5. little-endian, big-endian including BE32 and BE8
+	6. non-PIC or PIC code
+	   (We may only support non-PIC code now.)
+	7. ..., etc.
+
+    The authors of the extra library may use gcc's predefined macros to limit
+the compiled code.  Use the following command to see all of the gcc's
+predefined macros:
+
+	$ echo | ${MARVELL_TOOLS}-gcc -E -dM -
+
+    The following predefined macros may be useful for coding:
+
+. ARM arch5te v.s. arch7a
+
+#define __ARM_ARCH_5TE__ 1	/* for arch5te */
+#define __ARM_ARCH_7A__ 1	/* for arch7a */
+
+. -mfloat-abi=soft
+
+#define __ARM_PCS 1		/* -mfloat-abi=soft/softfp */
+#define __SOFTFP__ 1		/* for non-VFP/NEON */
+
+. -mfloat-abi=softfp
+
+#define __ARM_PCS 1		/* -mfloat-abi=soft/softfp */
+
+. -mfloat-abi=hard
+
+#define __ARM_PCS_VFP 1		/* --mfloat-abi=hard */
+
+. Thumb code
+
+#define __thumb__ 1		/* for thumb1 or thumb2 code */
+#define __thumb2__ 1		/* only for Thumb2 code */
+
+. Little endian v.s. big endian
+
+#define __ARMEL__ 1		/* for Little endian */
+#define __ARMEB__ 1		/* for BE32 of arch-v5 or BE8 of arch-v7 */
+
+. VFP support
+
+#define __VFP_FP__ 1
+
+. NEON support
+
+#define __ARM_NEON__ 1
+
+. WMMX support
+
+#define __ARM_IWMMXT__ 1
+
+
+
+
+
+--------------------------------------------------------------------------------
+4. Notes
+--------------------------------------------------------------------------------
+
+. The extra packages are used to replace some routines of the standard
+  libraries, especially for "libc.a" or "libm.a".  Please don't put other
+  non-standard routines to them.
+
+
+. The document of the extra package, i.e. "${EXTRA_SOURCE}/README", should
+  describe this extra package detailly, including:
+
+  - About the author, email address, SOC teams, etc..
+
+  - For what platform, execution environment, usage, limitation, and other
+    detail description.
+
+  - How to run the test cases in the "${EXTRA_SOURCE}/testsuite/" subdirectory.
+
+
+. "${EXTRA_SOURCE}/testsuite/" subdirectory should provide the test cases and
+  running scripts for QA.
+
+
+. It's better if "${EXTRA_SOURCE}/Makefile" provides "$ make clean" command to
+  cleanup generated files including object, ar, intermediate files, etc.
+
+
+. If the extra library wants to replace some standard C routines, follow
+  the ANSI C requirement.  For example:
+
+	void *memcpy(void *dest, const void *src, size_t n);
+
+  "memcpy" must return the pointer "dest".
+
+
+. Because the extra libraries are very very special for various targets on
+  different execution environments, users should make sense about the correct
+  usage on the correct environments.  For an example, it may be O.K. for eabi,
+  but not for linux-gnueabi.
+
+
+

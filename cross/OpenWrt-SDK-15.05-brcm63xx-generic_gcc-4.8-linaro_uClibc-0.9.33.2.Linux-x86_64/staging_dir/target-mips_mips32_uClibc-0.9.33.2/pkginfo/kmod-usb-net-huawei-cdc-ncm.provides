@@ -1,7 +1,0 @@
-cdc-wdm.ko
-cdc_ncm.ko
-huawei_cdc_ncm.ko
-nls_base.ko
-usb-common.ko
-usbcore.ko
-usbnet.ko

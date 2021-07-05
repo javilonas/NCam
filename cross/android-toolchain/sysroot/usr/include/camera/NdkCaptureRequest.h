@@ -32,16 +32,19 @@
  * Do not reference types that are not part of the NDK.
  * Do not #include files that aren't part of the NDK.
  */
-#include <android/native_window.h>
+
+#include <sys/cdefs.h>
+
 #include "NdkCameraError.h"
 #include "NdkCameraMetadata.h"
+#include "NdkCameraWindowType.h"
 
 #ifndef _NDK_CAPTURE_REQUEST_H
 #define _NDK_CAPTURE_REQUEST_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+__BEGIN_DECLS
+
+#if __ANDROID_API__ >= 24
 
 // Container for output targets
 typedef struct ACameraOutputTargets ACameraOutputTargets;
@@ -98,7 +101,8 @@ typedef struct ACaptureRequest ACaptureRequest;
  *
  * @see ACaptureRequest_addTarget
  */
-camera_status_t ACameraOutputTarget_create(ANativeWindow* window, ACameraOutputTarget** output);
+camera_status_t ACameraOutputTarget_create(ACameraWindowType* window,
+        ACameraOutputTarget** output) __INTRODUCED_IN(24);
 
 /**
  * Free a ACameraOutputTarget object.
@@ -107,7 +111,7 @@ camera_status_t ACameraOutputTarget_create(ANativeWindow* window, ACameraOutputT
  *
  * @see ACameraOutputTarget_create
  */
-void ACameraOutputTarget_free(ACameraOutputTarget* output);
+void ACameraOutputTarget_free(ACameraOutputTarget* output) __INTRODUCED_IN(24);
 
 /**
  * Add an {@link ACameraOutputTarget} object to {@link ACaptureRequest}.
@@ -120,7 +124,7 @@ void ACameraOutputTarget_free(ACameraOutputTarget* output);
  *         <li>{@link ACAMERA_ERROR_INVALID_PARAMETER} if request or output is NULL.</li></ul>
  */
 camera_status_t ACaptureRequest_addTarget(ACaptureRequest* request,
-        const ACameraOutputTarget* output);
+        const ACameraOutputTarget* output) __INTRODUCED_IN(24);
 
 /**
  * Remove an {@link ACameraOutputTarget} object from {@link ACaptureRequest}.
@@ -135,7 +139,7 @@ camera_status_t ACaptureRequest_addTarget(ACaptureRequest* request,
  *         <li>{@link ACAMERA_ERROR_INVALID_PARAMETER} if request or output is NULL.</li></ul>
  */
 camera_status_t ACaptureRequest_removeTarget(ACaptureRequest* request,
-        const ACameraOutputTarget* output);
+        const ACameraOutputTarget* output) __INTRODUCED_IN(24);
 
 /**
  * Get a metadata entry from input {@link ACaptureRequest}.
@@ -155,7 +159,7 @@ camera_status_t ACaptureRequest_removeTarget(ACaptureRequest* request,
  *             entry of input tag value.</li></ul>
  */
 camera_status_t ACaptureRequest_getConstEntry(
-        const ACaptureRequest* request, uint32_t tag, ACameraMetadata_const_entry* entry);
+        const ACaptureRequest* request, uint32_t tag, ACameraMetadata_const_entry* entry) __INTRODUCED_IN(24);
 
 /*
  * List all the entry tags in input {@link ACaptureRequest}.
@@ -176,7 +180,7 @@ camera_status_t ACaptureRequest_getConstEntry(
  *         <li>{@link ACAMERA_ERROR_UNKNOWN} if the method fails for some other reasons.</li></ul>
  */
 camera_status_t ACaptureRequest_getAllTags(
-        const ACaptureRequest* request, /*out*/int32_t* numTags, /*out*/const uint32_t** tags);
+        const ACaptureRequest* request, /*out*/int32_t* numTags, /*out*/const uint32_t** tags) __INTRODUCED_IN(24);
 
 /**
  * Set/change a camera capture control entry with unsigned 8 bits data type.
@@ -195,7 +199,7 @@ camera_status_t ACaptureRequest_getAllTags(
  *             the tag is not controllable by application.</li></ul>
  */
 camera_status_t ACaptureRequest_setEntry_u8(
-        ACaptureRequest* request, uint32_t tag, uint32_t count, const uint8_t* data);
+        ACaptureRequest* request, uint32_t tag, uint32_t count, const uint8_t* data) __INTRODUCED_IN(24);
 
 /**
  * Set/change a camera capture control entry with signed 32 bits data type.
@@ -214,7 +218,7 @@ camera_status_t ACaptureRequest_setEntry_u8(
  *             the tag is not controllable by application.</li></ul>
  */
 camera_status_t ACaptureRequest_setEntry_i32(
-        ACaptureRequest* request, uint32_t tag, uint32_t count, const int32_t* data);
+        ACaptureRequest* request, uint32_t tag, uint32_t count, const int32_t* data) __INTRODUCED_IN(24);
 
 /**
  * Set/change a camera capture control entry with float data type.
@@ -233,7 +237,7 @@ camera_status_t ACaptureRequest_setEntry_i32(
  *             the tag is not controllable by application.</li></ul>
  */
 camera_status_t ACaptureRequest_setEntry_float(
-        ACaptureRequest* request, uint32_t tag, uint32_t count, const float* data);
+        ACaptureRequest* request, uint32_t tag, uint32_t count, const float* data) __INTRODUCED_IN(24);
 
 /**
  * Set/change a camera capture control entry with signed 64 bits data type.
@@ -252,7 +256,7 @@ camera_status_t ACaptureRequest_setEntry_float(
  *             the tag is not controllable by application.</li></ul>
  */
 camera_status_t ACaptureRequest_setEntry_i64(
-        ACaptureRequest* request, uint32_t tag, uint32_t count, const int64_t* data);
+        ACaptureRequest* request, uint32_t tag, uint32_t count, const int64_t* data) __INTRODUCED_IN(24);
 
 /**
  * Set/change a camera capture control entry with double data type.
@@ -271,7 +275,7 @@ camera_status_t ACaptureRequest_setEntry_i64(
  *             the tag is not controllable by application.</li></ul>
  */
 camera_status_t ACaptureRequest_setEntry_double(
-        ACaptureRequest* request, uint32_t tag, uint32_t count, const double* data);
+        ACaptureRequest* request, uint32_t tag, uint32_t count, const double* data) __INTRODUCED_IN(24);
 
 /**
  * Set/change a camera capture control entry with rational data type.
@@ -291,19 +295,284 @@ camera_status_t ACaptureRequest_setEntry_double(
  */
 camera_status_t ACaptureRequest_setEntry_rational(
         ACaptureRequest* request, uint32_t tag, uint32_t count,
-        const ACameraMetadata_rational* data);
+        const ACameraMetadata_rational* data) __INTRODUCED_IN(24);
 
 /**
  * Free a {@link ACaptureRequest} structure.
  *
  * @param request the {@link ACaptureRequest} to be freed.
  */
-void ACaptureRequest_free(ACaptureRequest* request);
+void ACaptureRequest_free(ACaptureRequest* request) __INTRODUCED_IN(24);
 
-#ifdef __cplusplus
-} // extern "C"
-#endif
+#endif /* __ANDROID_API__ >= 24 */
 
-#endif // _NDK_CAPTURE_REQUEST_H
+#if __ANDROID_API__ >= 28
+
+/**
+ * Associate an arbitrary user context pointer to the {@link ACaptureRequest}
+ *
+ * This method is useful for user to identify the capture request in capture session callbacks.
+ * The context is NULL for newly created request.
+ * {@link ACameraOutputTarget_free} will not free the context. Also calling this method twice
+ * will not cause the previous context be freed.
+ * Also note that calling this method after the request has been sent to capture session will not
+ * change the context pointer in the capture callbacks.
+ *
+ * @param request the {@link ACaptureRequest} of interest.
+ * @param context the user context pointer to be associated with this capture request.
+ *
+ * @return <ul>
+ *         <li>{@link ACAMERA_OK} if the method call succeeds.</li>
+ *         <li>{@link ACAMERA_ERROR_INVALID_PARAMETER} if request is NULL.</li></ul>
+ */
+camera_status_t ACaptureRequest_setUserContext(
+        ACaptureRequest* request, void* context) __INTRODUCED_IN(28);
+
+/**
+ * Get the user context pointer of the {@link ACaptureRequest}
+ *
+ * This method is useful for user to identify the capture request in capture session callbacks.
+ * The context is NULL for newly created request.
+ *
+ * @param request the {@link ACaptureRequest} of interest.
+ * @param context the user context pointer of this capture request.
+ *
+ * @return <ul>
+ *         <li>{@link ACAMERA_OK} if the method call succeeds.</li>
+ *         <li>{@link ACAMERA_ERROR_INVALID_PARAMETER} if request is NULL.</li></ul>
+ */
+camera_status_t ACaptureRequest_getUserContext(
+        const ACaptureRequest* request, /*out*/void** context) __INTRODUCED_IN(28);
+
+/**
+ * Create a copy of input {@link ACaptureRequest}.
+ *
+ * <p>The returned ACaptureRequest must be freed by the application by {@link ACaptureRequest_free}
+ * after application is done using it.</p>
+ *
+ * @param src the input {@link ACaptureRequest} to be copied.
+ *
+ * @return a valid ACaptureRequest pointer or NULL if the input request cannot be copied.
+ */
+ACaptureRequest* ACaptureRequest_copy(const ACaptureRequest* src) __INTRODUCED_IN(28);
+
+#endif /* __ANDROID_API__ >= 28 */
+
+#if __ANDROID_API__ >= 29
+
+/**
+ * Get a metadata entry from input {@link ACaptureRequest} for
+ * a physical camera backing a logical multi-camera device.
+ *
+ * <p>Same as ACaptureRequest_getConstEntry, except that if the key is contained
+ * in {@link ACAMERA_REQUEST_AVAILABLE_PHYSICAL_CAMERA_REQUEST_KEYS}, this function
+ * returns the entry set by ACaptureRequest_setEntry_physicalCamera_* class of
+ * functions on the particular physical camera.</p>
+ *
+ * @param request the {@link ACaptureRequest} of interest created by
+ *                {@link ACameraDevice_createCaptureRequest_withPhysicalIds}.
+ * @param physicalId one of the physical Ids used when request is created with
+ *                   {@link ACameraDevice_createCaptureRequest_withPhysicalIds}.
+ * @param tag the capture request metadata tag in
+ *            {@link ACAMERA_REQUEST_AVAILABLE_PHYSICAL_CAMERA_REQUEST_KEYS}
+ *            that is set by ACaptureRequest_setEntry_physicalCamera_* class of functions.
+ *
+ * @return <ul>
+ *         <li>{@link ACAMERA_OK} if the method call succeeds.</li>
+ *         <li>{@link ACAMERA_ERROR_INVALID_PARAMETER} if metadata, physicalId, or entry is NULL,
+ *         physicalId is not one of the Ids used in creating the request, or if the capture
+ *         request is a regular request with no physical Ids at all.</li>
+ *         <li>{@link ACAMERA_ERROR_METADATA_NOT_FOUND} if the capture request does not contain an
+ *             entry of input tag value.</li></ul>
+ */
+camera_status_t ACaptureRequest_getConstEntry_physicalCamera(
+        const ACaptureRequest* request, const char* physicalId, uint32_t tag,
+        ACameraMetadata_const_entry* entry) __INTRODUCED_IN(29);
+
+/**
+ * Set/change a camera capture control entry with unsigned 8 bits data type for
+ * a physical camera backing a logical multi-camera device.
+ *
+ * <p>Same as ACaptureRequest_setEntry_u8, except that if {@link tag} is contained
+ * in {@link ACAMERA_REQUEST_AVAILABLE_PHYSICAL_CAMERA_REQUEST_KEYS}, this function
+ * sets the entry for a particular physical sub-camera backing the logical multi-camera.
+ * If {@link tag} is not contained in
+ * {@link ACAMERA_REQUEST_AVAILABLE_PHYSICAL_CAMERA_REQUEST_KEYS}, the key will be ignored
+ * by the camera device.</p>
+ *
+ * @param request the {@link ACaptureRequest} of interest created by
+ *                {@link ACameraDevice_createCaptureRequest_withPhysicalIds}.
+ * @param physicalId one of the physical Ids used when request is created with
+ *                   {@link ACameraDevice_createCaptureRequest_withPhysicalIds}.
+ * @param tag one of the capture request metadata tags in
+ *            {@link ACAMERA_REQUEST_AVAILABLE_PHYSICAL_CAMERA_REQUEST_KEYS}.
+ *
+ * @return <ul>
+ *         <li>{@link ACAMERA_OK} if the method call succeeds.</li>
+ *         <li>{@link ACAMERA_ERROR_INVALID_PARAMETER} if request or physicalId is NULL, count is
+ *             larger than zero while data is NULL, the data type of the tag is not unsigned 8 bits,
+ *             the tag is not controllable by application, physicalId is not one of the Ids used
+ *             in creating the request, or if the capture request is a regular request with no
+ *             physical Ids at all.</li></ul>
+ */
+camera_status_t ACaptureRequest_setEntry_physicalCamera_u8(
+        ACaptureRequest* request, const char* physicalId, uint32_t tag,
+        uint32_t count, const uint8_t* data) __INTRODUCED_IN(29);
+
+/**
+ * Set/change a camera capture control entry with signed 32 bits data type for
+ * a physical camera of a logical multi-camera device.
+ *
+ * <p>Same as ACaptureRequest_setEntry_i32, except that if {@link tag} is contained
+ * in {@link ACAMERA_REQUEST_AVAILABLE_PHYSICAL_CAMERA_REQUEST_KEYS}, this function
+ * sets the entry for a particular physical sub-camera backing the logical multi-camera.
+ * If {@link tag} is not contained in
+ * {@link ACAMERA_REQUEST_AVAILABLE_PHYSICAL_CAMERA_REQUEST_KEYS}, the key will be ignored
+ * by the camera device.</p>
+ *
+ * @param request the {@link ACaptureRequest} of interest created by
+ *                {@link ACameraDevice_createCaptureRequest_withPhysicalIds}.
+ * @param physicalId one of the physical Ids used when request is created with
+ *                   {@link ACameraDevice_createCaptureRequest_withPhysicalIds}.
+ * @param tag one of the capture request metadata tags in
+ *            {@link ACAMERA_REQUEST_AVAILABLE_PHYSICAL_CAMERA_REQUEST_KEYS}.
+ *
+ * @return <ul>
+ *         <li>{@link ACAMERA_OK} if the method call succeeds.</li>
+ *         <li>{@link ACAMERA_ERROR_INVALID_PARAMETER} if request or physicalId is NULL, count is
+ *             larger than zero while data is NULL, the data type of the tag is not signed 32 bits,
+ *             the tag is not controllable by application, physicalId is not one of the Ids used
+ *             in creating the request, or if the capture request is a regular request with no
+ *             physical Ids at all.</li></ul>
+ */
+camera_status_t ACaptureRequest_setEntry_physicalCamera_i32(
+        ACaptureRequest* request, const char* physicalId, uint32_t tag,
+        uint32_t count, const int32_t* data) __INTRODUCED_IN(29);
+
+/**
+ * Set/change a camera capture control entry with float data type for
+ * a physical camera of a logical multi-camera device.
+ *
+ * <p>Same as ACaptureRequest_setEntry_float, except that if {@link tag} is contained
+ * in {@link ACAMERA_REQUEST_AVAILABLE_PHYSICAL_CAMERA_REQUEST_KEYS}, this function
+ * sets the entry for a particular physical sub-camera backing the logical multi-camera.
+ * If {@link tag} is not contained in
+ * {@link ACAMERA_REQUEST_AVAILABLE_PHYSICAL_CAMERA_REQUEST_KEYS}, the key will be ignored
+ * by the camera device.</p>
+ *
+ * @param request the {@link ACaptureRequest} of interest created by
+ *                {@link ACameraDevice_createCaptureRequest_withPhysicalIds}.
+ * @param physicalId one of the physical Ids used when request is created with
+ *                   {@link ACameraDevice_createCaptureRequest_withPhysicalIds}.
+ * @param tag one of the capture request metadata tags in
+ *            {@link ACAMERA_REQUEST_AVAILABLE_PHYSICAL_CAMERA_REQUEST_KEYS}.
+ *
+ * @return <ul>
+ *         <li>{@link ACAMERA_OK} if the method call succeeds.</li>
+ *         <li>{@link ACAMERA_ERROR_INVALID_PARAMETER} if request or physicalId is NULL, count is
+ *             larger than zero while data is NULL, the data type of the tag is not float,
+ *             the tag is not controllable by application, physicalId is not one of the Ids used
+ *             in creating the request, or if the capture request is a regular request with no
+ *             physical Ids at all.</li></ul>
+ */
+camera_status_t ACaptureRequest_setEntry_physicalCamera_float(
+        ACaptureRequest* request, const char* physicalId, uint32_t tag,
+        uint32_t count, const float* data) __INTRODUCED_IN(29);
+
+/**
+ * Set/change a camera capture control entry with signed 64 bits data type for
+ * a physical camera of a logical multi-camera device.
+ *
+ * <p>Same as ACaptureRequest_setEntry_i64, except that if {@link tag} is contained
+ * in {@link ACAMERA_REQUEST_AVAILABLE_PHYSICAL_CAMERA_REQUEST_KEYS}, this function
+ * sets the entry for a particular physical sub-camera backing the logical multi-camera.
+ * If {@link tag} is not contained in
+ * {@link ACAMERA_REQUEST_AVAILABLE_PHYSICAL_CAMERA_REQUEST_KEYS}, the key will be ignored
+ * by the camera device.</p>
+ *
+ * @param request the {@link ACaptureRequest} of interest created by
+ *                {@link ACameraDevice_createCaptureRequest_withPhysicalIds}.
+ * @param physicalId one of the physical Ids used when request is created with
+ *                   {@link ACameraDevice_createCaptureRequest_withPhysicalIds}.
+ * @param tag one of the capture request metadata tags in
+ *            {@link ACAMERA_REQUEST_AVAILABLE_PHYSICAL_CAMERA_REQUEST_KEYS}.
+ *
+ * @return <ul>
+ *         <li>{@link ACAMERA_OK} if the method call succeeds.</li>
+ *         <li>{@link ACAMERA_ERROR_INVALID_PARAMETER} if request or physicalId is NULL, count is
+ *             larger than zero while data is NULL, the data type of the tag is not signed 64 bits,
+ *             the tag is not controllable by application, physicalId is not one of the Ids used
+ *             in creating the request, or if the capture request is a regular request with no
+ *             physical Ids at all.</li></ul>
+ */
+camera_status_t ACaptureRequest_setEntry_physicalCamera_i64(
+        ACaptureRequest* request, const char* physicalId, uint32_t tag,
+        uint32_t count, const int64_t* data) __INTRODUCED_IN(29);
+
+/**
+ * Set/change a camera capture control entry with double data type for
+ * a physical camera of a logical multi-camera device.
+ *
+ * <p>Same as ACaptureRequest_setEntry_double, except that if {@link tag} is contained
+ * in {@link ACAMERA_REQUEST_AVAILABLE_PHYSICAL_CAMERA_REQUEST_KEYS}, this function
+ * sets the entry for a particular physical sub-camera backing the logical multi-camera.
+ * If {@link tag} is not contained in
+ * {@link ACAMERA_REQUEST_AVAILABLE_PHYSICAL_CAMERA_REQUEST_KEYS}, the key will be ignored
+ * by the camera device.</p>
+ *
+ * @param request the {@link ACaptureRequest} of interest created by
+ *                {@link ACameraDevice_createCaptureRequest_withPhysicalIds}.
+ * @param physicalId one of the physical Ids used when request is created with
+ *                   {@link ACameraDevice_createCaptureRequest_withPhysicalIds}.
+ * @param tag one of the capture request metadata tags in
+ *            {@link ACAMERA_REQUEST_AVAILABLE_PHYSICAL_CAMERA_REQUEST_KEYS}.
+ *
+ * @return <ul>
+ *         <li>{@link ACAMERA_OK} if the method call succeeds.</li>
+ *         <li>{@link ACAMERA_ERROR_INVALID_PARAMETER} if request or physicalId is NULL, count is
+ *             larger than zero while data is NULL, the data type of the tag is not double,
+ *             the tag is not controllable by application, physicalId is not one of the Ids used
+ *             in creating the request, or if the capture request is a regular request with no
+ *             physical Ids at all.</li></ul>
+ */
+camera_status_t ACaptureRequest_setEntry_physicalCamera_double(
+        ACaptureRequest* request, const char* physicalId, uint32_t tag,
+        uint32_t count, const double* data) __INTRODUCED_IN(29);
+
+/**
+ * Set/change a camera capture control entry with rational data type for
+ * a physical camera of a logical multi-camera device.
+ *
+ * <p>Same as ACaptureRequest_setEntry_rational, except that if {@link tag} is contained
+ * in {@link ACAMERA_REQUEST_AVAILABLE_PHYSICAL_CAMERA_REQUEST_KEYS}, this function
+ * sets the entry for a particular physical sub-camera backing the logical multi-camera.
+ * If {@link tag} is not contained in
+ * {@link ACAMERA_REQUEST_AVAILABLE_PHYSICAL_CAMERA_REQUEST_KEYS}, the key will be ignored
+ * by the camera device.</p>
+ *
+ * @param request the {@link ACaptureRequest} of interest created by
+ *                {@link ACameraDevice_createCaptureRequest_withPhysicalIds}.
+ * @param physicalId one of the physical Ids used when request is created with
+ *                   {@link ACameraDevice_createCaptureRequest_withPhysicalIds}.
+ * @param tag one of the capture request metadata tags in
+ *            {@link ACAMERA_REQUEST_AVAILABLE_PHYSICAL_CAMERA_REQUEST_KEYS}.
+ *
+ * @return <ul>
+ *         <li>{@link ACAMERA_OK} if the method call succeeds.</li>
+ *         <li>{@link ACAMERA_ERROR_INVALID_PARAMETER} if request or physicalId is NULL, count is
+ *             larger than zero while data is NULL, the data type of the tag is not rational,
+ *             the tag is not controllable by application, physicalId is not one of the Ids used
+ *             in creating the request, or if the capture request is a regular request with no
+ *             physical Ids at all.</li></ul>
+ */
+camera_status_t ACaptureRequest_setEntry_physicalCamera_rational(
+        ACaptureRequest* request, const char* physicalId, uint32_t tag,
+        uint32_t count, const ACameraMetadata_rational* data) __INTRODUCED_IN(29);
+
+#endif /* __ANDROID_API__ >= 29 */
+
+__END_DECLS
+
+#endif /* _NDK_CAPTURE_REQUEST_H */
 
 /** @} */

@@ -1,3 +1,1 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:499d90f618e39d33115b019acd3382d97fd6d5d314bcb214b37ff40bb6c6336e
-size 6383524
+INPUT(-lunwind -lcompiler_rt-extras -lgcc_real -ldl)

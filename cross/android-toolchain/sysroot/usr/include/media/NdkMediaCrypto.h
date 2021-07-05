@@ -14,6 +14,14 @@
  * limitations under the License.
  */
 
+/**
+ * @addtogroup Media
+ * @{
+ */
+
+/**
+ * @file NdkMediaCrypto.h
+ */
 
 /*
  * This file defines an NDK API.
@@ -28,29 +36,31 @@
 #ifndef _NDK_MEDIA_CRYPTO_H
 #define _NDK_MEDIA_CRYPTO_H
 
+#include <sys/cdefs.h>
 #include <sys/types.h>
 #include <stdbool.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+__BEGIN_DECLS
 
 struct AMediaCrypto;
 typedef struct AMediaCrypto AMediaCrypto;
 
 typedef uint8_t AMediaUUID[16];
 
-bool AMediaCrypto_isCryptoSchemeSupported(const AMediaUUID uuid);
+#if __ANDROID_API__ >= 21
 
-bool AMediaCrypto_requiresSecureDecoderComponent(const char *mime);
+bool AMediaCrypto_isCryptoSchemeSupported(const AMediaUUID uuid) __INTRODUCED_IN(21);
 
-AMediaCrypto* AMediaCrypto_new(const AMediaUUID uuid, const void *initData, size_t initDataSize);
+bool AMediaCrypto_requiresSecureDecoderComponent(const char *mime) __INTRODUCED_IN(21);
 
-void AMediaCrypto_delete(AMediaCrypto* crypto);
+AMediaCrypto* AMediaCrypto_new(const AMediaUUID uuid, const void *initData, size_t initDataSize) __INTRODUCED_IN(21);
 
+void AMediaCrypto_delete(AMediaCrypto* crypto) __INTRODUCED_IN(21);
 
-#ifdef __cplusplus
-} // extern "C"
-#endif
+#endif /* __ANDROID_API__ >= 21 */
+
+__END_DECLS
 
 #endif // _NDK_MEDIA_CRYPTO_H
+
+/** @} */

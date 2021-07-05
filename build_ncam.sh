@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (c) 2017 Javier Sayago <admin@lonasdigital.com>
+# Copyright (c) 2021 Javier Sayago <admin@lonasdigital.com>
 # Contact: javilonas@esp-desarrolladores.com
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 
-version=0.2
+version=0.3
 
 while :
 do
@@ -37,14 +37,17 @@ echo "  5 - Build mips-uclibc (Tiviar Plus and similar)."
 echo "  6 - Build sh4 (Golden Media, Galaxy Innovations, Amiko...)."
 echo "  7 - Build ppc (Power PC - DM600, 7000, 7020, 7020si...)."
 echo "  8 - Build ppc-old (Power PC OLD - DM500, 500S, DBox2...)."
-echo "  9 - Build cortexa9hf-vfp-neon (Cortex-A9 - Wetek, Vu+4k and similar)."
-echo " 10 - Build router-openwrt-brcm47xx.mips (Routers openwrt brcm47xx)."
-echo " 11 - Build router-openwrt-ar71xx.mips (Routers openwrt ar71xx)."
-echo " 12 - Build router-openwrt-brcm63xx.mips (Routers openwrt brcm63xx)."
-echo " 13 - Build arm-raspbian (Rasp, Prismcube and similar)."
-echo " 14 - Build arm-marvell (Synology DS114, DS214 and similar)."
-echo " 15 - Build arm-android (For Android ARM)."
-echo " 16 - Build arm-mca (For Matrix CAM Air)."
+echo "  9 - Build ppc-exp (Power PC OLD - DM500S, DM600, 7020...)."
+echo " 10 - Build cortexa9hf-vfp-neon (Cortex-A9 - Wetek, Vu+4k and similar)."
+echo " 11 - Build router.mips (Routers Mips DDWRT)."
+echo " 12 - Build router-openwrt-brcm47xx.mips (Routers openwrt brcm47xx)."
+echo " 13 - Build router-openwrt-ar71xx.mips (Routers openwrt ar71xx)."
+echo " 14 - Build router-openwrt-brcm63xx.mips (Routers openwrt brcm63xx)."
+echo " 15 - Build arm-raspbian (Rasp, Prismcube and similar)."
+echo " 16 - Build arm-marvell (Synology Armada 375)."
+echo " 17 - Build arm-armada37xx (Synology Armada 37xx)."
+echo " 18 - Build arm-android (For Android ARM (API 24+))."
+echo " 19 - Build arm-mca (For Matrix CAM Air)."
 echo
 echo "  a - Advanced Options."
 echo "  i - About Build System NCam."
@@ -65,14 +68,17 @@ echo "- Enter option:"
       6) build_dir/build_sh4.sh;;
       7) build_dir/build_ppc.sh;;
       8) build_dir/build_ppc-old.sh;;
-      9) build_dir/build_cortexa9hf-vfp-neon.sh;;
-      10) build_dir/build_mips-router-openwrt-brcm47xx.sh;;
-      11) build_dir/build_mips-router-openwrt-ar71xx.sh;;
-      12) build_dir/build_mips-router-openwrt-brcm63xx.sh;;
-      13) build_dir/build_arm-raspbian.sh;;
-      14) build_dir/build_arm-marvell.sh;;
-      15) build_dir/build_arm-android.sh;;
-      16) build_dir/build_arm-mca.sh;;
+      9) build_dir/build_ppc-old-exp.sh;;
+      10) build_dir/build_cortexa9hf-vfp-neon.sh;;
+      11) build_dir/build_mips-router.sh;;
+      12) build_dir/build_mips-router-openwrt-brcm47xx.sh;;
+      13) build_dir/build_mips-router-openwrt-ar71xx.sh;;
+      14) build_dir/build_mips-router-openwrt-brcm63xx.sh;;
+      15) build_dir/build_arm-raspbian.sh;;
+      16) build_dir/build_arm-marvell.sh;;
+      17) build_dir/build_arm-armada37xx.sh;;
+      18) build_dir/build_arm-android.sh;;
+      19) build_dir/build_arm-mca.sh;;
       a) build_dir/advanced.sh $version; continue;;
       i) build_dir/info.sh $version; continue;;
       x) clear; echo; echo "Goodbye ;)"; echo; exit 1;;

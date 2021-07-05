@@ -6,8 +6,8 @@
 
 my $openssl;
 
-my $dir = "/home/lonas/android-toolchain/sysroot/usr/ssl";
-my $prefix = "/home/lonas/android-toolchain/sysroot/usr";
+my $dir = "/home/lonas/NCam/cross/android-toolchain/sysroot/usr/ssl";
+my $prefix = "/home/lonas/NCam/cross/android-toolchain/sysroot/usr";
 
 if(defined $ENV{OPENSSL}) {
 	$openssl = $ENV{OPENSSL};

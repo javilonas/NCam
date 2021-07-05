@@ -17,6 +17,7 @@
 #ifndef OPENSL_ES_ANDROID_H_
 #define OPENSL_ES_ANDROID_H_
 
+#include "OpenSLES.h"
 #include "OpenSLES_AndroidConfiguration.h"
 #include "OpenSLES_AndroidMetadata.h"
 #include <jni.h>
@@ -24,8 +25,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "OpenSLES.h"
 
 /*---------------------------------------------------------------------------*/
 /* Android common types                                                      */
@@ -375,7 +374,9 @@ typedef struct SLDataLocator_AndroidFD_ {
 /** Addendum to Data locator macros  */
 #define SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE ((SLuint32) 0x800007BD)
 
-/** BufferQueue-based data locator definition where locatorType must be SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE*/
+/** BufferQueue-based data locator definition where locatorType must
+ *  be SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE
+ */
 typedef struct SLDataLocator_AndroidSimpleBufferQueue {
 	SLuint32	locatorType;
 	SLuint32	numBuffers;
@@ -400,6 +401,64 @@ typedef struct SLDataLocator_AndroidBufferQueue_ {
  * MIME types required for data in Android Buffer Queues
  */
 #define SL_ANDROID_MIME_AACADTS            ((SLchar *) "audio/vnd.android.aac-adts")
+
+/*---------------------------------------------------------------------------*/
+/* Acoustic Echo Cancellation (AEC) Interface                                */
+/* --------------------------------------------------------------------------*/
+extern SL_API const SLInterfaceID SL_IID_ANDROIDACOUSTICECHOCANCELLATION;
+
+struct SLAndroidAcousticEchoCancellationItf_;
+typedef const struct SLAndroidAcousticEchoCancellationItf_ * const *
+        SLAndroidAcousticEchoCancellationItf;
+
+struct SLAndroidAcousticEchoCancellationItf_ {
+    SLresult (*SetEnabled)(
+        SLAndroidAcousticEchoCancellationItf self,
+        SLboolean enabled
+    );
+    SLresult (*IsEnabled)(
+        SLAndroidAcousticEchoCancellationItf self,
+        SLboolean *pEnabled
+    );
+};
+
+/*---------------------------------------------------------------------------*/
+/* Automatic Gain Control (ACC) Interface                                    */
+/* --------------------------------------------------------------------------*/
+extern SL_API const SLInterfaceID SL_IID_ANDROIDAUTOMATICGAINCONTROL;
+
+struct SLAndroidAutomaticGainControlItf_;
+typedef const struct SLAndroidAutomaticGainControlItf_ * const * SLAndroidAutomaticGainControlItf;
+
+struct SLAndroidAutomaticGainControlItf_ {
+    SLresult (*SetEnabled)(
+        SLAndroidAutomaticGainControlItf self,
+        SLboolean enabled
+    );
+    SLresult (*IsEnabled)(
+        SLAndroidAutomaticGainControlItf self,
+        SLboolean *pEnabled
+    );
+};
+
+/*---------------------------------------------------------------------------*/
+/* Noise Suppression Interface                                               */
+/* --------------------------------------------------------------------------*/
+extern SL_API const SLInterfaceID SL_IID_ANDROIDNOISESUPPRESSION;
+
+struct SLAndroidNoiseSuppressionItf_;
+typedef const struct SLAndroidNoiseSuppressionItf_ * const * SLAndroidNoiseSuppressionItf;
+
+struct SLAndroidNoiseSuppressionItf_ {
+    SLresult (*SetEnabled)(
+        SLAndroidNoiseSuppressionItf self,
+        SLboolean enabled
+    );
+    SLresult (*IsEnabled)(
+        SLAndroidNoiseSuppressionItf self,
+        SLboolean *pEnabled
+    );
+};
 
 #ifdef __cplusplus
 }

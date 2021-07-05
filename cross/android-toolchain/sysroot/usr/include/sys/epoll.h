@@ -31,54 +31,47 @@
 
 #include <sys/cdefs.h>
 #include <sys/types.h>
-#include <fcntl.h> /* For O_CLOEXEC. */
 #include <signal.h> /* For sigset_t. */
+
+#include <linux/eventpoll.h>
 
 __BEGIN_DECLS
 
-#define EPOLLIN          0x00000001
-#define EPOLLPRI         0x00000002
-#define EPOLLOUT         0x00000004
-#define EPOLLERR         0x00000008
-#define EPOLLHUP         0x00000010
-#define EPOLLRDNORM      0x00000040
-#define EPOLLRDBAND      0x00000080
-#define EPOLLWRNORM      0x00000100
-#define EPOLLWRBAND      0x00000200
-#define EPOLLMSG         0x00000400
-#define EPOLLRDHUP       0x00002000
-#define EPOLLWAKEUP      0x20000000
-#define EPOLLONESHOT     0x40000000
-#define EPOLLET          0x80000000
+int epoll_create(int __size);
 
-#define EPOLL_CTL_ADD    1
-#define EPOLL_CTL_DEL    2
-#define EPOLL_CTL_MOD    3
+#if __ANDROID_API__ >= 21
+int epoll_create1(int __flags) __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
 
-#define EPOLL_CLOEXEC O_CLOEXEC
 
-typedef union epoll_data {
-  void* ptr;
-  int fd;
-  uint32_t u32;
-  uint64_t u64;
-} epoll_data_t;
-
-struct epoll_event {
-  uint32_t events;
-  epoll_data_t data;
-}
-#ifdef __x86_64__
-__packed
+/*
+ * Some third-party code uses the existence of EPOLL_CLOEXEC to detect the
+ * availability of epoll_create1. This is not correct, since having up-to-date
+ * UAPI headers says nothing about the C library, but for the time being we
+ * don't want to harm adoption to the unified headers. We'll undef EPOLL_CLOEXEC
+ * if we don't have epoll_create1 for the time being, and maybe revisit this
+ * later.
+ *
+ * https://github.com/android-ndk/ndk/issues/302
+ * https://github.com/android-ndk/ndk/issues/394
+ */
+#if __ANDROID_API__ < __ANDROID_API_L__ && defined(EPOLL_CLOEXEC)
+#undef EPOLL_CLOEXEC
 #endif
-;
 
-int epoll_create(int);
-int epoll_create1(int);
-int epoll_ctl(int, int, int, struct epoll_event*);
-int epoll_wait(int, struct epoll_event*, int, int);
-int epoll_pwait(int, struct epoll_event*, int, int, const sigset_t*);
+int epoll_ctl(int __epoll_fd, int __op, int __fd, struct epoll_event* __event);
+int epoll_wait(int __epoll_fd, struct epoll_event* __events, int __event_count, int __timeout_ms);
+
+#if __ANDROID_API__ >= 21
+int epoll_pwait(int __epoll_fd, struct epoll_event* __events, int __event_count, int __timeout_ms, const sigset_t* __mask) __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
+
+
+#if __ANDROID_API__ >= 28
+int epoll_pwait64(int __epoll_fd, struct epoll_event* __events, int __event_count, int __timeout_ms, const sigset64_t* __mask) __INTRODUCED_IN(28);
+#endif /* __ANDROID_API__ >= 28 */
+
 
 __END_DECLS
 
-#endif  /* _SYS_EPOLL_H_ */
+#endif

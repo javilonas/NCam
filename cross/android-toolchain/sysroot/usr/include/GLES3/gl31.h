@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 /*
-** Copyright (c) 2013-2015 The Khronos Group Inc.
+** Copyright (c) 2013-2016 The Khronos Group Inc.
 **
 ** Permission is hereby granted, free of charge, to any person obtaining a
 ** copy of this software and/or associated documentation files (the
@@ -42,11 +42,11 @@ extern "C" {
 #define GL_APIENTRYP GL_APIENTRY*
 #endif
 
-#if !defined(GL_GLES_PROTOTYPES)
+#ifndef GL_GLES_PROTOTYPES
 #define GL_GLES_PROTOTYPES 1
 #endif
 
-/* Generated on date 20151015 */
+/* Generated on date 20161024 */
 
 /* Generated C header for:
  * API: gles2

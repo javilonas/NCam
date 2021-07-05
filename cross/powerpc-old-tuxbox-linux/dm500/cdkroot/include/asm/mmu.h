@@ -1,5 +1,0 @@
-/*
- * PowerPC memory management structures
- */
-
-

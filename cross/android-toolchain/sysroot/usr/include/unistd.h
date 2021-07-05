@@ -25,164 +25,336 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#ifndef _UNISTD_H_
-#define _UNISTD_H_
+
+#pragma once
 
 #include <stddef.h>
 #include <sys/cdefs.h>
 #include <sys/types.h>
 #include <sys/select.h>
-#include <sys/sysconf.h>
-#include <pathconf.h>
+
+#include <bits/fcntl.h>
+#include <bits/getopt.h>
+#include <bits/ioctl.h>
+#include <bits/lockf.h>
+#include <bits/posix_limits.h>
+#include <bits/seek_constants.h>
+#include <bits/sysconf.h>
 
 __BEGIN_DECLS
 
-/* Standard file descriptor numbers. */
 #define STDIN_FILENO	0
 #define STDOUT_FILENO	1
 #define STDERR_FILENO	2
 
-/* Values for whence in fseek and lseek */
-#define SEEK_SET 0
-#define SEEK_CUR 1
-#define SEEK_END 2
+#define F_OK 0
+#define X_OK 1
+#define W_OK 2
+#define R_OK 4
+
+#define _PC_FILESIZEBITS 0
+#define _PC_LINK_MAX 1
+#define _PC_MAX_CANON 2
+#define _PC_MAX_INPUT 3
+#define _PC_NAME_MAX 4
+#define _PC_PATH_MAX 5
+#define _PC_PIPE_BUF 6
+#define _PC_2_SYMLINKS 7
+#define _PC_ALLOC_SIZE_MIN 8
+#define _PC_REC_INCR_XFER_SIZE 9
+#define _PC_REC_MAX_XFER_SIZE 10
+#define _PC_REC_MIN_XFER_SIZE 11
+#define _PC_REC_XFER_ALIGN 12
+#define _PC_SYMLINK_MAX 13
+#define _PC_CHOWN_RESTRICTED 14
+#define _PC_NO_TRUNC 15
+#define _PC_VDISABLE 16
+#define _PC_ASYNC_IO 17
+#define _PC_PRIO_IO 18
+#define _PC_SYNC_IO 19
 
 extern char** environ;
 
-extern __noreturn void _exit(int);
+__noreturn void _exit(int __status);
 
-extern pid_t  fork(void);
-extern pid_t  vfork(void);
-extern pid_t  getpid(void);
-extern pid_t  gettid(void) __pure2;
-extern pid_t  getpgid(pid_t);
-extern int    setpgid(pid_t, pid_t);
-extern pid_t  getppid(void);
-extern pid_t  getpgrp(void);
-extern int    setpgrp(void);
-extern pid_t  getsid(pid_t);
-extern pid_t  setsid(void);
+pid_t  fork(void);
+pid_t  vfork(void);
+pid_t  getpid(void);
+pid_t  gettid(void) __attribute_const__;
+pid_t  getpgid(pid_t __pid);
+int    setpgid(pid_t __pid, pid_t __pgid);
+pid_t  getppid(void);
+pid_t  getpgrp(void);
+int    setpgrp(void);
 
-extern int execv(const char *, char * const *);
-extern int execvp(const char *, char * const *);
-extern int execvpe(const char *, char * const *, char * const *);
-extern int execve(const char *, char * const *, char * const *);
-extern int execl(const char *, const char *, ...);
-extern int execlp(const char *, const char *, ...);
-extern int execle(const char *, const char *, ...);
+#if __ANDROID_API__ >= 17
+pid_t  getsid(pid_t __pid) __INTRODUCED_IN(17);
+#endif /* __ANDROID_API__ >= 17 */
 
-extern int nice(int);
+pid_t  setsid(void);
 
-extern int setuid(uid_t);
-extern uid_t getuid(void);
-extern int seteuid(uid_t);
-extern uid_t geteuid(void);
-extern int setgid(gid_t);
-extern gid_t getgid(void);
-extern int setegid(gid_t);
-extern gid_t getegid(void);
-extern int getgroups(int, gid_t *);
-extern int setgroups(size_t, const gid_t *);
-extern int setreuid(uid_t, uid_t);
-extern int setregid(gid_t, gid_t);
-extern int setresuid(uid_t, uid_t, uid_t);
-extern int setresgid(gid_t, gid_t, gid_t);
-extern int getresuid(uid_t *ruid, uid_t *euid, uid_t *suid);
-extern int getresgid(gid_t *rgid, gid_t *egid, gid_t *sgid);
-extern char* getlogin(void);
+int execv(const char* __path, char* const* __argv);
+int execvp(const char* __file, char* const* __argv);
 
-/* Macros for access() */
-#define R_OK  4  /* Read */
-#define W_OK  2  /* Write */
-#define X_OK  1  /* Execute */
-#define F_OK  0  /* Existence */
+#if __ANDROID_API__ >= 21
+int execvpe(const char* __file, char* const* __argv, char* const* __envp) __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
 
-extern int access(const char*, int);
-extern int faccessat(int, const char*, int, int);
-extern int link(const char*, const char*);
-extern int linkat(int, const char*, int, const char*, int);
-extern int unlink(const char*);
-extern int unlinkat(int, const char*, int);
-extern int chdir(const char *);
-extern int fchdir(int);
-extern int rmdir(const char *);
-extern int pipe(int *);
-#ifdef _GNU_SOURCE
-extern int pipe2(int *, int);
+int execve(const char* __file, char* const* __argv, char* const* __envp);
+int execl(const char* __path, const char* __arg0, ...) __attribute__((__sentinel__));
+int execlp(const char* __file, const char* __arg0, ...) __attribute__((__sentinel__));
+int execle(const char* __path, const char* __arg0, ... /*,  char* const* __envp */)
+    __attribute__((__sentinel__(1)));
+
+#if __ANDROID_API__ >= 28
+int fexecve(int __fd, char* const* __argv, char* const* __envp) __INTRODUCED_IN(28);
+#endif /* __ANDROID_API__ >= 28 */
+
+
+int nice(int __incr);
+
+/**
+ * [setegid(2)](http://man7.org/linux/man-pages/man2/setegid.2.html) sets
+ * the effective group ID.
+ *
+ * On Android, this function only affects the calling thread, not all threads
+ * in the process.
+ *
+ * Returns 0 on success, and returns -1 and sets `errno` on failure.
+ */
+int setegid(gid_t __gid);
+
+/**
+ * [seteuid(2)](http://man7.org/linux/man-pages/man2/seteuid.2.html) sets
+ * the effective user ID.
+ *
+ * On Android, this function only affects the calling thread, not all threads
+ * in the process.
+ *
+ * Returns 0 on success, and returns -1 and sets `errno` on failure.
+ */
+int seteuid(uid_t __uid);
+
+/**
+ * [setgid(2)](http://man7.org/linux/man-pages/man2/setgid.2.html) sets
+ * the group ID.
+ *
+ * On Android, this function only affects the calling thread, not all threads
+ * in the process.
+ *
+ * Returns 0 on success, and returns -1 and sets `errno` on failure.
+ */
+int setgid(gid_t __gid);
+
+/**
+ * [setregid(2)](http://man7.org/linux/man-pages/man2/setregid.2.html) sets
+ * the real and effective group IDs (use -1 to leave an ID unchanged).
+ *
+ * On Android, this function only affects the calling thread, not all threads
+ * in the process.
+ *
+ * Returns 0 on success, and returns -1 and sets `errno` on failure.
+ */
+int setregid(gid_t __rgid, gid_t __egid);
+
+/**
+ * [setresgid(2)](http://man7.org/linux/man-pages/man2/setresgid.2.html) sets
+ * the real, effective, and saved group IDs (use -1 to leave an ID unchanged).
+ *
+ * On Android, this function only affects the calling thread, not all threads
+ * in the process.
+ *
+ * Returns 0 on success, and returns -1 and sets `errno` on failure.
+ */
+int setresgid(gid_t __rgid, gid_t __egid, gid_t __sgid);
+
+/**
+ * [setresuid(2)](http://man7.org/linux/man-pages/man2/setresuid.2.html) sets
+ * the real, effective, and saved user IDs (use -1 to leave an ID unchanged).
+ *
+ * On Android, this function only affects the calling thread, not all threads
+ * in the process.
+ *
+ * Returns 0 on success, and returns -1 and sets `errno` on failure.
+ */
+int setresuid(uid_t __ruid, uid_t __euid, uid_t __suid);
+
+/**
+ * [setreuid(2)](http://man7.org/linux/man-pages/man2/setreuid.2.html) sets
+ * the real and effective group IDs (use -1 to leave an ID unchanged).
+ *
+ * On Android, this function only affects the calling thread, not all threads
+ * in the process.
+ *
+ * Returns 0 on success, and returns -1 and sets `errno` on failure.
+ */
+int setreuid(uid_t __ruid, uid_t __euid);
+
+/**
+ * [setuid(2)](http://man7.org/linux/man-pages/man2/setuid.2.html) sets
+ * the user ID.
+ *
+ * On Android, this function only affects the calling thread, not all threads
+ * in the process.
+ *
+ * Returns 0 on success, and returns -1 and sets `errno` on failure.
+ */
+int setuid(uid_t __uid);
+
+uid_t getuid(void);
+uid_t geteuid(void);
+gid_t getgid(void);
+gid_t getegid(void);
+int getgroups(int __size, gid_t* __list);
+int setgroups(size_t __size, const gid_t* __list);
+int getresuid(uid_t* __ruid, uid_t* __euid, uid_t* __suid);
+int getresgid(gid_t* __rgid, gid_t* __egid, gid_t* __sgid);
+char* getlogin(void);
+
+#if __ANDROID_API__ >= 28
+int getlogin_r(char* __buffer, size_t __buffer_size) __INTRODUCED_IN(28);
+#endif /* __ANDROID_API__ >= 28 */
+
+
+long fpathconf(int __fd, int __name);
+long pathconf(const char* __path, int __name);
+
+int access(const char* __path, int __mode);
+
+#if __ANDROID_API__ >= 16
+int faccessat(int __dirfd, const char* __path, int __mode, int __flags) __INTRODUCED_IN(16);
+#endif /* __ANDROID_API__ >= 16 */
+
+int link(const char* __old_path, const char* __new_path);
+
+#if __ANDROID_API__ >= 21
+int linkat(int __old_dir_fd, const char* __old_path, int __new_dir_fd, const char* __new_path, int __flags) __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
+
+int unlink(const char* __path);
+int unlinkat(int __dirfd, const char* __path, int __flags);
+int chdir(const char* __path);
+int fchdir(int __fd);
+int rmdir(const char* __path);
+int pipe(int __fds[2]);
+#if defined(__USE_GNU)
+int pipe2(int __fds[2], int __flags) __INTRODUCED_IN(9);
 #endif
-extern int chroot(const char *);
-extern int symlink(const char*, const char*);
-extern int symlinkat(const char*, int, const char*);
-extern ssize_t readlink(const char*, char*, size_t);
-extern ssize_t readlinkat(int, const char*, char*, size_t);
-extern int chown(const char *, uid_t, gid_t);
-extern int fchown(int, uid_t, gid_t);
-extern int fchownat(int, const char*, uid_t, gid_t, int);
-extern int lchown(const char *, uid_t, gid_t);
-extern int truncate(const char *, off_t);
-extern int truncate64(const char *, off64_t);
-extern char *getcwd(char *, size_t);
+int chroot(const char* __path);
+int symlink(const char* __old_path, const char* __new_path);
 
-extern int sync(void);
+#if __ANDROID_API__ >= 21
+int symlinkat(const char* __old_path, int __new_dir_fd, const char* __new_path) __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
 
-extern int close(int);
-extern off_t lseek(int, off_t, int);
-extern off64_t lseek64(int, off64_t, int);
+ssize_t readlink(const char* __path, char* __buf, size_t __buf_size);
 
-extern ssize_t read(int, void *, size_t);
-extern ssize_t write(int, const void *, size_t);
-extern ssize_t pread(int, void *, size_t, off_t);
-extern ssize_t pread64(int, void *, size_t, off64_t);
-extern ssize_t pwrite(int, const void *, size_t, off_t);
-extern ssize_t pwrite64(int, const void *, size_t, off64_t);
+#if __ANDROID_API__ >= 21
+ssize_t readlinkat(int __dir_fd, const char* __path, char* __buf, size_t __buf_size)
+    __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
 
-extern int dup(int);
-extern int dup2(int, int);
-#ifdef _GNU_SOURCE
-extern int dup3(int, int, int);
+int chown(const char* __path, uid_t __owner, gid_t __group);
+int fchown(int __fd, uid_t __owner, gid_t __group);
+int fchownat(int __dir_fd, const char* __path, uid_t __owner, gid_t __group, int __flags);
+int lchown(const char* __path, uid_t __owner, gid_t __group);
+char* getcwd(char* __buf, size_t __size);
+
+void sync(void);
+#if defined(__USE_GNU)
+
+#if __ANDROID_API__ >= 28
+int syncfs(int __fd) __INTRODUCED_IN(28);
+#endif /* __ANDROID_API__ >= 28 */
+
 #endif
-extern int fcntl(int, int, ...);
-extern int ioctl(int, int, ...);
-extern int flock(int, int);
-extern int fsync(int);
-extern int fdatasync(int);
-extern int ftruncate(int, off_t);
-extern int ftruncate64(int, off64_t);
 
-extern int pause(void);
-extern unsigned int alarm(unsigned int);
-extern unsigned int sleep(unsigned int);
-extern int usleep(useconds_t);
+int close(int __fd);
 
-extern int gethostname(char *, size_t);
+ssize_t read(int __fd, void* __buf, size_t __count);
+ssize_t write(int __fd, const void* __buf, size_t __count);
 
-extern void *__brk(void *);
-extern int brk(void *);
-extern void *sbrk(ptrdiff_t);
+int dup(int __old_fd);
+int dup2(int __old_fd, int __new_fd);
 
-extern int getopt(int, char * const *, const char *);
-extern char *optarg;
-extern int optind, opterr, optopt;
+#if __ANDROID_API__ >= 21
+int dup3(int __old_fd, int __new_fd, int __flags) __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
 
-extern int isatty(int);
-extern char* ttyname(int) __warnattr("ttyname is not thread-safe; use ttyname_r instead");
-extern int ttyname_r(int, char*, size_t);
+int fsync(int __fd);
+int fdatasync(int __fd) __INTRODUCED_IN(9);
 
-extern int  acct(const char*  filepath);
+/* See https://android.googlesource.com/platform/bionic/+/master/docs/32-bit-abi.md */
+#if defined(__USE_FILE_OFFSET64)
 
-int getpagesize(void);
+#if __ANDROID_API__ >= 21
+int truncate(const char* __path, off_t __length) __RENAME(truncate64) __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
 
-long sysconf(int);
+off_t lseek(int __fd, off_t __offset, int __whence) __RENAME(lseek64);
+ssize_t pread(int __fd, void* __buf, size_t __count, off_t __offset)
+  __RENAME(pread64) __INTRODUCED_IN(12);
+ssize_t pwrite(int __fd, const void* __buf, size_t __count, off_t __offset)
+  __RENAME(pwrite64) __INTRODUCED_IN(12);
+int ftruncate(int __fd, off_t __length) __RENAME(ftruncate64) __INTRODUCED_IN(12);
+#else
+int truncate(const char* __path, off_t __length);
+off_t lseek(int __fd, off_t __offset, int __whence);
+ssize_t pread(int __fd, void* __buf, size_t __count, off_t __offset);
+ssize_t pwrite(int __fd, const void* __buf, size_t __count, off_t __offset);
+int ftruncate(int __fd, off_t __length);
+#endif
 
-extern int daemon(int, int);
+
+#if __ANDROID_API__ >= 21
+int truncate64(const char* __path, off64_t __length) __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
+
+off64_t lseek64(int __fd, off64_t __offset, int __whence);
+ssize_t pread64(int __fd, void* __buf, size_t __count, off64_t __offset) __INTRODUCED_IN(12);
+ssize_t pwrite64(int __fd, const void* __buf, size_t __count, off64_t __offset) __INTRODUCED_IN(12);
+int ftruncate64(int __fd, off64_t __length) __INTRODUCED_IN(12);
+
+int pause(void);
+unsigned int alarm(unsigned int __seconds);
+unsigned int sleep(unsigned int __seconds);
+int usleep(useconds_t __microseconds);
+
+int gethostname(char* __buf, size_t __buf_size);
+
+#if __ANDROID_API__ >= 23
+int sethostname(const char* __name, size_t __n) __INTRODUCED_IN(23);
+#endif /* __ANDROID_API__ >= 23 */
+
+
+int brk(void* __addr);
+void* sbrk(ptrdiff_t __increment);
+
+int isatty(int __fd);
+char* ttyname(int __fd);
+int ttyname_r(int __fd, char* __buf, size_t __buf_size) __INTRODUCED_IN(8);
+
+int acct(const char* __path);
+
+#if __ANDROID_API__ >= __ANDROID_API_L__
+int getpagesize(void) __INTRODUCED_IN(21);
+#else
+static __inline__ int getpagesize(void) {
+  return sysconf(_SC_PAGESIZE);
+}
+#endif
+
+long syscall(long __number, ...);
+
+int daemon(int __no_chdir, int __no_close);
 
 #if defined(__arm__) || (defined(__mips__) && !defined(__LP64__))
-extern int cacheflush(long, long, long);
+int cacheflush(long __addr, long __nbytes, long __cache);
     /* __attribute__((deprecated("use __builtin___clear_cache instead"))); */
 #endif
 
-extern pid_t tcgetpgrp(int fd);
-extern int   tcsetpgrp(int fd, pid_t _pid);
+pid_t tcgetpgrp(int __fd);
+int tcsetpgrp(int __fd, pid_t __pid);
 
 /* Used to retry syscalls that can return EINTR. */
 #define TEMP_FAILURE_RETRY(exp) ({         \
@@ -192,39 +364,23 @@ extern int   tcsetpgrp(int fd, pid_t _pid);
     } while (_rc == -1 && errno == EINTR); \
     _rc; })
 
-#if defined(__BIONIC_FORTIFY)
-extern ssize_t __read_chk(int, void*, size_t, size_t);
-__errordecl(__read_dest_size_error, "read called with size bigger than destination");
-__errordecl(__read_count_toobig_error, "read called with count > SSIZE_MAX");
-extern ssize_t __read_real(int, void*, size_t)
-    __asm__(__USER_LABEL_PREFIX__ "read");
 
-__BIONIC_FORTIFY_INLINE
-ssize_t read(int fd, void* buf, size_t count) {
-    size_t bos = __bos0(buf);
+#if __ANDROID_API__ >= 26
+int getdomainname(char* __buf, size_t __buf_size) __INTRODUCED_IN(26);
+int setdomainname(const char* __name, size_t __n) __INTRODUCED_IN(26);
+#endif /* __ANDROID_API__ >= 26 */
 
-#if !defined(__clang__)
-    if (__builtin_constant_p(count) && (count > SSIZE_MAX)) {
-        __read_count_toobig_error();
-    }
 
-    if (bos == __BIONIC_FORTIFY_UNKNOWN_SIZE) {
-        return __read_real(fd, buf, count);
-    }
 
-    if (__builtin_constant_p(count) && (count > bos)) {
-        __read_dest_size_error();
-    }
+#if __ANDROID_API__ >= 28
+void swab(const void* __src, void* __dst, ssize_t __byte_count) __INTRODUCED_IN(28);
+#endif /* __ANDROID_API__ >= 28 */
 
-    if (__builtin_constant_p(count) && (count <= bos)) {
-        return __read_real(fd, buf, count);
-    }
+
+#if defined(__BIONIC_INCLUDE_FORTIFY_HEADERS)
+#define _UNISTD_H_
+#include <bits/fortify/unistd.h>
+#undef _UNISTD_H_
 #endif
 
-    return __read_chk(fd, buf, count, bos);
-}
-#endif /* defined(__BIONIC_FORTIFY) */
-
 __END_DECLS
-
-#endif /* _UNISTD_H_ */

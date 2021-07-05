@@ -25,57 +25,60 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+
 #ifndef __DLFCN_H__
 #define __DLFCN_H__
 
+#include <stdint.h>
 #include <sys/cdefs.h>
 
 __BEGIN_DECLS
 
 typedef struct {
-    const char *dli_fname;  /* Pathname of shared object that
-                               contains address */
-    void       *dli_fbase;  /* Address at which shared object
-                               is loaded */
-    const char *dli_sname;  /* Name of nearest symbol with address
-                               lower than addr */
-    void       *dli_saddr;  /* Exact address of symbol named
-                               in dli_sname */
+  /* Pathname of shared object that contains address. */
+  const char* dli_fname;
+  /* Address at which shared object is loaded. */
+  void* dli_fbase;
+  /* Name of nearest symbol with address lower than addr. */
+  const char* dli_sname;
+  /* Exact address of symbol named in dli_sname. */
+  void* dli_saddr;
 } Dl_info;
 
-extern void*        dlopen(const char*  filename, int flag);
-extern int          dlclose(void*  handle);
-extern const char*  dlerror(void);
-extern void*        dlsym(void*  handle, const char*  symbol);
-extern int          dladdr(const void* addr, Dl_info *info);
+void* dlopen(const char* __filename, int __flag);
+int dlclose(void* __handle);
+char* dlerror(void);
+void* dlsym(void* __handle, const char* __symbol);
 
-enum {
-#if defined(__LP64__)
-  RTLD_NOW  = 2,
-#else
-  RTLD_NOW  = 0,
-#endif
-  RTLD_LAZY = 1,
+#if __ANDROID_API__ >= 24
+void* dlvsym(void* __handle, const char* __symbol, const char* __version) __INTRODUCED_IN(24);
+#endif /* __ANDROID_API__ >= 24 */
 
-  RTLD_LOCAL  = 0,
-#if defined(__LP64__)
-  RTLD_GLOBAL = 0x00100,
-#else
-  RTLD_GLOBAL = 2,
+int dladdr(const void* __addr, Dl_info* __info);
+
+#define RTLD_LOCAL    0
+#define RTLD_LAZY     0x00001
+#define RTLD_NOW      0x00002
+#define RTLD_NOLOAD   0x00004
+#define RTLD_GLOBAL   0x00100
+#define RTLD_NODELETE 0x01000
+
+#if !defined(__LP64__)
+/* LP32 is broken for historical reasons. */
+#undef RTLD_NOW
+#define RTLD_NOW      0x00000
+#undef RTLD_GLOBAL
+#define RTLD_GLOBAL   0x00002
 #endif
-  RTLD_NOLOAD = 4,
-};
 
 #if defined (__LP64__)
-#define RTLD_DEFAULT  ((void*) 0)
-#define RTLD_NEXT     ((void*) -1L)
+#define RTLD_DEFAULT  __BIONIC_CAST(reinterpret_cast, void*, 0)
+#define RTLD_NEXT     __BIONIC_CAST(reinterpret_cast, void*, -1L)
 #else
-#define RTLD_DEFAULT  ((void*) 0xffffffff)
-#define RTLD_NEXT     ((void*) 0xfffffffe)
+#define RTLD_DEFAULT  __BIONIC_CAST(reinterpret_cast, void*, 0xffffffff)
+#define RTLD_NEXT     __BIONIC_CAST(reinterpret_cast, void*, 0xfffffffe)
 #endif
 
 __END_DECLS
 
-#endif /* __DLFCN_H */
-
-
+#endif

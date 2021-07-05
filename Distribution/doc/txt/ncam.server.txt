@@ -3,10 +3,10 @@ ncam.server(5) 				       File Formats Manual					  ncam.server(5)
 
 
 NAME
-       ncam.server - reader configuration file for NCAm
+       ncam.server - reader configuration file for NCam
 
 SYNOPSIS
-       The server configuration file for NCAm contains reader parameters.  sections in ncam.server are recurring (more than one
+       The server configuration file for NCam contains reader parameters.  sections in ncam.server are recurring (more than one
        reader possible).  At least one [reader] section is required.
 
 DESCRIPTIONS
@@ -214,9 +214,6 @@ DESCRIPTIONS
        password = password
 	  password for remote reader
 
-       mg-encrypted = D: { <IP|hostname> { <local port> <remote port> { <password> { <level> <level> }}}}[,<local MAC address>]
-	  mgcamd encrypted gbox line, default MAC address = eth0
-
        services = [!]services[,[!]<services>]...
 	  reader [de]assignment to service group, default=none
 
@@ -290,9 +287,9 @@ DESCRIPTIONS
 
 		      0 = EMM caching disabeld (default)
 		      1 = enable EMM caching and save EMMs to file after
-			  stopping NCAm
+			  stopping NCam
 		      2 = enable EMM caching, don't save EMMs to file
-			  after stopping NCAm
+			  after stopping NCam
 
 	   rewrite  = determines how often one and the same EMM is
 		      written, default:0
@@ -318,7 +315,7 @@ DESCRIPTIONS
 	   3: enable reverse cache exchange push mode for camd 3.5x / 3.57x
 	      and CCcam protocol
 
-	  Identical cache exchange modes must be set on local NCAm server and remote NCAm user asccount.
+	  Identical cache exchange modes must be set on local NCam server and remote NCam user asccount.
 
 	  Please consider memory consumption.
 
@@ -436,7 +433,7 @@ DESCRIPTIONS
 		    readnano = /var/ncam/write.emm
 
        autorestartseconds = seconds
-		    force restart reader after seconds,default 0 disabled.
+          force restart reader after seconds,default 0 disabled.
 
        dropbadcws = 0|1
 	  1 = reject bad CWs, send "not found" instead of bad CWs, default:0
@@ -451,10 +448,6 @@ DESCRIPTIONS
 
        lb_whitelist_services = <services>,<services>...
 	  reader assignement to service group for channels which may never be  blocked	by  the  loadbalancer  to  the	reader	,
-	  default=none
-
-       lb_priority_services = <services>,<services>...
-	  reader assignement to service group for channels which are always tried regardless of the load balacing status  ,
 	  default=none
 
        lb_weight = weight
@@ -515,14 +508,23 @@ DESCRIPTIONS
        use_ssl = 0|1
 	  1 = use SSL for ghttp protocol, default:0
 
-       tongfang3_calibsn = tongfang3 calibsn number
-	  this value must be 4 hexadecimal bytes
+       tongfang3_calibsn = calibsn
+          CalibSN for tongfang3,it must be 4 hexadecimal bytes
 
+       jet_authorize_id = authorize id
+           for dvn jetcas,query entitlements need authorize id.
+
+       jet_fix_ecm = 0|1
+           1 = fix ecm header for dvn jetcas,just for network reader. default 0.
+
+       jet_resync_vendorkey = 0|1
+           1 = enable resync vendorkey for dvn jetcas, when enabled,every 48 ecm data handled,resync vendorkey from dvn card.
+           defalt=0.
 OVERCLOCKING
        ·  Dreambox and other internal readers
 
 	  For  Dreambox  and  other internal readers the highest possible clockrate will be auto detected. The mhz parameter lets
-	  you override the values chosen by NCAm, if it differs from 357 and 358, but usually you will not  set  any  value  for
+	  you override the values chosen by NCam, if it differs from 357 and 358, but usually you will not  set  any  value  for
 	  mhz.
 
 	  For  certain	Dreamboxes  (especially  PPC clones) the default mhz parameter leads to slow ECM times and/or "not found"
@@ -534,18 +536,18 @@ OVERCLOCKING
 
        ·  Phoenix / Smartmouse reader
 
-	  Overclocking does not work with Windows and Mac OS X.  Set mhz equivalent to the frequency of the  reader.   NCAm  can
+	  Overclocking does not work with Windows and Mac OS X.  Set mhz equivalent to the frequency of the  reader.   NCam  can
 	  not set the frequency of the reader.
 
        ·  Smargo Smartreader+
 
 	  Use  protocol  =  smargo for the FDDI kernel drivers (no libusb needed) or (not recommended) use protocol = smartreader
-	  for NCAm's driver implementation based on libusb.
+	  for NCam's driver implementation based on libusb.
 
-	  Set the reader frequency with the native Smargo Smartreader+ tool (srp_tools).  If not setting mhz and  cardmhz,  NCAm
+	  Set the reader frequency with the native Smargo Smartreader+ tool (srp_tools).  If not setting mhz and  cardmhz,  NCam
 	  tries  to  set the baudrate automatically, according to the maximum speed indicated by ATR. Overclocking is possible.
 
-       NCAm  tries  to set the baudrate automatically.  A standard serial port has limited baudrate settings, so SC overclocking
+       NCam  tries  to set the baudrate automatically.  A standard serial port has limited baudrate settings, so SC overclocking
        might not work.	When using a serial reader the best way for overclocking is connecting it to a FTDI based USB  to  serial
        port adapter.
 
@@ -554,22 +556,22 @@ OVERCLOCKING
        the more accurate the effective baudrate can be.
 
 CACHE EXCHANGE
-       ·  pull mode (on request: cache exchange from remote to local NCAm)
+       ·  pull mode (on request: cache exchange from remote to local NCam)
 
 	  ECM  requests  will be forwarded to the remote cache exchange partner. If the CW could not be found in the cache of the
 	  remote exchange partner, a not found will be answered. If the CW could not be found in the cache of the remote exchange
 	  partner but a pending ECM request is open, the request will be re-initiated after the wait time defined in cacheexwait‐
 	  time.
 
-       ·  push mode (continuous: cache exchange from remote to local NCAm)
+       ·  push mode (continuous: cache exchange from remote to local NCam)
 
 	  CWs from the remote cache exchange partner will be forwarded to the local cache. Forwarding only works while	the  camd
-	  camd 3.5x / 3.57x or CCcam protocol connection between the local and remote NCAm has been established.
+	  camd 3.5x / 3.57x or CCcam protocol connection between the local and remote NCam has been established.
 
-       ·  reverse push mode (continuous: cache exchange from local to remote NCAm)
+       ·  reverse push mode (continuous: cache exchange from local to remote NCam)
 
 	  CWs  from  the local cache will be forwarded to the remote cache exchange partner. Forwarding only works while the camd
-	  camd 3.5x / 3.57x or CCcam protocol connection between the remote and local NCAm has been established.
+	  camd 3.5x / 3.57x or CCcam protocol connection between the remote and local NCam has been established.
 
 EXAMPLES
        ·  serial mouse compatible reader
@@ -685,8 +687,8 @@ EXAMPLES
 	   caid     = 1100
 
 SEE ALSO
-       list_smargo(1), ncam(1), ncam.ac(5), ncam.cacheex(5), ncam.cert(5), ncam.conf(5), ncam.dvbapi(5),	ncam.fakecws(5),
-       ncam.guess(5),	ncam.ird(5),  ncam.provid(5),  ncam.ratelimit(5),  ncam.services(5), ncam.srvid(5), ncam.srvid2(5),
+       list_smargo(1), ncam(1), ncam.ac(5), ncam.cacheex(5), ncam.cert(5), ncam.conf(5), ncam.dvbapi(5), ncam.fakecws(5),
+       ncam.guess(5), ncam.ird(5), ncam.provid(5), ncam.ratelimit(5), ncam.services(5), ncam.srvid(5), ncam.srvid2(5),
        ncam.tiers(5), ncam.user(5), ncam.whitelist(5)
 
 

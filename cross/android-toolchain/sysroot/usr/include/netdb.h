@@ -73,9 +73,6 @@
 #define	_PATH_PROTOCOLS	"/system/etc/protocols"
 #define	_PATH_SERVICES	"/system/etc/services"
 
-#define  MAXHOSTNAMELEN  256
-
-
 /*
  * Structures returned by network data base library.  All addresses are
  * supplied in host order, and returned in network order (suitable for
@@ -195,59 +192,77 @@ struct addrinfo {
  */
 #define	SCOPE_DELIMITER	'%'
 
+#define IPPORT_RESERVED 1024
+
 __BEGIN_DECLS
-#pragma GCC visibility push(default)
 
-/* BIONIC-BEGIN */
-#define  h_errno   (*__get_h_errno())
-int*  __get_h_errno(void);
-/* BIONIC-END */
-void endhostent(void);
-void endnetent(void);
-void endnetgrent(void);
-void endprotoent(void);
+int getaddrinfo(const char* __node, const char* __service, const struct addrinfo* __hints, struct addrinfo** __result);
+void freeaddrinfo(struct addrinfo* __ptr);
+
+/* Android ABI error: POSIX getnameinfo(3) uses socklen_t rather than size_t. */
+int getnameinfo(const struct sockaddr* __sa, socklen_t __sa_length, char* __host, size_t __host_length, char* __service, size_t __service_length, int __flags);
+const char* gai_strerror(int __error);
+
+/* These functions are obsolete. Use getaddrinfo/getnameinfo instead. */
+#define h_errno (*__get_h_errno())
+int* __get_h_errno(void);
+void herror(const char* __s);
+const char* hstrerror(int __error);
+struct hostent* gethostbyaddr(const void* __addr, socklen_t __length, int __type);
+
+#if __ANDROID_API__ >= 23
+int gethostbyaddr_r(const void* __addr, socklen_t __length, int __type, struct hostent* __ret, char* __buf, size_t __buf_size, struct hostent** __result, int* __h_errno_ptr) __INTRODUCED_IN(23);
+#endif /* __ANDROID_API__ >= 23 */
+
+struct hostent* gethostbyname(const char* __name);
+int gethostbyname_r(const char* __name, struct hostent* __ret, char* __buf, size_t __buf_size, struct hostent** __result, int* __h_errno_ptr);
+struct hostent* gethostbyname2(const char* __name, int __af);
+
+#if __ANDROID_API__ >= 23
+int gethostbyname2_r(const char* __name, int __af, struct hostent* __ret, char* __buf, size_t __buf_size, struct hostent** __result, int* __h_errno_ptr) __INTRODUCED_IN(23);
+#endif /* __ANDROID_API__ >= 23 */
+
+
+#if __ANDROID_API__ >= 28
+void endhostent(void) __INTRODUCED_IN(28);
+#endif /* __ANDROID_API__ >= 28 */
+
+struct hostent* gethostent(void);
+
+#if __ANDROID_API__ >= 28
+void sethostent(int __stay_open) __INTRODUCED_IN(28);
+
+/* These functions are obsolete. None of these functions return anything but nullptr. */
+void endnetent(void) __INTRODUCED_IN(28);
+#endif /* __ANDROID_API__ >= 28 */
+
+struct netent* getnetbyaddr(uint32_t __net, int __type);
+struct netent* getnetbyname(const char* __name);
+
+#if __ANDROID_API__ >= 28
+struct netent* getnetent(void) __INTRODUCED_IN(28);
+void setnetent(int __stay_open) __INTRODUCED_IN(28);
+
+/* None of these functions return anything but nullptr. */
+void endprotoent(void) __INTRODUCED_IN(28);
+#endif /* __ANDROID_API__ >= 28 */
+
+struct protoent* getprotobyname(const char* __name);
+struct protoent* getprotobynumber(int __proto);
+
+#if __ANDROID_API__ >= 28
+struct protoent* getprotoent(void) __INTRODUCED_IN(28);
+void setprotoent(int __stay_open) __INTRODUCED_IN(28);
+#endif /* __ANDROID_API__ >= 28 */
+
+
+/* These functions return entries from a built-in database. */
 void endservent(void);
-void freehostent(struct hostent *);
-struct hostent	*gethostbyaddr(const void *, socklen_t, int);
-int gethostbyaddr_r(const void *, int, int, struct hostent *, char *, size_t, struct hostent **, int *);
-struct hostent	*gethostbyname(const char *);
-int gethostbyname_r(const char *, struct hostent *, char *, size_t, struct hostent **, int *);
-struct hostent	*gethostbyname2(const char *, int);
-int gethostbyname2_r(const char *, int, struct hostent *, char *, size_t, struct hostent **, int *);
-struct hostent	*gethostent(void);
-int gethostent_r(struct hostent *, char *, size_t, struct hostent **, int *);
-struct hostent	*getipnodebyaddr(const void *, size_t, int, int *);
-struct hostent	*getipnodebyname(const char *, int, int, int *);
-struct netent	*getnetbyaddr(uint32_t, int);
-int getnetbyaddr_r(uint32_t, int, struct netent *, char *, size_t, struct netent**, int *);
-struct netent	*getnetbyname(const char *);
-int getnetbyname_r(const char *, struct netent *, char *, size_t, struct netent **, int *);
-struct netent	*getnetent(void);
-int getnetent_r(struct netent *, char *, size_t, struct netent **, int *);
-int getnetgrent(char **, char **, char **);
-struct protoent	*getprotobyname(const char *);
-int getprotobyname_r(const char *, struct protoent *, char *, size_t, struct protoent **);
-struct protoent	*getprotobynumber(int);
-int getprotobynumber_r(int, struct protoent *, char *, size_t, struct protoent **);
-struct protoent	*getprotoent(void);
-int getprotoent_r(struct protoent *, char *, size_t, struct protoent **);
-struct servent	*getservbyname(const char *, const char *);
-struct servent	*getservbyport(int, const char *);
-struct servent	*getservent(void);
-void herror(const char *);
-const char	*hstrerror(int);
-int innetgr(const char *, const char *, const char *, const char *);
-void sethostent(int);
-void setnetent(int);
-void setprotoent(int);
-int getaddrinfo(const char *, const char *, const struct addrinfo *, struct addrinfo **);
-int getnameinfo(const struct sockaddr *, socklen_t, char *, size_t, char *, size_t, int);
-void freeaddrinfo(struct addrinfo *);
-const char	*gai_strerror(int);
-void setnetgrent(const char *);
-void setservent(int);
+struct servent* getservbyname(const char* __name, const char* __proto);
+struct servent* getservbyport(int __port_in_network_order, const char* __proto);
+struct servent* getservent(void);
+void setservent(int __stay_open);
 
-#pragma GCC visibility pop
 __END_DECLS
 
-#endif /* !_NETDB_H_ */
+#endif

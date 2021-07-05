@@ -1,0 +1,13 @@
+prefix=/opt/cross/arm-v7a8v3r1-linux-gnueabi/sys-root/usr
+exec_prefix=/opt/cross/arm-v7a8v3r1-linux-gnueabi/sys-root/usr
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include/PCSC
+usbdropdir=/opt/cross/arm-v7a8v3r1-linux-gnueabi/sys-root/usr
+serialconfdir=/opt/cross/arm-v7a8v3r1-linux-gnueabi/sys-root/usr/etc/reader.conf.d
+
+Name: PCSC Lite
+Description: PC/SC smart card interface
+Version: 1.8.10
+Libs: -L${libdir} -lpcsclite
+Libs.private: 
+Cflags: -I${includedir} -pthread

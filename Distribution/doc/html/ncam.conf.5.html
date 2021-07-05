@@ -8,13 +8,13 @@ Section: File Formats (5)<BR><A HREF="#index">Index</A>
 <A NAME="lbAB">&nbsp;</A>
 <H2>NAME</H2>
 
-<B>ncam.conf</B> - main configuration file for NCAm
+<B>ncam.conf</B> - main configuration file for NCam
 <A NAME="lbAC">&nbsp;</A>
 <H2>SYNOPSIS</H2>
 
-The main configuration file for NCAm contains global parameters 
-such as debugging, logging, monitor, protocols and anti-cascading. 
-sections in <B>ncam.conf</B> are <I>nonrecurring</I>. The [global] 
+The main configuration file for NCam contains global parameters
+such as debugging, logging, monitor, protocols and anti-cascading.
+sections in <B>ncam.conf</B> are <I>nonrecurring</I>. The [global]
 section is <I>required</I>. All other sections are optional.
 <A NAME="lbAD">&nbsp;</A>
 <H2>DESCRIPTIONS</H2>
@@ -41,15 +41,15 @@ set PID file, default:none
 
 <B>logfile</B> = [<B>filename</B>][<B>;syslog</B>][<B>;stdout</B>]
 <DL COMPACT><DT><DD>
-logging targets, default:/var/log/ncam.log. You can define a maximum of one filename and 
-additionally to log to stdout or syslog (you can also only log to stdout or syslog and omit 
+logging targets, default:/var/log/ncam.log. You can define a maximum of one filename and
+additionally to log to stdout or syslog (you can also only log to stdout or syslog and omit
 the filename).
 </DL>
 
 PP
 <B>initial_debuglevel</B> = <B>level</B>
 <DL COMPACT><DT><DD>
-set initial debug level for NCAm start, default:0
+set initial debug level for NCam start, default:0
 </DL>
 
 PP
@@ -202,14 +202,14 @@ define file saving NDS Videoguard mail messages from provider, default:none
 
 <P>
 
-<B>waitforcards</B> = <B>0</B>|<B>1</B> 
+<B>waitforcards</B> = <B>0</B>|<B>1</B>
 <DL COMPACT><DT><DD>
 1 = wait for local SCs on startup before opening network ports, default:1
 </DL>
 
 <P>
 
-<B>waitforcards_extra_delay</B> = <B>delay</B> 
+<B>waitforcards_extra_delay</B> = <B>delay</B>
 <DL COMPACT><DT><DD>
 additional delay in milli-seconds after waiting for local SCs on startup before opening network ports, default:500
 </DL>
@@ -218,7 +218,7 @@ additional delay in milli-seconds after waiting for local SCs on startup before 
 
 <B>preferlocalcards</B> = <B>0</B>|<B>1</B>
 <DL COMPACT><DT><DD>
-SC decoding behavior: 
+SC decoding behavior:
 <P>
 <BR>&nbsp;<B>0</B>&nbsp;=&nbsp;local&nbsp;SCs&nbsp;used&nbsp;like&nbsp;a&nbsp;remote&nbsp;reader
 <BR>&nbsp;<B>1</B>&nbsp;=&nbsp;prefer&nbsp;cache&nbsp;exchange&nbsp;based&nbsp;SCs&nbsp;(default)
@@ -255,20 +255,6 @@ value (clienttimeout in seconds &lt; 100, else milli-seconds) for client process
 
 <P>
 
-<B>maxecmtime</B> = <B>0</B>|<B>1</B>
-<DL COMPACT><DT><DD>
-1 = use client timeout as a max ecm time, default:0
-</DL>
-
-<P>
-
-<B>maxecmtimenotfound</B> = <B>0</B>|<B>1</B>
-<DL COMPACT><DT><DD>
-1 = mark not_found imediately ecm with higher ecm time than maxecmtime, default:0
-</DL>
-
-<P>
-
 <B>clientmaxidle</B> = <B>seconds</B>
 <DL COMPACT><DT><DD>
 value for client process being idle before disconnect, 0 = idle disconnect disabled, default:120
@@ -278,8 +264,8 @@ value for client process being idle before disconnect, 0 = idle disconnect disab
 
 <B>suppresscmd08</B> = <B>0</B>|<B>1</B>
 <DL COMPACT><DT><DD>
-0 = tell camd 3.5x, 3.57x and 3.78x clients not to request again for rejected 
-CAID, service ID and provider ID combination, 1 = disable, can be overwritten 
+0 = tell camd 3.5x, 3.57x and 3.78x clients not to request again for rejected
+CAID, service ID and provider ID combination, 1 = disable, can be overwritten
 per user in <B>ncam.user</B>, default:0
 </DL>
 
@@ -545,7 +531,7 @@ load balancing retry limit time per CAID, wildcard CAIDs with two-digit CAIDs po
 
 <B>lb_noproviderforcaid</B> = <B>CAID1[,CAID2]...</B>
 <DL COMPACT><DT><DD>
-ignore provider information for CAIDs to reduce load balancing statistic data, 
+ignore provider information for CAIDs to reduce load balancing statistic data,
 wildcard CAIDs with two-digit CAIDs possible, default:none
 <P>
 <BR>&nbsp;example:&nbsp;lb_noproviderforcaid&nbsp;=&nbsp;0100,02,0300,04&nbsp;
@@ -726,8 +712,8 @@ path for external CSS file, default:none
 
 <B>httptpl</B> = <B>path</B>
 <DL COMPACT><DT><DD>
-path for external templates and picons, multiple simultaneously templates and 
-picons are possible by creating sub folders (maximum length of 32 alphanumeric 
+path for external templates and picons, multiple simultaneously templates and
+picons are possible by creating sub folders (maximum length of 32 alphanumeric
 characters), sub folders naming is corresponding to sub folder in URL, default:none
 <P>
 <BR>&nbsp;example:&nbsp;httptpl&nbsp;=&nbsp;/this/is/my/path
@@ -772,7 +758,7 @@ status refresh in seconds, default:none
 
 <B>httphidetype</B> = <B>type</B>[<B>type</B>]...
 <DL COMPACT><DT><DD>
-characters defining columns to hide in web interface status page (see type 
+characters defining columns to hide in web interface status page (see type
 column), default:none
 <P>
 <BR>&nbsp;types:
@@ -874,7 +860,7 @@ set the locale environment, default:none
 
 <B>httpncamlabel</B> = <B>text</B>
 <DL COMPACT><DT><DD>
-set individual label in web interface header, default:NCAm
+set individual label in web interface header, default:NCam
 </DL>
 
 <P>
@@ -1356,9 +1342,9 @@ CCcam reshare setting:
 
 <B>stealth</B> = <B>0</B>|<B>1</B>
 <DL COMPACT><DT><DD>
-1 = behaviour like the original CCcam: no activate partner detection and 
-extended NCAm-CCcam protocol, prevent other NCAm to detect the server 
-as NCAm server, default:0
+1 = behaviour like the original CCcam: no activate partner detection and
+extended NCam-CCcam protocol, prevent other NCam to detect the server
+as NCam server, default:0
 </DL>
 
 <P>
@@ -1393,7 +1379,7 @@ set CCcam keepalive modus:
 
 <P>
 
-<B>cccfgfile</B> = <B>filename</B>
+<B>cccamcfgfile</B> = <B>filename</B>
 <DL COMPACT><DT><DD>
 enable to read reader from CCcam Config File filename,default to NULL string.
 </DL>
@@ -1416,7 +1402,7 @@ set network timeout for receiving data, default:2000
 
 <B>forward_origin_card</B> = <B>0</B>|<B>1</B>
 <DL COMPACT><DT><DD>
-1 = forward ECM request to reader holding this card, 
+1 = forward ECM request to reader holding this card,
 <I>load balancer, fallback and caching will be disabled</I>, default:0
 </DL>
 
@@ -1471,7 +1457,7 @@ proxy reader SCs to be reshared into gbox network, default:none
 
 <B>my_vers</B> = <B>version</B>
 <DL COMPACT><DT><DD>
-set gbox version in hexadecimal low byte, default:25
+set gbox version in hexadecimal low byte, default:2A
 </DL>
 
 <P>
@@ -1485,19 +1471,33 @@ set gbox CPU and API byte in hexadecimal, default:40
 
 <B>gbox_reconnect</B> = <B>time</B>
 <DL COMPACT><DT><DD>
-send message to peers in seconds, default:300
+send message to peers in seconds, default:180, min:60, max:300
+</DL>
+
+<P>
+
+<B>log_hello</B> = <B>0</B>|<B>1</B>
+<DL COMPACT><DT><DD>
+1 = log hello messages, default:1
+</DL>
+
+<P>
+
+<B>dis_attack_txt</B> = <B>0</B>|<B>1</B>
+<DL COMPACT><DT><DD>
+1 = disable attack.txt, default:0
 </DL>
 
 <P>
 
 <B>gsms_disable</B> = <B>0</B>|<B>1</B>
 <DL COMPACT><DT><DD>
-1 = disable gbox short message service (GSMS),default:0
+1 = disable gbox short message service (GSMS), default:1
 <P>
-sending a messeage: /tmp/gsms.txt: &lt;box ID&gt; &lt;1=mormal message|2=OSD/TV message&gt; 
-&lt;message 6 to 127 characters&gt;, status will be stored in '/tmp/gsms.ack' 
-respective 'gsms.nack', receiving a message: The message will be stored in 
-/tmp/gsms.log 
+sending a messeage: /tmp/gsms.txt: &lt;box ID&gt; &lt;1=mormal message|2=OSD/TV message&gt;
+&lt;message 6 to 127 characters&gt;, status will be stored in '/tmp/gsms.ack'
+respective 'gsms.nack', receiving a message: The message will be stored in
+/tmp/gsms.log
 </DL>
 
 <P>
@@ -1505,6 +1505,13 @@ respective 'gsms.nack', receiving a message: The message will be stored in
 <B>tmp_dir</B> = <B>path</B>
 <DL COMPACT><DT><DD>
 temporary directory for gbox, default:/tmp/.ncam
+</DL>
+
+<P>
+
+<B>accept_remm_peer</B> = <B>peer-id1</B>[,<B>peer-id2</B>]...
+<DL COMPACT><DT><DD>
+accept REMM requests from gbox peer(s), default:none
 </DL>
 
 <A NAME="lbAR">&nbsp;</A>
@@ -1526,7 +1533,7 @@ UDP port for scam server, default:0
 <DL COMPACT><DT><DD>
 1 = DVB API enabled, default:0
 <P>
-Create file /tmp/.pausencam to pause DVB API, e.g. if STB goes into standby and NCAm remains as SC server only.
+Create file /tmp/.pausencam to pause DVB API, e.g. if STB goes into standby and NCam remains as SC server only.
 </DL>
 
 <P>
@@ -1566,7 +1573,7 @@ CAIDs and provider IDs to be prioritized, default:CAIDs and provider IDs of loca
 
 <P>
 
-<B>au</B> = <B>0</B>|<B>1</B>|<B>2</B>
+<B>au</B> = <B>0</B>|<B>1</B>
 <DL COMPACT><DT><DD>
 AU mode:
 <P>
@@ -1591,12 +1598,22 @@ PMT mode:
 
 <P>
 
+<B>ecminfo_file</B> = <B>0</B>|<B>1</B>
+<DL COMPACT><DT><DD>
+ecm.info file:
+<P>
+<BR>&nbsp;<B>0</B>&nbsp;=&nbsp;Disable ecm.info file
+<BR>&nbsp;<B>1</B>&nbsp;=&nbsp;Enable ecm.info file (default)
+</DL>
+
+<P>
+
 <B>ecminfo_type</B> = <B>0</B>|<B>1</B>|<B>2</B>|<B>3</B>|<B>4</B>|<B>5</B>
 <DL COMPACT><DT><DD>
 ecm.info types:
 <P>
-<BR>&nbsp;<B>0</B>&nbsp;=&nbsp;NCAm&nbsp;syntax&nbsp;(default)
-<BR>&nbsp;<B>1</B>&nbsp;=&nbsp;NCAm&nbsp;syntax&nbsp;with&nbsp;ECM&nbsp;time&nbsp;in&nbsp;ms&nbsp;instead&nbsp;of&nbsp;seconds
+<BR>&nbsp;<B>0</B>&nbsp;=&nbsp;NCam&nbsp;syntax&nbsp;(default)
+<BR>&nbsp;<B>1</B>&nbsp;=&nbsp;NCam&nbsp;syntax&nbsp;with&nbsp;ECM&nbsp;time&nbsp;in&nbsp;ms&nbsp;instead&nbsp;of&nbsp;seconds
 <BR>&nbsp;<B>2</B>&nbsp;=&nbsp;WiCardd
 <BR>&nbsp;<B>3</B>&nbsp;=&nbsp;mgcamd
 <BR>&nbsp;<B>4</B>&nbsp;=&nbsp;CCcam
@@ -1619,10 +1636,10 @@ CAID request mode:
 <DL COMPACT><DT><DD>
 set boxtype, auto detection of DVB API will be aspired, default:dreambox
 <P>
-ipbox with camd.socket support, currently only with PGI image version 0.6 or above, 
+ipbox with camd.socket support, currently only with PGI image version 0.6 or above,
 verified on HD models only
 <P>
-ipbox-pmt can be used on any DGS based images (with or without camd.socket support), 
+ipbox-pmt can be used on any DGS based images (with or without camd.socket support),
 verified on HD models only
 <P>
 pc is for generic pc support (currently supported on VDR with vdr-plugin-dvbapi)
@@ -1863,12 +1880,12 @@ list of current processes and clients
 <DT>&bull;<DD>
 <B>shutdown</B>
 <P>
-shutdown NCAm
+shutdown NCam
 <BR>&nbsp;
 <DT>&bull;<DD>
 <B>restart</B>
 <P>
-restart NCAm
+restart NCam
 <BR>&nbsp;
 <DT>&bull;<DD>
 <B>keepalive</B>
@@ -1912,7 +1929,7 @@ debug level mask:
 <DT>&bull;<DD>
 <B>version</B>
 <P>
-show NCAm version
+show NCam version
 <P>
 <DT>&bull;<DD>
 <B>commands</B>
@@ -1926,10 +1943,10 @@ show all valid monitor commands
 <DT>&bull;<DD>
 template system
 <P>
-The web interface allows you to create your own template. For developing your 
-own template request the orignal template with the non-linked page 
-<B>savetemplates.html</B>. Store your own template in the directory specified 
-by <B>httptpl</B>. 
+The web interface allows you to create your own template. For developing your
+own template request the orignal template with the non-linked page
+<B>savetemplates.html</B>. Store your own template in the directory specified
+by <B>httptpl</B>.
 </DL>
 <A NAME="lbAX">&nbsp;</A>
 <H2>CACHING</H2>

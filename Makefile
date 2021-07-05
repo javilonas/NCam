@@ -4,8 +4,8 @@ SHELL = /bin/sh
 .SUFFIXES: .o .c
 .PHONY: all tests help README.build README.config simple default debug config menuconfig allyesconfig allnoconfig defconfig clean distclean
 
-VER     := $(shell ./config.sh --ncam-version)
-SVN_REV := $(shell ./config.sh --ncam-revision)
+VER          := $(shell ./config.sh --ncam-version)
+SVN_REV      := $(shell ./config.sh --ncam-revision)
 
 uname_S := $(shell sh -c 'uname -s 2>/dev/null || echo not')
 
@@ -18,13 +18,13 @@ LINKER_VER_OPT:=-Wl,--version
 
 # Find OSX SDK
 ifeq ($(uname_S),Darwin)
-# Setting OSX_VER allows you to choose prefered version if you have
-# two SDKs installed. For example if you have 10.6 and 10.5 installed
-# you can choose 10.5 by using 'make USE_PCSC=1 OSX_VER=10.5'
-# './config.sh --detect-osx-sdk-version' returns the newest SDK if
-# SDK_VER is not set.
-OSX_SDK := $(shell ./config.sh --detect-osx-sdk-version $(OSX_VER))
-LINKER_VER_OPT:=-Wl,-v
+	# Setting OSX_VER allows you to choose prefered version if you have
+	# two SDKs installed. For example if you have 10.6 and 10.5 installed
+	# you can choose 10.5 by using 'make USE_PCSC=1 OSX_VER=10.5'
+	# './config.sh --detect-osx-sdk-version' returns the newest SDK if
+	# SDK_VER is not set.
+	OSX_SDK := $(shell ./config.sh --detect-osx-sdk-version $(OSX_VER))
+	LINKER_VER_OPT:=-Wl,-v
 endif
 
 ifeq "$(shell ./config.sh --enabled WITH_SSL)" "Y"
@@ -38,48 +38,55 @@ endif
 CONF_DIR = /usr/local/etc
 
 LIB_PTHREAD = -lpthread
-LIB_DL := -ldl
+LIB_DL :=
 
 LIB_RT :=
 ifeq ($(uname_S),Linux)
+	LIB_DL := -ldl
 ifndef ANDROID_NDK
-ifeq "$(shell ./config.sh --enabled CLOCKFIX)" "Y"
-	LIB_RT := -lrt
+	ifeq "$(shell ./config.sh --enabled CLOCKFIX)" "Y"
+		LIB_RT := -lrt
+	endif
 endif
-endif
-endif
-ifeq ($(uname_S),FreeBSD)
-LIB_DL :=
 endif
 
-override STD_LIBS := $(LIB_PTHREAD) $(LIB_DL) $(LIB_RT)
+override STD_LIBS := -lm $(LIB_PTHREAD) $(LIB_DL) $(LIB_RT)
 override STD_DEFS := -D'CS_SVN_VERSION="$(SVN_REV)"'
+ifneq "$(shell ./config.sh --git-revision)" ""
+override STD_DEFS += -D'CS_GIT_VERSION="$(shell ./config.sh --git-revision | cut -d " " -f1-2 | sed -e "s| |:|g")"'
+endif
+override STD_DEFS += -D'CS_GIT_VERSION_HASH="$(shell ./config.sh --git-revision | cut -d " " -f3)"'
 override STD_DEFS += -D'CS_CONFDIR="$(CONF_DIR)"'
 
-MODFLAGS_OPTS = -fwrapv -fomit-frame-pointer
+ifdef ANDROID_NDK
+	MODFLAGS_WARN = -Wno-strncat-size -Wno-implicit-function-declaration -Wno-unused-variable -Wno-unused-parameter -Wno-unused-function -Wno-format
+else
+	MODFLAGS_WARN = -Wno-shadow -Wno-implicit-function-declaration -Wno-unused-but-set-variable -Wno-unused-variable  -Wno-unused-parameter -Wno-unused-function -Wno-format
+endif
+MODFLAGS_OPTS = -fPIC -ffast-math -fwrapv -fomit-frame-pointer
 
 # Compiler warnings
-CC_WARN = -W -Wall -Wshadow -Wno-shadow -Wredundant-decls -Wstrict-prototypes -Wold-style-definition
+CC_WARN = -W -Wall -Wshadow -Wredundant-decls -Wstrict-prototypes -Wold-style-definition $(MODFLAGS_WARN)
 
 # Compiler optimizations
 CC_OPTS = -Os -ggdb -pipe -ffunction-sections -fdata-sections $(MODFLAGS_OPTS)
 
 CC = $(CROSS_DIR)$(CROSS)gcc
 STRIP = $(CROSS_DIR)$(CROSS)strip
+LD = $(CROSS_DIR)$(CROSS)ld
+OBJCOPY = $(CROSS_DIR)$(CROSS)objcopy
 
-ifndef MCA
-#MODLDFLAGS = -lm
-else
-MODLDFLAGS = -lm
-endif
-
-LDFLAGS = -Wl,--gc-sections
+LDFLAGS += -Wl,--gc-sections
 
 TARGETHELP := $(shell $(CC) --target-help 2>&1)
-ifneq (,$(findstring sse2,$(TARGETHELP)))
-override CFLAGS += -fexpensive-optimizations -mmmx -msse -msse2 -msse3
+ifdef ANDROID_NDK
+	override CFLAGS += -fPIE
 else
-override CFLAGS += -fexpensive-optimizations
+	ifneq (,$(findstring sse2,$(TARGETHELP)))
+		override CFLAGS += -fexpensive-optimizations -mmmx -msse -msse2 -msse3
+	else
+		override CFLAGS += -fexpensive-optimizations
+	endif
 endif
 
 # The linker for powerpc have bug that prevents --gc-sections from working
@@ -93,22 +100,30 @@ LINKER_VER := $(shell set -e; VER="`$(CC) $(LINKER_VER_OPT) 2>&1`"; echo $$VER |
 
 # dm500 toolchain
 ifeq "$(LINKER_VER)" "20040727"
-LDFLAGS :=
+	LDFLAGS :=
 endif
 # dm600/7000/7020 toolchain
 ifeq "$(LINKER_VER)" "20041121"
-LDFLAGS :=
+	LDFLAGS :=
 endif
 # The OS X linker do not support --gc-sections
 ifeq ($(uname_S),Darwin)
-LDFLAGS :=
+	LDFLAGS :=
 endif
 
 # The compiler knows for what target it compiles, so use this information
 TARGET := $(shell $(CC) -dumpmachine 2>/dev/null)
 
 # Process USE_ variables
+ifdef USE_WI
+override USE_STAPI=1
+override CFLAGS += -DWITH_WI=1
+override LDFLAGS += -DWITH_WI=1
+DEFAULT_STAPI_LIB = -L./stapi -lwi
+DEFAULT_STAPI_FLAGS = -I./stapi/include
+else
 DEFAULT_STAPI_LIB = -L./stapi -lncam_stapi
+endif
 DEFAULT_STAPI5_LIB = -L./stapi -lncam_stapi5
 DEFAULT_COOLAPI_LIB = -lnxp -lrt
 DEFAULT_COOLAPI2_LIB = -llnxUKAL -llnxcssUsr -llnxscsUsr -llnxnotifyqUsr -llnxplatUsr -lrt
@@ -117,39 +132,40 @@ DEFAULT_AZBOX_LIB = -Lextapi/openxcas -lOpenXCASAPI
 DEFAULT_LIBCRYPTO_LIB = -lcrypto
 DEFAULT_SSL_LIB = -lssl
 ifeq ($(uname_S),Linux)
-DEFAULT_LIBUSB_LIB = -lusb-1.0 -lrt
+	DEFAULT_LIBUSB_LIB = -lusb-1.0 -lrt
 else
-DEFAULT_LIBUSB_LIB = -lusb-1.0
+	DEFAULT_LIBUSB_LIB = -lusb-1.0
 endif
 # Since FreeBSD 8 (released in 2010) they are using their own
 # libusb that is API compatible to libusb but with different soname
 ifeq ($(uname_S),FreeBSD)
-DEFAULT_LIBUSB_LIB = -lusb
+	DEFAULT_LIBUSB_LIB = -lusb
 endif
 ifeq ($(uname_S),Darwin)
-DEFAULT_LIBUSB_FLAGS = -I/opt/local/include
-DEFAULT_LIBUSB_LIB = -L/opt/local/lib -lusb-1.0
-DEFAULT_PCSC_FLAGS = -isysroot $(OSX_SDK)
-DEFAULT_PCSC_LIB = -isysroot $(OSX_SDK) -framework IOKit -framework CoreFoundation -framework PCSC
+	DEFAULT_LIBUSB_FLAGS = -I/opt/local/include
+	DEFAULT_LIBUSB_LIB = -L/opt/local/lib -lusb-1.0
+	DEFAULT_PCSC_FLAGS = -isysroot $(OSX_SDK)
+	DEFAULT_PCSC_LIB = -isysroot $(OSX_SDK) -framework IOKit -framework CoreFoundation -framework PCSC
 else
-# Get the compiler's last include PATHs. Basicaly it is /usr/include
-# but in case of cross compilation it might be something else.
-#
-# Since using -Iinc_path instructs the compiler to use inc_path
-# (without add the toolchain system root) we need to have this hack
-# to get the "real" last include path. Why we needs this?
-# Well, the PCSC headers are broken and rely on having the directory
-# that they are installed it to be in the include PATH.
-#
-# We can't just use -I/usr/include/PCSC because it won't work in
-# case of cross compilation.
-TOOLCHAIN_INC_DIR := $(strip $(shell echo | $(CC) -Wp,-v -xc - -fsyntax-only 2>&1 | grep include$ | tail -n 1))
-DEFAULT_PCSC_FLAGS = -I$(TOOLCHAIN_INC_DIR)/PCSC -I$(TOOLCHAIN_INC_DIR)/../local/include/PCSC
-DEFAULT_PCSC_LIB = -lpcsclite
+	# Get the compiler's last include PATHs. Basicaly it is /usr/include
+	# but in case of cross compilation it might be something else.
+	#
+	# Since using -Iinc_path instructs the compiler to use inc_path
+	# (without add the toolchain system root) we need to have this hack
+	# to get the "real" last include path. Why we needs this?
+	# Well, the PCSC headers are broken and rely on having the directory
+	# that they are installed it to be in the include PATH.
+	#
+	# We can't just use -I/usr/include/PCSC because it won't work in
+	# case of cross compilation.
+	TOOLCHAIN_INC_DIR := $(strip $(shell echo | $(CC) -Wp,-v -xc - -fsyntax-only 2>&1 | grep include$ | tail -n 1))
+	DEFAULT_PCSC_FLAGS = -I$(TOOLCHAIN_INC_DIR)/PCSC -I$(TOOLCHAIN_INC_DIR)/../local/include/PCSC
+	DEFAULT_PCSC_LIB = -lpcsclite
 endif
 
 ifeq ($(uname_S),Cygwin)
-DEFAULT_PCSC_LIB += -lwinscard
+	#DEFAULT_PCSC_LIB += -lwinscard
+	DEFAULT_PCSC_LIB = -lwinscard
 endif
 
 DEFAULT_UTF8_FLAGS = -DWITH_UTF8
@@ -159,18 +175,18 @@ DEFAULT_UTF8_FLAGS = -DWITH_UTF8
 define prepare_use_flags
 override DEFAULT_$(1)_FLAGS:=$$(strip -DWITH_$(1)=1 $$(DEFAULT_$(1)_FLAGS))
 ifdef USE_$(1)
-$(1)_FLAGS:=$$(DEFAULT_$(1)_FLAGS)
-$(1)_CFLAGS:=$$($(1)_FLAGS)
-$(1)_LDFLAGS:=$$($(1)_FLAGS)
-$(1)_LIB:=$$(DEFAULT_$(1)_LIB)
-ifneq "$(2)" ""
-override PLUS_TARGET:=$$(PLUS_TARGET)-$(2)
-endif
-override USE_CFLAGS+=$$($(1)_CFLAGS)
-override USE_LDFLAGS+=$$($(1)_LDFLAGS)
-override USE_LIBS+=$$($(1)_LIB)
-override USE_FLAGS+=$$(if $$(USE_$(1)),USE_$(1))
-endif
+	$(1)_FLAGS:=$$(DEFAULT_$(1)_FLAGS)
+	$(1)_CFLAGS:=$$($(1)_FLAGS)
+	$(1)_LDFLAGS:=$$($(1)_FLAGS)
+	$(1)_LIB:=$$(DEFAULT_$(1)_LIB)
+	ifneq "$(2)" ""
+		override PLUS_TARGET:=$$(PLUS_TARGET)-$(2)
+	endif
+	override USE_CFLAGS+=$$($(1)_CFLAGS)
+	override USE_LDFLAGS+=$$($(1)_LDFLAGS)
+	override USE_LIBS+=$$($(1)_LIB)
+	override USE_FLAGS+=$$(if $$(USE_$(1)),USE_$(1))
+	endif
 endef
 
 # Initialize USE variables
@@ -189,9 +205,9 @@ $(eval $(call prepare_use_flags,UTF8))
 
 # Add PLUS_TARGET and EXTRA_TARGET to TARGET
 ifdef NO_PLUS_TARGET
-override TARGET := $(TARGET)$(EXTRA_TARGET)
+	override TARGET := $(TARGET)$(EXTRA_TARGET)
 else
-override TARGET := $(TARGET)$(PLUS_TARGET)$(EXTRA_TARGET)
+	override TARGET := $(TARGET)$(PLUS_TARGET)$(EXTRA_TARGET)
 endif
 
 EXTRA_CFLAGS = $(EXTRA_FLAGS)
@@ -210,9 +226,9 @@ override STD_DEFS += -D'CS_TARGET="$(TARGET)"'
 Q =
 SAY = @true
 ifndef V
-Q = @
-NP = --no-print-directory
-SAY = @echo
+	Q = @
+	NP = --no-print-directory
+	SAY = @echo
 endif
 
 BINDIR := Distribution
@@ -229,7 +245,7 @@ LIST_SMARGO_BIN := $(BINDIR)/list_smargo-$(VER)$(SVN_REV)-$(subst cygwin,cygwin.
 
 # Build list_smargo-.... only when WITH_LIBUSB build is requested.
 ifndef USE_LIBUSB
-override LIST_SMARGO_BIN =
+	override LIST_SMARGO_BIN =
 endif
 
 SRC-$(CONFIG_LIB_AES) += cscrypt/aes.c
@@ -254,6 +270,9 @@ SRC-$(CONFIG_LIB_IDEA) += cscrypt/i_skey.c
 SRC-y += cscrypt/md5.c
 SRC-$(CONFIG_LIB_RC6) += cscrypt/rc6.c
 SRC-$(CONFIG_LIB_SHA1) += cscrypt/sha1.c
+SRC-$(CONFIG_LIB_MDC2) += cscrypt/mdc2.c
+SRC-$(CONFIG_LIB_FAST_AES) += cscrypt/fast_aes.c
+SRC-$(CONFIG_LIB_SHA256) += cscrypt/sha256.c
 
 SRC-$(CONFIG_WITH_CARDREADER) += csctapi/atr.c
 SRC-$(CONFIG_WITH_CARDREADER) += csctapi/icc_async.c
@@ -289,15 +308,28 @@ SRC-$(CONFIG_MODULE_CCCSHARE) += module-cccshare.c
 SRC-$(CONFIG_MODULE_CONSTCW) += module-constcw.c
 SRC-$(CONFIG_WITH_EMU) += module-emulator.c
 SRC-$(CONFIG_WITH_EMU) += module-emulator-nemu.c
-SRC-$(CONFIG_WITH_EMU) += module-emulator-stream.c
+SRC-$(CONFIG_WITH_EMU) += module-emulator-streamserver.c
+SRC-$(CONFIG_WITH_EMU) += module-emulator-biss.c
+SRC-$(CONFIG_WITH_EMU) += module-emulator-cryptoworks.c
+SRC-$(CONFIG_WITH_EMU) += module-emulator-director.c
+SRC-$(CONFIG_WITH_EMU) += module-emulator-drecrypt.c
+SRC-$(CONFIG_WITH_EMU) += module-emulator-irdeto.c
+SRC-$(CONFIG_WITH_EMU) += module-emulator-nagravision.c
+SRC-$(CONFIG_WITH_EMU) += module-emulator-powervu.c
+SRC-$(CONFIG_WITH_EMU) += module-emulator-viaccess.c
+SRC-$(CONFIG_WITH_EMU) += module-emulator-videoguard.c
 SRC-$(CONFIG_WITH_EMU) += ffdecsa/ffdecsa.c
+
+ifeq "$(CONFIG_WITH_EMU)" "y"
+ifeq "$(CONFIG_WITH_SOFTCAM)" "y"
 UNAME := $(shell uname -s)
 ifneq ($(UNAME),Darwin)
 ifndef ANDROID_NDK
 ifndef ANDROID_STANDALONE_TOOLCHAIN
-ifeq "$(CONFIG_WITH_EMU)" "y"
+
 TOUCH_SK := $(shell touch SoftCam.Key)
 override LDFLAGS += -Wl,--format=binary -Wl,SoftCam.Key -Wl,--format=default
+endif
 endif
 endif
 endif
@@ -306,7 +338,7 @@ SRC-$(CONFIG_CS_CACHEEX) += module-csp.c
 SRC-$(CONFIG_CW_CYCLE_CHECK) += module-cw-cycle-check.c
 SRC-$(CONFIG_WITH_AZBOX) += module-dvbapi-azbox.c
 SRC-$(CONFIG_WITH_MCA) += module-dvbapi-mca.c
-### SRC-$(CONFIG_WITH_COOLAPI) += module-dvbapi-coolapi.c 
+### SRC-$(CONFIG_WITH_COOLAPI) += module-dvbapi-coolapi.c
 ### experimental reversed API
 SRC-$(CONFIG_WITH_COOLAPI) += module-dvbapi-coolapi-legacy.c
 SRC-$(CONFIG_WITH_COOLAPI2) += module-dvbapi-coolapi.c
@@ -317,6 +349,7 @@ SRC-$(CONFIG_HAVE_DVBAPI) += module-dvbapi-chancache.c
 SRC-$(CONFIG_HAVE_DVBAPI) += module-dvbapi.c
 SRC-$(CONFIG_MODULE_GBOX) += module-gbox-helper.c
 SRC-$(CONFIG_MODULE_GBOX) += module-gbox-sms.c
+SRC-$(CONFIG_MODULE_GBOX) += module-gbox-remm.c
 SRC-$(CONFIG_MODULE_GBOX) += module-gbox-cards.c
 SRC-$(CONFIG_MODULE_GBOX) += module-gbox.c
 SRC-$(CONFIG_IRDETO_GUESSING) += module-ird-guess.c
@@ -346,7 +379,9 @@ SRC-$(CONFIG_READER_DRE) += reader-dre-common.c
 SRC-$(CONFIG_READER_DRE) += reader-dre-st20.c
 SRC-$(CONFIG_READER_GRIFFIN) += reader-griffin.c
 SRC-$(CONFIG_READER_IRDETO) += reader-irdeto.c
+SRC-$(CONFIG_READER_NAGRA_COMMON) += reader-nagra-common.c
 SRC-$(CONFIG_READER_NAGRA) += reader-nagra.c
+SRC-$(CONFIG_READER_NAGRA_MERLIN) += reader-nagracak7.c
 SRC-$(CONFIG_READER_SECA) += reader-seca.c
 SRC-$(CONFIG_READER_TONGFANG) += reader-tongfang.c
 SRC-$(CONFIG_READER_STREAMGUARD) += reader-streamguard.c
@@ -389,8 +424,8 @@ SRC-y += ncam.c
 # config.c is automatically generated by config.sh in OBJDIR
 SRC-y += config.c
 ifdef BUILD_TESTS
-SRC-y += tests.c
-override STD_DEFS += -DBUILD_TESTS=1
+	SRC-y += tests.c
+	override STD_DEFS += -DBUILD_TESTS=1
 endif
 
 SRC := $(SRC-y)
@@ -404,7 +439,7 @@ all:
 	@-mkdir -p $(OBJDIR)/cscrypt $(OBJDIR)/csctapi $(OBJDIR)/minilzo $(OBJDIR)/ffdecsa $(OBJDIR)/webif
 	@-printf "\
 +-------------------------------------------------------------------------------\n\
-| NCAm ver: $(VER) rev: $(SVN_REV) target: $(TARGET)\n\
+| NCam ver: $(VER) rev: $(SVN_REV) target: $(TARGET)\n\
 | Tools:\n\
 |  CROSS    = $(CROSS_DIR)$(CROSS)\n\
 |  CC       = $(CC)\n\
@@ -513,7 +548,7 @@ README.config:
 
 help:
 	@-printf "\
-NCAm build system documentation\n\
+NCam build system documentation\n\
 ================================\n\
 \n\
  Build variables:\n\
@@ -535,7 +570,7 @@ NCAm build system documentation\n\
                     'make sh4 CROSS_DIR=/opt/STM/STLinux-2.3/devkit/sh4/bin/'\n\
                     'make dm500 CROSS_DIR=/opt/cross/dm500/cdk/bin/'\n\
 \n\
-   CONF_DIR=/dir  - Set NCAm config directory. For example to change config\n\
+   CONF_DIR=/dir  - Set NCam config directory. For example to change config\n\
                     directory to /etc run: 'make CONF_DIR=/etc'\n\
                     The default config directory is: '$(CONF_DIR)'\n\
 \n\
@@ -582,7 +617,7 @@ NCAm build system documentation\n\
 \n\
  Use flags:\n\
    Use flags are used to request additional libraries or features to be used\n\
-   by NCAm. Currently defined USE_xxx flags are:\n\
+   by NCam. Currently defined USE_xxx flags are:\n\
 \n\
    USE_LIBUSB=1    - Request linking with libusb. The variables that control\n\
                      USE_LIBUSB=1 build are:\n\
@@ -665,7 +700,7 @@ NCAm build system documentation\n\
                          AZBOX_LIB='$(DEFAULT_AZBOX_LIB)'\n\
                      Using USE_AZBOX=1 adds to '-azbox' to PLUS_TARGET.\n\
                      extapi/openxcas/libOpenXCASAPI.a library that is shipped\n\
-                     with NCAm is compiled for MIPSEL.\n\
+                     with NCam is compiled for MIPSEL.\n\
 \n\
    USE_MCA=1      - Request support for Matrix Cam Air (MCA).\n\
                     The variables that control the build are:\n\
@@ -674,7 +709,7 @@ NCAm build system documentation\n\
                          MCA_LDFLAGS='$(DEFAULT_MCA_FLAGS)'\n\
                      Using USE_MCA=1 adds to '-mca' to PLUS_TARGET.\n\
 \n\
-   USE_LIBCRYPTO=1 - Request linking with libcrypto instead of using NCAm\n\
+   USE_LIBCRYPTO=1 - Request linking with libcrypto instead of using NCam\n\
                      internal crypto functions. USE_LIBCRYPTO is automatically\n\
                      enabled if the build is configured with SSL support. The\n\
                      variables that control USE_LIBCRYPTO=1 build are:\n\
@@ -715,9 +750,9 @@ NCAm build system documentation\n\
                       'Distribution/ncam-1.20-unstable_svn7404-i486-slackware-linux-static'\n\
                      For example you can run: 'make NCAM_BIN=my-ncam'\n\
 \n\
- Binaries compiled and run during the NCAm build:\n\
+ Binaries compiled and run during the NCam build:\n\
 \n\
-   NCAm builds webif/pages_gen binary that is run by the build system to\n\
+   NCam builds webif/pages_gen binary that is run by the build system to\n\
    generate file that holds web pages. To build this binary two variables\n\
    are used:\n\
 \n\
@@ -741,7 +776,7 @@ NCAm build system documentation\n\
                     located in '$(BINDIR)' directory.\n\
 \n\
  Build system files:\n\
-   config.sh      - NCAm configuration. Run 'config.sh --help' to see\n\
+   config.sh      - NCam configuration. Run 'config.sh --help' to see\n\
                     available parameters or 'make config' to start GUI\n\
                     configuratior.\n\
    Makefile       - Main build system file.\n\
@@ -753,61 +788,63 @@ NCAm build system documentation\n\
 \n\
  Here are some of the interesting predefined targets in Makefile.extra.\n\
  To use them run 'make target ...' where ... can be any extra flag. For\n\
- example if you want to compile NCAm for Dreambox (DM500) but do not\n\
+ example if you want to compile NCam for Dreambox (DM500) but do not\n\
  have the compilers in the path, you can run:\n\
     make dm500 CROSS_DIR=/opt/cross/dm500/cdk/bin/\n\
 \n\
  Predefined targets in Makefile.extra:\n\
 \n\
-    make libusb        - Builds NCAm with libusb support\n\
-    make pcsc          - Builds NCAm with PCSC support\n\
-    make pcsc-libusb   - Builds NCAm with PCSC and libusb support\n\
-    make dm500         - Builds NCAm for Dreambox (DM500)\n\
-    make sh4           - Builds NCAm for SH4 boxes\n\
-    make azbox         - Builds NCAm for AZBox STBs\n\
-    make mca           - Builds NCAm for Matrix Cam Air (MCA)\n\
-    make coolstream    - Builds NCAm for Coolstream HD1\n\
-    make coolstream2   - Builds NCAm for Coolstream HD2\n\
-    make dockstar      - Builds NCAm for Dockstar\n\
-    make qboxhd        - Builds NCAm for QBoxHD STBs\n\
-    make opensolaris   - Builds NCAm for OpenSolaris\n\
-    make uclinux       - Builds NCAm for m68k uClinux\n\
+    make libusb        - Builds NCam with libusb support\n\
+    make pcsc          - Builds NCam with PCSC support\n\
+    make pcsc-libusb   - Builds NCam with PCSC and libusb support\n\
+    make dm500         - Builds NCam for Dreambox (DM500)\n\
+    make sh4           - Builds NCam for SH4 boxes\n\
+    make azbox         - Builds NCam for AZBox STBs\n\
+    make mca           - Builds NCam for Matrix Cam Air (MCA)\n\
+    make coolstream    - Builds NCam for Coolstream HD1\n\
+    make coolstream2   - Builds NCam for Coolstream HD2\n\
+    make dockstar      - Builds NCam for Dockstar\n\
+    make qboxhd        - Builds NCam for QBoxHD STBs\n\
+    make opensolaris   - Builds NCam for OpenSolaris\n\
+    make uclinux       - Builds NCam for m68k uClinux\n\
 \n\
  Predefined targets for static builds:\n\
-    make static        - Builds NCAm statically\n\
-    make static-libusb - Builds NCAm with libusb linked statically\n\
-    make static-libcrypto - Builds NCAm with libcrypto linked statically\n\
-    make static-ssl    - Builds NCAm with SSL support linked statically\n\
+    make static        - Builds NCam statically\n\
+    make static-libusb - Builds NCam with libusb linked statically\n\
+    make static-libcrypto - Builds NCam with libcrypto linked statically\n\
+    make static-ssl    - Builds NCam with SSL support linked statically\n\
 \n\
  Developer targets:\n\
     make tests         - Builds '$(TESTS_BIN)' binary\n\
 \n\
  Examples:\n\
-   Build NCAm for SH4 (the compilers are in the path):\n\
+   Build NCam for SH4 (the compilers are in the path):\n\
      make CROSS=sh4-linux-\n\n\
-   Build NCAm for SH4 (the compilers are in not in the path):\n\
+   Build NCam for SH4 (the compilers are in not in the path):\n\
      make sh4 CROSS_DIR=/opt/STM/STLinux-2.3/devkit/sh4/bin/\n\
      make CROSS_DIR=/opt/STM/STLinux-2.3/devkit/sh4/bin/ CROSS=sh4-linux-\n\
      make CROSS=/opt/STM/STLinux-2.3/devkit/sh4/bin/sh4-linux-\n\n\
-   Build NCAm for SH4 with STAPI:\n\
+   Build NCam for SH4 with STAPI:\n\
      make CROSS=sh4-linux- USE_STAPI=1\n\n\
-   Build NCAm for SH4 with STAPI and changed configuration directory:\n\
+   Build NCam for SH4 with STAPI and changed configuration directory:\n\
      make CROSS=sh4-linux- USE_STAPI=1 CONF_DIR=/var/tuxbox/config\n\n\
-   Build NCAm for ARM with COOLAPI (coolstream aka NeutrinoHD):\n\
+   Build NCam for ARM with COOLAPI (coolstream aka NeutrinoHD):\n\
      make CROSS=arm-cx2450x-linux-gnueabi- USE_COOLAPI=1\n\n\
-   Build NCAm for ARM with COOLAPI2 (coolstream aka NeutrinoHD):\n\
+   Build NCam for ARM with COOLAPI2 (coolstream aka NeutrinoHD):\n\
      make CROSS=arm-pnx8400-linux-uclibcgnueabi- USE_COOLAPI2=1\n\n\
-   Build NCAm for MIPSEL with AZBOX support:\n\
+   Build NCam for MIPSEL with AZBOX support:\n\
      make CROSS=mipsel-linux-uclibc- USE_AZBOX=1\n\n\
-   Build NCAm for ARM with MCA support:\n\
+   Build NCam for ARM with MCA support:\n\
      make CROSS=arm-none-linux-gnueabi- USE_MCA=1\n\n\
-   Build NCAm with libusb and PCSC:\n\
+   Build NCAm for Android with STAPI and changed configuration directory:\n\
+     make CROSS=arm-linux-androideabi- USE_WI=1 CONF_DIR=/data/plugin/ncam\n\n\
+   Build NCam with libusb and PCSC:\n\
      make USE_LIBUSB=1 USE_PCSC=1\n\n\
-   Build NCAm with static libusb:\n\
+   Build NCam with static libusb:\n\
      make USE_LIBUSB=1 LIBUSB_LIB=\"/usr/lib/libusb-1.0.a\"\n\n\
-   Build NCAm with static libcrypto:\n\
+   Build NCam with static libcrypto:\n\
      make USE_LIBCRYPTO=1 LIBCRYPTO_LIB=\"/usr/lib/libcrypto.a\"\n\n\
-   Build NCAm with static libssl and libcrypto:\n\
+   Build NCam with static libssl and libcrypto:\n\
      make USE_SSL=1 SSL_LIB=\"/usr/lib/libssl.a\" LIBCRYPTO_LIB=\"/usr/lib/libcrypto.a\"\n\n\
    Build with verbose messages and size optimizations:\n\
      make V=1 CC_OPTS=-Os\n\n\
@@ -823,4 +860,3 @@ debug: all
 
 -include Makefile.extra
 -include Makefile.local
-

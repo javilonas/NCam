@@ -1,0 +1,118 @@
+
+Frequently Asked Questions (FAQ) for Marvell GCC Toolchain
+
+1. What is the difference between Marvell GCC Toolchain and any other GCC Toolchain for ARM? 
+   Does it cause any problem if I use other compiler?
+
+   In general, all compilers generate code for ARM v5 ISA will work with Marvell Sheeva 
+   based processors. We can support the compiler release by Marvell only. We can not 
+   guarantee that any open source compiler is workable because:
+   a) Anyone can take any code to build any version of compiler with any modification, 
+      which we do not know, thus we can not guarantee it.
+   b) This is free software; see the source for copying conditions. There is NO warranty; 
+      not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+   So, there is no any confirmation about the compiler that is not released by us.
+
+2. How reliable is it?
+
+   The Marvell toolchain is extensively tested and tortured before release.
+   We maintain at least the SAME level of quality, which means no new unknown errors,
+   when compared with the Codesourcery (CSL) release we base on.
+
+3. What are the differences between soft, softfp, and hardfp?
+
+   soft - Completely compile for integer code in the default GCC configuration and
+   the associated C libraries. All floating point is done using by emulation, implemented
+   in GCC runtime libraries.
+
+   softfp - Compile for VFP floating point unit. This toolchain generates VFP instructions
+   for the hardware FPU, but uses the same procedure call ABI as the soft toolchain;
+   this means that FP values are passed in the same manner, using r0-r3 ARM registers.
+
+   hard - Compile for VFP floating point unit, while using a different ABI that uses the
+   FPU registers when calling functions. This utilizes the s0-s15 VFP registers when
+   passing FP values in procedure calls.
+
+4. Under what scenarios should I use the soft/softfp/hard toolchain?
+
+   The soft toolchain is for completely FPU-less environments; all compiler generated code,
+   and all the C libraries, are integer only code. The math library in glibc is also compiled
+   using all integer code emulated FP library calls inside the GCC runtime.
+
+   The softfp toolchain uses the VFP unit, but retains the same ABI as the soft toolchain.
+   Binaries compiled under a soft environment, should link and run under a softfp library
+   environment without any issues. If the program called any math library functions,
+   the softfp math library's use of VFP instructions inside should only provide a healthy
+   boost of performance. This toolchain should be used when your platform possesses a VFP unit,
+   while also wishing to retain compatibility with binaries compiled for using the soft ABI
+   interface.
+
+   The hard FP toolchain, however, uses not only the VFP unit, but also different call
+   conventions for FP values; it uses the VFP FPU registers directly for passing values
+   between procedures. This means a higher level of FP performance compared to the other
+   toolchains, but at the cost of incompatiblity with code compiled using "soft" conventions.
+   This toolchain should be used when FP compatibility is no concern, such as when you are
+   ready to build a completely new Linux root filesystem. Another simple way of using hard FP
+   for individual programs, is to simply statically link those binaries requiring better FP
+   performance.
+
+5. By how much faster is the FP performance of the hard toolchain, compared to softfp?
+
+   It really depends. Remember the performance edge that hard has over softfp is when
+   passing arguments/returning values across functions. So for code with intensive
+   function calling, i.e. lots of calls in the inner loop, hard FP ABI may help boost
+   performance.
+
+   To remind of a presumably common scenario, take note that in C/C++, arrays are
+   passed by reference. This means that arrays are NOT passed in registers even under
+   VFP hard float, for example:
+          void transform (float vec[4], /* other args */)
+   Here, vec[4] is passed in memory through a pointer in r0 under all toolchains.
+   So the hard toolchain will not help here. In this example, if you must pass vec[]
+   in registers, wrap it in a struct. :P
+
+6. The hardfp toolchain refuses to compile programs when using -mthumb!?
+
+   The VFP floating point unit is mostly unaccessible under Thumb-1 mode,
+   therefore the Thumb-1 + hardfp configuration is unsupported.
+   Such a case means that you are probably using a V5 or V6 CPU option.
+
+   Under V6T2 or V7 CPU options, -mthumb means Thumb-2, which is capable of using
+   VFP instructions. The hardfp toolchain will work with -mthumb in that configuration.
+
+7. Why doesn't the optimization options for non-Marvell processors work anymore?
+
+   Marvell provides official support for our own processors only, other tuning options
+   are from the original CSL release. While unsupported by us, they can still be enabled
+   by simply adding this GCC flag:
+                -mmrvl-use-unsupported-cpu
+   This re-enables all existing tuning options for other non-Marvell ARM processors.
+
+8. The 4.2.x CSL-release based toolchain is a little old,
+   when will Marvell-specific support be added to the current (newest) mainline sources?
+
+   This is still being discussed.
+
+9. What are the licenses of packages in the Marvell toolchain?
+
+   All licenses of packages are as their original ones.
+   GCC 4.2.0: GPLv2.
+   Binutils: GPLv2.
+   GDB: GPLv3+.
+   Glibc: LGPLv2.1.
+   Newlib: http://sourceware.org/newlib/COPYING.NEWLIB.
+
+10. Anything that Marvell added to the license?
+
+   Copyright c  Marvell International Ltd. and/or its affiliates
+
+   This software file (the ``File'') is owned and distributed by Marvell International Ltd. 
+   and/or its affiliates (``Marvell'') under the terms and conditions of the General 
+   Public License Version 2, June 1991 (the ``GPL License''), a copy of which is available 
+   along with the File in the license.txt file or by writing to the Free Software 
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 or on the 
+   worldwide web at <http://www.gnu.org/licenses/gpl.txt>. 
+
+   THE FILE IS DISTRIBUTED AS-IS, WITHOUT WARRANTY OF ANY KIND, AND THE IMPLIED WARRANTIES 
+   OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE ARE EXPRESSLY DISCLAIMED.  
+   The GPL License provides additional details about this warranty disclaimer.

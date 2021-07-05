@@ -1,0 +1,13 @@
+prefix=/opt/OpenWrt-SDK-15.05.1-ar71xx-generic_gcc-4.8-linaro_uClibc-0.9.33.2.Linux-x86_64/staging_dir/toolchain-mips_34kc_gcc-4.8-linaro_uClibc-0.9.33.2/usr
+exec_prefix=/opt/OpenWrt-SDK-15.05.1-ar71xx-generic_gcc-4.8-linaro_uClibc-0.9.33.2.Linux-x86_64/staging_dir/toolchain-mips_34kc_gcc-4.8-linaro_uClibc-0.9.33.2/usr
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include/PCSC
+usbdropdir=/opt/OpenWrt-SDK-15.05.1-ar71xx-generic_gcc-4.8-linaro_uClibc-0.9.33.2.Linux-x86_64/staging_dir/toolchain-mips_34kc_gcc-4.8-linaro_uClibc-0.9.33.2/usr/lib/pcsc/drivers
+serialconfdir=/opt/OpenWrt-SDK-15.05.1-ar71xx-generic_gcc-4.8-linaro_uClibc-0.9.33.2.Linux-x86_64/staging_dir/toolchain-mips_34kc_gcc-4.8-linaro_uClibc-0.9.33.2/usr/etc/reader.conf.d
+
+Name: PCSC Lite
+Description: PC/SC smart card interface
+Version: 1.8.23
+Libs: -L${libdir} -lpcsclite
+Libs.private: 
+Cflags: -I${includedir} -pthread

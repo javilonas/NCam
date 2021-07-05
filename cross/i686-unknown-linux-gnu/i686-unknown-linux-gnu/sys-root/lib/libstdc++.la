@@ -14,7 +14,7 @@ library_names='libstdc++.so.6.0.9 libstdc++.so.6 libstdc++.so'
 old_library='libstdc++.a'
 
 # Libraries that this one depends upon.
-dependency_libs=' -L/home/slug/optware/i686g25/toolchain/build/targets/i686-unknown-linux-gnu/build/build-cc/i686-unknown-linux-gnu/libstdc++-v3/src -L/home/slug/optware/i686g25/toolchain/build/targets/i686-unknown-linux-gnu/build/build-cc/i686-unknown-linux-gnu/libstdc++-v3/src/.libs -lm -lm -lm -L/home/slug/optware/i686g25/toolchain/build/targets/i686-unknown-linux-gnu/build/build-cc/./gcc -L/home/slug/optware/i686g25/toolchain/i686-unknown-linux-gnu/i686-unknown-linux-gnu/bin -L/home/slug/optware/i686g25/toolchain/i686-unknown-linux-gnu/i686-unknown-linux-gnu/lib -L/home/slug/optware/i686g25/toolchain/i686-unknown-linux-gnu/lib/../i686-unknown-linux-gnu/lib -L/home/slug/optware/i686g25/toolchain/i686-unknown-linux-gnu/i686-unknown-linux-gnu//sys-root/lib -L/home/slug/optware/i686g25/toolchain/i686-unknown-linux-gnu/i686-unknown-linux-gnu//sys-root/usr/lib -lgcc_s -lc -lgcc_s -lm -lgcc_s -lc -lgcc_s'
+dependency_libs=' -L/home/slug/optware/i686g25/toolchain/build/targets/i686-unknown-linux-gnu/build/build-cc/i686-unknown-linux-gnu/libstdc++-v3/src -L/home/slug/optware/i686g25/toolchain/build/targets/i686-unknown-linux-gnu/build/build-cc/i686-unknown-linux-gnu/libstdc++-v3/src/.libs -lm -lm -lm -L/home/slug/optware/i686g25/toolchain/build/targets/i686-unknown-linux-gnu/build/build-cc/./gcc -L/home/lonas/NCam/cross/i686-unknown-linux-gnu/i686-unknown-linux-gnu/bin -L/home/lonas/NCam/cross/i686-unknown-linux-gnu/i686-unknown-linux-gnu/lib -L/home/slug/optware/i686g25/toolchain/i686-unknown-linux-gnu/lib/../i686-unknown-linux-gnu/lib -L/home/lonas/NCam/cross/i686-unknown-linux-gnu/i686-unknown-linux-gnu//sys-root/lib -L/home/lonas/NCam/cross/i686-unknown-linux-gnu/i686-unknown-linux-gnu//sys-root/usr/lib -lgcc_s -lc -lgcc_s -lm -lgcc_s -lc -lgcc_s'
 
 # Version information for libstdc++.
 current=6
@@ -29,4 +29,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='/home/slug/optware/i686g25/toolchain/i686-unknown-linux-gnu/i686-unknown-linux-gnu/lib'
+libdir='/home/lonas/NCam/cross/i686-unknown-linux-gnu/i686-unknown-linux-gnu/lib'

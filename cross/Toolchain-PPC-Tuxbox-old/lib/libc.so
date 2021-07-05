@@ -1,0 +1,1 @@
+GROUP ( libc.so.6 libc_nonshared.a )

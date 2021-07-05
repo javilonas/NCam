@@ -20,21 +20,36 @@
 export INIT_TIME=`date +'%d/%m/%y %H:%M:%S'`
 export START_TIME=`date +%s`
 export TIME_LOG=`date +%Y%m%d_%H%M`
-export ROOTFS_PATH=/home/*/NCam
+export user=`id -g -n`
+export ROOTFS_PATH=/home/$user/NCam
 export PARCH_LOGS=$ROOTFS_PATH/build_dir/logs
 export ARCH=mips
 export target=mips
 export NCAM_BIN=ncam-router-libusb.mips
-export CROSS=$ROOTFS_PATH/cross/ddwrt410/bin/mipsel-linux-uclibc-
+export CROSS=$ROOTFS_PATH/cross/Toolchain-MIPS-DDWRT/bin/mipsel-linux-uclibc-
+export CC=$ROOTFS_PATH/cross/Toolchain-MIPS-DDWRT/bin/mipsel-linux-uclibc-gcc
+export RANLIB=$ROOTFS_PATH/cross/Toolchain-MIPS-DDWRT/bin/mipsel-linux-uclibc-ranlib
 export DCMAKE=cross-mipsel-router-linux-uclibc-libusb
 export SCRIPT=build_mips-router-libusb.sh
 
-export LIB_PTHREAD="$ROOTFS_PATH/cross/ddwrt410/lib/libpthread.a -lrt"
-export PATH=$PATH:~$ROOTFS_PATH/cross/ddwrt410/bin
-export STAGING_DIR=~/openwrt/staging_dir
+export MODFLAGS_WARN=$MODFLAGS_WARN="-Wno-shadow -Wno-implicit-function-declaration -Wno-unused-variable  -Wno-unused-parameter -Wno-unused-function -Wno-format"
+export EXTRA_LIBS="-lrt"
 
-export LIBUSB_LIB="$ROOTFS_PATH/cross/ddwrt410/lib/libusb-1.0.a -lrt"
+export OPENSSLDIR=$ROOTFS_PATH/cross/Toolchain-MIPS-DDWRT/include/
+
+export LIB_RT="$ROOTFS_PATH/cross/Toolchain-MIPS-DDWRT/lib/librt.a -lrt"
+export LIB_PTHREAD="$ROOTFS_PATH/cross/Toolchain-MIPS-DDWRT/lib/libpthread.a -lrt"
+export LIBCRYPT="$ROOTFS_PATH/cross/Toolchain-MIPS-DDWRT/lib/libcrypt.a -lrt"
+
+export LIBCRYPTO="$ROOTFS_PATH/cross/Toolchain-MIPS-DDWRT/lib/libcrypto.a -lrt"
+export LIB_SSL="$ROOTFS_PATH/cross/Toolchain-MIPS-DDWRT/lib/libssl.a -lrt"
+
+export LIBUSB_LIB="$ROOTFS_PATH/cross/Toolchain-MIPS-DDWRT/lib/libusb-1.0.a -lrt"
 export LIST_SMARGO=list_smargo-*-mipsel-linux-uclibc-libusb
+export LIST_SMARGO2=list_smargo-*-mipsel-linux-uclibc-ssl-libusb
+
+export PATH=$PATH:~$ROOTFS_PATH/cross/Toolchain-MIPS-DDWRT/bin
+export STAGING_DIR=~/openwrt/staging_dir
 
 # BEGIN THE LOG
 cd $PARCH_LOGS/
@@ -64,9 +79,15 @@ echo "=============================================="
 echo ""
 echo ""
 rm -f $ROOTFS_PATH/Distribution/$LIST_SMARGO > /dev/null 2>&1
+rm -f $ROOTFS_PATH/Distribution/$LIST_SMARGO2 > /dev/null 2>&1
 rm -f $ROOTFS_PATH/Distribution/$NCAM_BIN > /dev/null 2>&1
 rm -f $ROOTFS_PATH/Distribution/$NCAM_BIN.debug > /dev/null 2>&1
-sh ./clean_all.sh > /dev/null 2>&1
+rm -f $ROOTFS_PATH/webif/pages_gen $ROOTFS_PATH/webif/pages.dep $ROOTFS_PATH/webif/pages.bin $ROOTFS_PATH/webif/pages.bin.compressed \
+      $ROOTFS_PATH/webif/pages.h $ROOTFS_PATH/webif/pages.c $ROOTFS_PATH/webif/is_defined.txt > /dev/null 2>&1
+echo ""
+cd $ROOTFS_PATH/webif
+make clean > /dev/null 2>&1
+cd ..
 sleep 0.8s
 sync
 echo " Cleaning performed correctly"

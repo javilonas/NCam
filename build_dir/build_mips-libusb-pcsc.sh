@@ -20,18 +20,33 @@
 export INIT_TIME=`date +'%d/%m/%y %H:%M:%S'`
 export START_TIME=`date +%s`
 export TIME_LOG=`date +%Y%m%d_%H%M`
-export ROOTFS_PATH=/home/*/NCam
+export user=`id -g -n`
+export ROOTFS_PATH=/home/$user/NCam
 export PARCH_LOGS=$ROOTFS_PATH/build_dir/logs
 export ARCH=mips
 export target=mips
 export NCAM_BIN=ncam-libusb-pcsc.mips
 export CROSS=$ROOTFS_PATH/cross/mipsel-tuxbox-linux-gnu/bin/mipsel-tuxbox-linux-gnu-
+export CC=$ROOTFS_PATH/cross/mipsel-tuxbox-linux-gnu/bin/mipsel-tuxbox-linux-gnu-gcc
+export RANLIB=$ROOTFS_PATH/cross/mipsel-tuxbox-linux-gnu/bin/mipsel-tuxbox-linux-gnu-ranlib
 export DCMAKE=cross-mipsel-tuxbox-linux-gnu-libusb-pcsc
 export SCRIPT=build_mips-libusb-pcsc.sh
+
+export EXTRA_LIBS="-lrt"
+
+export OPENSSLDIR=$ROOTFS_PATH/cross/mipsel-tuxbox-linux-gnu/mipsel-tuxbox-linux-gnu/sysroot/usr/include/openssl/
+
+export LIB_RT="$ROOTFS_PATH/cross/mipsel-tuxbox-linux-gnu/mipsel-tuxbox-linux-gnu/sysroot/usr/lib/librt.a -lrt"
+export LIB_PTHREAD="$ROOTFS_PATH/cross/mipsel-tuxbox-linux-gnu/mipsel-tuxbox-linux-gnu/sysroot/usr/lib/libpthread.a -lrt"
+export LIBCRYPT="$ROOTFS_PATH/cross/mipsel-tuxbox-linux-gnu/mipsel-tuxbox-linux-gnu/sysroot/usr/lib/libcrypt.a -lrt"
+
+export LIBCRYPTO="$ROOTFS_PATH/cross/mipsel-tuxbox-linux-gnu/mipsel-tuxbox-linux-gnu/sysroot/usr/lib/libcrypto.a -lrt"
+export LIB_SSL="$ROOTFS_PATH/cross/mipsel-tuxbox-linux-gnu/mipsel-tuxbox-linux-gnu/sysroot/usr/lib/libssl.a -lrt"
 
 export PCSC_LIB="$ROOTFS_PATH/cross/mipsel-tuxbox-linux-gnu/mipsel-tuxbox-linux-gnu/sysroot/usr/lib/libpcsclite.a -lrt"
 export LIBUSB_LIB="$ROOTFS_PATH/cross/mipsel-tuxbox-linux-gnu/mipsel-tuxbox-linux-gnu/sysroot/usr/lib/libusb-1.0.a -lrt"
 export LIST_SMARGO=list_smargo-*-mipsel-tuxbox-linux-gnu-libusb-pcsc
+export LIST_SMARGO2=list_smargo-*-mipsel-tuxbox-linux-gnu-ssl-libusb-pcsc
 
 # BEGIN THE LOG
 cd $PARCH_LOGS/
@@ -61,9 +76,15 @@ echo "=============================================="
 echo ""
 echo ""
 rm -f $ROOTFS_PATH/Distribution/$LIST_SMARGO > /dev/null 2>&1
+rm -f $ROOTFS_PATH/Distribution/$LIST_SMARGO2 > /dev/null 2>&1
 rm -f $ROOTFS_PATH/Distribution/$NCAM_BIN > /dev/null 2>&1
 rm -f $ROOTFS_PATH/Distribution/$NCAM_BIN.debug > /dev/null 2>&1
-sh ./clean_all.sh > /dev/null 2>&1
+rm -f $ROOTFS_PATH/webif/pages_gen $ROOTFS_PATH/webif/pages.dep $ROOTFS_PATH/webif/pages.bin $ROOTFS_PATH/webif/pages.bin.compressed \
+      $ROOTFS_PATH/webif/pages.h $ROOTFS_PATH/webif/pages.c $ROOTFS_PATH/webif/is_defined.txt > /dev/null 2>&1
+echo ""
+cd $ROOTFS_PATH/webif
+make clean > /dev/null 2>&1
+cd ..
 sleep 0.8s
 sync
 echo " Cleaning performed correctly"

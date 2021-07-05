@@ -25,11 +25,15 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+
 #ifndef _LOCALE_H_
 #define _LOCALE_H_
 
 #include <sys/cdefs.h>
 #include <xlocale.h>
+
+#define __need_NULL
+#include <stddef.h>
 
 __BEGIN_DECLS
 
@@ -66,42 +70,50 @@ __BEGIN_DECLS
                      LC_IDENTIFICATION_MASK)
 
 struct lconv {
-    char* decimal_point;
-    char* thousands_sep;
-    char* grouping;
-    char* int_curr_symbol;
-    char* currency_symbol;
-    char* mon_decimal_point;
-    char* mon_thousands_sep;
-    char* mon_grouping;
-    char* positive_sign;
-    char* negative_sign;
-    char  int_frac_digits;
-    char  frac_digits;
-    char  p_cs_precedes;
-    char  p_sep_by_space;
-    char  n_cs_precedes;
-    char  n_sep_by_space;
-    char  p_sign_posn;
-    char  n_sign_posn;
-    char  int_p_cs_precedes;
-    char  int_p_sep_by_space;
-    char  int_n_cs_precedes;
-    char  int_n_sep_by_space;
-    char  int_p_sign_posn;
-    char  int_n_sign_posn;
+  char* decimal_point;
+  char* thousands_sep;
+  char* grouping;
+  char* int_curr_symbol;
+  char* currency_symbol;
+  char* mon_decimal_point;
+  char* mon_thousands_sep;
+  char* mon_grouping;
+  char* positive_sign;
+  char* negative_sign;
+  char int_frac_digits;
+  char frac_digits;
+  char p_cs_precedes;
+  char p_sep_by_space;
+  char n_cs_precedes;
+  char n_sep_by_space;
+  char p_sign_posn;
+  char n_sign_posn;
+  char int_p_cs_precedes;
+  char int_p_sep_by_space;
+  char int_n_cs_precedes;
+  char int_n_sep_by_space;
+  char int_p_sign_posn;
+  char int_n_sign_posn;
 };
 
-struct lconv* localeconv(void);
+struct lconv* localeconv(void) __INTRODUCED_IN(21) __VERSIONER_NO_GUARD;
 
-locale_t duplocale(locale_t);
-void freelocale(locale_t);
-locale_t newlocale(int, const char*, locale_t);
-char* setlocale(int, const char*);
-locale_t uselocale(locale_t);
 
-#define LC_GLOBAL_LOCALE ((locale_t) -1L)
+#if __ANDROID_API__ >= 21
+locale_t duplocale(locale_t __l) __INTRODUCED_IN(21);
+void freelocale(locale_t __l) __INTRODUCED_IN(21);
+locale_t newlocale(int __category_mask, const char* __locale_name, locale_t __base) __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
+
+char* setlocale(int __category, const char* __locale_name);
+
+#if __ANDROID_API__ >= 21
+locale_t uselocale(locale_t __l) __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
+
+
+#define LC_GLOBAL_LOCALE __BIONIC_CAST(reinterpret_cast, locale_t, -1L)
 
 __END_DECLS
 
-#endif /* _LOCALE_H_ */
+#endif

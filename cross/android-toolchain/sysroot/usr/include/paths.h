@@ -29,46 +29,37 @@
  *	@(#)paths.h	8.1 (Berkeley) 6/2/93
  */
 
-#ifndef _PATHS_H_
-#define	_PATHS_H_
+#pragma once
 
-/* Default search path. */
-#define	_PATH_DEFPATH	"/usr/bin:/bin"
-/* All standard utilities path. */
-#define	_PATH_STDPATH \
-	"/usr/bin:/bin:/usr/sbin:/sbin"
+/**
+ * @file paths.h
+ * @brief Default paths.
+ */
 
-#define	_PATH_BSHELL	"/system/bin/sh"
-#define	_PATH_CONSOLE	"/dev/console"
-#define	_PATH_CSHELL	"/bin/csh"
-#define	_PATH_DEVDB	"/var/run/dev.db"
-#define	_PATH_DEVNULL	"/dev/null"
-#define	_PATH_DRUM	"/dev/drum"
-#define	_PATH_KLOG	"/proc/kmsg"
-#define	_PATH_KMEM	"/dev/kmem"
-#define	_PATH_LASTLOG	"/var/log/lastlog"
-#define	_PATH_MAILDIR	"/var/mail"
-#define	_PATH_MAN	"/usr/share/man"
-#define	_PATH_MEM	"/dev/mem"
-#define	_PATH_MNTTAB	"/etc/fstab"
-#define	_PATH_MOUNTED	"/etc/mtab"
-#define	_PATH_NOLOGIN	"/etc/nologin"
-#define	_PATH_PRESERVE	"/var/lib"
-#define	_PATH_RWHODIR	"/var/spool/rwho"
-#define	_PATH_SENDMAIL	"/usr/sbin/sendmail"
-#define	_PATH_SHADOW	"/etc/shadow"
-#define	_PATH_SHELLS	"/etc/shells"
-#define	_PATH_TTY	"/dev/tty"
-#define	_PATH_UNIX	"/boot/vmlinux"
-#define _PATH_UTMP	"/var/run/utmp"
-#define	_PATH_VI	"/bin/vi"
-#define _PATH_WTMP	"/var/log/wtmp"
+#include <sys/cdefs.h>
 
-/* Provide trailing slash, since mostly used for building pathnames. */
-#define	_PATH_DEV	"/dev/"
-#define	_PATH_TMP	"/tmp/"
-#define	_PATH_VARDB	"/var/db/"
-#define	_PATH_VARRUN	"/var/run/"
-#define	_PATH_VARTMP	"/var/tmp/"
+#ifndef _PATH_BSHELL
+/** Path to the default system shell. Historically the 'B' was to specify the Bourne shell. */
+#define _PATH_BSHELL "/system/bin/sh"
+#endif
 
-#endif /* !_PATHS_H_ */
+/** Path to the system console. */
+#define _PATH_CONSOLE "/dev/console"
+
+/** Default shell search path. */
+#define _PATH_DEFPATH "/sbin:/system/sbin:/product/bin:/apex/com.android.runtime/bin:/system/bin:/system/xbin:/odm/bin:/vendor/bin:/vendor/xbin"
+
+/** Path to the directory containing device files. */
+#define _PATH_DEV "/dev/"
+
+/** Path to `/dev/null`. */
+#define _PATH_DEVNULL "/dev/null"
+
+/** Path to the kernel log. */
+#define _PATH_KLOG "/proc/kmsg"
+
+/** Path to `/proc/mounts` for setmntent(). */
+#define _PATH_MOUNTED "/proc/mounts"
+
+/** Path to the calling process' tty. */
+#define _PATH_TTY "/dev/tty"

@@ -31,13 +31,14 @@
 
 #include <sys/cdefs.h>
 #include <stddef.h> /* For size_t. */
+#include <stdint.h>
 
 __BEGIN_DECLS
 
 #define PAGE_SIZE 4096
 #define PAGE_MASK (~(PAGE_SIZE - 1))
 
-#if __i386__
+#if defined(__i386__)
 
 struct user_fpregs_struct {
   long cwd;
@@ -101,6 +102,10 @@ struct user {
   int u_debugreg[8];
 };
 
+#define UPAGES 1
+#define HOST_TEXT_START_ADDR (u.start_code)
+#define HOST_STACK_END_ADDR (u.start_stack + u.u_ssize * PAGE_SIZE)
+
 #elif defined(__x86_64__)
 
 struct user_fpregs_struct {
@@ -108,13 +113,13 @@ struct user_fpregs_struct {
   unsigned short swd;
   unsigned short ftw;
   unsigned short fop;
-  __u64 rip;
-  __u64 rdp;
-  __u32 mxcsr;
-  __u32 mxcr_mask;
-  __u32 st_space[32];
-  __u32 xmm_space[64];
-  __u32 padding[24];
+  unsigned long rip;
+  unsigned long rdp;
+  unsigned int mxcsr;
+  unsigned int mxcr_mask;
+  unsigned int st_space[32];
+  unsigned int xmm_space[64];
+  unsigned int padding[24];
 };
 struct user_regs_struct {
   unsigned long r15;

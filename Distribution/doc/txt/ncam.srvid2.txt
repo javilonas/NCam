@@ -3,7 +3,7 @@ ncam.srvid2(5) 				       File Formats Manual					  ncam.srvid2(5)
 
 
 NAME
-       ncam.srvid2 - service ID configuration file for NCAm
+       ncam.srvid2 - service ID configuration file for NCam
 
 SYNOPSIS
        service ID mappings
@@ -18,11 +18,11 @@ ANNONTATIONS
        Please use Unix text file format only.
 
        You only need the ncam.srvid2 when using the monitor or the web interface.  For saving memory consumption only insert the
-       service IDs you really need. Some external programs use their own ncam.srvid2 and do not need the ncam.srvid2 of NCAm.
+       service IDs you really need. Some external programs use their own ncam.srvid2 and do not need the ncam.srvid2 of NCam.
 
 SEE ALSO
-       list_smargo(1),	ncam(1), ncam.ac(5), ncam.cacheex(5), ncam.cert(5), ncam.conf(5), ncam.dvbapi(5), ncam.fakecws(5),
-       ncam.guess(5), ncam.ird(5), ncam.provid(5),  ncam.ratelimit(5),  ncam.server(5),  ncam.services(5),  ncam.srvid(5),
+       list_smargo(1), ncam(1), ncam.ac(5), ncam.cacheex(5), ncam.cert(5), ncam.conf(5), ncam.dvbapi(5), ncam.fakecws(5),
+       ncam.guess(5), ncam.ird(5), ncam.provid(5), ncam.ratelimit(5), ncam.server(5), ncam.services(5), ncam.srvid(5),
        ncam.tiers(5), ncam.user(5), ncam.whitelist(5)
 
 

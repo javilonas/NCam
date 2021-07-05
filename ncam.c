@@ -12,6 +12,7 @@
 #include "module-cacheex.h"
 #include "module-cccam.h"
 #include "module-dvbapi.h"
+#include "module-xcam-a8plus.h"
 #include "module-dvbapi-azbox.h"
 #include "module-dvbapi-mca.h"
 #include "module-dvbapi-chancache.h"
@@ -77,7 +78,7 @@ static void ssl_done(void) { }
 extern char *config_mak;
 
 /*****************************************************************************
-        Globals
+		Globals
 *****************************************************************************/
 const char *syslog_ident = "ncam";
 static char *ncam_pidfile;
@@ -86,15 +87,15 @@ static char default_pidfile[64];
 int32_t exit_ncam = 0;
 static struct s_module modules[CS_MAX_MOD];
 
-struct s_client *first_client = NULL;  //Pointer to clients list, first client is master
-struct s_reader *first_active_reader = NULL;  //list of active readers (enable=1 deleted = 0)
-LLIST *configured_readers = NULL;  //list of all (configured) readers
+struct s_client *first_client = NULL; // Pointer to clients list, first client is master
+struct s_reader *first_active_reader = NULL; // list of active readers (enable=1 deleted = 0)
+LLIST *configured_readers = NULL; // list of all (configured) readers
 
-uint16_t  len4caid[256];    // table for guessing caid (by len)
-char  cs_confdir[128] = CS_CONFDIR;
+uint16_t len4caid[256]; // table for guessing caid (by len)
+char cs_confdir[128] = CS_CONFDIR;
 uint16_t cs_dblevel = 0; // Debug Level
 int32_t thread_pipe[2] = {0, 0};
-static int8_t cs_restart_mode = 1; //Restartmode: 0=off, no restart fork, 1=(default)restart fork, restart by webif, 2=like=1, but also restart on segfaults
+static int8_t cs_restart_mode = 1; // Restartmode: 0=off, no restart fork, 1=(default)restart fork, restart by webif, 2=like=1, but also restart on segfaults
 #ifdef WITH_UTF8
 uint8_t cs_http_use_utf8 = 1;
 #else
@@ -103,7 +104,7 @@ uint8_t cs_http_use_utf8 = 0;
 static int8_t cs_capture_SEGV;
 static int8_t cs_dump_stack;
 static uint16_t cs_waittime = 60;
-char  cs_tmpdir[200] = {0x00};
+char cs_tmpdir[200] = {0x00};
 CS_MUTEX_LOCK system_lock;
 CS_MUTEX_LOCK config_lock;
 CS_MUTEX_LOCK gethostbyname_lock;
@@ -117,17 +118,16 @@ static int32_t bg;
 static int32_t gbdb;
 static int32_t max_pending = 32;
 
-//ecms list
+// ecms list
 CS_MUTEX_LOCK ecmcache_lock;
-struct ecm_request_t    *ecmcwcache = NULL;
+struct ecm_request_t *ecmcwcache = NULL;
 uint32_t ecmcwcache_size = 0;
 
-//pushout deleted list
+// pushout deleted list
 CS_MUTEX_LOCK ecm_pushed_deleted_lock;
-struct ecm_request_t	*ecm_pushed_deleted = NULL;
+struct ecm_request_t *ecm_pushed_deleted = NULL;
 
-
-struct  s_config  cfg;
+struct s_config cfg;
 
 int log_remove_sensitive = 1;
 
@@ -138,7 +138,7 @@ static char *stb_boxname;
 static uint32_t ncam_stacksize = 0;
 
 /*****************************************************************************
-        Statics
+		Statics
 *****************************************************************************/
 /* Prints usage information and information about the built-in modules. */
 static void show_usage(void)
@@ -154,7 +154,7 @@ static void show_usage(void)
 		printf("%s).\n", info.machine);
 	}
 	printf("\n");
-	printf("Copyright (C) 2012-2018 developed by Javilonas.\n");
+	printf("Copyright (C) 2012-2021 developed by Javilonas.\n");
 	printf("Visit https://www.lonasdigital.com/ for more details.\n\n");
 
 	printf(" ConfigDir  : %s\n", CS_CONFDIR);
@@ -204,6 +204,7 @@ static void show_usage(void)
 	printf("                         .  1024 - Client ECM logging.\n");
 	printf("                         .  2048 - CSP logging.\n");
 	printf("                         .  4096 - CWC logging.\n");
+	printf("                         .  8192 - CW Cache logging.\n");
 	printf("                         . 65535 - Debug all.\n");
 	printf("\n Settings:\n");
 	printf(" -p, --pending-ecm <num> | Set the maximum number of pending ECM packets.\n");
@@ -214,7 +215,7 @@ static void show_usage(void)
 	}
 	printf("\n Debug parameters:\n");
 	printf(" -a, --crash-dump        | Write ncam.crash file on segfault. This option\n");
-	printf("                         . needs GDB to be installed and NCAm executable to\n");
+	printf("                         . needs GDB to be installed and NCam executable to\n");
 	printf("                         . contain the debug information (run ncam-XXXX.debug)\n");
 	printf(" -s, --capture-segfaults | Capture segmentation faults.\n");
 	printf(" -g, --gcollect <mode>   | Garbage collector debug mode:\n");
@@ -222,7 +223,7 @@ static void show_usage(void)
 	printf("                         .   2 - Check for double frees.\n");
 	printf("\n Information:\n");
 	printf(" -h, --help              | Show command line help text.\n");
-	printf(" -V, --build-info        | Show NCAm binary configuration and version.\n");
+	printf(" -V, --build-info        | Show NCam binary configuration and version.\n");
 }
 
 /* Keep the options sorted */
@@ -262,7 +263,7 @@ static void write_versionfile(bool use_stdout);
 
 static void parse_cmdline_params(int argc, char **argv)
 {
-#if defined(WITH_STAPI) || defined(WITH_STAPI5)	
+#if defined(WITH_STAPI) || defined(WITH_STAPI5)
 	bg = 1;
 #endif
 
@@ -279,15 +280,12 @@ static void parse_cmdline_params(int argc, char **argv)
 		case 'B': // --pidfile
 			ncam_pidfile = optarg;
 			break;
-#if defined(WITH_STAPI) || defined(WITH_STAPI5)
 		case 'f': // --foreground
 			bg = 0;
 			break;
-#else
 		case 'b': // --daemon
 			bg = 1;
 			break;
-#endif
 		case 'c': // --config-dir
 			cs_strncpy(cs_confdir, optarg, sizeof(cs_confdir));
 			break;
@@ -353,13 +351,13 @@ static void parse_cmdline_params(int argc, char **argv)
 }
 
 #define write_conf(CONFIG_VAR, text) \
-    fprintf(fp, "%-40s %s\n", text ":", config_enabled(CONFIG_VAR) ? "yes" : "no")
+	fprintf(fp, "%-40s %s\n", text ":", config_enabled(CONFIG_VAR) ? "yes" : "no")
 
 #define write_readerconf(CONFIG_VAR, text) \
-    fprintf(fp, "%-40s %s\n", text ":", config_enabled(CONFIG_VAR) ? "yes" : "no - no EMM support!")
+	fprintf(fp, "%-40s %s\n", text ":", config_enabled(CONFIG_VAR) ? "yes" : "no - no EMM support!")
 
 #define write_cardreaderconf(CONFIG_VAR, text) \
-    fprintf(fp, "%s%-29s %s\n", "cardreader_", text ":", config_enabled(CONFIG_VAR) ? "yes" : "no")
+	fprintf(fp, "%s%-29s %s\n", "cardreader_", text ":", config_enabled(CONFIG_VAR) ? "yes" : "no")
 
 static void write_versionfile(bool use_stdout)
 {
@@ -389,6 +387,16 @@ static void write_versionfile(bool use_stdout)
 	fprintf(fp, "Box type:       %s (%s)\n", boxtype_get(), boxname_get());
 	fprintf(fp, "PID:            %d\n", getppid());
 	fprintf(fp, "TempDir:        %s\n", cs_tmpdir);
+#ifdef MODULE_GBOX
+	if(cfg.gbox_tmp_dir == NULL)
+	{
+		fprintf(fp, "GBox tmp_dir:   not defined using: %s\n", cs_tmpdir);
+	}
+	else
+	{
+		fprintf(fp, "GBox tmp_dir:   %s\n", cfg.gbox_tmp_dir);
+	}
+#endif
 	fprintf(fp, "ConfigDir:      %s\n", cs_confdir);
 #ifdef WEBIF
 	fprintf(fp, "WebifPort:      %d\n", cfg.http_port);
@@ -408,6 +416,7 @@ static void write_versionfile(bool use_stdout)
 		write_conf(WITH_COOLAPI2, "DVB API with COOLAPI2 support");
 		write_conf(WITH_STAPI, "DVB API with STAPI support");
 		write_conf(WITH_STAPI5, "DVB API with STAPI5 support");
+		write_conf(WITH_NEUTRINO, "DVB API with NEUTRINO support");
 		write_conf(READ_SDT_CHARSETS, "DVB API read-sdt charsets");
 	}
 	write_conf(IRDETO_GUESSING, "Irdeto guessing");
@@ -420,12 +429,15 @@ static void write_versionfile(bool use_stdout)
 	write_conf(LCDSUPPORT, "LCD support");
 	write_conf(LEDSUPPORT, "LED support");
 	write_conf(WITH_EMU, "Emulator support");
-	switch (cs_getclocktype()) {
+	switch (cs_getclocktype())
+	{
 		case CLOCK_TYPE_UNKNOWN  : write_conf(CLOCKFIX, "Clockfix with UNKNOWN clock"); break;
 		case CLOCK_TYPE_REALTIME : write_conf(CLOCKFIX, "Clockfix with realtime clock"); break;
 		case CLOCK_TYPE_MONOTONIC: write_conf(CLOCKFIX, "Clockfix with monotonic clock"); break;
 	}
 	write_conf(IPV6SUPPORT, "IPv6 support");
+	write_conf(WITH_EMU, "Emulator support");
+	write_conf(WITH_SOFTCAM, "Built-in SoftCam.Key");
 
 	fprintf(fp, "\n");
 	write_conf(MODULE_CAMD33, "camd 3.3x");
@@ -448,6 +460,7 @@ static void write_versionfile(bool use_stdout)
 	{
 		fprintf(fp, "\n");
 		write_readerconf(READER_NAGRA, "Nagra");
+		write_readerconf(READER_NAGRA_MERLIN, "Nagra Merlin");
 		write_readerconf(READER_IRDETO, "Irdeto");
 		write_readerconf(READER_CONAX, "Conax");
 		write_readerconf(READER_CRYPTOWORKS, "Cryptoworks");
@@ -496,10 +509,10 @@ static void remove_versionfile(void)
 }
 
 #define report_emm_support(CONFIG_VAR, text) \
-    do { \
-        if (!config_enabled(CONFIG_VAR)) \
-            cs_log("Binary without %s module - no EMM processing for %s possible!", text, text); \
-    } while(0)
+	do { \
+		if (!config_enabled(CONFIG_VAR)) \
+			cs_log_dbg(D_TRACE, "Binary without %s module - no EMM processing for %s possible!", text, text); \
+	} while(0)
 
 static void do_report_emm_support(void)
 {
@@ -510,6 +523,7 @@ static void do_report_emm_support(void)
 	else
 	{
 		report_emm_support(READER_NAGRA, "Nagra");
+		report_emm_support(READER_NAGRA_MERLIN, "Nagra Merlin");
 		report_emm_support(READER_IRDETO, "Irdeto");
 		report_emm_support(READER_CONAX, "Conax");
 		report_emm_support(READER_CRYPTOWORKS, "Cryptoworks");
@@ -723,7 +737,7 @@ static void cs_reload_config(void)
 	SAFE_MUTEX_UNLOCK(&mutex);
 }
 
-/* Sets signal handlers to ignore for early startup of NCAm because for example log
+/* Sets signal handlers to ignore for early startup of NCam because for example log
    could cause SIGPIPE errors and the normal signal handlers can't be used at this point. */
 static void init_signal_pre(void)
 {
@@ -743,9 +757,9 @@ static void init_signal(void)
 	set_signal_handler(SIGTERM, 3, cs_exit);
 
 	set_signal_handler(SIGWINCH, 1, SIG_IGN);
-	set_signal_handler(SIGPIPE , 0, cs_sigpipe);
-	set_signal_handler(SIGALRM , 0, cs_master_alarm);
-	set_signal_handler(SIGHUP  , 1, cs_reload_config);
+	set_signal_handler(SIGPIPE, 0, cs_sigpipe);
+	set_signal_handler(SIGALRM, 0, cs_master_alarm);
+	set_signal_handler(SIGHUP, 1, cs_reload_config);
 	set_signal_handler(SIGUSR1, 1, cs_debug_level);
 	set_signal_handler(SIGUSR2, 1, cs_card_info);
 	set_signal_handler(NCAM_SIGNAL_WAKEUP, 0, cs_dummy);
@@ -774,19 +788,21 @@ void cs_exit(int32_t sig)
 	set_signal_handler(SIGPIPE, 1, SIG_IGN);
 
 	struct s_client *cl = cur_client();
-	if(!cl)
-		{ return; }
+	/*if(!cl)
+		{ return; }*/
 
 	// this is very important - do not remove
-	if(cl->typ != 's')
+	//if(cl->typ != 's')
+	// fix-close bsd-linux-mac
+	if(cl && cl->typ != 's')
 	{
 		cs_log_dbg(D_TRACE, "thread %8lX ended!", (unsigned long)pthread_self());
 
 		free_client(cl);
 
-		//Restore signals before exiting thread
-		set_signal_handler(SIGPIPE , 0, cs_sigpipe);
-		set_signal_handler(SIGHUP  , 1, cs_reload_config);
+		// Restore signals before exiting thread
+		set_signal_handler(SIGPIPE, 0, cs_sigpipe);
+		set_signal_handler(SIGHUP, 1, cs_reload_config);
 
 		pthread_exit(NULL);
 		return;
@@ -804,7 +820,7 @@ static char *read_line_from_file(char *fname, char *buf, int bufsz)
 		return NULL;
 	while (fgets(buf, bufsz, f))
 	{
-		if (strstr(buf,"\n")) //we need only the first line
+		if (strstr(buf,"\n")) // we need only the first line
 		{
 			buf[strlen(buf)-1] = '\0';
 			break;
@@ -849,7 +865,9 @@ static void init_machine_info(void)
 	read_line_from_file("/proc/stb/info/boxtype", boxtype, sizeof(boxtype));
 	read_line_from_file("/proc/stb/info/vumodel", vumodel, sizeof(vumodel));
 	if (vumodel[0] && !boxtype[0] && !azmodel)
+	{
 		snprintf(boxtype, sizeof(boxtype), "vu%s", vumodel);
+	}
 	if (!boxtype[0] && azmodel)
 		snprintf(boxtype, sizeof(boxtype), "Azbox-%s", model);
 
@@ -889,8 +907,8 @@ static void init_machine_info(void)
 
 	if (!boxtype[0])
 	{
-		uchar *pos;
-		pos = (uchar*) memchr(buffer.release, 'd', sizeof(buffer.release));
+		uint8_t *pos;
+		pos = (uint8_t *)memchr(buffer.release, 'd', sizeof(buffer.release));
 		if(pos)
 		{
 			if((!memcmp(pos, "dbox2", sizeof("dbox2"))) && !strcasecmp(buffer.machine, "ppc"))
@@ -971,7 +989,7 @@ static void init_check(void)
 			++i;
 			if(i > cs_waittime)
 			{
-				cs_log("Waiting was not successful. NCAm will be started but is UNSUPPORTED this way. Do not report any errors with this version.");
+				cs_log("Waiting was not successful. NCam will be started but is UNSUPPORTED this way. Do not report any errors with this version.");
 				break;
 			}
 		}
@@ -1056,13 +1074,13 @@ int32_t start_thread(char *nameroutine, void *startroutine, void *arg, pthread_t
 
 int32_t start_thread_nolog(char *nameroutine, void *startroutine, void *arg, pthread_t *pthread, int8_t detach, int8_t modify_stacksize)
 {
-	pthread_t temp;	
+	pthread_t temp;
 	pthread_attr_t attr;
 
 	SAFE_ATTR_INIT(&attr);
 
 	if(modify_stacksize)
-		{ SAFE_ATTR_SETSTACKSIZE(&attr, ncam_stacksize); }
+ 		{ SAFE_ATTR_SETSTACKSIZE(&attr, ncam_stacksize); }
 
 	int32_t ret = pthread_create(pthread == NULL ? &temp : pthread, &attr, startroutine, arg);
 	if(ret)
@@ -1188,10 +1206,10 @@ static void process_clients(void)
 	struct s_reader *rdr;
 	struct pollfd *pfd;
 	struct s_client **cl_list;
-	struct timeb start, end;  // start time poll, end time poll
+	struct timeb start, end; // start time poll, end time poll
 	uint32_t cl_size = 0;
 
-	uchar buf[10];
+	uint8_t buf[10];
 
 	if(pipe(thread_pipe) == -1)
 	{
@@ -1209,7 +1227,7 @@ static void process_clients(void)
 	{
 		pfdcount = 1;
 
-		//connected tcp clients
+		// connected tcp clients
 		for(cl = first_client->next; cl; cl = cl->next)
 		{
 			if(cl->init_done && !cl->kill && cl->pfd && cl->typ == 'c' && !cl->is_udp)
@@ -1307,7 +1325,6 @@ static void process_clients(void)
 				}
 			}
 
-
 			//reader
 			// either an ecm answer, a keepalive or connection closed from a proxy
 			// physical reader ('r') should never send data without request
@@ -1334,7 +1351,6 @@ static void process_clients(void)
 					add_job(cl2, ACTION_READER_REMOTE, NULL, 0);
 				}
 			}
-
 
 			//server sockets
 			// new connection on a tcp listen socket or new message on udp listen socket
@@ -1391,7 +1407,6 @@ static void *reader_check(void)
 				restart_cardreader(rdr, 1);
 			}
 		}
-
 		cs_readlock(__func__, &readerlist_lock);
 		for(rdr = first_active_reader; rdr; rdr = rdr->next)
 		{
@@ -1445,7 +1460,6 @@ static void * card_poll(void) {
 #ifdef WEBIF
 static pid_t pid;
 
-
 static void fwd_sig(int32_t sig)
 {
 	kill(pid, sig);
@@ -1455,15 +1469,14 @@ static void restart_daemon(void)
 {
 	while(1)
 	{
-
-		//start client process:
+		// start client process:
 		pid = fork();
 		if(!pid)
-			{ return; } //client process=ncam process
+			{ return; } // client process=ncam process
 		if(pid < 0)
 			{ exit(1); }
 
-		//set signal handler for the restart daemon:
+		// set signal handler for the restart daemon:
 		set_signal_handler(SIGINT, 3, fwd_sig);
 #if defined(__APPLE__)
 		set_signal_handler(SIGEMT, 3, fwd_sig);
@@ -1478,7 +1491,7 @@ static void restart_daemon(void)
 		set_signal_handler(SIGPIPE , 0, SIG_IGN);
 		set_signal_handler(NCAM_SIGNAL_WAKEUP, 0, SIG_IGN);
 
-		//restart control process:
+		// restart control process:
 		int32_t res = 0;
 		int32_t status = 0;
 		do
@@ -1493,11 +1506,11 @@ static void restart_daemon(void)
 		while(res != pid);
 
 		if(cs_restart_mode == 2 && WIFSIGNALED(status) && WTERMSIG(status) == SIGSEGV)
-			{ status = 99; } //restart on segfault!
+			{ status = 99; } // restart on segfault!
 		else
 			{ status = WEXITSTATUS(status); }
 
-		//status=99 restart ncam, all other->terminate
+		// status=99 restart ncam, all other->terminate
 		if(status != 99)
 		{
 			exit(status);
@@ -1571,6 +1584,9 @@ const struct s_cardsystem *cardsystems[] =
 {
 #ifdef READER_NAGRA
 	&reader_nagra,
+#endif
+#ifdef READER_NAGRA_MERLIN
+	&reader_nagracak7,
 #endif
 #ifdef READER_IRDETO
 	&reader_irdeto,
@@ -1663,13 +1679,15 @@ const struct s_cardreader *cardreaders[] =
 #ifdef WITH_EMU
 	&cardreader_emu,
 #endif
+
 	NULL
 };
 
 static void find_conf_dir(void)
 {
 	static const char* confdirs[] =
-		{	"/etc/tuxbox/config/",
+		{
+			"/etc/tuxbox/config/",
 			"/etc/tuxbox/config/ncam/",
 			"/var/tuxbox/config/",
 			"/usr/keys/",
@@ -1677,7 +1695,11 @@ static void find_conf_dir(void)
 			"/var/etc/ncam/",
 			"/var/etc/",
 			"/var/ncam/",
+			"/etc/ncam/",
 			"/config/ncam/",
+#ifdef WITH_WI
+			"/data/plugin/ncam/",
+#endif
 			NULL
 		};
 
@@ -1698,7 +1720,7 @@ static void find_conf_dir(void)
 		if(snprintf(conf_file, sizeof(conf_file), "%sncam.conf", confdirs[i]) < 0)
 			{ return; }
 
-		if (!access(conf_file, F_OK)) 
+		if (!access(conf_file, F_OK))
 		{
 			cs_strncpy(cs_confdir, confdirs[i], sizeof(cs_confdir));
 			return;
@@ -1808,6 +1830,7 @@ int32_t main(int32_t argc, char *argv[])
 	init_cache();
 	cacheex_init_hitcache();
 	init_config();
+	init_cw_cache();
 	cs_init_log();
 	init_machine_info();
 	init_check();
@@ -1879,7 +1902,7 @@ int32_t main(int32_t argc, char *argv[])
 		}
 	}
 
-	//set time for server to now to avoid 0 in monitor/webif
+	// set time for server to now to avoid 0 in monitor/webif
 	first_client->last = time((time_t *)0);
 
 	webif_init();
@@ -1920,11 +1943,12 @@ int32_t main(int32_t argc, char *argv[])
 	SAFE_COND_SIGNAL(&reader_check_sleep_cond); // Stop reader_check thread
 
 	// Cleanup
+#ifdef MODULE_GBOX
+if(!cfg.gsms_dis)
+	{ stop_sms_sender(); }
+#endif
 #ifdef WITH_EMU
 	stop_stream_server();
-#endif
-#ifdef MODULE_GBOX
-	stop_sms_sender();
 #endif
 	webif_close();
 	azbox_close();
@@ -1944,7 +1968,7 @@ int32_t main(int32_t argc, char *argv[])
 	save_emmstat_to_file();
 
 	cccam_done_share();
-	gbox_send_good_night(); 
+	gbox_send_good_night();
 
 	kill_all_clients();
 	kill_all_readers();

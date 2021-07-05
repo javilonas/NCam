@@ -20,17 +20,30 @@
 export INIT_TIME=`date +'%d/%m/%y %H:%M:%S'`
 export START_TIME=`date +%s`
 export TIME_LOG=`date +%Y%m%d_%H%M`
-export ROOTFS_PATH=/home/*/NCam
+export user=`id -g -n`
+export ROOTFS_PATH=/home/$user/NCam
 export PARCH_LOGS=$ROOTFS_PATH/build_dir/logs
 export ARCH=mips
 export target=mips
 export NCAM_BIN=ncam-router-OpenWrt-brcm47xx.mips
-export CROSS=$ROOTFS_PATH/cross/OpenWrt-SDK-15.05-brcm47xx-generic_gcc-4.8-linaro_uClibc-0.9.33.2.Linux-x86_64/staging_dir/toolchain-mipsel_mips32_gcc-4.8-linaro_uClibc-0.9.33.2/bin/mipsel-openwrt-linux-uclibc-
+export CROSS=$ROOTFS_PATH/cross/Toolchain-openwrt1505cc/bin/mips-openwrt-linux-uclibc-
+export CC=$ROOTFS_PATH/cross/Toolchain-openwrt1505cc/bin/mips-openwrt-linux-uclibc-gcc
+export RANLIB=$ROOTFS_PATH/cross/Toolchain-openwrt1505cc/bin/mips-openwrt-linux-uclibc-ranlib
 export DCMAKE=cross-mipsel-routerwrtbrcm47xx-linux-uclibc
 export SCRIPT=build_mips-router-openwrt-brcm47xx.sh
 
-export LIB_PTHREAD="$ROOTFS_PATH/cross/OpenWrt-SDK-15.05-brcm47xx-generic_gcc-4.8-linaro_uClibc-0.9.33.2.Linux-x86_64/staging_dir/toolchain-mipsel_mips32_gcc-4.8-linaro_uClibc-0.9.33.2/lib/libpthread.a -lrt"
-export PATH=$PATH:~$ROOTFS_PATH/cross/OpenWrt-SDK-15.05-brcm47xx-generic_gcc-4.8-linaro_uClibc-0.9.33.2.Linux-x86_64/staging_dir/toolchain-mipsel_mips32_gcc-4.8-linaro_uClibc-0.9.33.2/bin
+export EXTRA_LIBS="-lrt"
+
+export OPENSSLDIR=$ROOTFS_PATH/cross/Toolchain-openwrt1505cc/mips-openwrt-linux-uclibc/sys-include/openssl/
+
+export LIB_RT="$ROOTFS_PATH/cross/Toolchain-openwrt1505cc/mips-openwrt-linux-uclibc/lib/librt.a -lrt"
+export LIB_PTHREAD="$ROOTFS_PATH/cross/Toolchain-openwrt1505cc/mips-openwrt-linux-uclibc/lib/libpthread.a -lrt"
+export LIBCRYPT="$ROOTFS_PATH/cross/Toolchain-openwrt1505cc/mips-openwrt-linux-uclibc/lib/libcrypt.a -lrt"
+
+export LIBCRYPTO="$ROOTFS_PATH/cross/Toolchain-openwrt1505cc/mips-openwrt-linux-uclibc/lib/libcrypto.a -lrt"
+export LIB_SSL="$ROOTFS_PATH/cross/Toolchain-openwrt1505cc/mips-openwrt-linux-uclibc/lib/libssl.a -lrt"
+
+export PATH=$PATH:~$ROOTFS_PATH/cross/Toolchain-openwrt1505cc/bin/
 export STAGING_DIR=~/openwrt/staging_dir
 
 # BEGIN THE LOG
@@ -62,7 +75,12 @@ echo ""
 echo ""
 rm -f $ROOTFS_PATH/Distribution/$NCAM_BIN > /dev/null 2>&1
 rm -f $ROOTFS_PATH/Distribution/$NCAM_BIN.debug > /dev/null 2>&1
-sh ./clean_all.sh > /dev/null 2>&1
+rm -f $ROOTFS_PATH/webif/pages_gen $ROOTFS_PATH/webif/pages.dep $ROOTFS_PATH/webif/pages.bin $ROOTFS_PATH/webif/pages.bin.compressed \
+      $ROOTFS_PATH/webif/pages.h $ROOTFS_PATH/webif/pages.c $ROOTFS_PATH/webif/is_defined.txt > /dev/null 2>&1
+echo ""
+cd $ROOTFS_PATH/webif
+make clean > /dev/null 2>&1
+cd ..
 sleep 0.8s
 sync
 echo " Cleaning performed correctly"

@@ -1,4 +1,4 @@
-prefix=/home/lonas/android-toolchain/sysroot/usr
+prefix=/home/lonas/NCam/cross/android-toolchain/sysroot/usr
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include

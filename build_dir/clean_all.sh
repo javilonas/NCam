@@ -16,10 +16,14 @@
 # limitations under the License.
 #
 
-export ROOTFS_PATH=/home/*/NCam
+export user=`id -g -n`
+export ROOTFS_PATH=/home/$user/NCam
 export PARCH_LOGS=$ROOTFS_PATH/build_dir/logs
+export DISTRI=$ROOTFS_PATH/Distribution
+export NCAM_BIN=ncam*
 export SCRIPT=clean_all.sh
 echo ""
+
 rm -r $ROOTFS_PATH/build/* > /dev/null 2>&1
 rm -f ncam.mips > /dev/null 2>&1
 rm -f ncam.mips.debug > /dev/null 2>&1
@@ -81,7 +85,12 @@ rm -f ncam-router-openwrt-brcm63xx-libusb.mips > /dev/null 2>&1
 rm -f ncam-router-openwrt-brcm63xx-libusb.mips.debug > /dev/null 2>&1
 rm -f ncam.arm-mca > /dev/null 2>&1
 rm -f ncam.arm-mca.debug > /dev/null 2>&1
+rm -f $ROOTFS_PATH/webif/pages_gen $ROOTFS_PATH/webif/pages.dep $ROOTFS_PATH/webif/pages.bin $ROOTFS_PATH/webif/pages.bin.compressed \
+      $ROOTFS_PATH/webif/pages.h $ROOTFS_PATH/webif/pages.c $ROOTFS_PATH/webif/is_defined.txt > /dev/null 2>&1
 echo ""
+cd $ROOTFS_PATH/webif
+make clean > /dev/null 2>&1
+cd ..
 make clean > /dev/null 2>&1
 mkdir $ROOTFS_PATH/build > /dev/null 2>&1
 echo ""
@@ -103,7 +112,11 @@ echo ""
 sleep 0.8s
 echo ""
 echo ""
-sh clean_distri.sh > /dev/null 2>&1
+cd $DISTRI/
+rm -f $NCAM_BIN > /dev/null 2>&1
+cd ..
+chmod 755 $ROOTFS_PATH/build_dir/clean_distri.sh > /dev/null 2>&1
+sh $ROOTFS_PATH/build_dir/clean_distri.sh > /dev/null 2>&1
 sync
 echo " Clean all!!"
 

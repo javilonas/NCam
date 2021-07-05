@@ -1,0 +1,296 @@
+0. Turning on auto vectorization 
+==================================================
+
+ To switch on auto vec for the compiler, the following options should
+ be given:
+
+   -mmrvl-use-iwmmxt -ftree-vectorize -O2 (or -O3)
+
+ To view the detailed optimization information, use the additional options:
+
+   -ftree-vectorizer-verbose=3
+
+
+================================================================================
+1. Hint: use loop local variable instead of long-live variable to access array
+
+  The following code snippet is from jpeg:
+
+    >>>  for( k=0, i=1; i<17; i++ ){
+    >>>       L=(int)pHuffBits[i-1];
+    >>>       for (j = 1; j <= L; j++){
+    >>>           huffsize[k++] = (Ipp8u) i;
+    >>>       }
+    >>>  }
+
+  To make it clearer, rewrite it into:
+
+    <A>  int L, i, k, j;
+    <A>  for( k=0, i=1; i<17; i++ )
+    <A>    {
+    <A>      L = array2[ i - 1 ];
+    <A>      for( j=1; j<=L; j++ )
+    <A>        {
+    <A>          array[ ++k ] = i;
+    <A>        }
+    <A>    }
+
+  To enable auto vectorization, rewrite the above into:
+
+    <B>  int L, i, k, j;
+    <B>  for( k=0, i=1; i<17; i++ )
+    <B>    {
+    <B>      L = array2[ i - 1 ];
+    <B>      for( j=1; j<=L; j++ )
+    <B>        {
+    <B>          array[ j + k - 1 ] = i;
+    <B>        }
+    <B>      k += L;
+    <B>    }
+
+  The difference between the above two codes is that for <A>,
+  "array[++k]" references "k", which outlives this inner loop (the
+  inner loop is executed for 16 times from the outer loop, and k is
+  alive for these times).
+  
+  While in <B>, "j+k-1" is an expression whose live time is defined by
+  the inner loop (j is an induction variable, (k-1) is (inner)loop
+  invariant)
+    
+
+================================================================================
+2. Hint: use same data type in a single loop
+
+2.1. For the following codes from jpeg:
+
+    >>>  for (j=0; j<17; j++) {
+    >>>      pTable->mincodeptr[j] = 0;       
+    >>>      pTable->maxcode[j] = 0;
+    >>>  }
+    >>>
+
+  The above 2 assignment statements have different vec types thus 2
+  different vec factor, however a single loop can only be vectorized
+  using one vect factor, so the above case cannot be vectorized.
+
+  To enable above vectorizatio, you can transform the above into:
+
+    >>>  for (j=0; j<17; j++) {
+    >>>      pTable->maxcode[j] = 0;
+    >>>  }
+    >>>
+    >>>  for (j=0; j<17; j++) {
+    >>>      pTable->mincodeptr[j] = 0;
+    >>>  }
+
+2.2. For the following codes from jpeg:
+
+    >>>  while (p<i) {
+    >>>      pTable->huffVal[p] = pHuffValue[p];
+    >>>      p++;
+    >>>  }
+
+    The above "pTable->huffVal[p]" is of type IPP16u while pHuffValue
+    is of type IPP8u. 
+
+    So far, for the above example, there is no viable workaround.
+
+
+================================================================================
+3. Hint: use simple object reference
+
+  For the following codes
+
+  >>>  #define FLUSH_STREAM(pStream, fStreamFlush, pStreamHandle, len) \
+  >>>  { \
+  >>>      int byteWritten, ti;\
+  >>>      int availBytes = (pStream)->pBsCurByte - (pStream)->pBsBuffer;\
+  >>>      int minLen     = (len)-((pStream)->bsByteLen - ((pStream)->pBsCurByte - (pStream)->pBsBuffer));\
+  >>>      byteWritten = fStreamFlush((pStream)->pBsBuffer, pStreamHandle, availBytes, 0);\
+  >>>      if(minLen>byteWritten){\
+  >>>          return IPP_STATUS_STREAMFLUSH_ERR;\
+  >>>      }\
+  >>>      for(ti=0;ti<=availBytes-byteWritten;ti++) {\
+  >>>          (pStream)->pBsBuffer[ti] = (pStream)->pBsBuffer[ti+byteWritten];\
+  >>>      }\
+  >>>      (pStream)->pBsCurByte -= byteWritten;\
+  >>>  }
+
+  In the above loops, data reference analysis for
+  "pStream->pBsBuffer[ti]" will be reported out as "unhandled ref",
+  thus prevents it being processed by the vectorizer. To get around
+  this problem, you can rewrite the above as:
+
+  >>>      Ipp8u * pBuf = &(pStream->pBsBuffer[0]);
+  >>>      for(ti=0;ti<=availBytes-byteWritten;ti++) {
+  >>>          pBuf[ti] = pBuf[ti+byteWritten];
+  >>>      }
+    
+  (The above case though is still not vectorizable because of cross
+  loop iteration dependence mentioned below)
+
+================================================================================
+4. Hint: use "aligned" attribute for array when possible
+  For the following simplest code:
+
+    >>>  extern unsigned char arr1[100];
+    >>>  
+    >>>  extern a;
+    >>>  
+    >>>  int foo()
+    >>>  {
+    >>>    int i;
+    >>>    for( i = 0; i < 100; ++i )
+    >>>      {
+    >>>        arr1[i] = 0;
+    >>>      }
+    >>>  }
+
+  Loop peeling (or loop versioning) will be used by auto vectorizer,
+  which will bloat code size, to overcome such problems, try add
+  "aligned" attribute to the external declaration:
+
+    >>>  extern unsigned char __attribute__((aligned(8))) arr1[100];
+    >>>  
+    >>>  extern a;
+    >>>  
+    >>>  int foo()
+    >>>  {
+    >>>    int i;
+    >>>    for( i = 0; i < 100; ++i )
+    >>>      {
+    >>>        arr1[i] = 0;
+    >>>      }
+    >>>  }
+  
+================================================================================
+5. Issue: auto vected cases for pointers with loop peeling 
+
+   >>> IPPCODECFUN(IppCodecStatus, _ijxSetZero_16s) (Ipp16s * pDst, int len)
+   >>> {
+   >>>     int  i;
+   >>>     Ipp16s pp[len];
+   >>> 
+   >>> 	//_IPP_CHECK_ARG(pDst && len > 0);
+   >>> 
+   >>>     for ( i = 0; i < len; i ++ ) {
+   >>>         pDst[i] = 0;
+   >>> 	}
+   >>> 
+   >>> 	return IPP_STATUS_NOERR;
+   >>> }
+
+  For the above code snippet, the vectorizer will use loop peeling to
+  enable loop vectorizing. The side effect is that code size is bloated.
+  
+  Currently there is no way to specify pointer alignment in GCC, the
+  following is a description from the mailing list of one of the GCC
+  developers:
+  
+     "Unfortunately there's no way to specify alignment attribute of
+     pointers in GCC - the syntax was allowed in the past but not really
+     supported correctly, and then entirely disallowed (by this patch
+     http://gcc.gnu.org/ml/gcc-patches/2005-04/msg02284.html). This issue
+     was discussed in details in these threads:
+     http://gcc.gnu.org/bugzilla/show_bug.cgi?id=20794
+     http://gcc.gnu.org/ml/gcc/2005-03/msg00483.html (and recently came up
+     again also in http://gcc.gnu.org/bugzilla/show_bug.cgi?id=27827#c56).
+     The problem is that "We don't yet implement either attributes on array
+     parameters applying to the array not the pointer, or attributes inside
+     the [] of the array parameter applying to the pointer.  (This is
+     documented in "Attribute Syntax".)" (from the above thread)."
+  
+  So there seems no workaround for this loop peeling problem on pointers now.
+  
+================================================================================
+6. Issue: aliasing issue
+
+6.1. Pointers aliasing prevents vectorization
+     >>>  extern unsigned char arr1[100];
+     >>>  
+     >>>  int foo(unsigned char * p)
+     >>>  {
+     >>>    int i;
+     >>>    for( i = 0; i < 100; ++i )
+     >>>      {
+     >>>        p[ i ] = arr1[ i ];
+     >>>      }
+     >>>  }
+
+     The alias analysis result for "p" and "arr1" is "may_alias",
+     which effective prevents vectorization.
+
+     (To work around this problem, "-fargument-noalias-global" may
+     seems the right way to go, however, it just does not work here,
+     it may be fixed in future versions.)
+
+
+6.2. A more common example:
+
+     >>>  int foo(unsigned char * p, unsigned char * q)
+     >>>  {
+     >>>    int i;
+     >>>    for( i = 0; i < 100; ++i )
+     >>>      {
+     >>>        p[ i ] = q[ i ];
+     >>>      }
+     >>>  }
+
+     ("-fargument-noalias" does not work here)
+
+
+================================================================================
+7. Issue: dependence testing issue
+
+   For the following case from jpeg:
+
+     >>>      Ipp8u * pBuf = &(pStream->pBsBuffer[0]);
+     >>>      for(ti=0;ti<=availBytes-byteWritten;ti++) {
+     >>>          pBuf[ti] = pBuf[ti+byteWritten];
+     >>>      }
+
+   The dependence tester will judge that pBuf[ti] and
+   pBuf[ti+byteWritten] has cross loop dependence relation.
+
+   Currently there is no way to overcome this limitation, even for the
+   following case we know that byteWritten is large than 8: (seems
+   that dependence testing does not know that byteWritten > 8 ):
+
+     >>>      Ipp8u * pBuf = &(pStream->pBsBuffer[0]);
+     >>>      if( byteWritten > 32 )
+     >>>        for(ti=0;ti<=availBytes-byteWritten;ti++) {
+     >>>            pBuf[ti] = pBuf[ti+byteWritten];
+     >>>        }
+
+   The following case works:
+   
+     >>>      Ipp8u * pBuf = &(pStream->pBsBuffer[0]);
+     >>>      for(ti=0;ti<=anything;ti++) {
+     >>>          pBuf[ti] = pBuf[ti+32];
+     >>>      }
+
+   (Because vectorizer knows that difference for (ti) and (ti+32) is
+   larger than the vector factor(8 here))
+
+   
+================================================================================
+8. Issue: straight lines of statements will not be vectorized.
+
+   For the following example:
+
+     >>>  int foo(int i)
+     >>>  {
+     >>>    ...
+     >>>    a1[ i ] = 0
+     >>>    a1[ i + 1 ] = 0;
+     >>>    a1[ i + 2 ] = 0;
+     >>>    a1[ i + 3 ] = 0;
+     >>>    ...
+     >>>  }
+   
+   The assignment to a1 array will not be vectorized, because all of
+   these statements belongs to a same iteration vector.
+
+   In other words, vectorizer will only try to combine statements from
+   different but consecutive loop iteration vectors, statements that
+   belong to same iteration vector will not be combined.

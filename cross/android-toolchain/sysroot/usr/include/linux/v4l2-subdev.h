@@ -20,100 +20,86 @@
 #define __LINUX_V4L2_SUBDEV_H
 #include <linux/ioctl.h>
 #include <linux/types.h>
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
 #include <linux/v4l2-common.h>
 #include <linux/v4l2-mediabus.h>
 enum v4l2_subdev_format_whence {
- V4L2_SUBDEV_FORMAT_TRY = 0,
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
- V4L2_SUBDEV_FORMAT_ACTIVE = 1,
+  V4L2_SUBDEV_FORMAT_TRY = 0,
+  V4L2_SUBDEV_FORMAT_ACTIVE = 1,
 };
 struct v4l2_subdev_format {
- __u32 which;
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
- __u32 pad;
- struct v4l2_mbus_framefmt format;
- __u32 reserved[8];
+  __u32 which;
+  __u32 pad;
+  struct v4l2_mbus_framefmt format;
+  __u32 reserved[8];
 };
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
 struct v4l2_subdev_crop {
- __u32 which;
- __u32 pad;
- struct v4l2_rect rect;
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
- __u32 reserved[8];
+  __u32 which;
+  __u32 pad;
+  struct v4l2_rect rect;
+  __u32 reserved[8];
 };
 struct v4l2_subdev_mbus_code_enum {
- __u32 pad;
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
- __u32 index;
- __u32 code;
- __u32 reserved[9];
+  __u32 pad;
+  __u32 index;
+  __u32 code;
+  __u32 which;
+  __u32 reserved[8];
 };
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
 struct v4l2_subdev_frame_size_enum {
- __u32 index;
- __u32 pad;
- __u32 code;
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
- __u32 min_width;
- __u32 max_width;
- __u32 min_height;
- __u32 max_height;
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
- __u32 reserved[9];
+  __u32 index;
+  __u32 pad;
+  __u32 code;
+  __u32 min_width;
+  __u32 max_width;
+  __u32 min_height;
+  __u32 max_height;
+  __u32 which;
+  __u32 reserved[8];
 };
 struct v4l2_subdev_frame_interval {
- __u32 pad;
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
- struct v4l2_fract interval;
- __u32 reserved[9];
+  __u32 pad;
+  struct v4l2_fract interval;
+  __u32 reserved[9];
 };
 struct v4l2_subdev_frame_interval_enum {
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
- __u32 index;
- __u32 pad;
- __u32 code;
- __u32 width;
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
- __u32 height;
- struct v4l2_fract interval;
- __u32 reserved[9];
+  __u32 index;
+  __u32 pad;
+  __u32 code;
+  __u32 width;
+  __u32 height;
+  struct v4l2_fract interval;
+  __u32 which;
+  __u32 reserved[8];
 };
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
 struct v4l2_subdev_selection {
- __u32 which;
- __u32 pad;
- __u32 target;
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
- __u32 flags;
- struct v4l2_rect r;
- __u32 reserved[8];
+  __u32 which;
+  __u32 pad;
+  __u32 target;
+  __u32 flags;
+  struct v4l2_rect r;
+  __u32 reserved[8];
 };
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
-struct v4l2_subdev_edid {
- __u32 pad;
- __u32 start_block;
- __u32 blocks;
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
- __u32 reserved[5];
- __u8 __user *edid;
-};
+#define v4l2_subdev_edid v4l2_edid
 #define VIDIOC_SUBDEV_G_FMT _IOWR('V', 4, struct v4l2_subdev_format)
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
 #define VIDIOC_SUBDEV_S_FMT _IOWR('V', 5, struct v4l2_subdev_format)
-#define VIDIOC_SUBDEV_G_FRAME_INTERVAL   _IOWR('V', 21, struct v4l2_subdev_frame_interval)
-#define VIDIOC_SUBDEV_S_FRAME_INTERVAL   _IOWR('V', 22, struct v4l2_subdev_frame_interval)
-#define VIDIOC_SUBDEV_ENUM_MBUS_CODE   _IOWR('V', 2, struct v4l2_subdev_mbus_code_enum)
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
-#define VIDIOC_SUBDEV_ENUM_FRAME_SIZE   _IOWR('V', 74, struct v4l2_subdev_frame_size_enum)
-#define VIDIOC_SUBDEV_ENUM_FRAME_INTERVAL   _IOWR('V', 75, struct v4l2_subdev_frame_interval_enum)
+#define VIDIOC_SUBDEV_G_FRAME_INTERVAL _IOWR('V', 21, struct v4l2_subdev_frame_interval)
+#define VIDIOC_SUBDEV_S_FRAME_INTERVAL _IOWR('V', 22, struct v4l2_subdev_frame_interval)
+#define VIDIOC_SUBDEV_ENUM_MBUS_CODE _IOWR('V', 2, struct v4l2_subdev_mbus_code_enum)
+#define VIDIOC_SUBDEV_ENUM_FRAME_SIZE _IOWR('V', 74, struct v4l2_subdev_frame_size_enum)
+#define VIDIOC_SUBDEV_ENUM_FRAME_INTERVAL _IOWR('V', 75, struct v4l2_subdev_frame_interval_enum)
 #define VIDIOC_SUBDEV_G_CROP _IOWR('V', 59, struct v4l2_subdev_crop)
 #define VIDIOC_SUBDEV_S_CROP _IOWR('V', 60, struct v4l2_subdev_crop)
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
-#define VIDIOC_SUBDEV_G_SELECTION   _IOWR('V', 61, struct v4l2_subdev_selection)
-#define VIDIOC_SUBDEV_S_SELECTION   _IOWR('V', 62, struct v4l2_subdev_selection)
-#define VIDIOC_SUBDEV_G_EDID _IOWR('V', 40, struct v4l2_subdev_edid)
-#define VIDIOC_SUBDEV_S_EDID _IOWR('V', 41, struct v4l2_subdev_edid)
-/* WARNING: DO NOT EDIT, AUTO-GENERATED CODE - SEE TOP FOR INSTRUCTIONS */
+#define VIDIOC_SUBDEV_G_SELECTION _IOWR('V', 61, struct v4l2_subdev_selection)
+#define VIDIOC_SUBDEV_S_SELECTION _IOWR('V', 62, struct v4l2_subdev_selection)
+#define VIDIOC_SUBDEV_G_STD _IOR('V', 23, v4l2_std_id)
+#define VIDIOC_SUBDEV_S_STD _IOW('V', 24, v4l2_std_id)
+#define VIDIOC_SUBDEV_ENUMSTD _IOWR('V', 25, struct v4l2_standard)
+#define VIDIOC_SUBDEV_G_EDID _IOWR('V', 40, struct v4l2_edid)
+#define VIDIOC_SUBDEV_S_EDID _IOWR('V', 41, struct v4l2_edid)
+#define VIDIOC_SUBDEV_QUERYSTD _IOR('V', 63, v4l2_std_id)
+#define VIDIOC_SUBDEV_S_DV_TIMINGS _IOWR('V', 87, struct v4l2_dv_timings)
+#define VIDIOC_SUBDEV_G_DV_TIMINGS _IOWR('V', 88, struct v4l2_dv_timings)
+#define VIDIOC_SUBDEV_ENUM_DV_TIMINGS _IOWR('V', 98, struct v4l2_enum_dv_timings)
+#define VIDIOC_SUBDEV_QUERY_DV_TIMINGS _IOR('V', 99, struct v4l2_dv_timings)
+#define VIDIOC_SUBDEV_DV_TIMINGS_CAP _IOWR('V', 100, struct v4l2_dv_timings_cap)
 #endif

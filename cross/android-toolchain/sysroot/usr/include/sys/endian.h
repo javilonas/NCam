@@ -45,14 +45,18 @@
 
 #define __swap16 __builtin_bswap16
 #define __swap32 __builtin_bswap32
-#define __swap64 __builtin_bswap64
+#define __swap64(x) __BIONIC_CAST(static_cast,uint64_t,__builtin_bswap64(x))
 
 /* glibc compatibility. */
 __BEGIN_DECLS
-uint32_t htonl(uint32_t) __pure2;
-uint16_t htons(uint16_t) __pure2;
-uint32_t ntohl(uint32_t) __pure2;
-uint16_t ntohs(uint16_t) __pure2;
+
+#if __ANDROID_API__ >= 21
+uint32_t htonl(uint32_t __x) __attribute_const__ __INTRODUCED_IN(21);
+uint16_t htons(uint16_t __x) __attribute_const__ __INTRODUCED_IN(21);
+uint32_t ntohl(uint32_t __x) __attribute_const__ __INTRODUCED_IN(21);
+uint16_t ntohs(uint16_t __x) __attribute_const__ __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
+
 __END_DECLS
 
 #define htonl(x) __swap32(x)
@@ -64,23 +68,23 @@ __END_DECLS
 #define htonq(x) __swap64(x)
 #define ntohq(x) __swap64(x)
 
-#if __BSD_VISIBLE
+#if defined(__USE_BSD) || defined(__BIONIC__) /* Historically bionic exposed these. */
 #define LITTLE_ENDIAN _LITTLE_ENDIAN
 #define BIG_ENDIAN _BIG_ENDIAN
 #define PDP_ENDIAN _PDP_ENDIAN
 #define BYTE_ORDER _BYTE_ORDER
 
-#define	NTOHL(x) (x) = ntohl((u_int32_t)(x))
-#define	NTOHS(x) (x) = ntohs((u_int16_t)(x))
-#define	HTONL(x) (x) = htonl((u_int32_t)(x))
-#define	HTONS(x) (x) = htons((u_int16_t)(x))
+#define	NTOHL(x) (x) = ntohl(__BIONIC_CAST(static_cast,u_int32_t,(x)))
+#define	NTOHS(x) (x) = ntohs(__BIONIC_CAST(static_cast,u_int16_t,(x)))
+#define	HTONL(x) (x) = htonl(__BIONIC_CAST(static_cast,u_int32_t,(x)))
+#define	HTONS(x) (x) = htons(__BIONIC_CAST(static_cast,u_int16_t,(x)))
 
-#define htobe16 __swap16
-#define htobe32 __swap32
-#define htobe64 __swap64
-#define betoh16 __swap16
-#define betoh32 __swap32
-#define betoh64 __swap64
+#define htobe16(x) __swap16(x)
+#define htobe32(x) __swap32(x)
+#define htobe64(x) __swap64(x)
+#define betoh16(x) __swap16(x)
+#define betoh32(x) __swap32(x)
+#define betoh64(x) __swap64(x)
 
 #define htole16(x) (x)
 #define htole32(x) (x)
@@ -101,6 +105,7 @@ __END_DECLS
 #define le16toh(x) htole16(x)
 #define le32toh(x) htole32(x)
 #define le64toh(x) htole64(x)
-#endif /* __BSD_VISIBLE */
 
-#endif /* _SYS_ENDIAN_H_ */
+#endif
+
+#endif

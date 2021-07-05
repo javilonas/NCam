@@ -30,49 +30,58 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _GETOPT_H_
-#define _GETOPT_H_
+#pragma once
+
+/**
+ * @file getopt.h
+ * @brief The getopt() and getopt_long() functions.
+ */
 
 #include <sys/cdefs.h>
 
-/*
- * GNU-like getopt_long()/getopt_long_only() with 4.4BSD optreset extension.
- * getopt() is declared here too for GNU programs.
- */
-#define no_argument        0
-#define required_argument  1
-#define optional_argument  2
+#include <bits/getopt.h>
+
+/** A `has_arg` value for `struct option`. */
+#define no_argument 0
+/** A `has_arg` value for `struct option`. */
+#define required_argument 1
+/** A `has_arg` value for `struct option`. */
+#define optional_argument 2
 
 struct option {
-	/* name of long option */
-	const char *name;
-	/*
-	 * one of no_argument, required_argument, and optional_argument:
-	 * whether option takes an argument
-	 */
-	int has_arg;
-	/* if not NULL, set *flag to val when option found */
-	int *flag;
-	/* if flag not NULL, value to set *flag to; else return value */
-	int val;
+  /** Name of long option. */
+  const char *name;
+
+  /**
+   * One of `no_argument`, `required_argument`, or `optional_argument`.
+   */
+  int has_arg;
+
+  /** If not NULL, set `*flag` to val when option found. */
+  int* flag;
+
+  /** If `flag` not NULL, the value to assign to `*flag`; otherwise the return value. */
+  int val;
 };
 
 __BEGIN_DECLS
-int	getopt_long(int, char * const *, const char *,
-	const struct option *, int *);
-int	getopt_long_only(int, char * const *, const char *,
-	const struct option *, int *);
-#ifndef _GETOPT_DECLARED
-#define	_GETOPT_DECLARED
-int	 getopt(int, char * const [], const char *);
 
-extern char *optarg;			/* getopt(3) external variables */
-extern int optind, opterr, optopt;
-#endif
+/**
+ * [getopt_long(3)](http://man7.org/linux/man-pages/man3/getopt.3.html) parses command-line options.
+ */
+int getopt_long(int __argc, char* const* __argv, const char* __options, const struct option* __long_options, int* __long_index);
+
+/**
+ * [getopt_long_only(3)](http://man7.org/linux/man-pages/man3/getopt.3.html) parses command-line options.
+ */
+int getopt_long_only(int __argc, char* const* __argv, const char* __options, const struct option* __long_options, int* __long_index);
+
 #ifndef _OPTRESET_DECLARED
-#define	_OPTRESET_DECLARED
-extern int optreset;			/* getopt(3) external variable */
+#define _OPTRESET_DECLARED
+/**
+ * Must be set to 1 to reset the `getopt` functions before scanning a new argument vector.
+ */
+extern int optreset;
 #endif
+
 __END_DECLS
- 
-#endif /* !_GETOPT_H_ */

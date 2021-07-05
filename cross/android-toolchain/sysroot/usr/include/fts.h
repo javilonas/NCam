@@ -35,6 +35,7 @@
 #ifndef	_FTS_H_
 #define	_FTS_H_
 
+#include <sys/cdefs.h>
 #include <sys/types.h>
 
 typedef struct {
@@ -57,8 +58,9 @@ typedef struct {
 #define	FTS_XDEV	0x0040		/* don't cross devices */
 #define	FTS_OPTIONMASK	0x00ff		/* valid user option mask */
 
-#define	FTS_NAMEONLY	0x1000		/* (private) child names only */
-#define	FTS_STOP	0x2000		/* (private) unrecoverable error */
+#define FTS_NAMEONLY 0x1000  /* (private) child names only */
+#define FTS_STOP 0x2000      /* (private) unrecoverable error */
+#define FTS_FOR_FTW 0x4000   /* (private) fts is being called by ftw/nftw */
 	int fts_options;		/* fts_open options, global flags */
 } FTS;
 
@@ -114,12 +116,22 @@ typedef struct _ftsent {
 } FTSENT;
 
 __BEGIN_DECLS
-FTSENT	*fts_children(FTS *, int);
-int	 fts_close(FTS *);
-FTS	*fts_open(char * const *, int,
-	    int (*)(const FTSENT **, const FTSENT **));
-FTSENT	*fts_read(FTS *);
-int	 fts_set(FTS *, FTSENT *, int);
+
+/*
+ * Strictly these functions were available before Lollipop/21, but there was an accidental ABI
+ * breakage in 21 that means you can't write code that runs on current devices and pre-21 devices,
+ * so we break the tie in favor of current and future devices.
+ */
+
+#if __ANDROID_API__ >= 21
+FTSENT* fts_children(FTS* __fts, int __options) __INTRODUCED_IN(21);
+int fts_close(FTS* __fts) __INTRODUCED_IN(21);
+FTS* fts_open(char* const* __path, int __options, int (*__comparator)(const FTSENT** __lhs, const FTSENT** __rhs)) __INTRODUCED_IN(21);
+FTSENT* fts_read(FTS* __fts) __INTRODUCED_IN(21);
+int fts_set(FTS* __fts, FTSENT* __entry, int __options) __INTRODUCED_IN(21);
+#endif /* __ANDROID_API__ >= 21 */
+
+
 __END_DECLS
 
 #endif /* !_FTS_H_ */

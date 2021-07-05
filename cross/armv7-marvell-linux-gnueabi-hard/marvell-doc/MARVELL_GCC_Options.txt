@@ -1,0 +1,562 @@
+Topic:		Marvell-defined options in GCC C/C++ Compiler
+Release:	2013Q2 (gcc version 4.6.4)
+Date:		2013/06
+
+
+    The document describes the command line options of GCC created by Marvell
+in addition to original options.
+
+
+	Default Core Options of Marvell GCC
+	Marvell-defined GCC Options
+	Depreciated Marvell-defined GCC Options
+	Marvell-defined Binutils Features
+
+
+
+
+
+--------------------------------------------------------------------------------
+Default Core Options of Marvell GCC
+--------------------------------------------------------------------------------
+
+
+    The following listing is the basic Marvell's CPU cores:
+
+	-------------- --------- ------- ---------- ---------------
+	CPU Cores      ISA       Thumb   VFP        VFP+SIMD(NEON)
+	-mcpu=         -march=   -mthumb -mfpu=     -mfpu=
+	-------------- --------- ------- ---------- ---------------
+	marvell-pj1    armv5te   THUMB1  vfp        N/A
+	marvell-f      armv5te   THUMB1  vfp        N/A
+	marvell-fv7    armv7-a   THUMB2  vfpv3-d16  N/A
+	marvell-pj4    armv7-a   THUMB2  vfpv3-d16  N/A
+	marvell-pj4b   armv7-a   THUMB2  vfpv3      neon
+	                                 vfpv3-fp16 neon-fp16
+	marvell-pj4c   armv7-a   THUMB2  vfpv3      neon
+	                                 vfpv3-fp16 neon-fp16
+	-------------- --------- ------- ---------- ---------------
+
+    'marvell-pj4c' is only for experiment.
+
+    The Marvell GCC uses the following options to select what features the
+target supports.
+
+	-mcpu=<marvell-...>
+		Specify the target core with its ISA.  It's better to use
+		'-mcpu=<marvell-...>' instead of '-march=<armv5te/armv7-a>'.
+		The latter may not known the new features of Marvell cores.
+
+	-mfpu=<vfp/vfpv3-d16/vfpv3/vfpv3-fp16/neon/neon-fp16>
+		Specify the version of VFP or SIMD(NEON).
+
+	-mfloat-abi=<soft/softfp/hard>
+		'soft' float ABI does not generate VFP instructions, and others
+		do.  For function calls, 'softfp' does not pass floating-point
+		value by VFP registers, but 'hard' may do.  Object files
+		generated with 'soft' and 'softfp' are compatible, but not
+		with 'hard'.
+
+	-mthumb
+		For ARMv5te, enable THUMB1 features; for ARMv7-a, enable THUMB2.
+		Note that THUMB1 and VFP cannot co-work, so it is necessary to
+		use -mfloat-abi=soft to stop generating VFP instruction.
+
+	-mwmmxt
+		If your Marvell Cores support WMMXT feature, this option let
+		GCC generate the WMMXT instructions.  WMMXT and NEON are
+		incompatible.
+
+
+    It's hard to build the Marvell GCC Toolchains by user himself, and use
+the correct options mentioned above.  Marvell provides some pre-built toolchains
+to support different target features.  See the list:
+
+--------------- ------- ----------------- ------------------------------------
+Package         ISA     CPU Core          VFP and ABI
+--------------- ------- ----------------- ------------------------------------
+armv5-*-soft    ARMv5te -mcpu=marvell-f                   -mfloat-abi=soft
+armv5-*-softfp  ARMv5te -mcpu=marvell-f   -mfpu=vfp       -mfloat-abi=softfp
+armv5-*-hard    ARMv5te -mcpu=marvell-f   -mfpu=vfp       -mfloat-abi=hard
+armv7-*-soft    ARMv7-a -mcpu=marvell-pj4                 -mfloat-abi=soft
+armv7-*-softfp  ARMv7-a -mcpu=marvell-pj4 -mfpu=vfpv3-d16 -mfloat-abi=softfp
+armv7-*-hard    ARMv7-a -mcpu=marvell-pj4 -mfpu=vfpv3-d16 -mfloat-abi=hard
+--------------- ------- ----------------- ------------------------------------
+* Note: For BE32(ARMv5te)/BE8(ARMv7-a) package, the prefix is armeb*-*-*.
+
+
+    The armv5-* packages only provide ARM-code run-time and standard C/C++
+libraries.  That is your program may be built as THUMB1-code with '-mthumb'
+options, but linked to the ARM-code libraries.
+
+
+    The armv7-* packages provide the multilib mechanism and provide ARM-code
+and THUMB2-code run-time and standard C/C++ libraries.  Use '-mthumb' option
+to link to the THUMB2-code libraries.
+
+
+    If you are not sure the default core options, you can use 'gcc -v' to 
+check the setting of '--with-cpu', '--with-fpu'  and '--with-float'.  For
+example:
+
+	$ arm-marvell-eabi-gcc -v
+	Using built-in specs.
+	Target: arm-marvell-eabi
+	Configured with: ... --with-cpu=marvell-f
+	                     --with-fpu=vfp
+	                     --with-float=softfp ...
+
+
+    If your Marvell core is not matched, you should select the best similar
+package according to ARMv5te/ARMv7-a and soft/softfp/hard features.  And then
+use '-mcpu=' and '-mfpu=' options to compile the programs.  For example:
+
+	$ arm-marvell-eabi-gcc ... -mcpu=marvell-pj4b -mfpu=neon ...
+
+
+    But you should known that about options does not affect the compiled
+libraries, unless the whole toolchains are re-configured and re-built.
+
+
+
+
+
+--------------------------------------------------------------------------------
+Marvell-defined GCC Options
+--------------------------------------------------------------------------------
+
+-mmarvell-div				(default: off)
+
+    Generate Marvell-defined hardware integer division instructions supported
+    by some Marvell cores instead of calling run-time suport library.
+
+    For example, r1 = r2 / r3, the following co-processor instructions would be
+    emitted according to singed or unsigned integer:
+
+	mrc	p6, 1, r1, c2, c3, 4	@ signed div
+	mrc	p6, 1, r1, c2, c3, 0	@ unsigned div
+
+    Above codes are incompatiable with not-supporting chips and non-Marvell ARM
+    cores.
+
+    This option makes the predefined macro "__hw_int_div__" available.  This
+    may be helpful for assembler coding.  Assembler can use SDIV/UDIV pseudo
+    code instead of MRC code if the under gas is supported by Marvell.  User
+    should note that the predefined macro "__hw_int_div__" is for Marvell-
+    defined hardware integer division instructions, but "__ARM_ARCH_EXT_IDIV__"
+    for ARM-defined ones.
+
+
+
+-mldrd-strd				(default: on for LDRD/STRD is supported)
+
+    Turn on to support ldrd/strd code generation. It works iff architecture is
+    ARMv6t2/ARMv7 in ARM/THUMB mode or ARMv5te in ARM mode.
+
+    The old ABI -mabi=apcs-gnu/atpcs does not require double words at 8-bytes
+    alignment, so -mldrd-strd is useless.
+
+    The AAPCS ABI -mabi=aapcs/aapcs-linux always uses LDRD/STRD to access
+    8-byte-aligned double-word data (e.g. 'long long', 'double', or 'struct'
+    contains them).  But for some stange reasons that the data are not aligned
+    on 8-bytes, you may wish to use -mno-ldrd-strd to avoid generating
+    LDRD/STRD instructions.
+
+    If this option is turned off, the predefined macro "__no_ldrd_strd__" is
+    available.
+
+    If you need to trun it off to solve the non-alignment access problem, you
+    may better check your whole program.  Maybe the initial code (before 'main'
+    function) does not adjust the 'sp' register to the 8-byte boundary.  Or
+    maybe the data layout does not follow the AAPCS ABI.
+
+
+
+-mtune-ldrd				(default: off)
+
+    Tune to generate LDRD/STRD (double word load-stores) instructions over
+    LDM/STM.  For some Marvell's chips, the performacne of LDRD/STRD is better
+    than LDM/STM.  Becasue of the requirement of 8-byte alignment for LDRD/STRD,
+    the compiler may rearrange data aligned at most on 8-byte boundary in order
+    to promote the probability of using them.
+
+    Example 1:
+
+	struct S {
+	  char a[16];
+	};
+
+	struct S a, b;
+
+	void foo() { a = b; }
+
+    Using -mtune-ldrd, the structure 'a' and 'b' are placed on the 8-byte
+    boundary, so the compiler can generate LDRD/STRD insructions instead of
+    LDM/STM to do the memory block coping.
+
+    Example 2:
+
+	memcpy(q, "01234567", 8);
+
+    The const string literal, i.e. "01234567", may be forced to aling 8-byte,
+    so the memory routines, e.g. memcpy, may do a better job by using LDRD/STRD.
+    Moreover, the compiler may inline or expand these routines and use
+    LDRD/STRD.
+
+    Example 3:
+
+	long long q;
+	q = 0x3456789034567890LL;
+
+    The const long long literal, i.e. 0x3456789034567890LL, is divided into two
+    words, and use 2 LDR instructions to load them.  Using -mtune-ldrd, the
+    two-word long long literal is placed on the 8-byte boundary and 1 LDRD
+    instruction is generated to load.
+
+    Because of larger alignment and more LDRD/STRD code numbers, this option
+    may waste code and data space, so is turned off if using -Os.
+
+    Note that some data may be adjusted to align on 8-byte boundary.  If you
+    want to keep the data's natural alignment, e.g. 4-byte alignment, you
+    should do not use this option.  For building Linux or uBoot examples,
+    turning on may corrupt the layout of some arrays which natural
+    4-byte-aligned items come from different objects and are merged by the
+    static linker (i.e ld).
+
+
+
+-mbxret					(default: on)
+
+    Try to use the 'BX LR' instruction for function returns as possible.
+    Marvell cores has tuned it with the hardware return-stack mechanism.
+
+    For example, the original output codes:
+
+	foo:
+		@ function prologue
+		stmfd	sp!, {r3, lr}
+		...
+		@ function epilogue
+		ldmfd	sp!, {r3, pc}
+
+    would becomes:
+
+	foo:
+		@ function prologue
+		stmfd	sp!, {r3, lr}
+		...
+		@ function epilogue
+		ldmfd	sp!, {r3, lr}
+		bx	lr
+
+    This option may increase the code size.  Use -mno-bxret to turn it off.
+
+
+
+-mcond-exec				(default: on)
+
+    Enable conditional execution (CE) instructions, overriding processor
+    specific tune settings, while -mno-cond-exec does the reverse and forces
+    all CE to be avoided.
+
+    If this option is turned off, the predefined macro "__no_cond_exec__" is
+    available.
+
+    Some Marvell cores may get benefits from the pipeline scheduling by
+    avoiding conditional execution.
+
+
+
+-mwmmxt					(default: off)
+
+    Enable IWMMXT feature in Marvell Core.  You'd better use this option
+    instead of -mcpu=xscale/iwmmxt/iwmmxt2.
+
+    If this option is turned on, the predefined macro "__IWMMXT__"、
+    __IWMMXT2__ and "__ARM_WMMX" are available.
+
+
+
+-msched1=ARM_CORE			(default: same as -mcpu=)
+-msched2=ARM_CORE			(default: same as -mcpu=)
+
+    Specify pipeline description in pipeline scheduling staget before (
+    -msched1=) and after (-msched2=) register allocation.  The valid ARM_CORE
+    name is the same with '-mcpu=ARM_CORE' option.
+
+
+
+-mthumb-cbz				(default: off)
+
+    Generate thumb instructions CBZ/CBNZ if possible. So far Marvell chips
+    don't prefer them.
+
+
+
+-mpromote-inline-asm-input-int		(default: on)
+
+    Promote the small integer type, e.g. short, of input operands of the inline
+    asm to the full word-size integer.
+
+	__asm__ ("..." : ... : "r" (short_var) : ... );
+
+    would be converted to:
+
+	__asm__ ("..." : ... : "r" ((int)short_var) : ... );
+
+
+    The default is true.  If turning off, the compiler may do not zero- nor
+    signed-extend the small int to the full one in the general integer
+    register, and the high-part bytes of that register may contain garbage
+    value.
+
+
+
+-mmemcpy-ninsn=N			(default: 4. Internal tunning option.)
+
+    Specify the threshold of inlined memcpy instruction number. If exceeding
+    this threshold, memcpy will take a library call.
+    
+    This internal tunning option affects the MOVE_RATIO value used in the
+    Scalar Reduction of Aggregates (SRA) pass. For example:
+
+        struct S s, *p;
+        s = *p;        // structure copy even though some fields are not used!
+	...
+	s.f2++;
+
+    If the threshold is higher, the compiler may not use memcpy call to do the
+    structure assignment. Instead it may be tuned to the following code:
+
+        s.f1 = p->f1;  // maybe redundant and can be removed latter.
+        s.f2 = p->f2;
+        ...
+	s.f2++;
+
+    The member-wise assignment may be good sometime, e.g. simple structure and
+    removing the redundant assignments,  but the higher the threshold is, the
+    code size and register pressure also may become higher.
+
+    This option may waste code and data space, so is turned off if using -Os.
+
+
+
+-freduce-passed-addressof		(default: off)
+
+    Try to reduce the number of passing &var argument for improving points-to
+    analysis.  For example:
+
+	foo(&local_var);
+
+    If foo does not escape the local_var outside the current function, the
+    compiler may convert it under safety to:
+
+	tmp = local_var;
+	foo(&tmp);
+	local_var = tmp;
+
+    If being lucky, some optimizers may improve the useage of that local
+    variable because of not escaping.
+
+
+
+-fargument-restrict			(default: off)
+
+    Force pointer arguments to be qualified with restrict keyword. For
+    example:
+
+	foo(int* p1, int* p2);
+
+    is converted to:
+
+	foo(int* restrict p1, int* restrict p2);
+
+    So that the compiler can assume the memory blocks pointed to by p1 and
+    p2 are not overlapped and do more advance optimization.
+
+    This option only works for the C language.  This is a dangerous option
+    and works on the whole compilation unit.  Users should use it carefully.
+
+
+
+-floop-post-opt				(default: off)
+
+    Perform some optimizations immediately after RTL-level loop unrolling, such
+    as address forwarding and dead-code elimination.  From the experience of
+    clinpack benchmark, moving some optimization passes early can reduce
+    the data dependences and improve the instruction scheduling finally.
+
+
+
+-falign-arrays=N			(default: 0)
+
+    Align the start of non-local arrays to the next power-of-two greater than or
+    equal to the maximum value of N and their natural alignment.  For example:
+
+	char a1[11];
+	static char a2[22] = { 'a', 'b', ... };
+	void foo() { char a3[33]; ... }
+
+    If N is 17 ~ 32, then a1 and a2 are aligned to 32-byte boundary, but the
+    local stack variable, a3, is not affected by it.
+
+    Sometime it can improve the cache operation performance. E.g. benchmark
+    STREAM with N=32 may be improved on some Marvell's platforms.
+
+    This option may waste data space, so is turned off if using -Os.
+
+
+
+
+
+--------------------------------------------------------------------------------
+Depreciated Marvell-defined GCC Options
+--------------------------------------------------------------------------------
+
+
+
+    The following options are depreciated and will become obsolete (nothing) in
+the next Marvell GCC toolchains (mgcc48x).
+
+
+
+-miwmmxt-use-realign			(default: off)
+
+    Enable IWMMXT Vectorizer using WALIGNR & WALIGNI to support unaligned
+    load.
+
+
+
+-miwmmxt-use-aggressive-realign		(default: off)
+
+    Use optimized realign scheme for IWMMXT vectorizer.
+
+
+
+-mneon-no-always-misalign		(default: on)
+
+    Enable Vectorizer do loop peeling for vectorized loop to avoid unaligned
+    load/store.
+
+
+
+-mfused-mac				(default: off, experiment)
+
+    For VFPv4 or above, generate floating-point fused multiply-add instructions
+    supported by some Marvell cores.
+
+
+
+
+
+--------------------------------------------------------------------------------
+Marvell-defined Binutils Features
+--------------------------------------------------------------------------------
+
+
+
+. Marvell-defined ld option 
+
+	--skip-vendor-check
+		This option will skip vendor information check, so you
+		can link libraries built by different toolchain vendors, like
+		ARM RVCT, successfully.
+
+
+
+. Marvell-defined opcodes
+
+  The following testsuite give you the Marvell-defined opcode list:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+@	Tests for Marvell ALU extersion instructions
+	.text
+	.syntax unified
+	.thumb
+	sdiv r0, r1, r2
+	mrc p6, 1, r0, cr1, cr2, 4
+	sdiv r11, r7, r3
+	mrc p6, 1, r11, cr7, cr3, 4
+
+	.arm
+	sdiv r0, r1, r2
+	mrc p6, 1, r0, cr1, cr2, 4
+	sdiv r11, r7, r3
+	mrc p6, 1, r11, cr7, cr3, 4
+
+	.thumb
+	udiv r1, r2, r3
+	mrc p6, 1, r1, cr2, cr3, 0
+	udiv r10, r6, r2
+	mrc p6, 1, r10, cr6, cr2, 0
+
+	.arm
+	udiv r1, r2, r3
+	mrc p6, 1, r1, cr2, cr3, 0
+	udiv r10, r6, r2
+	mrc p6, 1, r10, cr6, cr2, 0
+
+	.thumb
+	cnt32 r11, r12
+	mrc p6,2,r11, cr12,cr0,0
+	cnt32 r1, r2
+	mrc p6,2,r1, cr2,cr0,0
+	cnt32 r3, r7
+	mrc p6,2,r3, cr7,cr0,0
+
+	.arm
+	cnt32 r11, r12
+	mrc p6,2,r11, cr12,cr0,0
+	cnt32 r1, r2
+	mrc p6,2,r1, cr2,cr0,0
+	cnt32 r3, r7
+	mrc p6,2,r3, cr7,cr0,0
+
+	.thumb
+	bitcnt2 r11, r12, r14
+	mrc p6,2,r11, cr12,cr14,1
+	bitcnt2 r1, r2, r0
+	mrc p6,2,r1, cr2,cr0,1
+	bitcnt2 r3, r7, r7
+	mrc p6,2,r3, cr7,cr7,1
+
+	and3 r0, r14, r8, r9, 7
+	mrc p6, 3, r0, cr14, cr8, 7
+	and3 r4, r2, r12, r13, 1
+	mrc p6, 3, r4, cr2, cr12, 1
+	and3 r14, r7, r0, r1, 3
+	mrc p6, 3, r14, cr7, cr0, 3
+
+	and3one r0, r14, r8, r9, 7
+	mrc p6, 4, r0, cr14, cr8, 7
+	and3one r4, r2, r12, r13, 1
+	mrc p6, 4, r4, cr2, cr12, 1
+	and3one r14, r7, r0, r1, 3
+	mrc p6, 4, r14, cr7, cr0, 3
+
+	mrc p6, 5, r4, cr2, cr3, 7
+	qaddsub r4, r7, r2, r3
+
+	mrc p6, 6, r4, cr2, cr3, 7
+	qdaddsub r4, r7, r2, r3
+	
+	cmp4x4 r14, r7, r7
+	mrc p6, 0, r14, cr7, cr7, 0
+	cmp4x4 r7, r1, r10
+	mrc p6, 0, r7, cr1, cr10, 0
+	cmp4x4 r2, r9, r2
+	mrc p6, 0, r2, cr9, cr2, 0
+	cmp4x4 r3, r2, r15
+	mrc p6, 0, r3, cr2, cr15, 0
+
+	cmp4x4s r7, r1, r10
+	mrc p6, 0, r7, cr1, cr10, 1
+	cmp1x4 r2, r9, r2
+	mrc p6, 0, r2, cr9, cr2, 2
+	cmp1x4s r3, r2, r15
+	mrc p6, 0, r3, cr2, cr15, 3
+	cmp1x3 r2, r9, r2
+	mrc p6, 0, r2, cr9, cr2, 4
+	cmp1x3s r3, r2, r15
+	mrc p6, 0, r3, cr2, cr15, 5
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+

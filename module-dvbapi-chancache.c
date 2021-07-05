@@ -17,7 +17,7 @@ static LLIST *channel_cache;
 void dvbapi_save_channel_cache(void)
 {
 	if(boxtype_is("dbox2")) return; // dont save channelcache on these boxes, they lack resources and will crash!
-	
+
 	if (USE_OPENXCAS) // Why?
 		return;
 
@@ -60,7 +60,7 @@ void dvbapi_save_channel_cache(void)
 void dvbapi_load_channel_cache(void)
 {
 	if(boxtype_is("dbox2")) return; // dont load channelcache on these boxes, they lack resources and will crash!
-	
+
 	if (USE_OPENXCAS) // Why?
 		return;
 
@@ -76,7 +76,7 @@ void dvbapi_load_channel_cache(void)
 		cs_log_dbg(D_TRACE, "dvbapi channelcache can't read from file %s", fname);
 		return;
 	}
-	
+
 	int32_t i = 1;
 	int32_t valid = 0;
 	char *ptr, *saveptr1 = NULL;
@@ -125,7 +125,7 @@ void dvbapi_load_channel_cache(void)
 
 struct s_channel_cache *dvbapi_find_channel_cache(int32_t demux_id, int32_t pidindex, int8_t caid_and_prid_only)
 {
-	struct s_ecmpids *p = &demux[demux_id].ECMpids[pidindex];
+	struct s_ecmpid *p = &demux[demux_id].ECMpids[pidindex];
 	struct s_channel_cache *c;
 	LL_ITER it;
 
@@ -163,7 +163,7 @@ struct s_channel_cache *dvbapi_find_channel_cache(int32_t demux_id, int32_t pidi
 
 int32_t dvbapi_edit_channel_cache(int32_t demux_id, int32_t pidindex, uint8_t add)
 {
-	struct s_ecmpids *p = &demux[demux_id].ECMpids[pidindex];
+	struct s_ecmpid *p = &demux[demux_id].ECMpids[pidindex];
 	struct s_channel_cache *c;
 	LL_ITER it;
 	int32_t count = 0;

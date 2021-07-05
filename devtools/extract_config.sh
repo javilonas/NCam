@@ -2,7 +2,7 @@
 
 if [ "$1" = "" ]
 then
-	echo "Extract NCAm config from NCAm binary"
+	echo "Extract NCam config from NCam binary"
 	echo
 	echo "  Usage: `basename $0` ncam_binary"
 	echo

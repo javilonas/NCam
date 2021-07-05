@@ -40,56 +40,10 @@
 #ifndef _ARPA_NAMESER_COMPAT_
 #define	_ARPA_NAMESER_COMPAT_
 
-#define	__BIND		19950621	/* (DEAD) interface version stamp. */
-
 #include <endian.h>
+#include <sys/cdefs.h>
 
-#ifndef BYTE_ORDER
-#if (BSD >= 199103)
-# include <machine/endian.h>
-#else
-#ifdef __linux__
-# include <endian.h>
-#else
-#define	LITTLE_ENDIAN	1234	/* least-significant byte first (vax, pc) */
-#define	BIG_ENDIAN	4321	/* most-significant byte first (IBM, net) */
-#define	PDP_ENDIAN	3412	/* LSB first in word, MSW first in long (pdp)*/
-
-#if defined(vax) || defined(ns32000) || defined(sun386) || defined(i386) || \
-    defined(MIPSEL) || defined(_MIPSEL) || defined(BIT_ZERO_ON_RIGHT) || \
-    defined(__i386__) || defined(__i386) || defined(__amd64__) || \
-    defined(__x86_64__) || defined(MIPSEL) || defined(_MIPSEL) || \
-    defined(BIT_ZERO_ON_RIGHT) || defined(__alpha__) || defined(__alpha) || \
-    (defined(__Lynx__) && defined(__x86__))
-#define BYTE_ORDER	LITTLE_ENDIAN
-#endif
-
-#if defined(sel) || defined(pyr) || defined(mc68000) || defined(sparc) || \
-    defined(is68k) || defined(tahoe) || defined(ibm032) || defined(ibm370) || \
-    defined(MIPSEB) || defined(_MIPSEB) || defined(_IBMR2) || defined(DGUX) ||\
-    defined(apollo) || defined(__convex__) || defined(_CRAY) || \
-    defined(__hppa) || defined(__hp9000) || \
-    defined(__hp9000s300) || defined(__hp9000s700) || \
-    defined(__hp3000s900) || defined(__hpux) || defined(MPE) || \
-    defined (BIT_ZERO_ON_LEFT) || defined(m68k) || defined(__sparc) ||  \
-    (defined(__Lynx__) && \
-     (defined(__68k__) || defined(__sparc__) || defined(__powerpc__)))
-#define BYTE_ORDER	BIG_ENDIAN
-#endif
-#endif /* __linux */
-#endif /* BSD */
-#endif /* BYTE_ORDER */
-
-#if !defined(BYTE_ORDER) || \
-    (BYTE_ORDER != BIG_ENDIAN && BYTE_ORDER != LITTLE_ENDIAN && \
-    BYTE_ORDER != PDP_ENDIAN)
-	/* you must determine what the correct bit order is for
-	 * your compiler - the next line is an intentional error
-	 * which will force your compiles to bomb until you fix
-	 * the above macros.
-	 */
-  #error "Undefined or invalid BYTE_ORDER";
-#endif
+#define	__BIND		19950621	/* (DEAD) interface version stamp. */
 
 /*
  * Structure for query header.  The order of the fields is machine- and
@@ -100,21 +54,6 @@
 
 typedef struct {
 	unsigned	id :16;		/* query identification number */
-#if BYTE_ORDER == BIG_ENDIAN
-			/* fields in third byte */
-	unsigned	qr: 1;		/* response flag */
-	unsigned	opcode: 4;	/* purpose of message */
-	unsigned	aa: 1;		/* authoritive answer */
-	unsigned	tc: 1;		/* truncated message */
-	unsigned	rd: 1;		/* recursion desired */
-			/* fields in fourth byte */
-	unsigned	ra: 1;		/* recursion available */
-	unsigned	unused :1;	/* unused bits (MBZ as of 4.9.3a3) */
-	unsigned	ad: 1;		/* authentic data from named */
-	unsigned	cd: 1;		/* checking disabled by resolver */
-	unsigned	rcode :4;	/* response code */
-#endif
-#if BYTE_ORDER == LITTLE_ENDIAN || BYTE_ORDER == PDP_ENDIAN
 			/* fields in third byte */
 	unsigned	rd :1;		/* recursion desired */
 	unsigned	tc :1;		/* truncated message */
@@ -127,7 +66,6 @@ typedef struct {
 	unsigned	ad: 1;		/* authentic data from named */
 	unsigned	unused :1;	/* unused bits (MBZ as of 4.9.3a3) */
 	unsigned	ra :1;		/* recursion available */
-#endif
 			/* remaining bytes */
 	unsigned	qdcount :16;	/* number of question entries */
 	unsigned	ancount :16;	/* number of answer entries */

@@ -373,9 +373,9 @@
 /* ===========================
  *			constants
  * =========================== */
-#define CS_VERSION    "5.3"
-#define DATE_BUILD    "05-07-2021"
-#define CS_REVISION   "r2"
+#define CS_VERSION    "5.4"
+#define DATE_BUILD    "04-02-2022"
+#define CS_REVISION   "r1"
 #ifndef CS_SVN_VERSION
 #   define CS_SVN_VERSION "stable"
 #endif

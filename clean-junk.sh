@@ -2,8 +2,7 @@
 #
 #if 0
 # 
-# Copyright (c) 2014 - 2015 Javier Sayago <admin@lonasdigital.com>
-# Contact: javilonas@esp-desarrolladores.com
+# Copyright (c) 2012-2022 Javier Sayago <admin@lonasdigital.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.

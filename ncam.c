@@ -135,7 +135,7 @@ static char *prog_name;
 static char *stb_boxtype;
 static char *stb_boxname;
 
-static uint32_t ncam_stacksize = 0;
+static int32_t ncam_stacksize = 0;
 
 /*****************************************************************************
 		Statics
@@ -154,7 +154,7 @@ static void show_usage(void)
 		printf("%s).\n", info.machine);
 	}
 	printf("\n");
-	printf("Copyright (C) 2012-2021 developed by Javilonas.\n");
+	printf("Copyright (C) 2012-2022 developed by Javilonas.\n");
 	printf("Visit https://www.lonasdigital.com/ for more details.\n\n");
 
 	printf(" ConfigDir  : %s\n", CS_CONFDIR);
@@ -1028,7 +1028,7 @@ static void fix_stacksize(void)
 #ifndef PTHREAD_STACK_MIN
 #define PTHREAD_STACK_MIN 64000
 #endif
-#define NCAM_STACK_MIN PTHREAD_STACK_MIN+32768
+#define NCAM_STACK_MIN ((int32_t)(PTHREAD_STACK_MIN + 32768))
 
 	if(ncam_stacksize < NCAM_STACK_MIN)
 	{
@@ -1039,7 +1039,7 @@ static void fix_stacksize(void)
 			return;
 		}
 
-		ncam_stacksize = (((NCAM_STACK_MIN) / pagesize) + 1) * pagesize;
+		ncam_stacksize = ((NCAM_STACK_MIN) / pagesize + 1) * pagesize;
 	}
 }
 
